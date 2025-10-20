@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block main %}
+    <h1>Mesdames, en Garde !</h1>
+    <p class="subtitle">Découvrez l'escrime, un sport d'élégance et de précision au Cercle de Blois.</p>
+    <div id="carouselTop" class="carousel slide mb-3" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselTop" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselTop" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselTop" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            <button type="button" data-bs-target="#carouselTop" data-bs-slide-to="3" aria-label="Slide 4"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{{ url_for('static', filename='images/escrime_feminin/image1.png') }}" class="d-block mx-auto" alt="Escrimeuses en action dans le gymnase">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ url_for('static', filename='images/escrime_feminin/image2.png') }}" class="d-block mx-auto" alt="Groupe d'escrimeuses posant">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ url_for('static', filename='images/escrime_feminin/image3.png') }}" class="d-block mx-auto" alt="Assaut entre deux escrimeuses">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ url_for('static', filename='images/escrime_feminin/image4.png') }}" class="d-block mx-auto" alt="Portrait de deux escrimeuses souriantes">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselTop" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselTop" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    
+    <section id="presentation">
+            <h2>Un Sport Complet pour le Corps et l'Esprit</h2>
+            <p>
+                Respect et maîtrise de soi sont les maîtres mots de l'escrime. Sport d'opposition, il n'est en aucun cas basé sur la force. L'escrime est une discipline complète qui demande de la vitesse, de la précision et des réflexes.
+            </p>
+            <p>
+                Le jeu est à la pointe de l'épée et vous permet de vous mesurer à vos adversaires dans la plus grande convivialité. Idéal pour l'entretien musculaire, l'escrime vous tonifie et affine votre silhouette : élégance et ligne feront partie de votre quotidien !
+            </p>
+            <ul>
+                <li><strong>Affinez votre silhouette :</strong> Tonifiez votre corps de manière harmonieuse.</li>
+                <li><strong>Développez vos réflexes :</strong> Améliorez votre concentration et votre agilité.</li>
+                <li><strong>Libérez-vous :</strong> Un sport individuel qui se pratique aussi en équipe, dans un esprit convivial.</li>
+            </ul>
+        </section>
+            
+        <section id="informations">
+            <h2>Rejoignez notre Séance Découverte</h2>
+            <p>
+                Pratique féminine de l'escrime, nous proposons une séance réservée uniquement pour les débutantes femmes adultes et adolescentes. Venez découvrir !
+            </p>
+            <div class="info-box">
+                <p><strong>🗓️ Quand ?</strong> Le mercredi de 20h00 à 21h00.</p>
+                <p><strong>📍 Où ?</strong> Salle du gymnase de Cabochon, rue Guynemer à Blois.</p>
+                <p><strong>✉️ Contact :</strong> <a href="mailto:blois.escrime@wanadoo.fr">blois.escrime@wanadoo.fr</a></p>
+                <p><strong>📞 Téléphone :</strong> 02 54 42 26 46</p>
+            </div>
+        </section>
+
+        <section style="text-align: center; margin-top: 40px; margin-bottom: 40px;">
+            <a href="mailto:blois.escrime@wanadoo.fr" class="cta-button">Réservez votre séance d'initiation !</a>
+        </section>
+
+
+    <div id="carouselBottom" class="carousel slide mb-3" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselBottom" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselBottom" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselBottom" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{{ url_for('static', filename='images/escrime_feminin/image5.png') }}" class="d-block mx-auto" alt="Escrimeuses en plein assaut">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ url_for('static', filename='images/escrime_feminin/image6.png') }}" class="d-block mx-auto" alt="Photo de groupe des escrimeuses du cercle">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ url_for('static', filename='images/escrime_feminin/image7.png') }}" class="d-block mx-auto" alt="Autre photo de groupe des participantes">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselBottom" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselBottom" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    <p>
+        C’est l’occasion pour les participantes de s’essayer à la pratique de l’escrime, encadrées par notre Maître d’Armes et par les escrimeuses du Cercle.
+    </p>
+        <img src="{{ url_for('static', filename='images/escrime_feminin/image8.png') }}" class="d-block mx-auto" alt="Article de presse sur l'escrime féminine">
+    <p>article paru dans la Nouvelle République, le 26/10/2008</p>
+    
+{% endblock %}
