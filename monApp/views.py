@@ -17,3 +17,9 @@ def about():
 def contact():
     return render_template("contact.html",title=TITLE+"- Conctact")
 
+@app.route("/escrime-feminin/")
+def escrime_feminin():
+    return render_template("escrime_feminin.html",title=TITLE+"- L'escrime Féminin")
+
+if __name__ == "__main__":
+    app.run()
