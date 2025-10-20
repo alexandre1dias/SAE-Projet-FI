@@ -19,7 +19,7 @@ def contact():
     return render_template("contact.html",title=TITLE+"- Conctact")
 
 #Vues pour le login 
-@app.route ("/login/", methods =("GET","POST" ,))
+@app.route ("/login/", methods =("GET","POST"))
 def login():
     unForm = LoginForm()
     unUser=None
@@ -33,3 +33,6 @@ def login():
             return redirect(next)
     return render_template ("login.html",form=unForm)
 
+
+if __name__ == '__main__':
+        app.run

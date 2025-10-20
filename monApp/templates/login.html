@@ -1,25 +1,26 @@
 {% extends "base.html" %}
 {% block main %}
-<form class="form-horizontal" role="form" method ="POST" action ="{{ url_for ('login') }}">
-    {{ form.hidden_tag() }}
-    <div class ="form-group">
-        <label for="username" class ="col-sm-2 control-label">{{ form.Login.label }}</label >
-        <div class ="col-sm-10">
-            {{ form.Login (size=50, class_="form-control") }}
-        </div >
-    </div >
-
-    <div class ="form-group">
-        <label for="password" class ="col-sm-2 control-label">{{ form.Password.label }}</label >
-        <div class ="col-sm-10">
-        {{ form.Password (size=50, class_ ="form-control ") }}
-        </div >
-    </div >
-
-    <div class ="form-group">
-        <div class ="col-sm-offset-2 col-sm-10">
-            <input class ="btn btn-success" type="submit" value ="Se connecter">
-        </div >
-    </div >
-</form >
+<div class="page-login">
+    <div class="login-container">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="Logo Cercle d'Escrime">
+        </div>
+        
+        <form method="POST" action="" style="width: 100%;">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-group">
+                {{ form.Login(class="form-input", placeholder="EMAIL") }}
+            </div>
+            
+            <div class="form-group">
+                {{ form.password(class="form-input", placeholder="MOT DE PASSE") }}
+            </div>
+            
+            <div class="form-group">
+                {{ form.connecter(class="btn-connecter", value="SE CONNECTER") }}
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
