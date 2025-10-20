@@ -18,6 +18,31 @@ def about():
 def contact():
     return render_template("contact.html",title=TITLE+"- Conctact")
 
+
+@app.route("/escrime-feminin/")
+def escrime_feminin():
+    return render_template("escrime_feminin.html",title=TITLE+"- L'escrime Féminin")
+
+@app.route("/adresse/")
+def adresse():
+    return render_template("adresse.html",title=TITLE+"- Adresse")
+
+@app.route("/horaires/")
+def horaires():
+    return render_template("horaire.html",title=TITLE+"- Horaires")
+
+@app.route("/adhesions/")
+def adhesions():
+    return render_template("adhesion.html",title=TITLE+"- Adhésions")
+
+@app.route("/materiel/")
+def materiel():
+    return render_template("materiel.html",title=TITLE+"- Matériel et tenues")
+
+@app.route("/historique/")
+def historique():
+    return render_template("historique.html",title=TITLE+"- Historique") 
+
 #Vues pour le login 
 @app.route ("/login/", methods =("GET","POST"))
 def login():
@@ -32,7 +57,6 @@ def login():
             next = unForm.next.data or url_for("index",name=unUser.Login)
             return redirect(next)
     return render_template ("login.html",form=unForm)
-
-
-if __name__ == '__main__':
-        app.run
+ 
+if __name__ == "__main__":
+    app.run()
