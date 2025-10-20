@@ -37,5 +37,10 @@ def adhesions():
 def materiel():
     return render_template("materiel.html",title=TITLE+"- Matériel et tenues")
 
+@app.route("/historique/")
+def historique():
+    return render_template("historique.html",title=TITLE+"- Historique") 
+  
 if __name__ == "__main__":
     app.run()
+
