@@ -21,17 +21,17 @@
                             id="auteursDropdown" role="button" data-bs-toggle="dropdown" 
                             aria-expanded="false">Renseignements</a>
                               <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
-                                <li><a class="dropdown-item" 
+                                <li><a class="dropdown-item" href="{{ url_for('adresse') }}"
                                         >Adresse</a>
                                 </li>
-                                <li><a class="dropdown-item"
+                                <li><a class="dropdown-item" href="{{ url_for('horaires') }}"
                                         >Horaires</a>
                                 </li>
                                 
-                                <li><a class="dropdown-item"
+                                <li><a class="dropdown-item" href="{{ url_for('adhesions') }}"
                                         >Adhésions</a>
                                 </li>
-                                <li><a class="dropdown-item"
+                                <li><a class="dropdown-item" href="{{ url_for('materiel') }}"
                                         >Matériel et tenues</a>
                                 </li>
                               </ul>
