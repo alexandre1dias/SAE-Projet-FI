@@ -19,3 +19,9 @@ nav .nav-link {
     height: 80px; 
     width: auto; 
 }
+
+/* Amélioration de la lisibilité des paragraphes */
+#main p {
+    text-align: justify; /* Aligne le texte à gauche et à droite */
+    line-height: 1.6;   /* Augmente l'espace entre les lignes */
+}
