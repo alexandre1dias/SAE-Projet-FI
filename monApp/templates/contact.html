@@ -37,6 +37,21 @@
                 <h2>Nous contacter</h2>
                 <form action="#" method="POST">
                     <div class="mb-3">
+                        <h5 class="mb-2">Choisissez le type de mail</h5>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="mail_type" id="type_question" value="question" checked>
+                            <label class="form-check-label" for="type_question">Question</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="mail_type" id="type_demande" value="demande">
+                            <label class="form-check-label" for="type_demande">Demande</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="mail_type" id="type_signalement" value="signalement">
+                            <label class="form-check-label" for="type_signalement">Signalement</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
                         <input type="text" class="form-control" placeholder="Entrez votre nom" required>
                     </div>
                     <div class="mb-3">
