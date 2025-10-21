@@ -57,6 +57,10 @@ def calendrier():
 def competitions():
     return render_template("competitions.html",title=TITLE+"- Competitions")
 
+@app.route("/competition_view/")
+def competition_view():
+    return render_template("competition_view.html",title=TITLE+"- Competition")
+
 @app.route("/evenement_club/")
 def evenement_club():
     return render_template("evenement_club.html",title=TITLE+"- Evenement du Club")
