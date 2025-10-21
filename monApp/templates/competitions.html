@@ -1,5 +1,7 @@
 {%extends "base.html"%}
-
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
+{% endblock %}
     {%block main%}
         <div class="container py-5">
             <h2 class="text-center mb-5">Listes des prochaines compétitions</h2>
