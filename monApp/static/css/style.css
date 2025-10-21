@@ -2,10 +2,8 @@
     margin-top: 7em;
 }
 
-body {
-    font-family: sans-serif;
-}
 
+/* Pour le nav de base */
 nav{
     background-color: #b82828;
 }
@@ -16,10 +14,12 @@ nav .nav-link {
 }
 
 .navbar-brand img {
-    height: 80px; 
+    height: 65px; 
     width: auto; 
 }
 
+
+/* Page escrime feminin */
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
     filter: invert(1);
@@ -39,6 +39,7 @@ nav .nav-link {
             transition: background-color 0.3s;
 }
 
+/*Pour la page contact*/
 .contact-section {
         padding: 50px 0;
         background-color: #f8f9fa;
@@ -112,3 +113,97 @@ nav .nav-link {
 button[type="submit"] {
     background-color: #b82828;
 }
+
+
+
+/* Page connexion */
+body {
+    font-family: sans-serif; 
+    min-height: 100vh;
+    display: flex;
+}
+
+.page-login {
+    background: #ffffff !important; /* le !important pour forcer la couleur. */ 
+    min-height: 100vh;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    width: 520px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 55px 65px;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    border-radius: 18px;
+    /* background: linear-gradient( rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);*/
+    background: #b82828;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+.logo {
+    margin-bottom: 30px;
+    text-align: center;
+    width: 100%;
+}
+
+.logo img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: white;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.form-input {
+    width: 100%;
+    padding: 15px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: all 0.3s;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+
+.form-input::placeholder {
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+.btn-connecter {
+    width: 100%;
+    padding: 15px;
+    background: white;
+    color: #b82828;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.3);;
+}
+
+.btn-connecter:hover {
+    background: #000000;
+    color: white;
+    box-shadow: 0 5px 15px rgba(239, 83, 80, 0.3);
+}
+p

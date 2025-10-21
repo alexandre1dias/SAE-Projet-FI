@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="page-login">
+    <div class="login-container">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="Logo Cercle d'Escrime">
+        </div>
+        
+        <form method="POST" action="" style="width: 100%;">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-group">
+                {{ form.Login(class="form-input", placeholder="EMAIL") }}
+            </div>
+            
+            <div class="form-group">
+                {{ form.password(class="form-input", placeholder="MOT DE PASSE") }}
+            </div>
+            
+            <div class="form-group">
+                {{ form.connecter(class="btn-connecter", value="SE CONNECTER") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,13 +1,15 @@
 from flask import Flask
-app = Flask(__name__)
+from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap5 import Bootstrap
-Bootstrap(app)
 
+
+app = Flask(__name__)
+Bootstrap(app)
 #Config options-Make sure you created a 'config.py' file.
 app.config.from_object('config')
 
 #Create database connection object
-from flask_sqlalchemy import SQLAlchemy
+
 db = SQLAlchemy()
 db.init_app(app)
 
