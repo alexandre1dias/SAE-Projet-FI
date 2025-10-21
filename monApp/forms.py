@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, PasswordField, SubmitField
+from wtforms import StringField, HiddenField, PasswordField, SubmitField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField
 from wtforms.validators import DataRequired, Email
 
 class LoginForm(FlaskForm):
@@ -7,4 +7,23 @@ class LoginForm(FlaskForm):
     password = PasswordField ('Mot de passe', validators=[DataRequired()])
     next = HiddenField()
     connecter = SubmitField()
+
+class EventForm(FlaskForm):
+    title = StringField('Titre de l\'événement', validators=[DataRequired()])
+    start_date = DateTimeLocalField('Date et heure de début', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
+    end_date = DateTimeLocalField('Date et heure de fin', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
+    category = SelectField('Catégorie', choices=[
+        ('Entraînement', 'Entraînement'),
+        ('Compétition', 'Compétition'),
+        ('Réunion', 'Réunion'),
+        ('Evenement du club', 'Evenement du club')
+    ], validators=[DataRequired()])
+    level = SelectMultipleField('Niveaux concernés', choices=[
+        ('debutant', 'Débutant'),
+        ('intermediaire', 'Intermédiaire'),
+        ('confirme', 'Confirmé'),
+        ('expert', 'Expert')
+    ], validators=[DataRequired()])
+    description = TextAreaField('Description (optionnel)')
+    submit = SubmitField('Ajouter l\'événement')
  

@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
+{% endblock %}
+
 {% block main %}
     <h1>Adhésion</h1>
     <p>Le montant de l’adhésion comprend la licence F.F.E. 2025 – 2026 :</p>
