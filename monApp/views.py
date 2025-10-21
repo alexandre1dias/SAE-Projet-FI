@@ -1,9 +1,10 @@
 from .app import app, db
-from flask import render_template, request,url_for , redirect
+from flask import render_template, request, url_for, redirect, flash
 from config import TITLE
 from flask_login import logout_user, login_user, login_required
-from .forms import LoginForm
-
+from .forms import LoginForm, EventForm
+from flask import jsonify
+#from .models import Event
 
 @app.route("/")
 @app.route("/index/")
@@ -105,5 +106,36 @@ def login():
             return redirect(next)
     return render_template ("login.html",form=unForm)
  
+
+# Route pour ajouter un événement
+@app.route("/add_event/", methods=["GET", "POST"])
+# @login_required # Décommentez cette ligne si vous voulez que seuls les utilisateurs connectés puissent ajouter des événements
+def add_event():
+    form = EventForm()
+    if form.validate_on_submit():
+        new_event = Event(
+            title=form.title.data,
+            start=form.start_date.data,
+            end=form.end_date.data if form.end_date.data else None,
+            description=form.description.data,
+            category=form.category.data,
+            level=", ".join(form.level.data)
+        )
+        db.session.add(new_event)
+        db.session.commit()
+        flash('Événement ajouté avec succès!', 'success') # Vous pouvez afficher un message de succès
+        return redirect(url_for('calendrier'))
+    return render_template("add_event.html", title=TITLE + "- Ajouter un événement", form=form)
+
+#Vue pour Calendrier 
+@app.route('/api/events')
+def get_events():
+    #events = Event.query.all()
+    events_data = []
+    for event in events:
+        events_data.append(event.to_dict())
+    return jsonify(events_data)
+
+
 if __name__ == "__main__":
     app.run()

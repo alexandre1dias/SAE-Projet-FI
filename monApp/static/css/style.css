@@ -207,6 +207,12 @@ body {
     box-shadow: 0 5px 15px rgba(239, 83, 80, 0.3);
 }
 
+/* Style pour le conteneur FullCalendar */
+.fullcalendar-container {
+    min-height: 600px; /* Assure que le calendrier a une hauteur visible */
+}
+
+
 
 /*Page de matériel*/
 .h1-materiel-section {
@@ -251,4 +257,3 @@ body {
 .box-prix .texte-informatif {
     color: #dc3545 !important;
 }
-

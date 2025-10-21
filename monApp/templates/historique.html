@@ -1,5 +1,9 @@
 <!doctype html>
-    {%extends "base.html"%}       
+    {%extends "base.html"%}
+    {% block head_extra %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/timeline.css') }}">
+    {% endblock %}
+
     {%block main%}
             <h1  class="display-4 text-center"><strong>L'HISTOIRE DU CERCLE</strong></h1>
             <img src="../static/images/Logo.png/"  class = "d-block mx-auto mb-4">
