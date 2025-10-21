@@ -48,7 +48,7 @@ def historique():
 def comite_cercle():
     return render_template("comite_cercle.html",title=TITLE+"- Comité directeur du Cercle")
 
-#Vue pour les Evenements 
+#Vues pour les Evenements 
 @app.route("/calendrier/")
 def calendrier():
     return render_template("calendrier.html",title=TITLE+"- Calendrier")
@@ -70,7 +70,7 @@ def reunion():
     return render_template("reunion.html",title=TITLE+"- Reunion")
 
 
-#Vue pour le Profil
+#Vues pour le Profil
 @app.route("/resultat_membre/")
 def resultat_membre():
     return render_template("resultat_membre.html",title=TITLE+"- Résultat du Membre")
@@ -83,15 +83,29 @@ def evenement_membre():
 def parametres():
     return render_template("parametres.html",title=TITLE+"- Paramètres du Membre")
 
-#Vue notification
+#Vues notification
 @app.route("/notifications/")
 def notifications():
     return render_template("notifications.html",title=TITLE+"- Notifications")
 
-#Vue pour Article 
+#Vues pour Article 
 @app.route("/articles/")
 def articles():
     return render_template("articles.html",title=TITLE+"- Articles")
+
+#Vues pour Admin
+@app.route("/gerer_formulaires/")
+def gerer_formulaires():
+    return render_template("gerer_formulaires.html",title=TITLE+"- Géstion des Formulaires")
+
+@app.route("/gerer_profils/")
+def gerer_profils():
+    return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils")
+
+@app.route("/gerer_inscriptions/")
+def gerer_inscriptions():
+    return render_template("gerer_inscriptions.html",title=TITLE+"- Géstion des Inscriptions")
+
 
 
 #Vues pour le login 
