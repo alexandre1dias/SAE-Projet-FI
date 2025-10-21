@@ -38,21 +38,44 @@
                                 </li>
                               </ul>
                         </li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('escrime_feminin') }}">L'escrime feminin</a></li >
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('escrime_feminin') }}">L'escrime feminin</a></li>
+                        
+                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" 
+                            id="auteursDropdown" role="button" data-bs-toggle="dropdown" 
+                            aria-expanded="false">Évènement</a>
+                              <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('calendrier') }}">Calendrier</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('competitions') }}">Compétitions</a></li>
+                                <!-- Reserver aux membres-->
+                                <li><a class="dropdown-item" href="{{ url_for('evenement_club') }}">Évènement du club</a></li>
+                                <!-- Reserver aux membres haut placés -->
+                                <li><a class="dropdown-item" href="{{ url_for('reunion') }}">Réunion</a></li>
+                              </ul>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('articles') }}">Articles</a></li>
                         
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <!-- Menu déroulant pour le à propos-->
-                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" 
-                            id="auteursDropdown" role="button" data-bs-toggle="dropdown" 
-                            aria-expanded="false">A propos</a>
-                              <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="auteursDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">A propos</a>
+                            <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
                                 <li><a class="dropdown-item" href="{{ url_for('historique') }}">Historique</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('comite_cercle')}}">Comite directeur du cercle</a></li>
-                              </ul>
+                            </ul>
                         </li>
+
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Se connecter</a></li >
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Profil</a>
+                            <ul class="dropdown-menu" aria-labelledby="profilDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('resultat_membre') }}">Vos résultat</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('evenement_membre') }}">Vos évènements</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('parametres') }}">Paramètres</a></li>
+                            </ul> 
+                        </li>   
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('notifications') }}">Notifs</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Se connecter</a></li>
                     </ul>
                     </div>
             </div>
