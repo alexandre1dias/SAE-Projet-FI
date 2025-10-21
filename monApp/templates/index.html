@@ -2,5 +2,66 @@
     {%extends "base.html"%}
 
     {%block main%}
-        <h1> L'escrime à Blois ... depuis 1883 </h1>
+    <header>
+        <div class="header-content">
+            <h2 class="h2acc">L'escrime à Blois... depuis 1883</h2>
+            <div class="lineH"></div>
+            <h1 class="h1acc"> Entrez dans notre histoire </h1>
+            <br>
+            <a href="/historique/" class="ctn"> Voir notre histoire </a>
+        </div>
+    </header>
+
+    
+    <section class = "explore">
+        <div class="explore-content">
+            <h1>C'était la Fête du Sport à Blois… </h1>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi itaque quaerat consequuntur, aliquam doloribus quod autem consequatur, in totam repellat, qui doloremque incidunt neque accusantium porro possimus nisi perferendis iusto?</p>
+        </div>
+        <div class="explore-col">
+            <video controls="" src="../static/video/Fete-du-Sport-Blois-2025-2.mp4"></video>
+        </div>
+    </section>
+
+    <section>
+        <div class= "title">
+            <h1> Les derniers articles </h1>
+            <div class = "line"></div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <img src="" alt="">
+                <a href="">Critérium Départemental Épée mixte Blois 21/06/2025</a>
+                <p>  </p>
+                <a href="">Critérium Départemental Épée mixte Blois 21/06/2025</a>
+                <p>  </p>
+                <a href="">Critérium Départemental Épée mixte Blois 21/06/2025</a>
+            </div>
+            <div class="col">
+                <img src="" alt="">
+                <a href="/article/" class="btn btn-article">Voir les articles récents</a>
+            </div>
+        </div>
+    </section>
+        <section>
+        <div class= "title">
+            <h1>Les dernières compétitions</h1>
+            <div class = "line"></div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <img src="" alt="">
+                <a href="">Critérium Départemental Épée mixte Blois 21/06/2025</a>
+                <p>  </p>
+                <a href="">Critérium Départemental Épée mixte Blois 21/06/2025</a>
+                <p>  </p>
+                <a href="">Critérium Départemental Épée mixte Blois 21/06/2025</a>
+            </div>
+            <div class="col">
+                <img src="" alt="">
+                <a href="/article/" class="btn btn-article">Voir les competitions récentes</a>
+            </div>
+        </div>
+    </section>
+
     {% endblock %}

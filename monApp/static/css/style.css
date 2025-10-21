@@ -1,3 +1,9 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 #main{
     margin-top: 7em;
 }
@@ -114,12 +120,160 @@ button[type="submit"] {
     background-color: #b82828;
 }
 
+/* Page d'Acceuil */
 
+header{
+    width: 100%;
+    height: 70vh;
+    background-image: url(../images/acceuil/headerbg2.jpg);
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.header-content{
+    margin-bottom: 150px;
+    color: whitesmoke;
+    text-align: center;
+}
+
+.header-content h2{
+    font-size: 4vmin;
+    background-color: #b82828;
+}
+
+.h1acc{
+    font-size: 7vmin;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    background-color: rgba(184, 40, 40, 0.8);
+    padding: 15px 40px;
+    border-radius: 50px;
+    display: inline-block;
+    backdrop-filter: blur(5px);  
+}
+
+.h2acc{
+    font-size: 4vmin;
+    background-color: rgba(184, 40, 40, 0.8); /* Semi-transparent */
+    padding: 10px 30px;
+    border-radius: 50px;
+    display: inline-block;
+    backdrop-filter: blur(5px); /* Effet de flou moderne */
+}
+
+.lineH{
+    width: 300px;
+    height: 4px;
+    background: #ffffff;
+    margin: 10px auto;
+    border-radius: 5px;
+}
+
+.line{
+    width: 150px;
+    height: 4px;
+    background: #000000;
+    margin: 10px auto;
+    border-radius: 5px;
+}
+
+.header-content h1{
+    font-size: 7vmin;
+    margin-top: 50px;
+    
+    margin-bottom: 30px;
+}
+
+.ctn{
+    padding: 8px 15px;
+    background: #b82828;
+    border-radius: 30px;
+    color: whitesmoke;
+    margin-top: 30px;
+}
+
+/* Acceuil Blocs */
+
+section{
+    width: 80%;
+    margin: 80px auto;
+}
+
+.title{
+    text-align: center;
+    font-size: 4vmin;
+    color: #b82828;
+}
+
+.btn-article{
+    width: 100%;
+    padding: 15px;
+    background: #b82828;
+    color: #ffffff;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.3);;
+}
+
+.btn-article:hover {
+    background: #000000;
+    color: white;
+    box-shadow: 0 5px 15px rgba(239, 83, 80, 0.3);
+}
+
+.explore{
+    width: 100%;
+    height: 80vh;
+   /* background-image: ;*/
+   background-position: center;
+   background-size: cover;
+   background-repeat: no-repeat;
+   display: flex;
+   align-items: center;
+}
+
+.explore-content{
+    width: 50%;
+    padding: 50px;
+    color: rgb(5, 0, 0);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.explore-content h1{
+    font-size: 7vmin;
+    margin: 50px;
+}
+
+.explore-content p{
+    color: rgb(2, 0, 0);
+}
+
+.explore-col{
+    height: 250px;
+    width: 500px;
+}
+
+.explore-col video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Pour garder les proportions */
+    border-radius: 10px; /* Optionnel : coins arrondis */
+}
 
 /* Page connexion */
 body {
     font-family: sans-serif; 
-    min-height: 100vh;
     display: flex;
 }
 
