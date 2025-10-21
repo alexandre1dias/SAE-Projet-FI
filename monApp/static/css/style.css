@@ -207,6 +207,8 @@ body {
     box-shadow: 0 5px 15px rgba(239, 83, 80, 0.3);
 }
 
+
+/*Page de matériel*/
 .h1-materiel-section {
     background: transparent;
     color: rgb(0, 0, 0);
@@ -249,3 +251,4 @@ body {
 .box-prix .texte-informatif {
     color: #dc3545 !important;
 }
+
