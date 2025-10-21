@@ -43,6 +43,10 @@ def materiel():
 def historique():
     return render_template("historique.html",title=TITLE+"- Historique") 
 
+@app.route("/comite_cercle/")
+def comite_cercle():
+    return render_template("comite_cercle.html",title=TITLE+"- Comité directeur du Cercle")
+
 #Vues pour le login 
 @app.route ("/login/", methods =("GET","POST"))
 def login():
