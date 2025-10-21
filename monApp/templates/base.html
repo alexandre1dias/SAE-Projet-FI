@@ -74,7 +74,17 @@
                                 <li><a class="dropdown-item" href="{{ url_for('parametres') }}">Paramètres</a></li>
                             </ul> 
                         </li>   
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('notifications') }}">Notifs</a></li>
+                        <!-- Menu de l'admin - Visible uniquement par un compte admin -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Menu Admin</a>
+                            <ul class="dropdown-menu" aria-labelledby="profilDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('gerer_formulaires') }}">Gérer Formulaires</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('gerer_profils') }}">Gérer Profils</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('gerer_inscriptions') }}">Gérer Inscriptions</a></li>
+                            </ul> 
+                        </li>   
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('notifications') }}" class="btn btn-custom">
+                                <img src="../static/images/cloche.png" class="cloche-icone" alt="Notifications"/></a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Se connecter</a></li>
                     </ul>
                     </div>
