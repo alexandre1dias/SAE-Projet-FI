@@ -19,10 +19,14 @@ class EventForm(FlaskForm):
         ('Evenement du club', 'Evenement du club')
     ], validators=[DataRequired()])
     level = SelectMultipleField('Niveaux concernés', choices=[
-        ('debutant', 'Débutant'),
-        ('intermediaire', 'Intermédiaire'),
-        ('confirme', 'Confirmé'),
-        ('expert', 'Expert')
+        ('M9', 'M9'),
+        ('M11', 'M11'),
+        ('M13', 'M13'),
+        ('M15', 'M15'),
+        ('M17', 'M17'),
+        ('M20', 'M20'),
+        ('Senior', 'Senior'),
+        ('Veteran', 'Veteran')
     ], validators=[DataRequired()])
     description = TextAreaField('Description (optionnel)')
     submit = SubmitField('Ajouter l\'événement')
