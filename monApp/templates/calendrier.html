@@ -3,6 +3,82 @@
 {%block main%}
 <div class="container py-5">
     <h1 class="text-center mb-5">Calendrier des Évènements</h1>
+            <div class="d-flex flex-wrap gap-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="competition3" id="type-competition3" checked>
+                    <label class="form-check-label" for="type-competition3">compétition</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="reunion3" id="type-reunion3" checked>
+                    <label class="form-check-label" for="type-reunion3">réunion</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="eventclub3" id="type-eventclub3" checked>
+                    <label class="form-check-label" for="type-eventclub3">évènement du club</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="entrainement3" id="type-entrainement3" checked>
+                    <label class="form-check-label" for="type-entrainement3">entrainement</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="homme3" id="type-homme3" checked>
+                    <label class="form-check-label" for="type-homme3">homme</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="femme3" id="type-femme3" checked>
+                    <label class="form-check-label" for="type-femme3">femme</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="regional3" id="type-regional3" checked>
+                    <label class="form-check-label" for="type-regional3">régional</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="national3" id="type-national3" checked>
+                    <label class="form-check-label" for="type-national3">national</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="epee3" id="type-epee3" checked>
+                    <label class="form-check-label" for="type-epee3">épée</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="fleuret3" id="type-fleuret3" checked>
+                    <label class="form-check-label" for="type-fleuret3">fleuret</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="sabre3" id="type-sabre3" checked>
+                    <label class="form-check-label" for="type-sabre3">sabre</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="M93" id="type-M93" checked>
+                    <label class="form-check-label" for="type-M93">M9</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="M113" id="type-M113" checked>
+                    <label class="form-check-label" for="type-M113">M11</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="M133" id="type-M133" checked>
+                    <label class="form-check-label" for="type-M133">M13</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="M153" id="type-M153" checked>
+                    <label class="form-check-label" for="type-M153">M15</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="M173" id="type-M173" checked>
+                    <label class="form-check-label" for="type-M173">M17</label>
+                </div><div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="M203" id="type-M203" checked>
+                    <label class="form-check-label" for="type-M203">M20</label>
+                </div><div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="senior3" id="type-senior3" checked>
+                    <label class="form-check-label" for="type-senior3">sénior</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="veteran3" id="type-veteran3" checked>
+                    <label class="form-check-label" for="type-veteran3">vétéran</label>
+                </div>
+            </div>
     <p class="text-center mb-4">
         <a href="{{ url_for('add_event') }}" class="btn btn-primary">Ajouter un événement</a>
     </p>
