@@ -161,14 +161,14 @@ def add_event():
         return redirect(url_for('calendrier'))
     return render_template("add_event.html", title=TITLE + "- Ajouter un événement", form=form)
 
-#Vue pour Calendrier 
-@app.route('/api/events')
-def get_events():
-    #events = Event.query.all()
-    events_data = []
-    for event in events:
-        events_data.append(event.to_dict())
-    return jsonify(events_data)
+##Vue pour Calendrier 
+#@app.route('/api/events')
+#def get_events():
+#    #events = Event.query.all()
+#    events_data = []
+#    for event in events:
+#        events_data.append(event.to_dict())
+#    return jsonify(events_data)
 
 
 if __name__ == "__main__":
