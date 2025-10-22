@@ -105,9 +105,9 @@ def parametres_update():
                          form=form)
 
 #Vues notification
-@app.route("/notifications/")
-def notifications():
-    return render_template("notifications.html",title=TITLE+"- Notifications")
+@app.route("/parametres_notifs/")
+def parametres_notifs():
+    return render_template("parametres_notifs.html",title=TITLE+"- Paramètres notifications")
 
 #Vues pour Article 
 @app.route("/articles/")

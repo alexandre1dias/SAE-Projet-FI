@@ -9,6 +9,21 @@
 }
 
 
+#cloche img {
+  width: 28px;   
+  height: auto;  
+  transition: width 0.3s ease;
+} 
+
+.badge{
+  transform: translate(-50%, 0%) !important; 
+}
+
+.notifs-scroll {
+  max-height: 400px; /* Hauteur maximale avant que la barre n'apparaisse */
+  overflow-y: auto;  /* Affiche la barre de défilement si nécessaire */
+}
+
 /* Pour le nav de base */
 nav{
     background-color: #b82828;
@@ -24,16 +39,6 @@ nav .nav-link {
     width: auto; 
 }
 
-.cloche-icone {
-  width: 28px;   
-  height: auto;  
-  transition: width 0.3s ease;
-}
-
-.cloche-icone:hover{
-    width: 32px; 
-    height: auto;
-}
 
 
 
@@ -546,8 +551,14 @@ body {
     background-color: rgb(110, 0, 0);
 }
 
-/* Activer le mode sombre */
 
+.switch-container {
+  display: flex;          
+  align-items: center;    
+  gap: 160px;              
+}
+
+/* Activer le mode sombre */
 .mode-sombre {
     display: flex;
     justify-content: center;
