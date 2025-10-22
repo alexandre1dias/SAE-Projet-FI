@@ -535,6 +535,21 @@ body {
     background-color: rgb(54, 53, 53);
 }
 
+.btn-retour {
+    background-color: #575252;
+    color: white;
+    padding: 5px 30px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-retour:hover{
+    background-color: rgb(110, 0, 0);
+}
+
 /* Activer le mode sombre */
 
 .mode-sombre {
@@ -591,8 +606,8 @@ input:checked + .slider:before {
     transform: translateX(26px);
 }
 
-body.dark-mode {
-    background-color: #1c1c1e;
+body.dark-mode .lineP {
+    background-color: #ffffff;
     color: #fefefe;
 }
 

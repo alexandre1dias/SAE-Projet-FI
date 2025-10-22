@@ -26,38 +26,44 @@
         <form method="POST" class="parametres-form">
             
             <div class="form-row-par">
-                <label>Votre Nom :</label>
-                {{ form.nom(class="form-input-param") }} 
+                <label>Modifier votre Nom :</label>
+                {{ form.nom(class="form-input-param") }}
             </div>
 
             <div class="form-row-par">
-                <label>Votre Prenom :</label>
+                <label>Modifier le Prenom :</label>
                 {{ form.prenom(class="form-input-param") }}
             </div>
 
             <div class="form-row-par">
-                <label>Votre age :</label>
+                <label>Modifier son age :</label>
                 {{ form.age(class="form-input-param") }}
             </div>
 
             <div class="form-row-par">
-                <label>Votre naissance :</label>
+                <label>Modifier sa date :</label>
                 {{ form.date(class="form-input-param") }}
             </div>            
 
             <div class="form-row-par">
-                <label>Votre catégorie :</label>
-                {{ form.categorie(class="form-input-param") }} 
-            </div>
-
-            <div class="form-row-par">
-                <label>Votre Email :</label>
+                <label>Modifier l'Email :</label>
                 {{ form.email(class="form-input-param") }}
             </div>
             
+
+            <div class="form-row-par">
+                <label>Nouveau mot de passe :</label>
+                {{ form.password(class="form-input-param") }}
+            </div>
+
             <div class="form-submit">
-                <a href="/parametres_update/"><button type="button" class="btn-envoyer">Modifier mes informations</button></a>
-                <a href="/notifications/"><button type="button" class="btn-notif">Aller aux parametres de notifications</button></a>
+                
+                <button type="submit" class="btn-envoyer">Envoyer la requête</button>
+                <a href="/notifications/"><button type="button" class="btn-notif">Aller aux parametres de notifications </button></a>
+                <br>
+                <br>
+                <a href="/parametres/"><button type="button" class="btn-retour">Retour </button></a>
+                
             </div>
         </form>
     </div>

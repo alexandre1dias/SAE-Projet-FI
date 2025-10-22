@@ -34,6 +34,16 @@ class EventForm(FlaskForm):
  
 
 class ParametresForm(FlaskForm):
+    nom = StringField('Nom', validators=[Optional()], render_kw={'readonly': True})
+    prenom = StringField('Prenom', validators=[Optional()], render_kw={'readonly': True})
+    age = StringField('age', validators=[Optional()], render_kw={'readonly': True})
+    date = StringField('nouvelle date de naissance', validators=[Optional()], render_kw={'readonly': True})
+    categorie = StringField('Categorie', validators=[Optional()], render_kw={'readonly': True})
+    email = StringField('Email', validators=[Optional(), Email()], render_kw={'readonly': True})
+    password = PasswordField('Nouveau mot de passe', validators=[Optional()], render_kw={'readonly': True})
+    submit = SubmitField('Envoyer la requête')
+
+class Parametres_updateForm(FlaskForm):
     nom = StringField('Nom', validators=[Optional()])
     prenom = StringField('Prenom', validators=[Optional()])
     age = IntegerField('age', validators=[Optional()])
