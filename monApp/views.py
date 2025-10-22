@@ -156,10 +156,6 @@ def profil_edit(user_id):
         'statut': 'Membre Actif'
     }
 
-    if request.method == "POST":
-        flash(f"Profil de {request.form['prenom']} {request.form['nom']} mis à jour (simulé)!", "success")
-        return redirect(url_for('profil_view', user_id=user_id))
-
     return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", user=current_user)
 
 @app.route("/gerer_inscriptions/")
