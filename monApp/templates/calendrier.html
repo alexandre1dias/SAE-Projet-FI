@@ -1,90 +1,133 @@
 {%extends "base.html"%}
 
-{%block main%}
-<div class="container py-5">
-    <h1 class="text-center mb-5">Calendrier des Évènements</h1>
-            <div class="d-flex flex-wrap gap-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="competition3" id="type-competition3" checked>
-                    <label class="form-check-label" for="type-competition3">compétition</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="reunion3" id="type-reunion3" checked>
-                    <label class="form-check-label" for="type-reunion3">réunion</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="eventclub3" id="type-eventclub3" checked>
-                    <label class="form-check-label" for="type-eventclub3">évènement du club</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="entrainement3" id="type-entrainement3" checked>
-                    <label class="form-check-label" for="type-entrainement3">entrainement</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="homme3" id="type-homme3" checked>
-                    <label class="form-check-label" for="type-homme3">homme</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="femme3" id="type-femme3" checked>
-                    <label class="form-check-label" for="type-femme3">femme</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="regional3" id="type-regional3" checked>
-                    <label class="form-check-label" for="type-regional3">régional</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="national3" id="type-national3" checked>
-                    <label class="form-check-label" for="type-national3">national</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="epee3" id="type-epee3" checked>
-                    <label class="form-check-label" for="type-epee3">épée</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="fleuret3" id="type-fleuret3" checked>
-                    <label class="form-check-label" for="type-fleuret3">fleuret</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="sabre3" id="type-sabre3" checked>
-                    <label class="form-check-label" for="type-sabre3">sabre</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="M93" id="type-M93" checked>
-                    <label class="form-check-label" for="type-M93">M9</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="M113" id="type-M113" checked>
-                    <label class="form-check-label" for="type-M113">M11</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="M133" id="type-M133" checked>
-                    <label class="form-check-label" for="type-M133">M13</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="M153" id="type-M153" checked>
-                    <label class="form-check-label" for="type-M153">M15</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="M173" id="type-M173" checked>
-                    <label class="form-check-label" for="type-M173">M17</label>
-                </div><div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="M203" id="type-M203" checked>
-                    <label class="form-check-label" for="type-M203">M20</label>
-                </div><div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="senior3" id="type-senior3" checked>
-                    <label class="form-check-label" for="type-senior3">sénior</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="veteran3" id="type-veteran3" checked>
-                    <label class="form-check-label" for="type-veteran3">vétéran</label>
+{% block main %}
+<section class="calendrier-section">
+    <div class="container-fluid py-5">
+        <h1 class="text-center mb-5">Calendrier des Évènements</h1>
+        
+        <div class="row">  <!--colonne pour les filtres à gauche -->
+            <div class="col-lg-3 col-md-4 mb-4">
+                <div class="filtres-container">
+                    <h5 class="filtres-titre">Filtres</h5>
+                    
+                    <div class="filtre-categorie">
+                        <h6>Type d'événement</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="competition" checked>
+                            <label class="form-check-label" for="competition">Compétition</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="reunion" checked>
+                            <label class="form-check-label" for="reunion">Réunion</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="eventclub" checked>
+                            <label class="form-check-label" for="eventclub">Évènement du club</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="entrainement" checked>
+                            <label class="form-check-label" for="entrainement">Entraînement</label>
+                        </div>
+                    </div>
+
+                   
+                    <div class="filtre-categorie">
+                        <h6>Type de compétition</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="regional" checked>
+                            <label class="form-check-label" for="regional">Régional</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="national" checked>
+                            <label class="form-check-label" for="national">National</label>
+                        </div>
+                    </div>
+
+                    
+                    <div class="filtre-categorie">
+                        <h6>Type d'arme</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="epee" checked>
+                            <label class="form-check-label" for="epee">Épée</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="fleuret" checked>
+                            <label class="form-check-label" for="fleuret">Fleuret</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="sabre" checked>
+                            <label class="form-check-label" for="sabre">Sabre</label>
+                        </div>
+                    </div>
+
+                    
+                    <div class="filtre-categorie">
+                        <h6>Genre</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="homme" checked>
+                            <label class="form-check-label" for="homme">Homme</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="femme" checked>
+                            <label class="form-check-label" for="femme">Femme</label>
+                        </div>
+                    </div>
+
+                    
+                    <div class="filtre-categorie">
+                        <h6>Niveau</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="M9" checked>
+                            <label class="form-check-label" for="M9">M9</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="M11" checked>
+                            <label class="form-check-label" for="M11">M11</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="M13" checked>
+                            <label class="form-check-label" for="M13">M13</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="M15" checked>
+                            <label class="form-check-label" for="M15">M15</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="M17" checked>
+                            <label class="form-check-label" for="M17">M17</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="M20" checked>
+                            <label class="form-check-label" for="M20">M20</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="senior" checked>
+                            <label class="form-check-label" for="senior">Sénior</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="veteran" checked>
+                            <label class="form-check-label" for="veteran">Vétéran</label>
+                        </div>
+                    </div>
+
+    
+                    <div class="mt-4">
+                        <a href="{{ url_for('add_event') }}" class="btn btn-primary w-100">
+                            Ajouter un événement
+                        </a>
+                    </div>
                 </div>
             </div>
-    <p class="text-center mb-4">
-        <a href="{{ url_for('add_event') }}" class="btn btn-primary">Ajouter un événement</a>
-    </p>
-    <div id='calendar' class="fullcalendar-container"></div>
-</div>
-{%endblock%}
+
+            
+            <div class="col-lg-9 col-md-8"> <!-- pour la colonne du calendrier à droite -->
+                <div class="calendrier-wrapper">
+                    <div id='calendar'></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
 
 {% block scripts %}
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
@@ -94,6 +137,7 @@
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth', // Vue par défaut
             locale: 'fr', // Mettre le calendrier en français
+            height: 700,
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
@@ -106,7 +150,7 @@
                 day: 'Jour',
                 list: 'Liste'
             },
-            events: '/api/events', // Charger les événements depuis cette URL
+            /*events: '/api/events', // Charger les événements depuis cette URL
             eventClick: function(info) {
                 let event = info.event;
                 let startDate = event.start ? event.start.toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' }) : 'Non spécifié';
@@ -122,7 +166,7 @@
                                     Catégorie: ${category};
                                     Niveaux: ${levels}`;
                 alert(alertMessage);
-            }
+            }*/
         });
         calendar.render();
     });

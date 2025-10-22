@@ -1,5 +1,115 @@
 {%extends "base.html"%}
-
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
+{% endblock %}
     {%block main%}
-        <h1> Mettre les réunions</h1>
+        <div class="container py-5">
+            <h2 class="text-center mb-5">Listes des prochaines réunions</h2>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card pricing-card h-80">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0">Réunion du comite</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4 h4">19/10/2025 - 20h30</h2>
+                            <ul class="feature-list text-center mb-4">
+                                <li>Club House</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card pricing-card h-80">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0">Assemblée générale</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4 h4">31/10/2025 - 19h30</h2>
+                            <ul class="feature-list text-center mb-4">
+                                <li>Club House</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card pricing-card h-80">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0">Election du comité directeur</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4 h4">19/12/2025 - 18h30</h2>
+                            <ul class="feature-list text-center mb-4">
+                                <li>Gymnase</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container py-5">
+            <h2 class="text-center mb-5">Listes des anciennes réunions</h2>
+            <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">Filtrer par</button>
+                    <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                        <li><a class="dropdown-item" href="#">Date (Plus récent)</a></li>
+                        <li><a class="dropdown-item" href="#">Date (Plus ancien)</a></li>
+                    </ul>
+            </div>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card pricing-card h-100">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0">Election du comité directeur</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4 h4">01/10/2024 - 17h30</h2>
+                            <ul class="feature-list text-center mb-4">
+                                <li>Club House</li>
+                            </ul>
+                            <div class="text-center">
+                                <a href="{{ url_for('reunion_view') }}" class="btn btn-outline-primary btn-custom">consulter rapport</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card pricing-card h-100">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0">Election du comité directeur</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4 h4">01/10/2024 - 17h30</h2>
+                            <ul class="feature-list text-center mb-4">
+                                <li>Club House</li>
+                            </ul>
+                            <div class="text-center">
+                                <a href="{{ url_for('reunion_view') }}" class="btn btn-outline-primary btn-custom">consulter rapport</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card pricing-card h-100">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0">Election du comité directeur</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4 h4">01/10/2024 - 17h30</h2>
+                            <ul class="feature-list text-center mb-4">
+                                <li>Club House</li>
+                            </ul>
+                            <div class="text-center">
+                                <a href="{{ url_for('reunion_view') }}" class="btn btn-outline-primary btn-custom">consulter rapport</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     {%endblock%}
