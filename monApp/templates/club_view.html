@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block main %}
 
-<h1 class="mb-4" >[Nom Compétition]</h1>
+<h1 class="mb-4" >[Nom Evènement]</h1>
 
 <div class="row justify-content-center">
         <div class="col-lg-4 col-md-6 mb-4">
@@ -27,36 +27,7 @@
         </div>
     </div>
     
-    <div class="table-responsive"></div>
-    <h2>Classement du Club</h2>
-    <table class="table table-striped table-hover">
-        <thead class="thead-dark">
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Nom du tireur</th>
-                <th scope="col">classement</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>Dupont Jean</td>
-                <td>2</td>
-            </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>Martin Sophie</td>
-                <td>3</td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="3" class="text-center">
-                    <a href="#" class="btn btn-outline-primary btn-custom">Voir classement complet</a>
-                </td>
-            </tr>
-        </tfoot>
-    </table>
+
     <div id="carouselTop" class="carousel slide mb-3" data-bs-ride="carousel">
         <div class="carousel-indicators">
             <button type="button" data-bs-target="#carouselTop" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
@@ -87,6 +58,6 @@
             <span class="visually-hidden">Next</span>
         </button>
     </div>
-    <a href="{{ url_for('competitions') }}" class="btn btn-outline-primary btn-custom">retour</a>
+    <a href="{{ url_for('evenement_club') }}" class="btn btn-outline-primary btn-custom">retour</a>
 
 {% endblock %}

@@ -66,6 +66,10 @@ def competition_view():
 def evenement_club():
     return render_template("evenement_club.html",title=TITLE+"- Evenement du Club")
 
+@app.route("/club_view/")
+def club_view():
+    return render_template("club_view.html",title=TITLE+"- Club")
+
 @app.route("/reunion/")
 def reunion():
     return render_template("reunion.html",title=TITLE+"- Reunion")
