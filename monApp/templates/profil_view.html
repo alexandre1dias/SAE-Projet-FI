@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div class="container py-5">
+    <h1 class="text-center mb-5">Profil de {{ user.prenom }} {{ user.nom }}</h1>
+
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <img src="{{ url_for('static', filename='images/parametres/pngegg.png') }}" alt="Avatar de l'utilisateur" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 2px solid #b82828;">
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Nom : </div>
+                        <div class="col-sm-8">{{ user.nom }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Prénom : </div>
+                        <div class="col-sm-8">{{ user.prenom }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Âge : </div>
+                        <div class="col-sm-8">{{ user.age }} ans</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Date de naissance : </div>
+                        <div class="col-sm-8">{{ user.date_naissance }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Niveau : </div>
+                        <div class="col-sm-8">{{ user.niveau }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Email : </div>
+                        <div class="col-sm-8">{{ user.email }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Statut : </div>
+                        <div class="col-sm-8">{{ user.statut }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('gerer_profils') }}" class="btn btn-secondary me-2">Retour à la liste</a>
+        <a href="{{ url_for('profil_edit', user_id=user.id) }}" class="btn btn-primary me-2">Modifier ce profil</a>
+        <a href="#" class="btn btn-danger">Désinscrire ce profil</a>
+    </div>
+</div>
+{% endblock %}
