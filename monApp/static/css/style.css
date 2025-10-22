@@ -738,6 +738,36 @@ color: #fefefe;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+/* pour le mode clair par défaut du calendirer lorsque le mode sombre est désactivé */
+.fc {
+    color: #000;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border-color: #ddd;
+    background-color: white;
+}
+
+.fc-daygrid-day {
+    background-color: white;
+    color: #000;
+}
+
+.fc-col-header-cell {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+.fc-day-today {
+    background-color: #fff3cd !important;
+}
+
+.fc-daygrid-day-number {
+    color: #000;
+}
+
+
 /* pour le mode sombre du calendrier*/
 body.dark-mode .filtres-container,
 body.dark-mode .calendrier-wrapper {
