@@ -4,7 +4,21 @@
     {% endblock %}
     {%block main%}
         <div class="container py-5">
-            <h2 class="text-center mb-5">Listes des prochaines compétitions</h2>
+            <h2 class="text-center mb-5">Listes des prochain évènements</h2>
+            <div class="d-flex gap-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="competition1" id="type-competition1" checked>
+                    <label class="form-check-label" for="type-competition1">compétition</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="reunion1" id="type-reunion1" checked>
+                    <label class="form-check-label" for="type-reunion1">réunion</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type" value="eventclub1" id="type-eventclub1" checked>
+                    <label class="form-check-label" for="type-eventclub1">évènement du club</label>
+                </div>
+            </div>
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <div class="col">
                     <div class="card pricing-card h-100">
@@ -28,7 +42,30 @@
         </div>
 
         <div class="container py-5">
-            <h2 class="text-center mb-5">Listes des compétitions passées</h2>
+                <h2 class="text-center mb-5">Listes des évènements passés</h2>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="competition2" id="type-competition2" checked>
+                        <label class="form-check-label" for="type-competition2">compétition</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="reunion2" id="type-reunion2">
+                        <label class="form-check-label" for="type-reunion2">réunion</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="eventclub2" id="type-eventclub2">
+                        <label class="form-check-label" for="type-eventclub2">évènement du club</label>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">Filtrer par</button>
+                    <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                        <li><a class="dropdown-item" href="#">Date (Plus récent)</a></li>
+                        <li><a class="dropdown-item" href="#">Date (Plus ancien)</a></li>
+                        <li><a class="dropdown-item" href="#">Classement (Meilleur)</a></li>
+                    </ul>
+                </div>
+            </div>
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <div class="col">
                     <div class="card pricing-card h-100">
