@@ -88,6 +88,14 @@ def parametres():
                          title=TITLE+"- Paramètres du Membre", 
                          form=form)
 
+@app.route('/parametres_update/')
+def parametres_update():
+    from .forms import Parametres_updateForm
+    form = Parametres_updateForm()
+    return render_template("parametres_update.html", 
+                         title=TITLE+"- Paramètres du Membre", 
+                         form=form)
+
 #Vues notification
 @app.route("/notifications/")
 def notifications():
