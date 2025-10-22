@@ -74,6 +74,10 @@ def club_view():
 def reunion():
     return render_template("reunion.html",title=TITLE+"- Reunion")
 
+@app.route("/reunion_view/")
+def reunion_view():
+    return render_template("reunion_view.html",title=TITLE+"- Reunion vue")
+
 
 #Vues pour le Profil
 @app.route("/resultat_membre/")
