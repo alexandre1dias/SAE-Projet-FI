@@ -4,4 +4,8 @@
 <h1 class="mb-4" >[Nom Réunion]</h1>
 <h2>Description:</h2>
 <p>[...]</p>
+<a href="{{ url_for('reunion') }}" class="btn btn-outline-primary btn-custom">retour</a>
+     <!-- boutons Admin-->
+    <a href="{{ url_for('reunion_view') }}" class="btn btn-danger">supprimer évènement</a>
+    <a href="{{ url_for('reunion_view') }}" class="btn btn-primary">modifier évènement</a>
 {% endblock %}
