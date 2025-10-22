@@ -93,6 +93,29 @@
         <main id="main" role=" main" class=" container">
             {% block main %}{% endblock %}
         </main>
+
+        <script>
+            // pour récupérer l'état qui a été sauvegardé
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const savedMode = localStorage.getItem('darkMode');
+
+            // pour appliquer le mode sauvegardé au chargement
+            if (savedMode === 'enabled') {
+                document.body.classList.add('dark-mode');
+                darkModeToggle.checked = true;
+            }
+
+            //savoir les changements du toggle
+            darkModeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+            });
+        </script>
        {% endblock %}
   
   

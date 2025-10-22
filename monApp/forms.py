@@ -1,6 +1,7 @@
+
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, PasswordField, SubmitField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField
-from wtforms.validators import DataRequired, Email
+from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField
+from wtforms.validators import DataRequired, Email, Optional
 
 class LoginForm(FlaskForm):
     Login = StringField ('Email' ,validators= [DataRequired(), Email()])
@@ -27,3 +28,13 @@ class EventForm(FlaskForm):
     description = TextAreaField('Description (optionnel)')
     submit = SubmitField('Ajouter l\'événement')
  
+
+class ParametresForm(FlaskForm):
+    nom = StringField('Nom', validators=[Optional()])
+    prenom = StringField('Prenom', validators=[Optional()])
+    age = IntegerField('age', validators=[Optional()])
+    date = StringField('nouvelle date de naissance', validators=[Optional()])
+    categorie = StringField('Categorie', validators=[Optional()])
+    email = StringField('Email', validators=[Optional(), Email()])
+    password = PasswordField('Nouveau mot de passe', validators=[Optional()])
+    submit = SubmitField('Envoyer la requête')
