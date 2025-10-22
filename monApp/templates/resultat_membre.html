@@ -3,17 +3,69 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
     {% endblock %}
     {%block main%}
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Voici la liste de vos résultats</h1>
-            <div class="dropdown">
-                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">Filtrer par</button>
-                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-                    <li><a class="dropdown-item" href="#">Date (Plus récent)</a></li>
-                    <li><a class="dropdown-item" href="#">Date (Plus ancien)</a></li>
-                    <li><a class="dropdown-item" href="#">Classement (Meilleur)</a></li>
-                </ul>
+            <div class="container py-5">
+                <h2 class="text-center mb-5">Listes de vos résultats</h2>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="sabre4" id="type-sabre4" checked>
+                        <label class="form-check-label" for="type-sabre4">sabre</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="fleuret4" id="type-fleuret4" checked>
+                        <label class="form-check-label" for="type-fleuret4">fleuret</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="epee4" id="type-epee4" checked>
+                        <label class="form-check-label" for="type-epee4">épée</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="regional4" id="type-regional4" checked>
+                        <label class="form-check-label" for="type-regional4">régional</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="national4" id="type-national4" checked>
+                        <label class="form-check-label" for="type-national4">national</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="M93" id="type-M93" checked>
+                        <label class="form-check-label" for="type-M93">M9</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="M113" id="type-M113" checked>
+                        <label class="form-check-label" for="type-M113">M11</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="M133" id="type-M133" checked>
+                        <label class="form-check-label" for="type-M133">M13</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="M153" id="type-M153" checked>
+                        <label class="form-check-label" for="type-M153">M15</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="M173" id="type-M173" checked>
+                        <label class="form-check-label" for="type-M173">M17</label>
+                    </div><div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="M203" id="type-M203" checked>
+                        <label class="form-check-label" for="type-M203">M20</label>
+                    </div><div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="senior3" id="type-senior3" checked>
+                        <label class="form-check-label" for="type-senior3">sénior</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="type" value="veteran3" id="type-veteran3" checked>
+                        <label class="form-check-label" for="type-veteran3">vétéran</label>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">Filtrer par</button>
+                    <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                        <li><a class="dropdown-item" href="#">Date (Plus récent)</a></li>
+                        <li><a class="dropdown-item" href="#">Date (Plus ancien)</a></li>
+                        <li><a class="dropdown-item" href="#">Classement (Meilleur)</a></li>
+                    </ul>
+                </div>
             </div>
-        </div>
         <div class="container py-5">
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <div class="col">
