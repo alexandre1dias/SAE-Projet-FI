@@ -1,6 +1,11 @@
 <!doctype html>
     {%extends "base.html"%}
 
+    {% block head_extra %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
+    {% endblock %}
+
+
     {%block main%}
     <header>
         <div class="header-content">
