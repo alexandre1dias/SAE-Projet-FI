@@ -29,6 +29,20 @@ class EventForm(FlaskForm):
         ('Senior', 'Senior'),
         ('Veteran', 'Veteran')
     ], validators=[DataRequired()])
+    sexe = SelectField('Sexe concerné', choices=[
+        ('Masculin', 'Masculin'),
+        ('Féminin', 'Féminin'),
+        ('Mixte', 'Mixte')
+    ], validators=[DataRequired()])
+    arme = SelectField('Arme concernée', choices=[
+        ('Fleuret', 'Fleuret'),
+        ('Épée', 'Épée'),
+        ('Sabre', 'Sabre')
+    ], validators=[DataRequired()])
+    type = SelectField('Type d\'événement', choices=[
+        ('Regionale', 'Regionale'),
+        ('National', 'National')
+    ], validators=[DataRequired()])
     description = TextAreaField('Description (optionnel)')
     submit = SubmitField('Ajouter l\'événement')
  
