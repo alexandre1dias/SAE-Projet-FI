@@ -80,9 +80,13 @@ def resultat_membre():
 def evenement_membre():
     return render_template("evenement_membre.html",title=TITLE+"- Résultat du Membre")
 
-@app.route("/parametres/")
+@app.route('/parametres/')
 def parametres():
-    return render_template("parametres.html",title=TITLE+"- Paramètres du Membre")
+    from .forms import ParametresForm
+    form = ParametresForm()
+    return render_template("parametres.html", 
+                         title=TITLE+"- Paramètres du Membre", 
+                         form=form)
 
 #Vues notification
 @app.route("/notifications/")
