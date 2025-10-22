@@ -1,5 +1,35 @@
 {%extends "base.html"%}
 
 {%block main%}
-    <h1> Faire la gestion des profils</h1>
+    <h1> Liste des profils des membres</h1>
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Age</th>
+                <th>Date de naissance</th>
+                <th>Niveau</th>
+                <th>Email</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Nom</td>
+                <td>Prénom</td>
+                <td>Age</td>
+                <td>Date de naissance</td>
+                <td>Niveau</td>
+                <td>Email</td>
+                <td>Statut</td>
+                <td>
+                    <a href="{{ url_for('profil_view', user_id=1) }}" class="btn btn-warning">Consulter</a>
+                    <a href="{{ url_for('profil_edit', user_id=1) }}" class="btn btn-primary">Modifier</a>
+                    <a href="#" class="btn btn-danger">Désinscrire</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 {% endblock %}
