@@ -670,5 +670,16 @@ body.dark-mode .box-prix {
 }
 
 body.dark-mode .page-login {
-    background: #1c1c1e !important; 
+    background-color: #1c1c1e !important; 
+    color: #fefefe;
+}
+
+body.dark-mode th, tr{
+background-color: #1c1c1e !important;
+color: #fefefe;
+}
+
+body.dark-mode td{
+background-color: #1c1c1e !important;
+color: #fefefe;
 }
