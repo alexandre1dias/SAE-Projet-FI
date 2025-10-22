@@ -119,6 +119,10 @@ def articles():
 def gerer_formulaires():
     return render_template("gerer_formulaires.html",title=TITLE+"- Géstion des Formulaires")
 
+@app.route("/formulaire_view/")
+def formulaire_view():
+    return render_template("formulaire_view.html",title=TITLE+"- Consultation de Formulaire")
+
 @app.route("/gerer_profils/")
 def gerer_profils():
     return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils")

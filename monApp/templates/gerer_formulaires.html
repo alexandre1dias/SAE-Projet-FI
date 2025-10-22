@@ -1,5 +1,27 @@
 {%extends "base.html"%}
 
 {%block main%}
-    <h1> Faire la gestion des formulaires</h1>
+    <h1> Liste des formulaires en attentes</h1> 
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Sujet</th>
+                <th>Mail envoyeur</th>
+                <th>description</th>
+                <th>consulter</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Question/Demade/Signalement</td>
+                <td>sujet</td>
+                <td>adreese mail</td>
+                <td>description</td>
+                    <td>
+                        <a href="{{ url_for('formulaire_view') }}" class="btn btn-warning">Consulter <i class="fas fa-pen"></i></a>
+                    </td>
+            </tr>
+        </tbody>
+    </table>
 {% endblock %}
