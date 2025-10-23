@@ -56,7 +56,8 @@
                             <td>15/05/2024</td>
                             <td>
                                 <a href="#" class="btn btn-success btn-sm">Accepter</a>
-                                <a href="#" class="btn btn-danger btn-sm">Refuser</a>
+                                <!-- Bouton qui déclenche la modale -->
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#refusModal" data-url="#">Refuser</button>
                             </td>
                         </tr>
                         <tr>
@@ -70,11 +71,51 @@
                             <td>14/05/2024</td>
                             <td>
                                 <a href="#" class="btn btn-success btn-sm">Accepter</a>
-                                <a href="#" class="btn btn-danger btn-sm">Refuser</a>
+                                <!-- Bouton qui déclenche la modale -->
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#refusModal" data-url="#">Refuser</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+
+        <!-- Modale de Confirmation de Refus -->
+        <div class="modal fade" id="refusModal" tabindex="-1" aria-labelledby="refusModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="refusModalLabel">Justification du Refus</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="refusForm" method="POST" action="">
+                        <div class="modal-body">
+                            <p>Veuillez indiquer la raison du refus de cette demande.</p>
+                            <div class="mb-3">
+                                <label for="justification" class="form-label">Justification :</label>
+                                <textarea class="form-control" id="justification" name="justification" rows="4" required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-success">Confirmer le Refus</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var refusModal = document.getElementById('refusModal');
+    refusModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget; // Le bouton qui a déclenché la modale
+        var url = button.getAttribute('data-url'); // Récupère l'URL depuis l'attribut data-url
+        var form = document.getElementById('refusForm');
+        form.action = url; // Met à jour l'action du formulaire avec l'URL de la demande
+    });
+});
+</script>
 {% endblock %}
