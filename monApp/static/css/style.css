@@ -1010,22 +1010,6 @@ body.dark-mode .fc-daygrid-day {
 
 
 /* pour les bordures dans l'acceuil */ 
-#main {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    max-width: 100% !important; 
-}
-
-.explore-section, 
-.acceuil-section, 
-.title-acceuil {
-    width: 100vw !important; 
-    padding: 0 !important; 
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    margin: 80px 0 !important; 
-}
 
 header {
     width: 100vw !important;
