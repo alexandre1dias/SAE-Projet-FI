@@ -19,9 +19,31 @@
   transform: translate(-50%, 0%) !important; 
 }
 
+
+/*Pour les notifications*/
 .notifs-scroll {
-  max-height: 400px; /* Hauteur maximale avant que la barre n'apparaisse */
-  overflow-y: auto;  /* Affiche la barre de défilement si nécessaire */
+  max-height: 400px; 
+  overflow-y: auto;  
+}
+.dropdown-menu .notification-delete {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    flex-shrink: 0; 
+}
+.dropdown-menu .notif-new{
+    margin-right: 40px;
+}
+.dropdown-menu .notification-delete img {
+    width: 100% !important;   
+    height: 100% !important; 
+    object-fit: contain;
+}
+.dropdown-menu .notification-delete:hover {
+    opacity: 0.7;
 }
 
 /* Pour le nav de base */

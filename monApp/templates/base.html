@@ -97,20 +97,26 @@
                                 <ul class="dropdown-menu dropdown-menu-end notifs-scroll" aria-labelledby="notificationDropdown" style="width: 360px;">
                                     <li><h6 class="dropdown-header">Notifications</h6></li>
                                     <li>
-                                        <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                        <a class="dropdown-item d-flex align-items-center justify-content-between" href="#">
                                             <span class="p-1 bg-primary border border-light rounded-circle"></span>
                                             <div>
-                                                <p class="mb-0 fs-6">Demande d'inscription: Jean</p>
+                                                <p class="mb-0 notif-new">Demande d'inscription: Jean</p>
                                                 <small class="text-muted">il y a 5 minutes</small>
                                             </div>
+                                            <button class="btn notification-delete" type="button" aria-label="Supprimer la notification">
+                                                <img src="{{ url_for('static', filename='images/supprimer.png') }}" alt="Supprimer notifications"/>
+                                            </button>
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                        <a class="dropdown-item d-flex align-items-center justify-content-between" href="#">
                                             <div>
                                                 <p class="mb-0">Demande formulaire: Visiteur</p>
                                                 <small class="text-muted">il y a 1 heure</small>
                                             </div>
+                                            <button class="btn notification-delete" type="button" aria-label="Supprimer la notification">
+                                                <img src="{{ url_for('static', filename='images/supprimer.png') }}" alt="Supprimer notifications"/>
+                                            </button>
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
