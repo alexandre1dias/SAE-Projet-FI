@@ -3,184 +3,134 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
     {% endblock %}
     {%block main%}
-        <div class="container py-5">
-            <h2 class="text-center mb-5">Listes des prochain évènements</h2>
-            <div class="d-flex gap-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="competition" id="type-competition" checked>
-                    <label class="form-check-label" for="type-competition">compétition</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="sabre4" id="type-sabre4" checked>
-                    <label class="form-check-label" for="type-sabre4">sabre</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="fleuret4" id="type-fleuret4" checked>
-                    <label class="form-check-label" for="type-fleuret4">fleuret</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="epee4" id="type-epee4" checked>
-                    <label class="form-check-label" for="type-epee4">épée</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="regional4" id="type-regional4" checked>
-                    <label class="form-check-label" for="type-regional4">régional</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="national4" id="type-national4" checked>
-                    <label class="form-check-label" for="type-national4">national</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="M94" id="type-M94" checked>
-                    <label class="form-check-label" for="type-M94">M9</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="M114" id="type-M114" checked>
-                    <label class="form-check-label" for="type-M114">M11</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="M134" id="type-M134" checked>
-                    <label class="form-check-label" for="type-M134">M13</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="M154" id="type-M154" checked>
-                    <label class="form-check-label" for="type-M154">M15</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="M174" id="type-M174" checked>
-                    <label class="form-check-label" for="type-M174">M17</label>
-                </div><div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="M204" id="type-M204" checked>
-                    <label class="form-check-label" for="type-M204">M20</label>
-                </div><div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="senior4" id="type-senior4" checked>
-                    <label class="form-check-label" for="type-senior4">sénior</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="veteran4" id="type-veteran4" checked>
-                    <label class="form-check-label" for="type-veteran4">vétéran</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="reunion1" id="type-reunion" checked>
-                    <label class="form-check-label" for="type-reunion">réunion</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="type" value="eventclub" id="type-eventclub" checked>
-                    <label class="form-check-label" for="type-eventclub">évènement du club</label>
-                </div>
-            </div>
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                <div class="col">
-                    <div class="card pricing-card h-100">
-                        <div class="card-header pricing-header basic-header p-4">
-                            <h3 class="card-title text-center mb-0">Duc De guise Mer</h3>
+    <div class="container-fluid py-5">
+        <h2 class="text-center mb-5">Vos Évènements</h2>
+        <div class="row">
+            <aside class="col-lg-2 col-md-3 mb-4">
+                <div class="filtres-box">
+                    <h5>Filtrer par</h5>
+                    
+                    <div class="filtre-categorie">
+                        <h6>Type d'événement</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-competition" checked>
+                            <label class="form-check-label" for="type-competition">Compétition</label>
                         </div>
-                        <div class="card-body p-4">
-                            <h2 class="card-title text-center mb-4">Tous niveaux</h2>
-                            <ul class="feature-list text-center mb-4">
-                                <li>18/10/2025 - 19/10/2025</li>
-                                <li>sabre</li>
-                                <li>Nationnal</li>
-                                <li>nombres de participants appartenant au cercle : 15</li>
-                            </ul>
-                            <div class="text-center d-flex justify-content-center gap-2">
-                                <a href="{{ url_for('competition_view') }}" class="btn btn-outline-primary btn-custom">Consulter</a>
-                                <a href="" class="btn btn-outline-primary btn-custom">Désinscrire</a>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-reunion" checked>
+                            <label class="form-check-label" for="type-reunion">Réunion</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-eventclub" checked>
+                            <label class="form-check-label" for="type-eventclub">Évènement du club</label>
+                        </div>
+                    </div>
+
+                    <div class="filtre-categorie">
+                        <h6>Type d'arme</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-sabre" checked>
+                            <label class="form-check-label" for="type-sabre">Sabre</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-fleuret" checked>
+                            <label class="form-check-label" for="type-fleuret">Fleuret</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-epee" checked>
+                            <label class="form-check-label" for="type-epee">Épée</label>
+                        </div>
+                    </div>
+
+                    <div class="filtre-categorie">
+                        <h6>Niveau</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-M9" checked>
+                            <label class="form-check-label" for="type-M9">M9</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-M11" checked>
+                            <label class="form-check-label" for="type-M11">M11</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-M13" checked>
+                            <label class="form-check-label" for="type-M13">M13</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-M15" checked>
+                            <label class="form-check-label" for="type-M15">M15</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-M17" checked>
+                            <label class="form-check-label" for="type-M17">M17</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-M20" checked>
+                            <label class="form-check-label" for="type-M20">M20</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-senior" checked>
+                            <label class="form-check-label" for="type-senior">Sénior</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="type-veteran" checked>
+                            <label class="form-check-label" for="type-veteran">Vétéran</label>
+                        </div>
+                    </div>
+
+                    <div class="filtre-categorie">
+                        <h6>Trier par</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tri" id="dateRecente" checked>
+                            <label class="form-check-label" for="dateRecente">Date (plus récent)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tri" id="dateAncienne">
+                            <label class="form-check-label" for="dateAncienne">Date (plus ancien)</label>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="col-lg-10 col-md-9">
+                <h3 class="mb-4">Évènements à venir</h3>
+                <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+                    <div class="col">
+                        <div class="card pricing-card h-100">
+                            <div class="card-header pricing-header basic-header p-4">
+                                <h3 class="card-title text-center mb-0">Duc De guise Mer</h3>
+                            </div>
+                            <div class="card-body p-4">
+                                <h4 class="card-title text-center mb-4 h5">Tous niveaux</h4>
+                                <ul class="feature-list text-center mb-4">
+                                    <li>18/10/2025 - 19/10/2025</li>
+                                    <li>Sabre</li>
+                                    <li>National</li>
+                                    <li>Participants du cercle : 15</li>
+                                </ul>
+                                <div class="text-center d-flex justify-content-center gap-2">
+                                    <a href="{{ url_for('competition_view') }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                    <a href="#" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="container py-5">
-                <h2 class="text-center mb-5">Listes des évènements passés</h2>
-                <div class="d-flex gap-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="competition" id="type-competition" checked>
-                        <label class="form-check-label" for="type-competition">compétition</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="sabre4" id="type-sabre4" checked>
-                        <label class="form-check-label" for="type-sabre4">sabre</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="fleuret4" id="type-fleuret4" checked>
-                        <label class="form-check-label" for="type-fleuret4">fleuret</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="epee4" id="type-epee4" checked>
-                        <label class="form-check-label" for="type-epee4">épée</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="regional4" id="type-regional4" checked>
-                        <label class="form-check-label" for="type-regional4">régional</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="national4" id="type-national4" checked>
-                        <label class="form-check-label" for="type-national4">national</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="M94" id="type-M94" checked>
-                        <label class="form-check-label" for="type-M94">M9</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="M114" id="type-M114" checked>
-                        <label class="form-check-label" for="type-M114">M11</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="M134" id="type-M134" checked>
-                        <label class="form-check-label" for="type-M134">M13</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="M154" id="type-M154" checked>
-                        <label class="form-check-label" for="type-M154">M15</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="M174" id="type-M174" checked>
-                        <label class="form-check-label" for="type-M174">M17</label>
-                    </div><div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="M204" id="type-M204" checked>
-                        <label class="form-check-label" for="type-M204">M20</label>
-                    </div><div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="senior4" id="type-senior4" checked>
-                        <label class="form-check-label" for="type-senior4">sénior</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="veteran4" id="type-veteran4" checked>
-                        <label class="form-check-label" for="type-veteran4">vétéran</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="reunion1" id="type-reunion" checked>
-                        <label class="form-check-label" for="type-reunion">réunion</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="type" value="eventclub" id="type-eventclub" checked>
-                        <label class="form-check-label" for="type-eventclub">évènement du club</label>
-                    </div>
-                </div>
-                <div class="dropdown">
-                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">Filtrer par</button>
-                    <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-                        <li><a class="dropdown-item" href="#">Date (Plus récent)</a></li>
-                        <li><a class="dropdown-item" href="#">Date (Plus ancien)</a></li>
-                        <li><a class="dropdown-item" href="#">Classement (Meilleur)</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <h3 class="mb-4">Évènements passés</h3>
+                <div class="row row-cols-1 row-cols-md-3 g-4">
                 <div class="col">
                     <div class="card pricing-card h-100">
                         <div class="card-header pricing-header basic-header p-4">
                             <h3 class="card-title text-center mb-0">Tournoi club Blois</h3>
                         </div>
                         <div class="card-body p-4">
-                            <h2 class="card-title text-center mb-4">Tous niveaux</h2>
+                                <h4 class="card-title text-center mb-4 h5">Tous niveaux</h4>
                             <ul class="feature-list text-center mb-4">
                                 <li>01/10/2025 - 02/10/2025</li>
                                 <li>sabre</li>
-                                <li>Nationnal</li>
-                                <li>Votre classement : </li>
+                                    <li>National</li>
+                                    <li>Votre classement : 5ème</li>
                             </ul>
                             <div class="text-center">
                                 <a href="{{ url_for('competition_view') }}" class="btn btn-outline-primary btn-custom">Consulter</a>
@@ -188,6 +138,8 @@
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
         </div>
+    </div>
     {%endblock%}
