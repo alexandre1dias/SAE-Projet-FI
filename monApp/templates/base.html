@@ -10,7 +10,7 @@
         {% block head_extra %}{% endblock %}
     </head>
 
-    <body>
+    <body class="{% block body_class %}{% endblock %}">
         {% block navbar %}
         <nav class="navbar navbar-expand-md fixed-top">
             <div class="container-fluid">

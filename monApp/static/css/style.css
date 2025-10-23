@@ -166,6 +166,7 @@ header{
     display: flex;
     align-items: flex-end;
     justify-content: center;
+    padding-bottom: 60px;
 }
 
 .header-content{
@@ -1025,4 +1026,92 @@ body.dark-mode .fc-daygrid-day {
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
+}
+
+
+/* pour les bordures dans l'acceuil */ 
+
+header {
+    width: 100vw !important;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 100vw; 
+}
+
+.explore-section {
+    width: 80% !important; 
+    margin-left: auto !important;
+    margin-right: auto !important;
+    position: static !important;
+    left: auto !important;
+    transform: none !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between; 
+    padding: 0 15px !important; 
+}
+
+.explore-section .explore-content {
+    width: 50% !important;
+    padding: 50px !important; 
+}
+.explore-section .explore-col {
+    height: 250px !important;
+    width: 500px !important;
+    margin: 0 !important;
+}
+
+.acceuil-section > .title,
+.title-acceuil > .title {
+    width: 80% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+
+.acceuil-section > .row,
+.title-acceuil > .row {
+    width: 80% !important; 
+    margin: 0 auto !important; 
+    padding: 0 15px !important; 
+}
+
+.acceuil-section .row .container.py-5,
+.title-acceuil .row .container.py-5 {
+    padding: 0 !important; 
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.acceuil-section .container.py-5 .row,
+.title-acceuil .container.py-5 .row {
+    margin-left: -15px !important; 
+    margin-right: -15px !important;
+}
+
+
+.acceuil-section > .row > .col:last-child,
+.title-acceuil > .row > .col:last-child {
+    width: 100% !important; 
+    max-width: 100% !important;
+    margin: 20px auto 0 !important;
+    padding: 0 15px !important;
+    text-align: center;
+}
+
+.btn-article {
+    display: block; 
+    width: 100%;
+    max-width: 300px;
+    margin: 20px auto;
+}
+
+#main:has(.homepage-content) {
+    margin-top: 0 !important;
+}
+
+body.homepage #main {
+    margin-top: 79px !important;
 }

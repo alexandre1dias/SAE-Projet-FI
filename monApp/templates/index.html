@@ -1,6 +1,8 @@
 <!doctype html>
     {%extends "base.html"%}
 
+    {% block body_class %}homepage{% endblock %}
+
     {% block head_extra %}
         <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
     {% endblock %}
@@ -18,7 +20,7 @@
     </header>
 
     
-    <section class = "explore">
+    <section class = "explore-section">
         <div class="explore-content">
             <h1>C'était la Fête du Sport à Blois… </h1>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi itaque quaerat consequuntur, aliquam doloribus quod autem consequatur, in totam repellat, qui doloremque incidunt neque accusantium porro possimus nisi perferendis iusto?</p>
@@ -28,7 +30,7 @@
         </div>
     </section>
 
-    <section>
+    <section class = "acceuil-section">
         <div class= "title">
             <h1> Les derniers articles </h1>
             <div class = "line"></div>
@@ -94,7 +96,7 @@
             </div>
         </div>
     </section>
-        <section>
+        <section class="title-acceuil">
         <div class= "title">
             <h1>Les dernières compétitions</h1>
             <div class = "line"></div>
