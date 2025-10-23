@@ -6,9 +6,8 @@
         <h1 class="text-center mb-5">Calendrier des Évènements</h1>
         
         <div class="row">  <!--colonne pour les filtres à gauche -->
-            <div class="col-lg-3 col-md-4 mb-4">
-                <div class="filtres-container">
-                    <h5 class="filtres-titre">Filtres</h5>
+            <div class="col-lg-2 col-md-3 mb-4">
+                <h5 class="filtres-titre">Filtres</h5>
                     
                     <div class="filtre-categorie">
                         <h6>Type d'événement</h6>
@@ -115,12 +114,11 @@
                         <a href="{{ url_for('add_event') }}" class="btn btn-primary w-100">
                             Ajouter un événement
                         </a>
-                    </div>
                 </div>
             </div>
 
             
-            <div class="col-lg-9 col-md-8"> <!-- pour la colonne du calendrier à droite -->
+            <div class="col-lg-10 col-md-9"> <!-- pour la colonne du calendrier à droite -->
                 <div class="calendrier-wrapper">
                     <div id='calendar'></div>
                 </div>
