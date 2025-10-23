@@ -82,9 +82,43 @@
                                 <li><a class="dropdown-item" href="{{ url_for('gerer_inscriptions') }}">Gérer Inscriptions</a></li>
                             </ul> 
                         </li>   
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('notifications') }}" class="btn btn-custom">
-                                <img src="../static/images/cloche.png" class="cloche-icone" alt="Notifications"/></a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Se connecter</a></li>
+
+                        <!-- Notification -->
+                        <li class="nav-item">
+                            <div class="dropdown">
+                                <button class="btn position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="{{ url_for('static', filename='images/cloche.png') }}" alt="Notifications" style="height: 30px;"/>
+                                    <span class="position-absolute badge rounded-pill bg-danger">
+                                        1
+                                        <span class="visually-hidden">notifications non lues</span>
+                                    </span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end notifs-scroll" aria-labelledby="notificationDropdown" style="width: 360px;">
+                                    <li><h6 class="dropdown-header">Notifications</h6></li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                            <span class="p-1 bg-primary border border-light rounded-circle"></span>
+                                            <div>
+                                                <p class="mb-0 fs-6">Demande d'inscription: Jean</p>
+                                                <small class="text-muted">il y a 5 minutes</small>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                            <div>
+                                                <p class="mb-0">Demande formulaire: Visiteur</p>
+                                                <small class="text-muted">il y a 1 heure</small>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-center" href="{{ url_for('parametres_notifs') }}">Paramètre de notification</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- Login -->
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Se connecter</a></li>
                     </ul>
                     </div>
             </div>
@@ -121,6 +155,7 @@
   
        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-       {% block scripts %}{% endblock %}
+       {% block scripts %}{% endblock %}    
+       <script src="{{ url_for('static', filename='js/notifs.js') }}"></script>
       </body>
 </html>
