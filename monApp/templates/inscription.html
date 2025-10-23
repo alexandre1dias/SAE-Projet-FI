@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="page-login">
+    <div class="inscription-container">
+        <div class="titre-inscription">
+            <h1>Inscription</h1>
+        </div>
+        
+        <form method="POST" action="" style="width: 100%;">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.Login(class="form-input", placeholder="Rentrer votre email") }}
+            </div>
+            <div class="form-group">
+                {{ form.nom(class="form-input", placeholder="Rentrer votre nom") }}
+            </div>
+            <div class="form-group">
+                {{ form.prenom(class="form-input", placeholder="Rentrer votre prenom") }}
+            </div>
+            <div class="form-group">
+                {{ form.date_naissance(class="form-input", placeholder="Rentrer votre date de naissance") }}
+            </div>
+
+
+            <div class="form-group">
+                {{ form.password(class="form-input", placeholder="Rentrer votre mot de passe") }}
+            </div>
+            <div class="form-group">
+                {{ form.confirm_password(class="form-input", placeholder="Confirmer votre mot de passe") }}
+            </div>
+            
+            <div class="form-group">
+               <button type="button" class="btn-inscription" data-bs-toggle="modal" data-bs-target="#conditionModal" data-url="#">CONDITIONS D'INSCRIPTION</button>
+            </div>
+            <div class="form-group">
+                {{ form.inscription(class="btn-connecter", value="S'INSCRIRE") }}
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+<!-- Modale de Confirmation de Refus -->
+        <div class="modal fade" id="conditionModal" tabindex="-1"  aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="refusModalLabel">Condition d'inscription</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="refusForm" method="POST" action="">
+                        <div class="modal-body">
+                            <p>Mettre les conditions</p>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-success">Accepter les conditions</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+{% endblock %}

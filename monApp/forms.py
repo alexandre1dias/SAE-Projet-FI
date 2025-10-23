@@ -12,10 +12,21 @@ class LoginForm(FlaskForm):
 
 class PasswordChangeForm(FlaskForm):
     Login = StringField ('Email' ,validators= [DataRequired(), Email()])
-    old_password = PasswordField ('Mot de passe', validators=[DataRequired()])
-    new_password = PasswordField ('Mot de passe', validators=[DataRequired()])
+    old_password = PasswordField ('Ancient mot de passe', validators=[DataRequired()])
+    new_password = PasswordField ('Nouveau mot de passe', validators=[DataRequired()])
     next = HiddenField()
     connecter = SubmitField()
+
+class InscriptionForm(FlaskForm):
+    Login = StringField ('Email' ,validators= [DataRequired(), Email()])
+    nom = StringField ('nom' ,validators= [DataRequired()])
+    prenom = StringField ('prenom' ,validators= [DataRequired()])
+    date_naissance = StringField ('date de naissance' ,validators= [DataRequired()])
+    
+    password = PasswordField ('Mot de passe', validators=[DataRequired()])
+    confirm_password = PasswordField ('Confirmer mot de passe', validators=[DataRequired()])
+    next = HiddenField()
+    inscription = SubmitField()
 
 class EventForm(FlaskForm):
     title = StringField('Titre de l\'événement', validators=[DataRequired()])
