@@ -841,6 +841,39 @@ body.dark-mode .fc-daygrid-day {
     margin-bottom: 40px;
 }
 
+.header-container {
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;            
+    width: 100%;
+    margin-bottom: 20px; 
+    gap: 20px; 
+}
+
+.header-container .btn {
+    height: 50px;
+    display: inline-flex;  
+    align-items: center;   
+    white-space: nowrap;  
+}
+
+/* search bar */
+.search-container {
+    position: relative;
+    flex-grow: 1; 
+    max-width: 400px; 
+    margin-top: 13px;
+}
+
+.search-input {
+    height: 50px; 
+    border-radius: 30px;
+    padding-left: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
 /*le container des filtres*/
 .filtres-container {
     background-color: white;
@@ -1027,7 +1060,6 @@ body.dark-mode .fc-daygrid-day {
     margin-left: -50vw;
     margin-right: -50vw;
 }
-
 
 /* pour les bordures dans l'acceuil */ 
 

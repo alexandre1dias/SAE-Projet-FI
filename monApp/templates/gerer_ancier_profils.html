@@ -9,7 +9,7 @@
         <input type="text" class="form-control search-input" placeholder="Rechercher...">
     </div>
     
-        <a href="{{ url_for('gerer_ancier_profils') }}" class="btn btn-secondary">Voir la liste des ancien membres</a>
+        <a href="{{ url_for('gerer_profils') }}" class="btn btn-secondary">Voir la liste des ancien membres</a>
     </div>
 
         <div class="row"><!--colonne pour les filtres à gauche -->
@@ -100,7 +100,7 @@
                         <th>Prénom</th>
                         <th>Age</th>
                         <th>Date de naissance</th>
-                        <th>Date d'inscription</th>
+                        <th>Date de désinscription</th>
                         <th>Niveau</th>
                         <th>Email</th>
                         <th>Statut</th>
@@ -109,20 +109,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Sarah</td>
-                        <td>Fortune</td>
-                        <td>25</td>
-                        <td>01/01/2000</td>
-                        <td>21/05/2023</td>
-                        <td>Scenior</td>
-                        <td>miss.fortune@gmail.com</td>
-                        <td>Membre</td>
-                        <td>F</td>
+                    <tr> 
+                        <td>Hayreddin</td>
+                        <td>Barbarossa</td>
+                        <td>50</td>
+                        <td>01/01/1975</td>
+                        <td>21/07/2023</td>
+                        <td>Veteran</td>
+                        <td>gangplank@gmail.com</td>
+                        <td>Ancien Membre</td>
+                        <td>M</td>
                         <td>
                             <a href="{{ url_for('profil_view', user_id=1) }}" class="btn btn-warning">Consulter</a>
-                            <a href="{{ url_for('profil_edit', user_id=1) }}" class="btn btn-primary">Modifier</a>
-                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal">Désinscrire</button>                
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reinscriptionModal">Réinscrire</button>                
                         </td>
                     </tr>
                 </tbody>
@@ -134,27 +133,28 @@
 
 
 
-    <!-- Modale raison de la désinscription -->
-        <div class="modal fade" id="desinscriptionModal" tabindex="-1" aria-labelledby="desinscriptionModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+    <!-- Modale pour confirmer la reinscription -->
+        <div class="modal fade" id="reinscriptionModal" tabindex="-1" aria-labelledby="reinscriptionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg"> 
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="desinscriptionModalLabel">Raison de la désinscription</h5>
+                        <h5 class="modal-title" id="reinscriptionModalLabel">Confirmation de réinscription</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form id="refusForm" method="POST" action="">
-                        <div class="modal-body">
-                            <p>Veuillez indiquer la raison de la désinscription.</p>
-                            <div class="mb-3">
-                                <textarea class="form-control" id="justification" name="justification" rows="4" required></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
+                    <div class="modal-body">
+                        <p>Êtes-vous sûr de vouloir réinscrire ce membre ?</p>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <form id="reinscriptionForm" method="POST" action="">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                             <button type="submit" class="btn btn-success">Confirmer</button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
 {% endblock %}
+
+
+
+ 

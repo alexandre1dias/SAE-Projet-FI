@@ -44,15 +44,41 @@
             </div>
         </div>
     </div>
-    <!--Pour Admin-->
-    <div class="text-center mt-4">
-        <a href="{{ url_for('gerer_profils') }}" class="btn btn-secondary me-2">Retour à la liste</a>
-        <a href="{{ url_for('profil_edit', user_id=user.id) }}" class="btn btn-primary me-2">Modifier ce profil</a>
-        <a href="#" class="btn btn-danger">Désinscrire ce profil</a>
-    </div>
     <!--Pour Membre-->
     <div class="text-center mt-4">
         <a href="{{ url_for('profil_edit', user_id=user.id) }}" class="btn btn-primary me-2">Formuler une demande de modification du profil</a>
     </div>
-</div>
+
+
+    <!--Pour Admin-->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('gerer_profils') }}" class="btn btn-secondary me-2">Retour à la liste</a>
+        <a href="{{ url_for('profil_edit', user_id=user.id) }}" class="btn btn-primary me-2">Modifier ce profil</a>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal">Désinscrire</button>     
+    </div>
+    </div>
+    <!-- Modale raison de la désinscription -->
+        <div class="modal fade" id="desinscriptionModal" tabindex="-1" aria-labelledby="desinscriptionModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="desinscriptionModalLabel">Raison de la désinscription</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="refusForm" method="POST" action="">
+                        <div class="modal-body">
+                            <p>Veuillez indiquer la raison de la désinscription.</p>
+                            <div class="mb-3">
+                                <textarea class="form-control" id="justification" name="justification" rows="4" required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-success">Confirmer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    
 {% endblock %}
