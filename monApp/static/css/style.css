@@ -69,8 +69,8 @@ nav .nav-link {
     }
 
 .contact-container {
-    background-color: #c85a5a;
-    padding: 40px;
+    background-color: #b82828;
+    padding: 10px;
     border-radius: 12px;
     color: white;
 }
@@ -522,7 +522,7 @@ body {
 
 
 .btn-notif {
-    background-color: #575252;
+    background-color: #8b1f1f;
     color: white;
     padding: 12px 40px;
     border: none;
@@ -561,8 +561,6 @@ body {
 /* Activer le mode sombre */
 .mode-sombre {
     display: flex;
-    justify-content: center;
-    align-items: center;
     gap: 15px;
     margin-bottom: 30px;
     font-weight: bold;

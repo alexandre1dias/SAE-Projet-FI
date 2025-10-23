@@ -9,6 +9,14 @@ class LoginForm(FlaskForm):
     next = HiddenField()
     connecter = SubmitField()
 
+
+class PasswordChangeForm(FlaskForm):
+    Login = StringField ('Email' ,validators= [DataRequired(), Email()])
+    old_password = PasswordField ('Mot de passe', validators=[DataRequired()])
+    new_password = PasswordField ('Mot de passe', validators=[DataRequired()])
+    next = HiddenField()
+    connecter = SubmitField()
+
 class EventForm(FlaskForm):
     title = StringField('Titre de l\'événement', validators=[DataRequired()])
     start_date = DateTimeLocalField('Date et heure de début', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])

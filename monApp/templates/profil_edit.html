@@ -37,6 +37,8 @@
                         </div>
                     </div>
 
+                    <!-- Statut - Seul un admin peut changer ce champ-->
+                    <!-- Pourrait être automatiquement fait avec un trigger-->
                     <div class="mb-3 row">
                         <label for="categorie" class="col-sm-4 col-form-label text-muted">Niveau :</label>
                         <div class="col-sm-8">
@@ -60,6 +62,7 @@
                         </div>
                     </div>
 
+                    <!-- Statut - Seul un admin peut changer ce champ-->
                     <div class="mb-3 row">
                         <label for="statut" class="col-sm-4 col-form-label text-muted">Statut :</label>
                         <div class="col-sm-8">
@@ -72,9 +75,15 @@
                             </select>
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <textarea class="form-control" rows="5" placeholder="Décrivez la raison de la modification" required></textarea>
+                    </div>
 
                     <div class="text-center mt-4">
+                        <!-- Pour Admin -->
                         <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
+                        <!-- Pour Membre -->
+                         <button type="submit" class="btn btn-success">Valider la demande de modifications</button>
                         <a href="{{ url_for('profil_view', user_id=user.id) }}" class="btn btn-secondary">Annuler</a>
                     </div>
                 </form>

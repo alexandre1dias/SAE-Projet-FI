@@ -2,7 +2,7 @@ from .app import app, db
 from flask import render_template, request, url_for, redirect, flash
 from config import TITLE
 from flask_login import logout_user, login_user, login_required
-from .forms import LoginForm, EventForm
+from .forms import LoginForm, EventForm,PasswordChangeForm
 from flask import jsonify
 #from .models import Event
 
@@ -103,6 +103,13 @@ def parametres_update():
     return render_template("parametres_update.html", 
                          title=TITLE+"- Paramètres du Membre", 
                          form=form)
+
+@app.route("/changer_mdp/")
+def changer_mdp():
+    unForm = PasswordChangeForm()
+    #Code à faire
+    return render_template ("changer_mdp.html",form=unForm, title=TITLE+"- Changer mot de passe")
+
 
 #Vues notification
 @app.route("/parametres_notifs/")
