@@ -996,3 +996,13 @@ body.dark-mode .fc-daygrid-day {
         display: flex;
     }
 }
+
+/* Permet à la section de s'étendre sur toute la largeur */
+.competitions-section {
+    width: 80vw;
+    position: relative;
+    left: 55%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+}
