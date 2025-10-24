@@ -62,10 +62,15 @@
         </button>
     </div>
     <!--Fin Carousel-->
-    <a href="{{ url_for('evenement_club') }}" class="btn btn-outline-primary btn-custom">retour</a>
-    <a href="" class="btn btn-success">S'inscrire</a>
-    <!-- boutons Admin-->
-    <a href="{{ url_for('club_view') }}" class="btn btn-danger">supprimer évènement</a>
-    <a href="{{ url_for('club_view') }}" class="btn btn-primary">modifier évènement</a>
+
+
+    
+    <div class="d-flex justify-content-center">
+        <a href="{{ url_for('evenement_club') }}" class="btn btn-secondary">Retour</a>
+        <a href="" class="btn btn-success">S'inscrire</a>
+        <!-- boutons Admin-->
+        <a href="{{ url_for('club_update') }}" class="btn btn-primary">Modifier évènement</a>
+        <a href="{{ url_for('club_view') }}" class="btn btn-danger">Supprimer évènement</a>
+    </div>
 
 {% endblock %}

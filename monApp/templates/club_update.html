@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block main %}
-<h1 class="mb-4" >[Nom Compétition]</h1>
+<h1 class="mb-4" >[Nom Evenement Club]</h1>
 
 <div class="row justify-content-center">
         <!--Cartes-->
@@ -39,16 +39,15 @@
     <div class="mb-3">
         <textarea class="form-control" rows="5" placeholder="[Lorem ipsum]" required></textarea>
     </div>
-    <h2>Classement du Club</h2>
+    <h2>Liste des inscrits</h2>
 
-    <!-- Tableau de classement -->
+    <!-- Tableau des inscrits -->
     <table class="table table-striped table-hover">
         <thead class="thead-dark">
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Nom du tireur</th>
                 <th scope="col">Prenom du tireur</th>
-                <th scope="col">Classement</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -57,10 +56,8 @@
                 <th scope="row">1</th>
                 <td>Dupont</td>
                 <td>Jean</td>
-                <td>2</td>
                 <td>
                     <a href="{{ url_for('profil_view', user_id=1) }}" class="btn btn-primary">Consulter</a>
-                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#classementModal">Classer</button>
                     <a class="btn btn-danger">Supprimer</a>
                 </td>
             </tr>
@@ -68,10 +65,8 @@
                 <th scope="row">2</th>
                 <td>Martin</td>
                 <td>Sophie</td>
-                <td>3</td>
                 <td>
                     <a href="{{ url_for('profil_view', user_id=1) }}" class="btn btn-primary">Consulter</a>
-                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#classementModal">Classer</button>
                     <a class="btn btn-danger">Supprimer</a>
                 </td>
             </tr>
@@ -79,7 +74,6 @@
         <tfoot>
             <tr>
                 <td colspan="5" class="text-center">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#classementPDFModal">Mettre/Modifier le classement complet</button>
                     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inscrireMembreModal">Inscrire un membre</button>
                 </td>
             </tr>
@@ -121,7 +115,7 @@
     </div>
     <!--Fin Carousel-->
     <div class="d-flex justify-content-center">
-        <a href="{{ url_for('competition_view') }}" class="btn btn-secondary">retour</a>
+        <a href="{{ url_for('club_view') }}" class="btn btn-secondary">Retour</a>
         <a href="{{ url_for('competitions') }}" class="btn btn-danger">supprimer competition</a>
     </div>
 
@@ -208,52 +202,6 @@
                     </div>
                     <div class="mb-3 text-center">
                             <a class="btn btn-success">Ajouter une image</a>
-                    </div>
-                    <div class="modal-footer justify-content-center">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-success">Confirmer</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale pour mettre le classement PDF -->
-    <div class="modal fade" id="classementPDFModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="classementPDFModalLabel">Mettre/Modifier le classement</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="refusForm" method="POST" action="">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                        <p>Mettre un glisser déposer</p>
-                        </div> 
-                    </div>
-                    <div class="modal-footer justify-content-center">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-success">Confirmer</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale pour modifier le classement-->
-    <div class="modal fade" id="classementModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="classementModalLabel">Modifier le classement du membre</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="refusForm" method="POST" action="">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                         <input type="text" class="form-control" id="nom" name="nom" value="[nb classement]" required>
-                        </div> 
                     </div>
                     <div class="modal-footer justify-content-center">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
