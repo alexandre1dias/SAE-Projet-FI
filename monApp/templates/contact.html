@@ -1,0 +1,71 @@
+{%extends "base.html"%}
+
+{%block main%}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mb-4">Nous Contacter</h1>
+            <p class="text-center lead mb-5">
+                Pour toute question concernant les inscriptions, les horaires ou nos activités, n'hésitez pas à nous joindre. Notre équipe se fera un plaisir de vous répondre.
+            </p>
+        </div>
+        <div class="contact-container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="row justify-content-center">
+                    <div class="col-md-6 mb-3">
+                        <div class="contact-info-box">
+                            <img src="{{ url_for('static', filename='images/contact/carte.png') }}" class="d-block mx-auto contact-icon-img" alt="image de position">
+                            <h5>20 rue Guynemer, Blois</h5>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="contact-info-box">
+                            <img src="{{ url_for('static', filename='images/contact/telephone.png') }}" class="d-block mx-auto contact-icon-img" alt="image de téléphone">
+                            <h5>02 54 42 26 46</h5>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="contact-info-box">
+                            <img src="{{ url_for('static', filename='images/contact/e-mail.png') }}" class="d-block mx-auto contact-icon-img" alt="image de e-mail">
+                            <h5>blois.escrime@wanadoo.fr</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 contact-form">
+                <h2>Nous contacter</h2>
+                <form action="#" method="POST">
+                    <div class="mb-3">
+                        <h5 class="mb-2">Choisissez le type de mail</h5>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="mail_type" id="type_question" value="question" checked>
+                            <label class="form-check-label" for="type_question">Question</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="mail_type" id="type_demande" value="demande">
+                            <label class="form-check-label" for="type_demande">Demande</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="mail_type" id="type_signalement" value="signalement">
+                            <label class="form-check-label" for="type_signalement">Signalement</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" class="form-control" placeholder="Entrez votre nom" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="sujet" class="form-control" placeholder="Sujet" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="email" class="form-control" placeholder="Entrez une adresse email valide" required>
+                    </div>
+                    <div class="mb-3">
+                        <textarea class="form-control" rows="5" placeholder="Entrez votre message" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Nous faire parvenir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

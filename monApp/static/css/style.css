@@ -1,0 +1,1230 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#main{
+    margin-top: 7em;
+}
+
+
+#cloche img {
+  width: 28px;   
+  height: auto;  
+  transition: width 0.3s ease;
+} 
+
+.badge{
+  transform: translate(-50%, 0%) !important; 
+}
+
+/* Pour paramètres*/
+#param:hover img {
+    filter: brightness(0);
+}
+
+/*Pour les notifications*/
+.notifs-scroll {
+  max-height: 400px; 
+  overflow-y: auto;  
+}
+.dropdown-menu .notification-delete {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    flex-shrink: 0; 
+}
+.dropdown-menu .notif-new{
+    margin-right: 40px;
+}
+.dropdown-menu .notification-delete img {
+    width: 100% !important;   
+    height: 100% !important; 
+    object-fit: contain;
+}
+.dropdown-menu .notification-delete:hover {
+    opacity: 0.7;
+}
+
+/* Pour le nav de base */
+nav{
+    background-color: #b82828;
+}
+
+nav .nav-link {
+  color: white; /* Remplacez par le code couleur de votre choix */
+  font-size: larger;
+}
+
+.navbar-brand img {
+    height: 65px; 
+    width: auto; 
+}
+
+
+
+/* Page escrime feminin */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    filter: invert(1);
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+}
+
+.cta-button {
+            display: inline-block;
+            background-color: #b82828;
+            color: #fff;
+            padding: 12px 25px;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+}
+
+/*Pour la page contact*/
+.contact-section {
+        padding: 50px 0;
+        background-color: #f8f9fa;
+    }
+
+.contact-container {
+    background-color: #b82828;
+    padding: 10px;
+    border-radius: 12px;
+    color: white;
+}
+
+.contact-info-box {
+    background-color: white;
+    color: #333;
+    padding: 25px;
+    text-align: center;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.contact-info-box .icon {
+    font-size: 2rem;
+    color: #c85a5a; /* Couleur de l'icône */
+    margin-bottom: 15px;
+}
+
+.contact-info-box h5 {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.contact-form h2 {
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.form-control {
+    background-color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+}
+
+.form-control:focus {
+    background-color: white;
+    box-shadow: 0 0 0 2px #a04848;
+}
+
+.page-title {
+    font-weight: bold;
+    display: inline-block;
+    border-bottom: 4px solid #c85a5a;
+    padding-bottom: 5px;
+    margin-bottom: 40px;
+}
+
+.contact-icon-img {
+    height: 40px;
+    width: auto;
+    margin-bottom: 15px;
+}
+
+/* Page d'Acceuil */
+
+header{
+    width: 100%;
+    height: 70vh;
+    background-image: url(../images/acceuil/headerbg2.jpg);
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 60px;
+}
+
+.header-content{
+    margin-bottom: 150px;
+    color: whitesmoke;
+    text-align: center;
+}
+
+.header-content h2{
+    font-size: 4vmin;
+    background-color: #b82828;
+}
+
+.h1acc{
+    font-size: 7vmin;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    background-color: rgba(184, 40, 40, 0.8);
+    padding: 15px 40px;
+    border-radius: 50px;
+    display: inline-block;
+    backdrop-filter: blur(5px);  
+}
+
+.h2acc{
+    font-size: 4vmin;
+    background-color: rgba(184, 40, 40, 0.8); /* Semi-transparent */
+    padding: 10px 30px;
+    border-radius: 50px;
+    display: inline-block;
+    backdrop-filter: blur(5px); /* Effet de flou moderne */
+}
+
+.lineH{
+    width: 300px;
+    height: 4px;
+    background: #ffffff;
+    margin: 10px auto;
+    border-radius: 5px;
+}
+
+.line{
+    width: 150px;
+    height: 4px;
+    background: #000000;
+    margin: 10px auto;
+    border-radius: 5px;
+}
+
+.header-content h1{
+    font-size: 7vmin;
+    margin-top: 50px;
+    
+    margin-bottom: 30px;
+}
+
+.ctn{
+    padding: 8px 15px;
+    background: #b82828;
+    border-radius: 30px;
+    color: whitesmoke;
+    margin-top: 30px;
+}
+
+/* Acceuil Blocs */
+
+section{
+    width: 80%;
+    margin: 80px auto;
+}
+
+.title{
+    text-align: center;
+    font-size: 4vmin;
+    color: #b82828;
+}
+
+.btn-article{
+    width: 100%;
+    padding: 15px;
+    background: #b82828;
+    color: #ffffff;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.3);;
+}
+
+.btn-article:hover {
+    background: #000000;
+    color: white;
+    box-shadow: 0 5px 15px rgba(239, 83, 80, 0.3);
+}
+
+.explore{
+    width: 100%;
+    height: 80vh;
+   /* background-image: ;*/
+   background-position: center;
+   background-size: cover;
+   background-repeat: no-repeat;
+   display: flex;
+   align-items: center;
+}
+
+.explore-content{
+    width: 50%;
+    padding: 50px;
+    color: rgb(5, 0, 0);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.explore-content h1{
+    font-size: 7vmin;
+    margin: 50px;
+}
+
+.explore-content p{
+    color: rgb(2, 0, 0);
+}
+
+.explore-col{
+    height: 250px;
+    width: 500px;
+}
+
+.explore-col video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Pour garder les proportions */
+    border-radius: 10px; /* Optionnel : coins arrondis */
+}
+
+/* Page connexion */
+body {
+    font-family: sans-serif; 
+    display: flex;
+}
+
+.page-login {
+    background: #ffffff !important; /* le !important pour forcer la couleur. */ 
+    min-height: 100vh;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    width: 520px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 55px 65px;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    border-radius: 18px;
+    /* background: linear-gradient( rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);*/
+    background: #b82828;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+.logo {
+    margin-bottom: 30px;
+    text-align: center;
+    width: 100%;
+}
+
+.logo img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: white;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.form-input {
+    width: 100%;
+    padding: 15px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: all 0.3s;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+
+.form-input::placeholder {
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+.btn-connecter {
+    width: 100%;
+    padding: 15px;
+    background: white;
+    color: #b82828;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.3);;
+}
+.btn-connecter:hover {
+    background: #000000;
+    color: white;
+    box-shadow: 0 5px 15px rgba(239, 83, 80, 0.3);
+}
+
+/*Page gerer profils*/
+.table-responsive {
+    overflow-x: auto;
+}
+
+#table-profils td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    vertical-align: middle;
+}
+
+#table-profils .actions {
+    white-space: normal;
+    overflow: visible;
+    max-width: none;
+    position: sticky;
+    right: 0;
+    z-index: 1;
+    background-color: white;
+     display: flex;
+    gap: 5px; 
+}
+
+.action-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+}
+
+/* Inscription*/
+.btn-inscription {
+    display: block; /* Important pour que le lien <a> prenne toute la largeur */
+    width: 100%;
+    padding: 15px;
+    background: white;
+    color: #b82828;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.3);
+    text-align: center; /* Pour centrer le texte */
+    text-decoration: none; /* Pour enlever le soulignement du lien */
+}
+.btn-inscription:hover {
+    background: #000000;
+    color: white;
+    box-shadow: 0 5px 15px rgba(239, 83, 80, 0.3);
+}
+.titre-inscription{
+    color: white;
+}
+.inscription-container {
+    width: 520px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 20px;
+    margin-top: 100px;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    border-radius: 18px;
+    /* background: linear-gradient( rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);*/
+    background: #b82828;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+.modal-title{
+    text-align: center;
+    width: 100%;
+}
+
+
+
+/* Style pour le conteneur FullCalendar */
+.fullcalendar-container {
+    min-height: 600px; /* Assure que le calendrier a une hauteur visible */
+}
+
+
+
+/*Page de matériel*/
+.h1-materiel-section {
+    background: transparent;
+    color: rgb(0, 0, 0);
+    padding: 60px 0;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.h1-materiel-section h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.h1-materiel-section .lead {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* Boîte de prix */
+.box-prix {
+    background-color: #f8f9fa;
+    border-left: 4px solid #b82828;
+    padding: 20px;
+    margin: 30px 0;
+    border-radius: 5px;
+}
+
+.box-prix .prix {
+    font-size: 2rem;
+    color: #b82828;
+    font-weight: bold;
+}
+
+.box-prix h4 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.box-prix .texte-informatif {
+    color: #dc3545 !important;
+}
+
+/* Page de paramètres */ 
+
+.titreparametre{
+    margin-right: 30px;
+    margin-top: 5vmin;
+}
+
+.lineP{
+    width: 230px;
+    height: 4px;
+    background: #000000;
+    margin: 1px;
+    border-radius: 5px;
+}
+
+.parametres-page {
+    max-width: 600px;
+    margin: 0;
+    padding: 40px 20px 80px 20px;
+}
+
+.page-title {
+    font-weight: bold;
+    display: inline-block;
+    border-bottom: 4px solid #b82828;
+    padding-bottom: 5px;
+    margin-bottom: 40px;
+}
+
+.parametres-container {
+    margin-top: 20px;
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 50px;
+}
+
+
+.user-icon {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.user-icon img {
+    width: 80px;
+    height: 80px;
+}
+
+.parametres-form {
+    margin-top: 30px;
+}
+
+.form-row-par {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 1000px;
+}
+
+.form-row-par label {
+    font-weight: bold;
+    min-width: 200px;
+    margin-left: 15vmin;
+}
+
+.form-input-param {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+}
+
+.form-submit {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.btn-envoyer {
+    background-color: #b82828;
+    color: white;
+    padding: 12px 40px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-envoyer:hover {
+    background-color: #8b1f1f;
+}
+
+
+.btn-notif {
+    background-color: #8b1f1f;
+    color: white;
+    padding: 12px 40px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-notif:hover{
+    background-color: rgb(54, 53, 53);
+}
+
+.btn-retour {
+    background-color: #575252;
+    color: white;
+    padding: 5px 30px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-retour:hover{
+    background-color: rgb(110, 0, 0);
+}
+
+
+.switch-container {
+  display: flex;          
+  align-items: center;    
+  gap: 160px;              
+}
+
+/* Activer le mode sombre */
+.mode-sombre {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 24px;
+    transition: 0.4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.4s;
+}
+
+input:checked + .slider {
+    background-color: #48ad4c;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+body.dark-mode .lineP {
+    background-color: #ffffff;
+    color: #fefefe;
+}
+
+body.dark-mode {
+    background-color: #1c1c1e;
+    color: #fefefe;
+}
+
+body.dark-mode nav {
+    background-color: #8b1f1f !important;
+}
+
+body.dark-mode a {
+    color: whitesmoke;
+}
+
+body.dark-mode h1,h2,h3,h4 {
+    color: whitesmoke;
+}
+
+body.dark-mode p {
+    color: whitesmoke;
+}
+
+body.dark-mode .dropdown-menu {
+    background-color: #2c2c2e;
+    border-color: #555;
+}
+
+body.dark-mode .dropdown-item {
+    color: #fefefe;
+}
+
+body.dark-mode .dropdown-item:hover,
+body.dark-mode .dropdown-item:focus {
+    background-color: #3a3a3c;
+    color: #fefefe;
+}
+
+body.dark-mode .parametres-container,
+body.dark-mode .contact-container,
+body.dark-mode .card {
+    background-color: #2c2c2e;
+    color: #fefefe;
+}
+
+body.dark-mode .form-input-param,
+body.dark-mode .form-control {
+    background-color: #3a3a3c;
+    color: #fefefe;
+    border-color: #555;
+}
+
+body.dark-mode img {
+    filter: brightness(0.8);
+}
+
+body.dark-mode .box-prix {
+    background-color: #2c2c2e;
+}
+
+body.dark-mode .page-login {
+    background-color: #1c1c1e !important; 
+    color: #fefefe;
+}
+
+body.dark-mode th, tr{
+background-color: #1c1c1e !important;
+color: #fefefe;
+}
+
+body.dark-mode td{
+background-color: #1c1c1e !important;
+color: #fefefe;
+}
+
+/* CSS Calendrier */
+
+.calendrier-section {
+    padding: 40px 20px;
+}
+
+.calendrier-section h1 {
+    color: #b82828;
+    margin-bottom: 40px;
+}
+
+/*le container des filtres*/
+.filtres-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.filtres-titre {
+    color: #b82828;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #b82828;
+}
+
+.filtre-categorie {
+    margin-bottom: 20px;
+}
+
+.filtre-categorie h6 {
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+}
+
+.form-check {
+    margin-bottom: 8px;
+}
+
+.form-check-label {
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+/*le container du calendrier */
+.calendrier-wrapper {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* pour le mode clair par défaut du calendirer lorsque le mode sombre est désactivé */
+.fc {
+    color: #000;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border-color: #ddd;
+    background-color: white;
+}
+
+.fc-daygrid-day {
+    background-color: white;
+    color: #000;
+}
+
+.fc-col-header-cell {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+.fc-day-today {
+    background-color: #fff3cd !important;
+}
+
+.fc-daygrid-day-number {
+    color: #000;
+}
+
+
+/* pour le mode sombre du calendrier*/
+body.dark-mode .filtres-container,
+body.dark-mode .calendrier-wrapper {
+    background-color: #2c2c2e;
+}
+
+body.dark-mode .filtre-categorie h6,
+body.dark-mode .form-check-label {
+    color: #fefefe;
+}
+
+body.dark-mode .fc {
+    color: #fefefe;
+}
+
+body.dark-mode .fc-theme-standard td,
+body.dark-mode .fc-theme-standard th {
+    border-color: #555;
+}
+
+body.dark-mode .fc-daygrid-day {
+    background-color: #2c2c2e;
+}
+
+/* Proportions des colonnes */
+@media (min-width: 992px) {
+    .col-lg-3 {
+        max-width: 23%;
+    }
+    
+    .col-lg-9 {
+        max-width: 77%;
+    }
+}
+/* CSS Calendrier */
+
+.calendrier-section {
+    padding: 40px 20px;
+}
+
+.calendrier-section h1 {
+    color: #b82828;
+    margin-bottom: 40px;
+}
+
+.header-container {
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;            
+    width: 100%;
+    margin-bottom: 20px; 
+    gap: 20px; 
+}
+
+.header-container .btn {
+    height: 50px;
+    display: inline-flex;  
+    align-items: center;   
+    white-space: nowrap;  
+}
+
+/* search bar */
+.search-container {
+    position: relative;
+    flex-grow: 1; 
+    max-width: 400px; 
+    margin-top: 13px;
+}
+
+.search-input {
+    height: 50px; 
+    border-radius: 30px;
+    padding-left: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+/*le container des filtres*/
+.filtres-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.filtres-titre {
+    color: #b82828;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #b82828;
+}
+
+.filtre-categorie {
+    margin-bottom: 20px;
+}
+
+.filtre-categorie h6 {
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+}
+
+.form-check {
+    margin-bottom: 8px;
+}
+
+.form-check-label {
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+/*le container du calendrier */
+.calendrier-wrapper {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* pour le mode clair par défaut du calendirer lorsque le mode sombre est désactivé */
+.fc {
+    color: #000;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border-color: #ddd;
+    background-color: white;
+}
+
+.fc-daygrid-day {
+    background-color: white;
+    color: #000;
+}
+
+.fc-col-header-cell {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+.fc-day-today {
+    background-color: #fff3cd !important;
+}
+
+.fc-daygrid-day-number {
+    color: #000;
+}
+
+
+/* pour le mode sombre du calendrier*/
+body.dark-mode .filtres-container,
+body.dark-mode .calendrier-wrapper {
+    background-color: #2c2c2e;
+}
+
+body.dark-mode .filtre-categorie h6,
+body.dark-mode .form-check-label {
+    color: #fefefe;
+}
+
+body.dark-mode .fc {
+    color: #fefefe;
+}
+
+body.dark-mode .fc-theme-standard td,
+body.dark-mode .fc-theme-standard th {
+    border-color: #555;
+}
+
+body.dark-mode .fc-daygrid-day {
+    background-color: #2c2c2e;
+}
+
+/* Proportions des colonnes */
+@media (min-width: 992px) {
+    .col-lg-3 {
+        max-width: 23%;
+    }
+    
+    .col-lg-9 {
+        max-width: 77%;
+    }
+}
+
+/* CSS Compétitions */
+
+/* Filtres aside */
+.filtres-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.filtres-box h5 {
+    color: #b82828;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #b82828;
+}
+
+.form-check {
+    margin-bottom: 10px;
+}
+
+.form-check-label {
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: #b82828;
+    border-color: #b82828;
+}
+
+/* Container des cartes */
+.competitions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Ou si vous utilisez déjà Bootstrap row/col */
+.card-competition {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    height: 100%; /* Pour que toutes les cartes aient la même hauteur */
+    display: flex;
+    flex-direction: column;
+}
+
+.card-competition h3 {
+    background-color: #b82828;
+    color: white;
+    padding: 15px;
+    margin: -20px -20px 15px -20px;
+    border-radius: 8px 8px 0 0;
+}
+
+.card-competition button {
+    margin-top: auto; /* Pousse le bouton vers le bas */
+}
+
+/* Ajuster les colonnes Bootstrap */
+@media (min-width: 992px) {
+    .col-lg-9 .row > div {
+        display: flex;
+    }
+}
+
+/* Permet à la section de s'étendre sur toute la largeur */
+.competitions-section {
+    width: 80vw;
+    position: relative;
+    left: 55%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+}
+
+/* pour les bordures dans l'acceuil */ 
+
+header {
+    width: 100vw !important;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 100vw; 
+}
+
+.explore-section {
+    width: 80% !important; 
+    margin-left: auto !important;
+    margin-right: auto !important;
+    position: static !important;
+    left: auto !important;
+    transform: none !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between; 
+    padding: 0 15px !important; 
+}
+
+.explore-section .explore-content {
+    width: 50% !important;
+    padding: 50px !important; 
+}
+.explore-section .explore-col {
+    height: 250px !important;
+    width: 500px !important;
+    margin: 0 !important;
+}
+
+.acceuil-section > .title,
+.title-acceuil > .title {
+    width: 80% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+
+.acceuil-section > .row,
+.title-acceuil > .row {
+    width: 80% !important; 
+    margin: 0 auto !important; 
+    padding: 0 15px !important; 
+}
+
+.acceuil-section .row .container.py-5,
+.title-acceuil .row .container.py-5 {
+    padding: 0 !important; 
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.acceuil-section .container.py-5 .row,
+.title-acceuil .container.py-5 .row {
+    margin-left: -15px !important; 
+    margin-right: -15px !important;
+}
+
+
+.acceuil-section > .row > .col:last-child,
+.title-acceuil > .row > .col:last-child {
+    width: 100% !important; 
+    max-width: 100% !important;
+    margin: 20px auto 0 !important;
+    padding: 0 15px !important;
+    text-align: center;
+}
+
+.btn-article {
+    display: block; 
+    width: 100%;
+    max-width: 300px;
+    margin: 20px auto;
+}
+
+#main:has(.homepage-content) {
+    margin-top: 0 !important;
+}
+
+body.homepage #main {
+    margin-top: 79px !important;
+}

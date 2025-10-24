@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
+{% endblock %}
+
+{% block main %}
+    <h1>Adhésion</h1>
+    <p>Le montant de l’adhésion comprend la licence F.F.E. 2025 – 2026 :</p>
+<div class="container py-5">
+    <h2 class="text-center mb-5">Choississez votre adhésion</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col">
+            <div class="card pricing-card h-100">
+                <div class="card-header pricing-header basic-header p-4">
+                    <h3 class="card-title text-center mb-0">Initiation</h3>
+                </div>
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">225 €<small class="text-muted">/an</small></h2>
+                    <ul class="feature-list text-center mb-4">
+                        <li>pour la première année puis voir les autres tarifs</li>
+                    </ul>
+                    <div class="text-center">
+                        <a href="#" class="btn btn-outline-primary btn-custom">Choisir</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card pricing-card h-100">
+                <div class="card-header pricing-header basic-header p-4">
+                    <h3 class="card-title text-center mb-0">Scolaires/Etudiants</h3>
+                </div>
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">235 €<small class="text-muted">/an</small></h2>
+                    <div class="text-center">
+                        <a href="#" class="btn btn-outline-primary btn-custom">Choisir</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card pricing-card h-100">
+                <div class="card-header pricing-header basic-header p-4">
+                    <h3 class="card-title text-center mb-0">Autres adultes</h3>
+                </div>
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">255 €<small class="text-muted">/an</small></h2>
+                    <div class="text-center">
+                        <a href="#" class="btn btn-outline-primary btn-custom">Choisir</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

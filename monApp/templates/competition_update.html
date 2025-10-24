@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toggle_switch.css') }}">
+{% endblock %}
+
+{% block main %}
+<h1 class="mb-4" >[Nom Compétition]</h1>
+
+<div class="row justify-content-center">
+        <!--Cartes-->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 text-center shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <input type="text" class="form-control" id="nom" name="nom" value="[date]" required>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 text-center shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <input type="text" class="form-control" id="nom" name="nom" value="[lieu]" required>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 text-center shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <input type="text" class="form-control" id="nom" name="nom" value="[nb participants]" required>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Fin Carte-->
+    
+    <h2>Description :</h2>
+    <div class="mb-3">
+        <textarea class="form-control" rows="5" placeholder="[Lorem ipsum]" required></textarea>
+    </div>
+    <h2>Classement du Club</h2>
+
+    <!-- Tableau de classement -->
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nom du tireur</th>
+                <th scope="col">Prenom du tireur</th>
+                <th scope="col">Classement</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>Dupont</td>
+                <td>Jean</td>
+                <td>2</td>
+                <td>
+                    <a href="{{ url_for('profil_view', user_id=1) }}" class="btn btn-primary">Consulter</a>
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#classementModal">Classer</button>
+                    <a class="btn btn-danger">Supprimer</a>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">2</th>
+                <td>Martin</td>
+                <td>Sophie</td>
+                <td>3</td>
+                <td>
+                    <a href="{{ url_for('profil_view', user_id=1) }}" class="btn btn-primary">Consulter</a>
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#classementModal">Classer</button>
+                    <a class="btn btn-danger">Supprimer</a>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" class="text-center">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#classementPDFModal">Mettre/Modifier le classement complet</button>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inscrireMembreModal">Inscrire un membre</button>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    <!--Fin Tableau-->
+    <!-- Carousel d'images -->
+     <div class="text-center"><button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#gererImagesModal">Gérer les images</button></div>
+    <div id="carouselTop" class="carousel slide mb-3" data-bs-ride="carousel">
+        
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselTop" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselTop" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselTop" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            <button type="button" data-bs-target="#carouselTop" data-bs-slide-to="3" aria-label="Slide 4"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{{ url_for('static', filename='images/escrime_feminin/image1.png') }}" class="d-block mx-auto" alt="Escrimeuses en action dans le gymnase">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ url_for('static', filename='images/escrime_feminin/image2.png') }}" class="d-block mx-auto" alt="Groupe d'escrimeuses posant">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ url_for('static', filename='images/escrime_feminin/image3.png') }}" class="d-block mx-auto" alt="Assaut entre deux escrimeuses">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ url_for('static', filename='images/escrime_feminin/image4.png') }}" class="d-block mx-auto" alt="Portrait de deux escrimeuses souriantes">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselTop" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselTop" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    <!--Fin Carousel-->
+    <div class="d-flex justify-content-center">
+        <a href="{{ url_for('competition_view') }}" class="btn btn-secondary">retour</a>
+        <a href="{{ url_for('competitions') }}" class="btn btn-danger">supprimer competition</a>
+    </div>
+
+    <!-- Modale pour inscrire un membre -->
+    <div class="modal fade" id="inscrireMembreModal" >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inscrireMembreModalLabel">Inscription d'un membre</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="refusForm" method="POST" action="">
+                    <div class="modal-body">
+                        <input type="text" class="modal-title search-input" id="inscrireMembreModalRecherche" placeholder="Rechercher...">
+                        <div class="mb-3">
+                             <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Prenom</th>
+                                        <th>Niveau</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>Jean</th>
+                                        <td>Dupont</td>
+                                        <td>M17</td>
+                                        <td><a class="btn btn-success">Ajouter</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-success">Confirmer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale pour gérer les images -->
+    <div class="modal fade" id="gererImagesModal" tabindex="-1" aria-labelledby="gererImagesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="gererImagesModalLabel">Gérer images</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="refusForm" method="POST" action="">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                             <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Numéro</th>
+                                        <th>Url</th>
+                                        <th>Nom</th>
+                                        <th>Privée</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th><input type="text" class="form-control" id="num-image" value="1" required></th>
+                                        <td>image.png</td>
+                                        <td><input type="text" class="form-control" id="nom-image" value="image" required></td>
+                                        <td>
+                                            <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                                                <input checked type="checkbox" id="image-privee">
+                                                <span class="toggle">
+                                                    <span class="switch"></span>
+                                                </span>
+                                            </label>
+                                        </td>
+                                        <td><a class="btn btn-warning">Changer Url</a><a class="btn btn-danger">Supprimer</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="mb-3 text-center">
+                            <a class="btn btn-success">Ajouter une image</a>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-success">Confirmer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale pour mettre le classement PDF -->
+    <div class="modal fade" id="classementPDFModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="classementPDFModalLabel">Mettre/Modifier le classement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="refusForm" method="POST" action="">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                        <p>Mettre un glisser déposer</p>
+                        </div> 
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-success">Confirmer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale pour modifier le classement-->
+    <div class="modal fade" id="classementModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="classementModalLabel">Modifier le classement du membre</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="refusForm" method="POST" action="">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                         <input type="text" class="form-control" id="nom" name="nom" value="[nb classement]" required>
+                        </div> 
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-success">Confirmer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{%extends "base.html"%}
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toggle_switch.css') }}">
+{% endblock %}
+
+
+{%block main%}
+    <h1 class="titreparametre"> <strong> Parametres</strong> </h1>
+    <div class="lineP"></div>
+
+    <ul class="list-group">
+        <li class="list-group-item">
+            <h4>Paramètres visuel</h4>
+            <div class="mode-sombre">
+                <label>Mode sombre :</label>
+                <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                    <input  type="checkbox" id="darkModeToggle">
+                    <span class="toggle">
+                        <span class="switch"></span>
+                    </span>
+                </label>
+            </div>    
+        </li>
+        <li class="list-group-item">
+            <h4>Paramètres du site</h4>
+            <a href="/parametres_notifs/"><button type="button" class="btn-notif">Aller aux parametres de notifications</button></a>  
+        </li>
+        <li class="list-group-item">
+            <h4>Paramètres de confidentialités</h4>
+            <a href="/changer_mdp/"><button type="button" class="btn-notif">Changer le mot de passe</button></a>  
+        </li>
+    </ul>
+    
+
+
+
+    
+{% endblock %}
+

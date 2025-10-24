@@ -1,0 +1,160 @@
+{%extends "base.html"%}
+
+{%block main%}
+    
+    <div class="header-container">
+    <h1>Liste des profils des membres</h1>
+    
+    <div class="search-container">
+        <input type="text" class="form-control search-input" placeholder="Rechercher...">
+    </div>
+    
+        <a href="{{ url_for('gerer_profils') }}" class="btn btn-secondary">Voir la liste des ancien membres</a>
+    </div>
+
+        <div class="row"><!--colonne pour les filtres à gauche -->
+            <aside class="col-lg-2 col-md-3 mb-4">
+                <div class="filtres-box">
+                    <h5 class="filtres-titre">Filtres</h5>
+                        <h6>Sexe</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="homme" checked>
+                            <label class="form-check-label" for="homme">Homme</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="femme" checked>
+                            <label class="form-check-label" for="femme">Femme</label>
+                        </div>
+                        <h6>Niveau</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="M9" checked>
+                            <label class="form-check-label" for="M9">M9</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="M11" checked>
+                            <label class="form-check-label" for="M11">M11</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="M13" checked>
+                            <label class="form-check-label" for="M13">M13</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="M15" checked>
+                            <label class="form-check-label" for="M15">M15</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="M17" checked>
+                            <label class="form-check-label" for="M17">M17</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="M20" checked>
+                            <label class="form-check-label" for="M20">M20</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="senior" checked>
+                            <label class="form-check-label" for="senior">Sénior</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="veteran" checked>
+                            <label class="form-check-label" for="veteran">Vétéran</label>
+                        </div>
+                    <div class="filtre-categorie">
+                        <h6>Trier par </h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tri" id="dateRecente" checked>
+                            <label class="form-check-label" for="dateRecente">Date plus récent</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tri" id="dateAncienne">
+                            <label class="form-check-label" for="dateAncienne">Date plus ancienne</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tri" id="alphabetique-nom-croissant">
+                            <label class="form-check-label" for="alphabetique-nom-croissant">Ordre alphabétique Nom A-Z</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tri" id="alphabetique-nom-decroissant">
+                            <label class="form-check-label" for="alphabetique-nom-decroissant">Ordre alphabétique Nom Z-A</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tri" id="alphabetique-prenom-croissant">
+                            <label class="form-check-label" for="alphabetique-prenom-croissant">Ordre alphabétique Prenom A-Z</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tri" id="alphabetique-prenom-decroissant">
+                            <label class="form-check-label" for="alphabetique-prenom-decroissant">Ordre alphabétique Prenom Z-A</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tri" id="trie-statut">
+                            <label class="form-check-label" for="trie-statut">Statut</label>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+        <div class="col-lg-10 col-md-9">
+            <table class="table table-striped table-bordered table-hover" id="table-profils">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Age</th>
+                        <th>Date de naissance</th>
+                        <th>Date de désinscription</th>
+                        <th>Niveau</th>
+                        <th>Email</th>
+                        <th>Statut</th>
+                        <th>Sexe</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr> 
+                        <td>Hayreddin</td>
+                        <td>Barbarossa</td>
+                        <td>50</td>
+                        <td>01/01/1975</td>
+                        <td>21/07/2023</td>
+                        <td>Veteran</td>
+                        <td>gangplank@gmail.com</td>
+                        <td>Ancien Membre</td>
+                        <td>M</td>
+                        <td>
+                            <a href="{{ url_for('profil_view', user_id=1) }}" class="btn btn-warning">Consulter</a>
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reinscriptionModal">Réinscrire</button>                
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+
+
+
+
+    <!-- Modale pour confirmer la reinscription -->
+        <div class="modal fade" id="reinscriptionModal" tabindex="-1" aria-labelledby="reinscriptionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg"> 
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="reinscriptionModalLabel">Confirmation de réinscription</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Êtes-vous sûr de vouloir réinscrire ce membre ?</p>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <form id="reinscriptionForm" method="POST" action="">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-success">Confirmer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+
+
+ 

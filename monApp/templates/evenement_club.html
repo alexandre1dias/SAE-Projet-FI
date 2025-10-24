@@ -1,0 +1,150 @@
+{%extends "base.html"%}
+    {% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
+    {% endblock %}
+    {%block main%}
+        <div class="container py-5">
+            <h2 class="text-center mb-5">Listes des prochains évènements du cercle</h2>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <!--Cartes-->
+                <!--faire une boucle-->
+                <div class="col">
+                    <div class="card pricing-card h-100">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0">Raclette</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4">Tous le monde</h2>
+                            <ul class="feature-list text-center mb-4">
+                                <li>18/10/2025 - 18/10/2025</li>
+                                <li>à partir de 19H</li>
+                                <li>Club House</li>
+                                <li>nombres de participants actuels: 15</li>
+
+                            </ul>
+                            <div class="text-center">
+                                <a href="{{ url_for('club_view') }}" class="btn btn-outline-primary btn-custom">voir plus</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Fin Carte-->
+                <div class="col">
+                    <div class="card pricing-card h-100">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0">Stage d'Automne</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4">M13,M15,M17</h2>
+                            <ul class="feature-list text-center mb-4">
+                                <li>20/10/2025 - 24/10/2025</li>
+                                <li>rendez vous devant le club à 9h</li>
+                                <li>gymnase</li>
+                                <li>nombres de participants actuels: 15</li>
+
+                            </ul>
+                            <div class="text-center">
+                                <a href="{{ url_for('club_view') }}" class="btn btn-outline-primary btn-custom">voir plus</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card pricing-card h-100">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0">Activité découverte sabre laser</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4">M13,M15,M17</h2>
+                            <ul class="feature-list text-center mb-4">
+                                <li>25/10/2025 - 25/10/2025</li>
+                                <li>à partir de 13h30</li>
+                                <li>gymnase</li>
+                                <li>nombres de participants actuels: 8</li>
+
+                            </ul>
+                            <div class="text-center">
+                                <a href="{{ url_for('club_view') }}" class="btn btn-outline-primary btn-custom">voir plus</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container py-5">
+            <h2 class="text-center mb-5">Listes des évènements passés du cercle</h2>
+            <!--Filtres ordre-->
+            <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">Filtrer par</button>
+                    <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                        <li><a class="dropdown-item" href="#">Date (Plus récent)</a></li>
+                        <li><a class="dropdown-item" href="#">Date (Plus ancien)</a></li>
+                    </ul>
+            </div>
+            <!--Fin Filtres ordre-->
+            
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card pricing-card h-100">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0">Barbecue</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4">Tous le monde</h2>
+                            <ul class="feature-list text-center mb-4">
+                                <li>26/8/2025 - 26/8/2025</li>
+                                <li>à partir de 12H</li>
+                                <li>Club House</li>
+                                <li>nombres de participants actuels: 35</li>
+
+                            </ul>
+                            <div class="text-center">
+                                <a href="{{ url_for('club_view') }}" class="btn btn-outline-primary btn-custom">voir plus</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card pricing-card h-100">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0">Stage d'Été</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4">M13,M15,M17</h2>
+                            <ul class="feature-list text-center mb-4">
+                                <li>14/07/2025 - 18/08/2025</li>
+                                <li>rendez vous devant le club à 9h</li>
+                                <li>gymnase</li>
+                                <li>nombres de participants actuels: 21</li>
+
+                            </ul>
+                            <div class="text-center">
+                                <a href="{{ url_for('club_view') }}" class="btn btn-outline-primary btn-custom">voir plus</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card pricing-card h-100">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0">initiation garderie</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4">Vétérans & Seniors</h2>
+                            <ul class="feature-list text-center mb-4">
+                                <li>08/06/2025 - 08/06/2025</li>
+                                <li>15h30</li>
+                                <li>Garderie des moineaux,Blois</li>
+                                <li>nombres de participants actuels: 2</li>
+
+                            </ul>
+                            <div class="text-center">
+                                <a href="{{ url_for('club_view') }}" class="btn btn-outline-primary btn-custom">voir plus</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}   
+        

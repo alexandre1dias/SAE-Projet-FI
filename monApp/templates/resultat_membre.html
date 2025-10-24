@@ -1,0 +1,74 @@
+{%extends "base.html"%}
+    {% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
+    {% endblock %}
+    {%block main%}
+    <div class="container-fluid py-5">
+        <h2 class="text-center mb-5">Liste de vos résultats</h2>
+        <div class="row">
+            <aside class="col-lg-2 col-md-3 mb-4">
+                <div class="filtres-box">
+                    <h5>Filtrer par</h5>
+                    <h6>Type d'arme</h6>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="sabre" checked>
+                        <label class="form-check-label" for="sabre">Sabre</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="fleuret" checked>
+                        <label class="form-check-label" for="fleuret">Fleuret</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="epee" checked>
+                        <label class="form-check-label" for="epee">Épée</label>
+                    </div>
+                    <h6>Type de compétition</h6>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="regional" checked>
+                        <label class="form-check-label" for="regional">Régional</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="national" checked>
+                        <label class="form-check-label" for="national">National</label>
+                    </div>
+                    <h6>Trier par</h6>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="tri" id="dateRecente" checked>
+                        <label class="form-check-label" for="dateRecente">Date (plus récent)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="tri" id="dateAncienne">
+                        <label class="form-check-label" for="dateAncienne">Date (plus ancien)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="tri" id="meilleurClassement">
+                        <label class="form-check-label" for="meilleurClassement">Classement (meilleur)</label>
+                    </div>
+                </div>
+            </aside>
+            <div class="col-lg-10 col-md-9">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div class="col">
+                        <div class="card pricing-card h-100">
+                            <div class="card-header pricing-header basic-header p-4">
+                                <h3 class="card-title text-center mb-0">Tournoi club Blois</h3>
+                            </div>
+                            <div class="card-body p-4">
+                                <h4 class="card-title text-center mb-4 h5">Tous niveaux</h4>
+                                <ul class="feature-list text-center mb-4">
+                                    <li>01/10/2025 - 02/10/2025</li>
+                                    <li>sabre</li>
+                                    <li>National</li>
+                                    <li><strong>Votre classement : 5ème</strong></li>
+                                </ul>
+                                <div class="text-center">
+                                    <a href="{{ url_for('competition_view') }}" class="btn btn-outline-primary btn-custom">Consulter</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {%endblock%}

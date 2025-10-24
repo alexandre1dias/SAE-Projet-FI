@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toggle_switch.css') }}">
+{% endblock %}
+
+{% block main %}
+    <!-- Paramètre de notification Membre-->
+    <section>
+        <h1>Paramètre de notification Membre</h1>
+        <ul class="list-group">
+        <li class="list-group-item">
+            <h4>Evenement - Inscription </h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_site">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_mail">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Evenement - Nouveau</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_site">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_mail">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div> 
+        </li>
+
+        <li class="list-group-item">
+            <h4>Evenement - Annulation </h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_site">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_mail">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Résultat - Nouveau</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_site">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_mail">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Réponses de formulaire</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_site">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_mail">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Modification du Profil</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_site">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_mail">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+    </ul>
+    </section>
+
+    <!-- Paramètre de notification Admin -->
+    <section>
+        <h1>Paramètre de notification Admin</h1>
+        <ul class="list-group">
+        <li class="list-group-item">
+            <h4>Formulaire - Demande</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_site">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_mail">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Formulaire - Question</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_site">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_mail">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div> 
+        </li>
+
+        <li class="list-group-item">
+            <h4>Formulaire - Signalement</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_site">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_mail">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Demande de modification de profil</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_site">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_mail">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Demande d'inscription</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_site">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input checked type="checkbox" id="notifications_mail">
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+    </ul>
+    </section>
+{% endblock %}
