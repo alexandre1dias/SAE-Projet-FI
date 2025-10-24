@@ -71,7 +71,6 @@
                                 <li><a class="dropdown-item" href="{{ url_for('resultat_membre') }}">Vos résultat</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('evenement_membre') }}">Vos évènements</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('profil_view', user_id=1) }}">Vos informations</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('parametres') }}">Paramètres</a></li>
                             </ul> 
                         </li>   
                         <!-- Menu de l'admin - Visible uniquement par un compte admin -->
@@ -124,6 +123,14 @@
                                 </ul>
                             </div>
                         </li>
+                        
+                        <!-- Paramètres -->
+                        <li class="nav-item">
+                            <a class="btn position-relative" id="param" href="{{ url_for('parametres') }}">
+                                <img src="{{ url_for('static', filename='images/parametres.png') }}" alt="Parametres" style="height: 30px;"/>
+                            </a>
+                        </li>
+                    
                         <!-- Login -->
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Se connecter</a></li>
                     </ul>

@@ -19,6 +19,10 @@
   transform: translate(-50%, 0%) !important; 
 }
 
+/* Pour paramètres*/
+#param:hover img {
+    filter: brightness(0);
+}
 
 /*Pour les notifications*/
 .notifs-scroll {
