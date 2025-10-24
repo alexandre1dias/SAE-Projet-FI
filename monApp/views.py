@@ -66,15 +66,17 @@ def competition_view():
 def competition_update():
     return render_template("competition_update.html",title=TITLE+"- Modification de la competition")
 
-
-
 @app.route("/evenement_club/")
 def evenement_club():
-    return render_template("evenement_club.html",title=TITLE+"- Evenement du Club")
+    return render_template("evenement_club.html",title=TITLE+"- Evenements du Club")
 
 @app.route("/club_view/")
 def club_view():
-    return render_template("club_view.html",title=TITLE+"- Club")
+    return render_template("club_view.html",title=TITLE+"- un évenement du club")
+
+@app.route("/club_update/")
+def club_update():
+    return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club")
 
 @app.route("/reunion/")
 def reunion():
@@ -82,8 +84,11 @@ def reunion():
 
 @app.route("/reunion_view/")
 def reunion_view():
-    return render_template("reunion_view.html",title=TITLE+"- Reunion vue")
+    return render_template("reunion_view.html",title=TITLE+"- Consultatiion d'une réunion")
 
+@app.route("/reunion_update/")
+def reunion_update():
+    return render_template("reunion_update.html",title=TITLE+"- Modification d'une réunion")
 
 #Vues pour le Profil
 @app.route("/resultat_membre/")
