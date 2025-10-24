@@ -134,6 +134,10 @@ def formulaire_view():
 def gerer_profils():
     return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils")
 
+@app.route("/gerer_ancier_profils/")
+def gerer_ancier_profils():
+    return render_template("gerer_ancier_profils.html",title=TITLE+"- Géstion des Anciens Profils")
+
 @app.route("/profil_view/<int:user_id>")
 def profil_view(user_id):
     current_user = {
