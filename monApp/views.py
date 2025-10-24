@@ -2,7 +2,7 @@ from .app import app, db
 from flask import render_template, request, url_for, redirect, flash
 from config import TITLE
 from flask_login import logout_user, login_user, login_required
-from .forms import LoginForm, EventForm,PasswordChangeForm
+from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm
 from flask import jsonify
 #from .models import Event
 
@@ -188,8 +188,12 @@ def login():
             login_user(unUser)
             next = unForm.next.data or url_for("index",name=unUser.Login)
             return redirect(next)
-    return render_template ("login.html",form=unForm)
- 
+    return render_template ("login.html",form=unForm) 
+
+@app.route("/inscription/")
+def inscription():
+    unForm = InscriptionForm()
+    return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
 
 # Route pour ajouter un événement
 @app.route("/add_event/", methods=["GET", "POST"])
