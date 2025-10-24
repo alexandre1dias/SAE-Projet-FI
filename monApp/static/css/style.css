@@ -399,6 +399,37 @@ body {
     box-shadow: 0 5px 15px rgba(239, 83, 80, 0.3);
 }
 
+/*Page gerer profils*/
+.table-responsive {
+    overflow-x: auto;
+}
+
+#table-profils td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    vertical-align: middle;
+}
+
+#table-profils .actions {
+    white-space: normal;
+    overflow: visible;
+    max-width: none;
+    position: sticky;
+    right: 0;
+    z-index: 1;
+    background-color: white;
+     display: flex;
+    gap: 5px; 
+}
+
+.action-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+}
+
 /* Inscription*/
 .btn-inscription {
     display: block; /* Important pour que le lien <a> prenne toute la largeur */
