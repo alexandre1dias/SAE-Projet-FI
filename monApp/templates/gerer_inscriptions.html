@@ -132,17 +132,3 @@
             </div>
         </div>
 {% endblock %}
-
-{% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    var refusModal = document.getElementById('refusModal');
-    refusModal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget; // Le bouton qui a déclenché la modale
-        var url = button.getAttribute('data-url'); // Récupère l'URL depuis l'attribut data-url
-        var form = document.getElementById('refusForm');
-        form.action = url; // Met à jour l'action du formulaire avec l'URL de la demande
-    });
-});
-</script>
-{% endblock %}
