@@ -58,6 +58,7 @@
                                 <a href="#" class="btn btn-success btn-sm">Accepter</a>
                                 <!-- Bouton qui déclenche la modale -->
                                 <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#refusModal" data-url="#">Refuser</button>
+                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#detailModal" data-url="#">Description</button>
                             </td>
                         </tr>
                         <tr>
@@ -71,8 +72,11 @@
                             <td>14/05/2024</td>
                             <td>
                                 <a href="#" class="btn btn-success btn-sm">Accepter</a>
-                                <!-- Bouton qui déclenche la modale -->
+                                <!-- Bouton qui déclenche la modale Refus -->
                                 <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#refusModal" data-url="#">Refuser</button>
+                                <!-- Bouton qui déclenche la modale details-->
+                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#detailModal" data-url="#">Description</button>
+                            
                             </td>
                         </tr>
                     </tbody>
@@ -99,6 +103,29 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                             <button type="submit" class="btn btn-success">Confirmer le Refus</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailModalLabel">Description de la demande</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="refusForm" method="POST" action="">
+                        <div class="modal-body">
+                            <p><strong>Type:</strong> Type</p>
+                            <p><strong>Demandeur:</strong> Demandeur</p>
+                            <p><strong>Détails:</strong>Détails</p>
+                            <p><strong>Date:</strong>Date</p>
+                            <p><strong>Description:</strong><br>Description</p>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Retour</button>
                         </div>
                     </form>
                 </div>
