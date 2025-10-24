@@ -60,7 +60,13 @@ def competitions():
 
 @app.route("/competition_view/")
 def competition_view():
-    return render_template("competition_view.html",title=TITLE+"- Competition")
+    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition")
+
+@app.route("/competition_update/")
+def competition_update():
+    return render_template("competition_update.html",title=TITLE+"- Modification de la competition")
+
+
 
 @app.route("/evenement_club/")
 def evenement_club():
