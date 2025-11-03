@@ -121,3 +121,46 @@ END;
 //
 
 DELIMITER ;
+
+
+-- NOTIFICATION POUR formulaire de contact, inscription , demande de modification 
+
+DELIMITER //
+
+CREATE TRIGGER notif_admin_inscription
+AFTER INSERT ON Inscription
+FOR EACH ROW
+BEGIN
+    INSERT INTO Notifs (typeN, sourceN, lue, idMembre, IdAdmin)
+    VALUES ('Inscription', CONCAT('Nouvelle inscription : ', NEW.nomI, ' ', NEW.prenomI), 0, NEW.idMembre, 1); -- ici IdAdmin = 1 par exemple
+    
+END;
+//
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER notif_admin_formulaire
+AFTER INSERT ON Formulaire_Contact
+FOR EACH ROW
+BEGIN
+    INSERT INTO Notifs (typeN, sourceN, lue, idMembre, IdAdmin)
+    VALUES ('Formulaire', CONCAT('Nouveau formulaire : ', NEW.sujetFC), 0, NEW.idMembre, 1);
+END;
+//
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER notif_admin_modif
+AFTER INSERT ON DemandeModif
+FOR EACH ROW
+BEGIN
+    INSERT INTO Notifs (typeN, sourceN, lue, idMembre, IdAdmin)
+    VALUES ('DemandeModification', CONCAT('Nouvelle demande de modification'), 0, NEW.idMembre, 1);
+END;
+//
+
+DELIMITER ;
