@@ -1,0 +1,30 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+drop table if exists ADMINSTRATEUR;
+drop table if exists PARAMETRE_NOTIF_ADMIN;
+drop table if exists PARAMETRE_NOTIF_MEMBRE;
+drop table if exists MEMBRE;
+drop table if exists NOTIFS;
+drop table if exists RECEVOIRM;
+drop table if exists RECEVOIRA;
+drop table if exists FORMULAIRE_CONTACT;
+drop table if exists REPONDRE;
+drop table if exists REMPLIR;
+drop table if exists INSCRIPTION;
+drop table if exists GENERER;
+drop table if exists EVENEMENT;
+drop table if exists PARTICIPER;
+drop table if exists ENTRAINEMENT;
+drop table if exists REUNION;
+drop table if exists COMPETITION;
+drop table if exists EVENTCLUB;
+drop table if exists RESULTAT;
+drop table if exists RESULTER;
+drop table if exists AVOIR;
+drop table if exists IMAGEAPP;
+drop table if exists IMAGERC;
+drop table if exists IMAGERE;
+drop table if exists ACTUALITE;
+drop table if exists IMAGERA; 
+
+SET FOREIGN_KEY_CHECKS = 1;
