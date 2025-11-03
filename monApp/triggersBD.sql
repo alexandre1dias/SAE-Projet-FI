@@ -1,4 +1,4 @@
-DELIMITER //
+DELIMITER // -- les délimiters MySQL se présentent ainsi, avec des // ou des $$. 
 
 CREATE TRIGGER verif_genre_competition
 BEFORE INSERT ON Participer
@@ -218,6 +218,107 @@ BEGIN
         WHEN @age BETWEEN 21 AND 39 THEN 'Senior'
         ELSE 'Vétéran'
     END;
+END;
+//
+
+DELIMITER ;
+
+
+-- Quand un formulaire de contact a une réponse
+
+DELIMITER //
+
+CREATE TRIGGER notif_membre_reponse_formulaire
+AFTER INSERT ON Repondre
+FOR EACH ROW
+BEGIN
+    INSERT INTO Notifs (typeN, sourceN, lue, idMembre, IdAdmin)
+    VALUES ('RéponseFormulaire', CONCAT('Votre formulaire a reçu une réponse'), 0, NEW.idMembre, NULL);
+END;
+//
+
+DELIMITER ;
+
+-- Quand une demande de modification est acceptée
+
+DELIMITER //
+
+CREATE TRIGGER notif_membre_modif_acceptee
+AFTER UPDATE ON DemandeModif
+FOR EACH ROW
+BEGIN
+    IF NEW.acceptée = 1 AND OLD.acceptée <> 1 THEN -- (OLD.acceptée <> 1 permet de savoir si la demande n'a pas déjà été acceptée)
+        INSERT INTO Notifs (typeN, sourceN, lue, idMembre, IdAdmin)
+        VALUES ('DemandeModif', 'Votre demande de modification a été acceptée', 0, NEW.idMembre, NULL);
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+
+-- Quand de nouveaux résultats sont ajoutés
+
+DELIMITER //
+
+CREATE TRIGGER notif_membre_nouveau_resultat
+AFTER INSERT ON Resulter
+FOR EACH ROW
+BEGIN
+    INSERT INTO Notifs (typeN, sourceN, lue, idMembre, IdAdmin)
+    VALUES ('NouveauResultat', 'Un nouveau résultat a été ajouté', 0, NEW.idMembre, NULL);
+END;
+//
+
+DELIMITER ;
+
+-- Event Crée
+
+DELIMITER //
+
+CREATE TRIGGER notif_membre_evenement_cree
+AFTER INSERT ON Evenement
+FOR EACH ROW
+BEGIN
+    -- ici on notifie tous les membres
+    INSERT INTO Notifs (typeN, sourceN, lue, idMembre, IdAdmin)
+    SELECT 'NouvelEvenement', CONCAT('Un nouvel événement est créé'), 0, idMembre, NULL
+    FROM Membre;
+END;
+//
+
+DELIMITER ;
+
+-- Event annulé 
+
+DELIMITER //
+
+CREATE TRIGGER notif_membre_evenement_annule
+AFTER UPDATE ON Evenement
+FOR EACH ROW
+BEGIN
+    IF NEW.annule = 1 AND OLD.annule <> 1 THEN
+        INSERT INTO Notifs (typeN, sourceN, lue, idMembre, IdAdmin)
+        SELECT 'EvenementAnnule', CONCAT('Un événement auquel vous étiez inscrit a été annulé'), 0, idMembre, NULL
+        FROM Participer
+        WHERE idEvenement = NEW.idEvenement;
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+
+-- quand un membre s'inscrit à un evenement
+
+DELIMITER //
+
+CREATE TRIGGER notif_membre_inscription_evenement
+AFTER INSERT ON Participer
+FOR EACH ROW
+BEGIN
+    INSERT INTO Notifs (typeN, sourceN, lue, idMembre, IdAdmin)
+    VALUES ('InscriptionEvenement', 'Vous êtes inscrit à un événement', 0, NEW.idMembre, NULL);
 END;
 //
 
