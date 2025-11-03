@@ -3,8 +3,9 @@ from flask import render_template, request, url_for, redirect, flash
 from config import TITLE
 from flask_login import logout_user, login_user, login_required
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm
-from flask import jsonify
-#from .models import Event
+from .connexionPythonSQL import *
+
+
 
 @app.route("/")
 @app.route("/index/")
@@ -238,3 +239,4 @@ def add_event():
 
 if __name__ == "__main__":
     app.run()
+    db.close()
