@@ -164,3 +164,61 @@ END;
 //
 
 DELIMITER ;
+
+-- Trigger pour calculer le niveau d’un membre à partir de sa date de naissance
+
+
+DELIMITER //
+
+CREATE TRIGGER calcul_niveau_membre
+BEFORE INSERT ON Membre
+FOR EACH ROW
+BEGIN
+    DECLARE annee INT;
+
+
+    SET annee = YEAR(NEW.ddnM);
+    SET @age = YEAR(CURDATE()) - annee; -- Détermine l'age approximatif
+
+    -- Détermination du niveau selon l'age
+    SET NEW.niveau = CASE
+        WHEN @age < 10 THEN 'M9'
+        WHEN @age BETWEEN 10 AND 11 THEN 'M11'
+        WHEN @age BETWEEN 12 AND 13 THEN 'M13'
+        WHEN @age BETWEEN 14 AND 15 THEN 'M15'
+        WHEN @age BETWEEN 16 AND 17 THEN 'M17'
+        WHEN @age BETWEEN 18 AND 20 THEN 'M20'
+        WHEN @age BETWEEN 21 AND 39 THEN 'Senior'
+        ELSE 'Vétéran'
+    END;
+END;
+//
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER mise_a_jour_niveau_membre
+BEFORE UPDATE ON Membre
+FOR EACH ROW
+BEGIN
+    DECLARE age INT;
+
+    SET annee = YEAR(NEW.ddnM);
+    SET @age = YEAR(CURDATE()) - annee; -- Détermine l'age approximatif
+
+    -- Détermination du niveau selon l'age
+    SET NEW.niveau = CASE
+        WHEN @age < 10 THEN 'M9'
+        WHEN @age BETWEEN 10 AND 11 THEN 'M11'
+        WHEN @age BETWEEN 12 AND 13 THEN 'M13'
+        WHEN @age BETWEEN 14 AND 15 THEN 'M15'
+        WHEN @age BETWEEN 16 AND 17 THEN 'M17'
+        WHEN @age BETWEEN 18 AND 20 THEN 'M20'
+        WHEN @age BETWEEN 21 AND 39 THEN 'Senior'
+        ELSE 'Vétéran'
+    END;
+END;
+//
+
+DELIMITER ;
