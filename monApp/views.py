@@ -4,6 +4,7 @@ from config import TITLE
 from flask_login import logout_user, login_user, login_required
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm
 from .connexionPythonSQL import *
+from monApp.modelBD import MembreBD
 
 
 
@@ -144,7 +145,8 @@ def formulaire_view():
 
 @app.route("/gerer_profils/")
 def gerer_profils():
-    return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils")
+    lesMembres = db.session.query(MembreBD).all()
+    return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres)
 
 @app.route("/gerer_ancier_profils/")
 def gerer_ancier_profils():

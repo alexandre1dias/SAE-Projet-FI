@@ -9,3 +9,4 @@ LOGIN="dias"
 PASSWD="dias"
 SERVEUR="servinfo-maria"
 BD="DBdias"
+SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{LOGIN}:{PASSWD}@{SERVEUR}/{BD}'

@@ -1,24 +1,24 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap5 import Bootstrap
+from flask_login import LoginManager
 from .connexionPythonSQL import ouvrir_connexion
 from config import LOGIN, PASSWD, SERVEUR, BD
 
-
+#Creation de l'app
 app = Flask(__name__)
-Bootstrap(app)
-#Config options-Make sure you created a 'config.py' file.
+
+#Ajout de la config
 app.config.from_object('config')
 
-#Create database connection object
+#Ajout de extension
+db = SQLAlchemy(app)
+Bootstrap(app)
 
-db = ouvrir_connexion(LOGIN, PASSWD, SERVEUR, BD)
+#login_manager = LoginManager(app)
 
 
+#Connexion à la BD avec python (peut etre inutile)
+cnx = ouvrir_connexion(LOGIN, PASSWD, SERVEUR, BD)
 
-# Fait bugger le fichier pour l'instant
-"""
-from flask_login import LoginManager
-login_manager = LoginManager(app)
-login_manager.login_view = "login"
-"""
+
