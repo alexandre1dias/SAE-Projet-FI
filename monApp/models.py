@@ -314,12 +314,12 @@ class Entrainement:
 
 class Reunion:
     """Représente une réunion."""
-    def __init__(self, idReunionu, nomRE, lieuRE,  dateRE, heureDebutRE, nbParticipantRE, typeReunionRE, rapportRE, niveauxRE, idEvent):
+    def __init__(self, idReunion, nomRE, lieuRE,  dateRE, heureDebutRE, nbParticipantRE, typeReunionRE, rapportRE, niveauxRE, idEvent):
         """
         Initialise une réunion.
 
         Args:
-            idReunionu (int): L'identifiant unique de la réunion.
+            idReunion (int): L'identifiant unique de la réunion.
             nomRE (str): Le nom de la réunion.
             lieuRE (str): Le lieu de la réunion.
             dateRE (date): La date de la réunion.
@@ -330,7 +330,7 @@ class Reunion:
             niveauxRE (str): Les niveaux concernés.
             idEvent (int): L'identifiant de l'événement parent.
         """
-        self.idReunionu = idReunionu
+        self.idReunion = idReunion
         self.nomRE = nomRE
         self.lieuRE = lieuRE
         self.dateRE = dateRE
