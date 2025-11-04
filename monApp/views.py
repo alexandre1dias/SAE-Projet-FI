@@ -4,7 +4,7 @@ from config import TITLE
 from flask_login import logout_user, login_user, login_required
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm
 from .connexionPythonSQL import *
-from monApp.modelBD import MembreBD,Reunion
+from monApp.modelBD import MembreBD,ReunionBD
 
 from datetime import datetime
 
@@ -86,7 +86,7 @@ def club_update():
 
 @app.route("/reunion/")
 def reunion():
-    reunions = Reunion.query.all()
+    reunions = ReunionBD.query.all()
     today = datetime.now().date() #on s'assure d'avoir un objet date
     prochaines_reunions = [r for r in reunions if r.dateRE and r.dateRE >= today]
     anciennes_reunions = [r for r in reunions if r.dateRE and r.dateRE < today]
@@ -94,12 +94,12 @@ def reunion():
 
 @app.route("/reunion_view/<int:idReunion>")
 def reunion_view(idReunion):
-    reunion = Reunion.query.get(idReunion)
+    reunion = ReunionBD.query.get(idReunion)
     return render_template("reunion_view.html",title=TITLE+"- Consultatiion d'une réunion", selectedReunion = reunion)
 
 @app.route("/reunion_delete/<int:idReunion>", methods=['POST'])
 def reunion_delete(idReunion):
-    reunion = Reunion.query.get_or_404(idReunion)
+    reunion = ReunionBD.query.get_or_404(idReunion)
     db.session.delete(reunion)
     db.session.commit()
     flash('La réunion a été supprimée avec succès.', 'success')
@@ -108,7 +108,7 @@ def reunion_delete(idReunion):
 
 @app.route("/reunion_update/<int:idReunion>", methods=['GET', 'POST'])
 def reunion_update(idReunion):
-    reunion = Reunion.query.get_or_404(idReunion)
+    reunion = ReunionBD.query.get_or_404(idReunion)
     if request.method == 'POST':
         reunion.nom = request.form['nom']
         reunion.lieu = request.form['lieu']

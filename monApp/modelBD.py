@@ -22,7 +22,7 @@ class MembreBD(UserMixin, db.Model):
     statut = db.Column(db.String(15))
     activite = db.Column(db.Boolean)
 
-class Reunion(UserMixin, db.Model):
+class ReunionBD(UserMixin, db.Model):
     __tablename__ = 'REUNION'
 
     id = db.Column('idReunion', db.Integer, primary_key=True)
