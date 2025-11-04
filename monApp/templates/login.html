@@ -10,11 +10,17 @@
             {{ form.hidden_tag() }}
             
             <div class="form-group">
-                {{ form.Login(class="form-input", placeholder="EMAIL") }}
+                {{ form.email(class="form-input" + (" is-invalid" if form.email.errors else ""), placeholder="EMAIL") }}
+                {% for error in form.email.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
             </div>
             
             <div class="form-group">
-                {{ form.password(class="form-input", placeholder="MOT DE PASSE") }}
+                {{ form.password(class="form-input" + (" is-invalid" if form.password.errors else ""), placeholder="MOT DE PASSE") }}
+                {% for error in form.password.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
             </div>
             
             <div class="form-group">

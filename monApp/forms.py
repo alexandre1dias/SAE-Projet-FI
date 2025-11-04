@@ -2,12 +2,12 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField
 from wtforms.validators import DataRequired, Email, Optional
+from . modelBD import MembreBD
 
 class LoginForm(FlaskForm):
-    Login = StringField ('Email' ,validators= [DataRequired(), Email()])
+    email = StringField ('Email' ,validators= [DataRequired(), Email()])
     password = PasswordField ('Mot de passe', validators=[DataRequired()])
-    next = HiddenField()
-    connecter = SubmitField()
+    connecter = SubmitField('Se connecter')
 
 class PasswordChangeForm(FlaskForm):
     Login = StringField ('Email' ,validators= [DataRequired(), Email()])
