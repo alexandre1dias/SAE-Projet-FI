@@ -18,7 +18,7 @@ class MembreBD(UserMixin, db.Model):
     sexe = db.Column('sexeM', db.String(5))
     ddn = db.Column('ddnM', db.Date)
     niveau = db.Column(db.String(15))
-    statut = db.Column(db.String(15))
+    statut = db.Column(db.String(30))
     activite = db.Column(db.Boolean)
 
 class AdminBD(UserMixin, db.Model):

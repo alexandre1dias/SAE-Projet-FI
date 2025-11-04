@@ -50,7 +50,7 @@ create table MEMBRE(
     sexeM varchar(5),
     ddnM date,
     niveau varchar(15),
-    statut varchar(15),
+    statut varchar(30),
     activite boolean,
     idParamNotifMembre integer,
     PRIMARY KEY(idMembre)
