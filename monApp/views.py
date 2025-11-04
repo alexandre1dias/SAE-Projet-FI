@@ -67,9 +67,10 @@ def competitions():
     lesCompetitions = CompetitionBD.query.all()
     return render_template("competitions.html", title=TITLE+"- Competitions", competitions=lesCompetitions)
 
-@app.route("/competition_view/")
-def competition_view():
-    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition")
+@app.route("/competitions/<int:idCompetition>/competition_view")
+def competition_view(idCompetition):
+    uneCompetition = CompetitionBD.query.get(idCompetition)
+    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",selectedCompetition=uneCompetition)
 
 @app.route("/competition_update/")
 def competition_update():

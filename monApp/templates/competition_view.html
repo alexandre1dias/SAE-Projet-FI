@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% block main %}
 
-<h1 class="mb-4" >[Nom Compétition]</h1>
+<h1 class="mb-4" >{{selectedCompetition.nom}}</h1>
 
 <div class="row justify-content-center">
         <!--Cartes-->
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 text-center shadow-sm">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    <h5 class="card-title">[date]</h5>
+                    <h5 class="card-title">{{selectedCompetition.date_debut}} - {{selectedCompetition.date_fin}}</h5>
                 </div>
             </div>
         </div>
@@ -17,14 +17,14 @@
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 text-center shadow-sm">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    <h5 class="card-title"> [lieu]</h5>
+                    <h5 class="card-title"> {{selectedCompetition.adresse}}</h5>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 text-center shadow-sm">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    <h5 class="card-title">nb participants</h5>
+                    <h5 class="card-title">{{selectedCompetition.nb_participants}}</h5>
                 </div>
             </div>
         </div>
@@ -32,7 +32,7 @@
     <!--Fin Carte-->
     
     <h2>Description :</h2>
-    <p>[...]</p>
+    <p>{{selectedCompetition.description}}</p>
     <div class="table-responsive"></div>
     <h2>Classement du Club</h2>
 
