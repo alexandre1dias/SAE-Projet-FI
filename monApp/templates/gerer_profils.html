@@ -109,22 +109,24 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {%for unMembre in membres %}
                     <tr>
-                        <td>Sarah</td>
-                        <td>Fortune</td>
+                        <td>{{unMembre.nom}}</td>
+                        <td>{{unMembre.prenom}}</td>
                         <td>25</td>
-                        <td>01/01/2000</td>
-                        <td>21/05/2023</td>
-                        <td>Scenior</td>
-                        <td>miss.fortune@gmail.com</td>
-                        <td>Membre</td>
-                        <td>F</td>
+                        <td>{{unMembre.ddn}}</td>
+                        <td>{{unMembre.date_inscription}}</td>
+                        <td>{{unMembre.niveau}}</td>
+                        <td>{{unMembre.email}}</td>
+                        <td>{{unMembre.statut}}</td>
+                        <td>{{unMembre.sexe}}</td>
                         <td class="actions">
                             <a href="{{ url_for('profil_view', user_id=1) }}" class="btn btn-warning">Consulter</a>
                             <a href="{{ url_for('profil_edit', user_id=1) }}" class="btn btn-primary">Modifier</a>
                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal">Désinscrire</button>                
                         </td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
