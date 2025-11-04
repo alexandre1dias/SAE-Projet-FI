@@ -2,7 +2,7 @@
 
 {% block main %}
 <div class="container py-5">
-    <h1 class="text-center mb-5">Profil de {{ user.prenom }} {{ user.nom }}</h1>
+    <h1 class="text-center mb-5">Profil de {{ selectedMembre.prenom }} {{ selectedMembre.nom }}</h1>
 
     <div class="row justify-content-center mb-4">
         <div class="col-md-8">
@@ -14,57 +14,61 @@
 
                     <div class="row mb-3">
                         <div class="col-sm-4 text-muted">Nom : </div>
-                        <div class="col-sm-8">{{ user.nom }}</div>
+                        <div class="col-sm-8">{{ selectedMembre.nom }}</div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4 text-muted">Prénom : </div>
-                        <div class="col-sm-8">{{ user.prenom }}</div>
+                        <div class="col-sm-8">{{ selectedMembre.prenom }}</div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4 text-muted">Âge : </div>
-                        <div class="col-sm-8">{{ user.age }} ans</div>
+                        <div class="col-sm-8">{{ selectedMembre.age }} ans</div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4 text-muted">Date de naissance : </div>
-                        <div class="col-sm-8">{{ user.date_naissance }}</div>
+                        <div class="col-sm-8">{{ selectedMembre.ddn }}</div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4 text-muted">Sexe : </div>
-                        <div class="col-sm-8">{{ user.sexe }}</div>
+                        <div class="col-sm-8">{{ selectedMembre.sexe }}</div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4 text-muted">Date d'inscription : </div>
-                        <div class="col-sm-8">{{ user.date_inscription }}</div>
+                        <div class="col-sm-8">{{ selectedMembre.date_inscription }}</div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4 text-muted">Niveau : </div>
-                        <div class="col-sm-8">{{ user.niveau }}</div>
+                        <div class="col-sm-8">{{ selectedMembre.niveau }}</div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4 text-muted">Email : </div>
-                        <div class="col-sm-8">{{ user.email }}</div>
+                        <div class="col-sm-8">{{ selectedMembre.email }}</div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4 text-muted">Statut : </div>
-                        <div class="col-sm-8">{{ user.statut }}</div>
+                        <div class="col-sm-8">{{ selectedMembre.statut }}</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <!--Pour Membre-->
+    {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
     <div class="text-center mt-4">
-        <a href="{{ url_for('profil_edit', user_id=user.id) }}" class="btn btn-primary me-2">Formuler une demande de modification du profil</a>
+        <a href="{{ url_for('profil_edit', idM=selectedMembre.id) }}" class="btn btn-primary me-2">Formuler une demande de modification du profil</a>
     </div>
-
+    {% endif %}
 
     <!--Pour Admin-->
+    {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
     <div class="text-center mt-4">
         <a href="{{ url_for('gerer_profils') }}" class="btn btn-secondary me-2">Retour à la liste</a>
-        <a href="{{ url_for('profil_edit', user_id=user.id) }}" class="btn btn-primary me-2">Modifier ce profil</a>
+        <a href="{{ url_for('profil_edit', idM=selectedMembre.id) }}" class="btn btn-primary me-2">Modifier ce profil</a>
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal">Désinscrire</button>     
     </div>
-    </div>
+    {% endif %}
+</div>
+
     <!-- Modale raison de la désinscription -->
         <div class="modal fade" id="desinscriptionModal" tabindex="-1" aria-labelledby="desinscriptionModalLabel" aria-hidden="true">
             <div class="modal-dialog">

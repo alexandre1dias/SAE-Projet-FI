@@ -1,7 +1,7 @@
 CREATE TABLE ADMINISTRATEUR(
     idAdmin integer AUTO_INCREMENT,
     emailA varchar(41),
-    mdpA varchar(16),
+    mdpA varchar(64),
     idParamNotifAdmin integer,
     PRIMARY KEY(idAdmin)
 );
@@ -50,7 +50,7 @@ create table MEMBRE(
     sexeM varchar(5),
     ddnM date,
     niveau varchar(15),
-    statut varchar(15),
+    statut varchar(30),
     activite boolean,
     idParamNotifMembre integer,
     PRIMARY KEY(idMembre)
@@ -112,7 +112,6 @@ create table INSCRIPTION(
     mdpI varchar(64),
     sexeI varchar(5),
     acceptee boolean,
-    idMembre integer,
     PRIMARY KEY(idInscription)
 );
 
@@ -180,6 +179,7 @@ create table COMPETITION(
     descriptionCO varchar(200), 
     niveauCO varchar(15),
     classementCO varchar(20),
+    passeeCO boolean,
     idEvent integer,
     PRIMARY KEY(idCompetition)
 );
@@ -285,8 +285,6 @@ ALTER TABLE REPONDRE ADD FOREIGN KEY (idAdmin) REFERENCES ADMINISTRATEUR(idAdmin
 
 ALTER TABLE REMPLIR ADD FOREIGN KEY (idFormulaire) REFERENCES FORMULAIRE_CONTACT(idFormulaire);
 ALTER TABLE REMPLIR ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
-
-ALTER TABLE INSCRIPTION ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
 
 ALTER TABLE GENERER ADD FOREIGN KEY (idInscription) REFERENCES INSCRIPTION(idInscription);
 ALTER TABLE GENERER ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);

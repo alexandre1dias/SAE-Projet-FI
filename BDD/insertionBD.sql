@@ -14,9 +14,10 @@ UPDATE ADMINISTRATEUR SET idParamNotifAdmin = 1 WHERE idAdmin = 1;
 
 -- Insertion des membres (avec idParamNotifMembre initialement à NULL)
 INSERT INTO MEMBRE (nomM, prenomM, emailM, mdpM, date_inscription, sexeM, ddnM, niveau, statut, activite, idParamNotifMembre) VALUES
-('Dupont', 'Jean', 'jean.dupont@email.com', 'mdp123', '2023-01-15', 'Homme', '1995-05-20', 'Senior', 'Membre Actif', 1, NULL),
-('Durand', 'Marie', 'marie.durand@email.com', 'mdp456', '2023-02-20', 'Femme', '2008-08-10', 'M17', 'Membre Actif', 1, NULL),
-('Martin', 'Paul', 'paul.martin@email.com', 'mdp789', '2022-09-01', 'Homme', '2015-03-25', 'M9', 'Membre Inactif', 0, NULL);
+('Dupont', 'Jean', 'jean.dupont@email.com', 'mdp123', '2023-01-15', 'Homme', '1995-05-20', 'Senior', 'Membre', 1, NULL),
+('Durand', 'Marie', 'marie.durand@email.com', 'mdp456', '2023-02-20', 'Femme', '2008-08-10', 'M17', 'Membre', 1, NULL),
+('Martin', 'Paul', 'paul.martin@email.com', 'mdp789', '2022-09-01', 'Homme', '2015-03-25', 'M9', 'Ancien Membre', 0, NULL),
+('Eche', 'Régis', 'regis.eche@email.com', 'mdp741', '2000-01-01', 'Homme', '1975-02-07', 'Vétéran', 'Président', 1, NULL);
 
 -- Insertion des paramètres de notification pour les membres
 INSERT INTO PARAMETRE_NOTIF_MEMBRE (eventInscriptionSite, evenementInscriptionMail, eventNouveauSite, eventNouveauMail, eventAnnulationSite, eventAnnulationMail, resultatNouveauSite, resuletatNouveauMail, reponseFormulaireSite, reponseFormulaireMail, modifProfilSite, modifProfilMail, idMembre) VALUES
@@ -31,12 +32,24 @@ UPDATE MEMBRE SET idParamNotifMembre = 3 WHERE idMembre = 3;
 
 -- Insertion des événements (table parente)
 INSERT INTO EVENEMENT () VALUES
-(), (), (), (), (), ();
+(), (), (), (), (), (),
+-- Ajout de 9 événements pour les nouvelles compétitions
+(), (), (), (), (), (), (), (), ();
 
 -- Insertion des compétitions
-INSERT INTO COMPETITION (nomCO, villeCO, adresseCO, dateDebutCO, heureDebutCO, dateFinCO, heureFinCO, typeArmeCO, nbParticipantsCO, sexeCO, typeCompete, descriptionCO, niveauCO, classementCO, idEvent) VALUES
-('Tournoi Régional', 'Orléans', '123 Rue du Sport', '2024-05-10', '09:00', '2024-05-11', '18:00', 'Épée', 64, 'Mixte', 'Régional', 'Compétition ouverte à tous les niveaux régionaux.', 'Senior', 'En cours', 1),
-('Championnat M17', 'Tours', '456 Avenue de la Victoire', '2024-06-15', '08:30', '2024-06-15', '19:00', 'Fleuret', 32, 'Femme', 'National', 'Championnat national pour la catégorie M17.', 'M17', NULL, 2);
+INSERT INTO COMPETITION (nomCO, villeCO, adresseCO, dateDebutCO, heureDebutCO, dateFinCO, heureFinCO, typeArmeCO, nbParticipantsCO, sexeCO, typeCompete, descriptionCO, niveauCO, classementCO,passeeCO, idEvent) VALUES
+('Tournoi Régional', 'Orléans', '123 Rue du Sport', '2024-05-10', '09:00', '2024-05-11', '18:00', 'Épée', 64, 'Mixte', 'Régional', 'Compétition ouverte à tous les niveaux régionaux.', 'Senior', 'En cours', 1,1),
+('Championnat M17', 'Tours', '456 Avenue de la Victoire', '2024-06-15', '08:30', '2024-06-15', '19:00', 'Fleuret', 32, 'Femme', 'National', 'Championnat national pour la catégorie M17.', 'M17', NULL, 1,2),
+('Championnat M17 Futur', 'Tours', '456 Avenue de la Victoire', '2026-06-15', '08:30', '2026-06-15', '19:00', 'Fleuret', 32, 'Femme', 'National', 'Championnat national pour la catégorie M17.', 'M17', NULL, 0,6),
+('Open de Blois', 'Blois', '1 Rue de la Halle', '2025-09-20', '09:00', '2025-09-21', '17:00', 'Sabre', 48, 'Homme', 'National', 'Open national de sabre masculin.', 'Senior', NULL, 0, 7),
+('Circuit National M20', 'Paris', '2 Avenue de la Porte', '2025-10-11', '08:00', '2025-10-12', '18:00', 'Épée', 128, 'Mixte', 'National', 'Étape du circuit national M20 épée.', 'M20', NULL, 0, 8),
+('Tournoi des Ducs', 'Bourges', '3 Place Séraucourt', '2025-11-08', '10:00', '2025-11-08', '16:00', 'Fleuret', 32, 'Femme', 'Régional', 'Tournoi amical fleuret féminin.', 'Senior', NULL, 0, 9),
+('Challenge de Noël M15', 'Orléans', '123 Rue du Sport', '2025-12-13', '09:30', '2025-12-13', '17:30', 'Sabre', 64, 'Mixte', 'Régional', 'Compétition pour les jeunes sabreurs.', 'M15', NULL, 0, 10),
+('Coupe de la Nouvelle Année', 'Tours', '456 Avenue de la Victoire', '2026-01-10', '09:00', '2026-01-11', '18:00', 'Épée', 50, 'Homme', 'Régional', 'Première compétition de l''année.', 'Senior', NULL, 0, 11),
+('Tournoi de la Chandeleur', 'Vierzon', '4 Rue de la Paix', '2024-02-03', '09:00', '2024-02-04', '17:00', 'Fleuret', 40, 'Mixte', 'Régional', 'Tournoi régional de début d''année.', 'M17', 'Terminé', 1, 12),
+('Grand Prix de Printemps', 'Chartres', '5 Boulevard de la Liberté', '2024-03-22', '08:30', '2024-03-23', '19:00', 'Sabre', 80, 'Homme', 'National', 'Grand prix national de sabre.', 'Senior', 'Terminé', 1, 13),
+('Critérium M13', 'Châteauroux', '6 Avenue du Stade', '2024-04-12', '10:00', '2024-04-12', '16:00', 'Épée', 32, 'Femme', 'Départemental', 'Critérium pour les jeunes épéistes.', 'M13', 'Terminé', 1, 14),
+('Mémorial Jean Moulin', 'Montargis', '7 Rue de la Résistance', '2023-11-11', '09:00', '2023-11-11', '18:00', 'Toutes', 90, 'Mixte', 'Régional', 'Tournoi commémoratif toutes armes.', 'Tous', 'Terminé', 1, 15);
 
 -- Insertion des entraînements
 INSERT INTO ENTRAINEMENT (jourEN, lieuEN, dateEN, heureDebutEN, heureFinEN, typeArmeEN, niveauEN, idEvent) VALUES
@@ -89,8 +102,8 @@ INSERT INTO REMPLIR (idFormulaire, idMembre) VALUES
 (2, 2);
 
 -- Insertion des inscriptions en attente
-INSERT INTO INSCRIPTION (mailInscr, nomI, prenomI, ddnI, mdpI, sexeI, acceptee, idMembre) VALUES
-('nouveau.membre@email.com', 'Nouveau', 'Alice', '2000-01-01', 'mdpsecure', 'Femme', 0, NULL);
+INSERT INTO INSCRIPTION (mailInscr, nomI, prenomI, ddnI, mdpI, sexeI, acceptee) VALUES
+('nouveau.membre@email.com', 'Nouveau', 'Alice', '2000-01-01', 'mdpsecure', 'Femme', 0);
 
 -- Insertion des notifications
 INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, idAdmin) VALUES

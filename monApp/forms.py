@@ -1,14 +1,14 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField
-from wtforms.validators import DataRequired, Email, Optional
+from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField
+from wtforms.validators import DataRequired, Email, Optional, ValidationError
+from . modelBD import MembreBD
+from datetime import date
 
 class LoginForm(FlaskForm):
-    Login = StringField ('Email' ,validators= [DataRequired(), Email()])
+    email = StringField ('Email' ,validators= [DataRequired(), Email()])
     password = PasswordField ('Mot de passe', validators=[DataRequired()])
-    next = HiddenField()
-    connecter = SubmitField()
-
+    connecter = SubmitField('Se connecter')
 
 class PasswordChangeForm(FlaskForm):
     Login = StringField ('Email' ,validators= [DataRequired(), Email()])
@@ -17,16 +17,47 @@ class PasswordChangeForm(FlaskForm):
     next = HiddenField()
     connecter = SubmitField()
 
+class MembreForm(FlaskForm):
+    nom = StringField ('nom' ,validators= [DataRequired()])
+    prenom = StringField ('prenom' ,validators= [DataRequired()])
+    ddn = StringField ('date de naissance' ,validators= [DataRequired()])
+    sexe = SelectField('Sexe concerné', choices=[
+        ('Homme', 'Homme'),
+        ('Femme', 'Femme')
+    ], validators=[DataRequired()])
+    email = StringField ('Email' ,validators= [DataRequired()])
+    statut = SelectField('Statut', choices=[
+        ('Membre', 'Membre'),
+        ('Secrétaire Général', 'Secrétaire Général'),
+        ('Trésorier Général', 'Trésorier Général'),
+        ('Vice-président', 'Vice-président'),
+        ('Président', 'Président')
+    ], validators=[DataRequired()])
+    
+# cette fonction permet de vérifier que l'utilisateur a au moins 8 ans
+def validate_age(form, field):
+    """
+    Vérification que l'utilisateur a au moins 8 ans.
+    """
+    if field.data:
+        today = date.today()
+        # Calcul de l'âge
+        age = today.year - field.data.year - ((today.month, today.day) < (field.data.month, field.data.day))
+        if age < 8:
+            raise ValidationError()
+
+
 class InscriptionForm(FlaskForm):
     Login = StringField ('Email' ,validators= [DataRequired(), Email()])
     nom = StringField ('nom' ,validators= [DataRequired()])
     prenom = StringField ('prenom' ,validators= [DataRequired()])
-    date_naissance = StringField ('date de naissance' ,validators= [DataRequired()])
-    
+    date_naissance = DateField ('date de naissance' , format='%d-%m-%y', validators=[DataRequired(), validate_age])
+    sexe = SelectField ('sexe' , choices=[('Homme', 'Homme'), ('Femme', 'Femme')], validators=[DataRequired()])
     password = PasswordField ('Mot de passe', validators=[DataRequired()])
     confirm_password = PasswordField ('Confirmer mot de passe', validators=[DataRequired()])
     next = HiddenField()
     inscription = SubmitField()
+
 
 class EventForm(FlaskForm):
     title = StringField('Titre de l\'événement', validators=[DataRequired()])

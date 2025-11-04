@@ -65,74 +65,83 @@
 
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Profil</a>
-                            <ul class="dropdown-menu" aria-labelledby="profilDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('resultat_membre') }}">Vos résultat</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('evenement_membre') }}">Vos évènements</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('profil_view', user_id=1) }}">Vos informations</a></li>
-                            </ul> 
-                        </li>   
-                        <!-- Menu de l'admin - Visible uniquement par un compte admin -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Menu Admin</a>
-                            <ul class="dropdown-menu" aria-labelledby="profilDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('gerer_formulaires') }}">Gérer Formulaires</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('gerer_profils') }}">Gérer Profils</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('gerer_inscriptions') }}">Gérer Inscriptions/Modification</a></li>
-                            </ul> 
-                        </li>   
-
-                        <!-- Notification -->
-                        <li class="nav-item">
-                            <div class="dropdown">
-                                <button class="btn position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <img src="{{ url_for('static', filename='images/cloche.png') }}" alt="Notifications" style="height: 30px;"/>
-                                    <span class="position-absolute badge rounded-pill bg-danger">
-                                        1
-                                        <span class="visually-hidden">notifications non lues</span>
-                                    </span>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end notifs-scroll" aria-labelledby="notificationDropdown" style="width: 360px;">
-                                    <li><h6 class="dropdown-header">Notifications</h6></li>
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center justify-content-between" href="#">
-                                            <span class="p-1 bg-primary border border-light rounded-circle"></span>
-                                            <div>
-                                                <p class="mb-0 notif-new">Demande d'inscription: Jean</p>
-                                                <small class="text-muted">il y a 5 minutes</small>
-                                            </div>
-                                            <button class="btn notification-delete" type="button" aria-label="Supprimer la notification">
-                                                <img src="{{ url_for('static', filename='images/supprimer.png') }}" alt="Supprimer notifications"/>
-                                            </button>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center justify-content-between" href="#">
-                                            <div>
-                                                <p class="mb-0">Demande formulaire: Visiteur</p>
-                                                <small class="text-muted">il y a 1 heure</small>
-                                            </div>
-                                            <button class="btn notification-delete" type="button" aria-label="Supprimer la notification">
-                                                <img src="{{ url_for('static', filename='images/supprimer.png') }}" alt="Supprimer notifications"/>
-                                            </button>
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item text-center" href="{{ url_for('parametres_notifs') }}">Paramètre de notification</a></li>
-                                </ul>
-                            </div>
-                        </li>
+                        {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
+                            <!-- Liens pour les utilisateurs connectés -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Profil</a>
+                                <ul class="dropdown-menu" aria-labelledby="profilDropdown">
+                                    <li><a class="dropdown-item" href="{{ url_for('resultat_membre') }}">Vos résultat</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('evenement_membre') }}">Vos évènements</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('profil_view', idM=current_user.id) }}">Vos informations</a></li>
+                                </ul> 
+                            </li> 
+                        {% endif %}
+                        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+                            <!-- Menu de l'admin - Visible uniquement par un compte admin -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Menu Admin</a>
+                                <ul class="dropdown-menu" aria-labelledby="profilDropdown">
+                                    <li><a class="dropdown-item" href="{{ url_for('gerer_formulaires') }}">Gérer Formulaires</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('gerer_profils') }}">Gérer Profils</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('gerer_inscriptions') }}">Gérer Inscriptions/Modification</a></li>
+                                </ul> 
+                            </li>
+                        {% endif %}
+                        {% if current_user.is_authenticated %}
+                            <!-- Notification -->
+                            <li class="nav-item">
+                                <div class="dropdown">
+                                    <button class="btn position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="{{ url_for('static', filename='images/cloche.png') }}" alt="Notifications" style="height: 30px;"/>
+                                        <span class="position-absolute badge rounded-pill bg-danger">
+                                            1
+                                            <span class="visually-hidden">notifications non lues</span>
+                                        </span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end notifs-scroll" aria-labelledby="notificationDropdown" style="width: 360px;">
+                                        <li><h6 class="dropdown-header">Notifications</h6></li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center justify-content-between" href="#">
+                                                <span class="p-1 bg-primary border border-light rounded-circle"></span>
+                                                <div>
+                                                    <p class="mb-0 notif-new">Demande d'inscription: Jean</p>
+                                                    <small class="text-muted">il y a 5 minutes</small>
+                                                </div>
+                                                <button class="btn notification-delete" type="button" aria-label="Supprimer la notification">
+                                                    <img src="{{ url_for('static', filename='images/supprimer.png') }}" alt="Supprimer notifications"/>
+                                                </button>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center justify-content-between" href="#">
+                                                <div>
+                                                    <p class="mb-0">Demande formulaire: Visiteur</p>
+                                                    <small class="text-muted">il y a 1 heure</small>
+                                                </div>
+                                                <button class="btn notification-delete" type="button" aria-label="Supprimer la notification">
+                                                    <img src="{{ url_for('static', filename='images/supprimer.png') }}" alt="Supprimer notifications"/>
+                                                </button>
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-center" href="{{ url_for('parametres_notifs') }}">Paramètre de notification</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            
+                            <!-- Paramètres -->
+                            <li class="nav-item">
+                                <a class="btn position-relative" id="param" href="{{ url_for('parametres') }}">
+                                    <img src="{{ url_for('static', filename='images/parametres.png') }}" alt="Parametres" style="height: 30px;"/>
+                                </a>
+                            </li>
                         
-                        <!-- Paramètres -->
-                        <li class="nav-item">
-                            <a class="btn position-relative" id="param" href="{{ url_for('parametres') }}">
-                                <img src="{{ url_for('static', filename='images/parametres.png') }}" alt="Parametres" style="height: 30px;"/>
-                            </a>
-                        </li>
-                    
-                        <!-- Login -->
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Se connecter</a></li>
+                            <!-- Logout -->
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Se déconnecter</a></li>
+                        {% else %}
+                            <!-- Login -->
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Se connecter</a></li>
+                        {% endif %}
                     </ul>
                     </div>
             </div>

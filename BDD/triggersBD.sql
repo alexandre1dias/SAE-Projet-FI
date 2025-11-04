@@ -112,7 +112,7 @@ AFTER INSERT ON INSCRIPTION
 FOR EACH ROW
 BEGIN
     INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, IdAdmin)
-    VALUES ('Inscription', CONCAT('Nouvelle inscription : ', NEW.nomI, ' ', NEW.prenomI), 0, NEW.idMembre, 1); -- ici IdAdmin = 1 par exemple
+    VALUES ('Inscription', CONCAT('Nouvelle inscription : ', NEW.nomI, ' ', NEW.prenomI), 0, NULL, 1); -- ici IdAdmin = 1 par exemple
     
 END;
 //
@@ -298,6 +298,27 @@ FOR EACH ROW
 BEGIN
     INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, IdAdmin)
     VALUES ('Inscription', 'Vous êtes inscrit à un événement', 0, NEW.idMembre, NULL);
+END;
+//
+
+DELIMITER ;
+
+
+-- definie compétition comme passée si sa date de fin est plus petite qu'aujourd'hui
+
+DELIMITER //
+
+-- Création de l'événement planifié
+CREATE OR REPLACE EVENT mettre_a_jour_statut_competition
+ON SCHEDULE EVERY 1 MINUTE STARTS NOW()
+DO
+BEGIN
+    -- Met à jour la colonne 'passeeCO' à vrai (1) pour toutes les compétitions
+    -- dont la date de fin est antérieure à la date actuelle
+    -- et qui ne sont pas déjà marquées comme passées.
+    UPDATE COMPETITION
+    SET passeeCO = 1
+    WHERE dateFinCO < CURDATE() AND (passeeCO = 0 OR passeeCO IS NULL);
 END;
 //
 

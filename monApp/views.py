@@ -1,12 +1,14 @@
 from .app import app, db
-from flask import render_template, request, url_for, redirect, flash
+from flask import render_template, request, url_for, redirect, flash, session
 from config import TITLE
-from flask_login import logout_user, login_user, login_required
-from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm
+from flask_login import logout_user, login_user, login_required, current_user
+from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm
 from .connexionPythonSQL import *
-from monApp.modelBD import MembreBD,ReunionBD
+
+from monApp.modelBD import MembreBD,ReunionBD,CompetitionBD,InscriptionBD
 
 from datetime import datetime
+
 
 from .forms import LoginForm, EventForm
 from flask import jsonify
@@ -62,7 +64,8 @@ def calendrier():
 
 @app.route("/competitions/")
 def competitions():
-    return render_template("competitions.html",title=TITLE+"- Competitions")
+    lesCompetitions = CompetitionBD.query.all()
+    return render_template("competitions.html", title=TITLE+"- Competitions", competitions=lesCompetitions)
 
 @app.route("/competition_view/")
 def competition_view():
@@ -180,38 +183,24 @@ def gerer_profils():
 def gerer_ancier_profils():
     return render_template("gerer_ancier_profils.html",title=TITLE+"- Géstion des Anciens Profils")
 
-@app.route("/profil_view/<int:user_id>")
-def profil_view(user_id):
-    current_user = {
-        'id': user_id,
-        'nom': 'Doe',
-        'prenom': 'John',
-        'age': 30,
-        'date_naissance': '15/05/1994',
-        'sexe': 'Homme',
-        'date_inscription': '15/05/2023',
-        'categorie': 'Senior',
-        'niveau': 'National',
-        'email': 'john.doe@example.com',
-        'statut': 'Membre Actif'
-    }
-    return render_template("profil_view.html", title=TITLE + "- Profil Membre", user=current_user)
+@app.route("/profil_view/<int:idM>")
+def profil_view(idM):
+    unMembre = db.session.get(MembreBD,idM)
+    return render_template("profil_view.html", title=TITLE + "- Profil Membre", selectedMembre=unMembre)
 
-@app.route("/profil_edit/<int:user_id>", methods=["GET", "POST"])
-def profil_edit(user_id):
-    current_user = {
-        'id': user_id,
-        'nom': 'Doe',
-        'prenom': 'John',
-        'age': 30,
-        'date_naissance': '1994-05-15',
-        'categorie': 'Senior',
-        'niveau': 'National',
-        'email': 'john.doe@example.com',
-        'statut': 'Membre Actif'
-    }
 
-    return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", user=current_user)
+@app.route("/profil_edit/<int:idM>", methods=["GET", "POST"])
+def profil_edit(idM):
+    unMembre = db.session.get(MembreBD,idM)
+    unForm = MembreForm(obj=unMembre)
+    if unForm.validate_on_submit():
+        unForm.populate_obj(unMembre)
+        db.session.commit()
+        return redirect(url_for('gerer_profils'))
+    return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm)
+
+
+
 
 @app.route("/gerer_inscriptions/")
 def gerer_inscriptions():
@@ -222,22 +211,75 @@ def gerer_inscriptions():
 #Vues pour le login 
 @app.route ("/login/", methods =("GET","POST"))
 def login():
-    unForm = LoginForm()
-    unUser=None
-    if not unForm.is_submitted():
-        unForm.next.data = request.args.get('next')
-    elif unForm.validate_on_submit():
-        unUser = unForm.get_authenticated_user()
-        if unUser:
-            login_user(unUser)
-            next = unForm.next.data or url_for("index",name=unUser.Login)
-            return redirect(next)
-    return render_template ("login.html",form=unForm) 
+    # Si l'utilisateur est déjà connecté, on le redirige vers l'accueil
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    form = LoginForm()
+    if form.validate_on_submit():
+        # 1. Essayer de trouver un membre
+        user = MembreBD.query.filter_by(email=form.email.data).first()
+        is_admin = False
+        
+        # 2. Si ce n'est pas un membre, essayer de trouver un admin
+        if user is None:
+            user = AdminBD.query.filter_by(email=form.email.data).first()
+            is_admin = True
 
-@app.route("/inscription/")
+        # 3. Vérifier si un utilisateur a été trouvé et si le mot de passe est correct
+        # La vérification du mot de passe est une comparaison directe
+        if user is None or user.mdp_hash != form.password.data:
+            return redirect(url_for('login'))
+        
+        # Connexion de l'utilisateur
+        login_user(user)
+        
+        # Stocker le type d'utilisateur dans la session
+        session['user_type'] = 'admin' if is_admin else 'membre'
+
+        # Redirection vers la page suivante ou l'accueil
+        next_page = request.args.get('next')
+        return redirect(next_page) if next_page else redirect(url_for('index'))
+        
+    return render_template("login.html", title=TITLE + "- Connexion", form=form)
+
+@app.route("/inscription/", methods=["GET", "POST"])  # Accepte GET et POST
 def inscription():
     unForm = InscriptionForm()
+    if unForm.validate_on_submit():
+        existing_inscription = db.session.scalar(
+            db.select(InscriptionBD).where(InscriptionBD.email == unForm.Login.data)
+        )
+        existing_membre = db.session.scalar(
+            db.select(MembreBD).where(MembreBD.email == unForm.Login.data)
+        )
+        if existing_inscription or existing_membre:
+            return render_template("inscription.html", title=TITLE+"- Inscriptions", form=unForm)
+        if unForm.password.data != unForm.confirm_password.data:
+            return render_template("inscription.html", title=TITLE+"- Inscriptions", form=unForm)
+        new_inscription = InscriptionBD(
+            email=unForm.Login.data,           
+            nom=unForm.nom.data,
+            prenom=unForm.prenom.data,
+            ddn=unForm.date_naissance.data,
+            sexe=unForm.sexe.data,
+            mdp_hash=unForm.password.data,
+            acceptee=False
+        )
+        try:
+            db.session.add(new_inscription)
+            db.session.commit()
+            
+            return redirect(url_for('index'))
+        except Exception as e:
+            db.session.rollback()
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
+
+@app.route("/logout/")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 # Route pour ajouter un événement
 @app.route("/add_event/", methods=["GET", "POST"])
@@ -255,7 +297,6 @@ def add_event():
         )
         db.session.add(new_event)
         db.session.commit()
-        flash('Événement ajouté avec succès!', 'success') # Vous pouvez afficher un message de succès
         return redirect(url_for('calendrier'))
     return render_template("add_event.html", title=TITLE + "- Ajouter un événement", form=form)
 
