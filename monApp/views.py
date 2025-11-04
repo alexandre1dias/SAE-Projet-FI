@@ -5,7 +5,7 @@ from flask_login import logout_user, login_user, login_required
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm
 from .connexionPythonSQL import *
 from monApp.modelBD import MembreBD
-
+from monApp.modelBD import CompetitionBD 
 
 
 @app.route("/")
@@ -58,7 +58,8 @@ def calendrier():
 
 @app.route("/competitions/")
 def competitions():
-    return render_template("competitions.html",title=TITLE+"- Competitions")
+    lesCompetitions = CompetitionBD.query.all()
+    return render_template("competitions.html", title=TITLE+"- Competitions", competitions=lesCompetitions)
 
 @app.route("/competition_view/")
 def competition_view():

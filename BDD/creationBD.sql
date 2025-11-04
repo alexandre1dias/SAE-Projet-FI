@@ -1,13 +1,13 @@
-CREATE TABLE ADMINSTRATEUR(
-    idAdmin integer,
+CREATE TABLE ADMINISTRATEUR(
+    idAdmin integer AUTO_INCREMENT,
     emailA varchar(41),
-    mdpA varchar(16),
+    mdpA varchar(64),
     idParamNotifAdmin integer,
     PRIMARY KEY(idAdmin)
 );
 
 create table PARAMETRE_NOTIF_ADMIN(
-    idParamNotifAdmin integer,
+    idParamNotifAdmin integer AUTO_INCREMENT,
     formulaireDemandeSite boolean not null,
     formulaireDemandeMail boolean not null,
     formulaireQuestionSite boolean not null,
@@ -23,7 +23,7 @@ create table PARAMETRE_NOTIF_ADMIN(
 );
 
 create table PARAMETRE_NOTIF_MEMBRE(
-    idParamNotifMembre integer,
+    idParamNotifMembre integer AUTO_INCREMENT,
     eventInscriptionSite boolean not null,
     evenementInscriptionMail boolean not null,
     eventNouveauSite boolean not null,
@@ -41,11 +41,11 @@ create table PARAMETRE_NOTIF_MEMBRE(
 );
     
 create table MEMBRE(
-    idMembre integer,
+    idMembre integer AUTO_INCREMENT,
     nomM varchar(41),
     prenomM varchar(41),
     emailM varchar(41),
-    mdpM varchar(16),
+    mdpM varchar(64),
     date_inscription date,
     sexeM varchar(5),
     ddnM date,
@@ -57,10 +57,9 @@ create table MEMBRE(
 );
 
 create table NOTIFS(
-    idNotifs integer,
+    idNotifs integer AUTO_INCREMENT,
     typeN varchar(19),
-
-    sourceN varchar(19),
+    sourceN varchar(255),
     lue boolean,
     idMembre integer,
     idAdmin integer,
@@ -81,7 +80,7 @@ create table RECEVOIRA(
 );
 
 create table FORMULAIRE_CONTACT(
-    idFormulaire integer,
+    idFormulaire integer AUTO_INCREMENT,
     typeFC varchar(15),
     sujetFC varchar(20),
     mailFC varchar(41),
@@ -105,14 +104,14 @@ create table REMPLIR(
 );
 
 create table INSCRIPTION(
-    idInscription integer,
+    idInscription integer AUTO_INCREMENT,
     mailInscr varchar(41),
     nomI varchar(41),
     prenomI varchar(41),
     ddnI date,
-    mdpI varchar(16),
+    mdpI varchar(64),
     sexeI varchar(5),
-    acceptée boolean,
+    acceptee boolean,
     idMembre integer,
     PRIMARY KEY(idInscription)
 );
@@ -126,7 +125,7 @@ create table GENERER(
 );
 
 create table EVENEMENT(
-    idEvent integer,
+    idEvent integer AUTO_INCREMENT,
     PRIMARY KEY(idEvent)
 );
 
@@ -137,7 +136,7 @@ create table PARTICIPER(
 );
 
 create table ENTRAINEMENT(
-    idEntrainement integer,
+    idEntrainement integer AUTO_INCREMENT,
     jourEN varchar(8),
     lieuEN varchar(20),
     dateEN date,
@@ -151,7 +150,7 @@ create table ENTRAINEMENT(
 );
 
 create table REUNION(
-    idReunion integer,
+    idReunion integer AUTO_INCREMENT,
     nomRE varchar(20),
     lieuRE varchar(20),
     dateRE date,
@@ -166,7 +165,7 @@ create table REUNION(
 );
 
 create table COMPETITION(
-    idCompetition integer,
+    idCompetition integer AUTO_INCREMENT,
     nomCO varchar(50),
     villeCO varchar(50),
     adresseCO varchar(50),
@@ -181,12 +180,13 @@ create table COMPETITION(
     descriptionCO varchar(200), 
     niveauCO varchar(15),
     classementCO varchar(20),
+    passeeCO boolean,
     idEvent integer,
     PRIMARY KEY(idCompetition)
 );
 
 create table EVENTCLUB(
-    idEventClub integer,
+    idEventClub integer AUTO_INCREMENT,
     NomEV varchar(50),
     villeEV varchar(50),
     adresseEV varchar(50),
@@ -202,7 +202,7 @@ create table EVENTCLUB(
 );
 
 create table RESULTAT(
-    idResultat integer,
+    idResultat integer AUTO_INCREMENT,
     resultat varchar(50),
     dateRE date,
     typeArmeRE varchar(12),
@@ -225,7 +225,7 @@ create table AVOIR(
 );
 
 create table IMAGEAPP(
-    idImage integer,
+    idImage integer AUTO_INCREMENT,
     urlI varchar(255),
     prive boolean,
     alt varchar(21),
@@ -245,7 +245,7 @@ create table IMAGERE(
 );
 
 create table ACTUALITE(
-    idActualite integer,
+    idActualite integer AUTO_INCREMENT,
     dateAC date,
     heureAC varchar(5),
     nomAC varchar(15),
@@ -261,28 +261,28 @@ create table IMAGERA(
 
 -- Ajout des contraintes de clé étrangère
 
-ALTER TABLE ADMINSTRATEUR ADD FOREIGN KEY (idParamNotifAdmin) REFERENCES PARAMETRE_NOTIF_ADMIN(idParamNotifAdmin);
+ALTER TABLE ADMINISTRATEUR ADD FOREIGN KEY (idParamNotifAdmin) REFERENCES PARAMETRE_NOTIF_ADMIN(idParamNotifAdmin);
 
-ALTER TABLE PARAMETRE_NOTIF_ADMIN ADD FOREIGN KEY (idAdmin) REFERENCES ADMINSTRATEUR(idAdmin);
+ALTER TABLE PARAMETRE_NOTIF_ADMIN ADD FOREIGN KEY (idAdmin) REFERENCES ADMINISTRATEUR(idAdmin);
 
 ALTER TABLE PARAMETRE_NOTIF_MEMBRE ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
 
 ALTER TABLE MEMBRE ADD FOREIGN KEY (idParamNotifMembre) REFERENCES PARAMETRE_NOTIF_MEMBRE(idParamNotifMembre);
 
 ALTER TABLE NOTIFS ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
-ALTER TABLE NOTIFS ADD FOREIGN KEY (idAdmin) REFERENCES ADMINSTRATEUR(idAdmin);
+ALTER TABLE NOTIFS ADD FOREIGN KEY (idAdmin) REFERENCES ADMINISTRATEUR(idAdmin);
 
 ALTER TABLE RECEVOIRM ADD FOREIGN KEY (idNotifs) REFERENCES NOTIFS(idNotifs);
 ALTER TABLE RECEVOIRM ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
 
 ALTER TABLE RECEVOIRA ADD FOREIGN KEY (idNotifs) REFERENCES NOTIFS(idNotifs);
-ALTER TABLE RECEVOIRA ADD FOREIGN KEY (idAdmin) REFERENCES ADMINSTRATEUR(idAdmin);
+ALTER TABLE RECEVOIRA ADD FOREIGN KEY (idAdmin) REFERENCES ADMINISTRATEUR(idAdmin);
 
 ALTER TABLE FORMULAIRE_CONTACT ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
-ALTER TABLE FORMULAIRE_CONTACT ADD FOREIGN KEY (idAdmin) REFERENCES ADMINSTRATEUR(idAdmin);
+ALTER TABLE FORMULAIRE_CONTACT ADD FOREIGN KEY (idAdmin) REFERENCES ADMINISTRATEUR(idAdmin);
 
 ALTER TABLE REPONDRE ADD FOREIGN KEY (idFormulaire) REFERENCES FORMULAIRE_CONTACT(idFormulaire);
-ALTER TABLE REPONDRE ADD FOREIGN KEY (idAdmin) REFERENCES ADMINSTRATEUR(idAdmin);
+ALTER TABLE REPONDRE ADD FOREIGN KEY (idAdmin) REFERENCES ADMINISTRATEUR(idAdmin);
 
 ALTER TABLE REMPLIR ADD FOREIGN KEY (idFormulaire) REFERENCES FORMULAIRE_CONTACT(idFormulaire);
 ALTER TABLE REMPLIR ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
