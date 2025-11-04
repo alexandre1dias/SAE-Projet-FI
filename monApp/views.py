@@ -1,12 +1,10 @@
 from .app import app, db
-from flask import render_template, request, url_for, redirect, flash
+from flask import render_template, request, url_for, redirect, flash, session
 from config import TITLE
-from flask_login import logout_user, login_user, login_required
+from flask_login import logout_user, login_user, login_required, current_user
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm
 from .connexionPythonSQL import *
-from monApp.modelBD import MembreBD
-
-
+from monApp.modelBD import MembreBD, AdminBD
 
 @app.route("/")
 @app.route("/index/")
@@ -194,22 +192,48 @@ def gerer_inscriptions():
 #Vues pour le login 
 @app.route ("/login/", methods =("GET","POST"))
 def login():
-    unForm = LoginForm()
-    unUser=None
-    if not unForm.is_submitted():
-        unForm.next.data = request.args.get('next')
-    elif unForm.validate_on_submit():
-        unUser = unForm.get_authenticated_user()
-        if unUser:
-            login_user(unUser)
-            next = unForm.next.data or url_for("index",name=unUser.Login)
-            return redirect(next)
-    return render_template ("login.html",form=unForm) 
+    # Si l'utilisateur est déjà connecté, on le redirige vers l'accueil
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    form = LoginForm()
+    if form.validate_on_submit():
+        # 1. Essayer de trouver un membre
+        user = MembreBD.query.filter_by(email=form.email.data).first()
+        is_admin = False
+        
+        # 2. Si ce n'est pas un membre, essayer de trouver un admin
+        if user is None:
+            user = AdminBD.query.filter_by(email=form.email.data).first()
+            is_admin = True
+
+        # 3. Vérifier si un utilisateur a été trouvé et si le mot de passe est correct
+        # La vérification du mot de passe est une comparaison directe
+        if user is None or user.mdp_hash != form.password.data:
+            return redirect(url_for('login'))
+        
+        # Connexion de l'utilisateur
+        login_user(user)
+        
+        # Stocker le type d'utilisateur dans la session
+        session['user_type'] = 'admin' if is_admin else 'membre'
+
+        # Redirection vers la page suivante ou l'accueil
+        next_page = request.args.get('next')
+        return redirect(next_page) if next_page else redirect(url_for('index'))
+        
+    return render_template("login.html", title=TITLE + "- Connexion", form=form)
 
 @app.route("/inscription/")
 def inscription():
     unForm = InscriptionForm()
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
+
+@app.route("/logout/")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 # Route pour ajouter un événement
 @app.route("/add_event/", methods=["GET", "POST"])
@@ -227,7 +251,6 @@ def add_event():
         )
         db.session.add(new_event)
         db.session.commit()
-        flash('Événement ajouté avec succès!', 'success') # Vous pouvez afficher un message de succès
         return redirect(url_for('calendrier'))
     return render_template("add_event.html", title=TITLE + "- Ajouter un événement", form=form)
 
