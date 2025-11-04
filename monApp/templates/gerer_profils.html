@@ -14,6 +14,8 @@
 
         <div class="row"><!--colonne pour les filtres à gauche -->
             <aside class="col-lg-2 col-md-3 mb-4">
+                <a href="{{ url_for('inscription') }}" class="btn btn-success">Crée un membre</a>
+                <br></br>
                 <div class="filtres-box">
                     <h5 class="filtres-titre">Filtres</h5>
                         <h6>Sexe</h6>
@@ -121,8 +123,8 @@
                         <td>{{unMembre.statut}}</td>
                         <td>{{unMembre.sexe}}</td>
                         <td class="actions">
-                            <a href="{{ url_for('profil_view', user_id=1) }}" class="btn btn-warning">Consulter</a>
-                            <a href="{{ url_for('profil_edit', user_id=1) }}" class="btn btn-primary">Modifier</a>
+                            <a href="{{ url_for('profil_view', idM=unMembre.id) }}" class="btn btn-warning">Consulter</a>
+                            <a href="{{ url_for('profil_edit', idM=unMembre.id) }}" class="btn btn-primary">Modifier</a>
                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal">Désinscrire</button>                
                         </td>
                     </tr>

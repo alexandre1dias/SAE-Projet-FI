@@ -2,13 +2,12 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField
 from wtforms.validators import DataRequired, Email, Optional
+from . modelBD import MembreBD
 
 class LoginForm(FlaskForm):
-    Login = StringField ('Email' ,validators= [DataRequired(), Email()])
+    email = StringField ('Email' ,validators= [DataRequired(), Email()])
     password = PasswordField ('Mot de passe', validators=[DataRequired()])
-    next = HiddenField()
-    connecter = SubmitField()
-
+    connecter = SubmitField('Se connecter')
 
 class PasswordChangeForm(FlaskForm):
     Login = StringField ('Email' ,validators= [DataRequired(), Email()])
@@ -16,6 +15,25 @@ class PasswordChangeForm(FlaskForm):
     new_password = PasswordField ('Nouveau mot de passe', validators=[DataRequired()])
     next = HiddenField()
     connecter = SubmitField()
+
+class MembreForm(FlaskForm):
+    nom = StringField ('nom' ,validators= [DataRequired()])
+    prenom = StringField ('prenom' ,validators= [DataRequired()])
+    ddn = StringField ('date de naissance' ,validators= [DataRequired()])
+    sexe = SelectField('Sexe concerné', choices=[
+        ('Homme', 'Homme'),
+        ('Femme', 'Femme')
+    ], validators=[DataRequired()])
+    email = StringField ('Email' ,validators= [DataRequired()])
+    statut = SelectField('Statut', choices=[
+        ('Membre', 'Membre'),
+        ('Secrétaire Général', 'Secrétaire Général'),
+        ('Trésorier Général', 'Trésorier Général'),
+        ('Vice-président', 'Vice-président'),
+        ('Président', 'Président')
+    ], validators=[DataRequired()])
+    
+
 
 class InscriptionForm(FlaskForm):
     Login = StringField ('Email' ,validators= [DataRequired(), Email()])
