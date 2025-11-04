@@ -4,7 +4,7 @@ from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm
 from .connexionPythonSQL import *
-from monApp.modelBD import MembreBD, AdminBD, Inscription
+from monApp.modelBD import MembreBD, AdminBD, InscriptionBD
 
 @app.route("/")
 @app.route("/index/")
@@ -227,7 +227,7 @@ def inscription():
     unForm = InscriptionForm()
     if unForm.validate_on_submit():
         existing_inscription = db.session.scalar(
-            db.select(Inscription).where(Inscription.email == unForm.Login.data)
+            db.select(InscriptionBD).where(InscriptionBD.email == unForm.Login.data)
         )
         existing_membre = db.session.scalar(
             db.select(MembreBD).where(MembreBD.email == unForm.Login.data)
@@ -236,7 +236,7 @@ def inscription():
             return render_template("inscription.html", title=TITLE+"- Inscriptions", form=unForm)
         if unForm.password.data != unForm.confirm_password.data:
             return render_template("inscription.html", title=TITLE+"- Inscriptions", form=unForm)
-        new_inscription = Inscription(
+        new_inscription = InscriptionBD(
             email=unForm.Login.data,           
             nom=unForm.nom.data,
             prenom=unForm.prenom.data,
@@ -252,8 +252,6 @@ def inscription():
             return redirect(url_for('index'))
         except Exception as e:
             db.session.rollback()
-
-    # Si c'est une requête GET (premier affichage) ou si le formulaire n'est pas valide
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
 
 @app.route("/logout/")

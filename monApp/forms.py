@@ -37,7 +37,7 @@ class MembreForm(FlaskForm):
 # cette fonction permet de vérifier que l'utilisateur a au moins 8 ans
 def validate_age(form, field):
     """
-    Validateur personnalisé pour vérifier que l'utilisateur a au moins 8 ans.
+    Vérification que l'utilisateur a au moins 8 ans.
     """
     if field.data:
         today = date.today()
@@ -51,8 +51,8 @@ class InscriptionForm(FlaskForm):
     Login = StringField ('Email' ,validators= [DataRequired(), Email()])
     nom = StringField ('nom' ,validators= [DataRequired()])
     prenom = StringField ('prenom' ,validators= [DataRequired()])
-    date_naissance = DateField ('date de naissance' , format='%Y-%m-%d', validators=[DataRequired(), validate_age])
-    sexe = SelectField ('sexe' , choices=[('H', 'H'), ('F', 'F')], validators=[DataRequired()])
+    date_naissance = DateField ('date de naissance' , format='%d-%m-%y', validators=[DataRequired(), validate_age])
+    sexe = SelectField ('sexe' , choices=[('Homme', 'Homme'), ('Femme', 'Femme')], validators=[DataRequired()])
     password = PasswordField ('Mot de passe', validators=[DataRequired()])
     confirm_password = PasswordField ('Confirmer mot de passe', validators=[DataRequired()])
     next = HiddenField()

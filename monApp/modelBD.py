@@ -32,7 +32,7 @@ class AdminBD(UserMixin, db.Model):
     email = db.Column('emailA', db.String(41), unique=True, nullable=False)
     mdp_hash = db.Column('mdpA', db.String(64))
 
-class Inscription(db.Model):
+class InscriptionBD(db.Model):
     """
     Modèle SQLAlchemy pour la table INSCRIPTION.
     """
