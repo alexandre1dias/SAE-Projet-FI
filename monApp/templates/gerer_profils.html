@@ -123,7 +123,7 @@
                         <td>{{unMembre.statut}}</td>
                         <td>{{unMembre.sexe}}</td>
                         <td class="actions">
-                            <a href="{{ url_for('profil_view', user_id=1) }}" class="btn btn-warning">Consulter</a>
+                            <a href="{{ url_for('profil_view', idM=unMembre.id) }}" class="btn btn-warning">Consulter</a>
                             <a href="{{ url_for('profil_edit', idM=unMembre.id) }}" class="btn btn-primary">Modifier</a>
                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal">Désinscrire</button>                
                         </td>

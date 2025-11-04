@@ -50,7 +50,7 @@ create table MEMBRE(
     sexeM varchar(5),
     ddnM date,
     niveau varchar(15),
-    statut varchar(15),
+    statut varchar(30),
     activite boolean,
     idParamNotifMembre integer,
     PRIMARY KEY(idMembre)
@@ -179,6 +179,7 @@ create table COMPETITION(
     descriptionCO varchar(200), 
     niveauCO varchar(15),
     classementCO varchar(20),
+    passeeCO boolean,
     idEvent integer,
     PRIMARY KEY(idCompetition)
 );

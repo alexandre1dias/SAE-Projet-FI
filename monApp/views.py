@@ -4,7 +4,8 @@ from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm
 from .connexionPythonSQL import *
-from monApp.modelBD import MembreBD, AdminBD, InscriptionBD
+from monApp.modelBD import MembreBD, AdminBD, CompetitionBD , InscriptionBD
+
 
 @app.route("/")
 @app.route("/index/")
@@ -56,7 +57,8 @@ def calendrier():
 
 @app.route("/competitions/")
 def competitions():
-    return render_template("competitions.html",title=TITLE+"- Competitions")
+    lesCompetitions = CompetitionBD.query.all()
+    return render_template("competitions.html", title=TITLE+"- Competitions", competitions=lesCompetitions)
 
 @app.route("/competition_view/")
 def competition_view():
@@ -150,22 +152,11 @@ def gerer_profils():
 def gerer_ancier_profils():
     return render_template("gerer_ancier_profils.html",title=TITLE+"- Géstion des Anciens Profils")
 
-@app.route("/profil_view/<int:user_id>")
-def profil_view(user_id):
-    current_user = {
-        'id': user_id,
-        'nom': 'Doe',
-        'prenom': 'John',
-        'age': 30,
-        'date_naissance': '15/05/1994',
-        'sexe': 'Homme',
-        'date_inscription': '15/05/2023',
-        'categorie': 'Senior',
-        'niveau': 'National',
-        'email': 'john.doe@example.com',
-        'statut': 'Membre Actif'
-    }
-    return render_template("profil_view.html", title=TITLE + "- Profil Membre", user=current_user)
+@app.route("/profil_view/<int:idM>")
+def profil_view(idM):
+    unMembre = db.session.get(MembreBD,idM)
+    return render_template("profil_view.html", title=TITLE + "- Profil Membre", selectedMembre=unMembre)
+
 
 @app.route("/profil_edit/<int:idM>", methods=["GET", "POST"])
 def profil_edit(idM):
@@ -175,7 +166,6 @@ def profil_edit(idM):
         unForm.populate_obj(unMembre)
         db.session.commit()
         return redirect(url_for('gerer_profils'))
-
     return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm)
 
 
