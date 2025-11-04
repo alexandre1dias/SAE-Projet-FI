@@ -1,8 +1,9 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField
-from wtforms.validators import DataRequired, Email, Optional
+from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField
+from wtforms.validators import DataRequired, Email, Optional, ValidationError
 from . modelBD import MembreBD
+from datetime import date
 
 class LoginForm(FlaskForm):
     email = StringField ('Email' ,validators= [DataRequired(), Email()])
@@ -33,18 +34,30 @@ class MembreForm(FlaskForm):
         ('Président', 'Président')
     ], validators=[DataRequired()])
     
+# cette fonction permet de vérifier que l'utilisateur a au moins 8 ans
+def validate_age(form, field):
+    """
+    Validateur personnalisé pour vérifier que l'utilisateur a au moins 8 ans.
+    """
+    if field.data:
+        today = date.today()
+        # Calcul de l'âge
+        age = today.year - field.data.year - ((today.month, today.day) < (field.data.month, field.data.day))
+        if age < 8:
+            raise ValidationError()
 
 
 class InscriptionForm(FlaskForm):
     Login = StringField ('Email' ,validators= [DataRequired(), Email()])
     nom = StringField ('nom' ,validators= [DataRequired()])
     prenom = StringField ('prenom' ,validators= [DataRequired()])
-    date_naissance = StringField ('date de naissance' ,validators= [DataRequired()])
-    
+    date_naissance = DateField ('date de naissance' , format='%Y-%m-%d', validators=[DataRequired(), validate_age])
+    sexe = SelectField ('sexe' , choices=[('H', 'H'), ('F', 'F')], validators=[DataRequired()])
     password = PasswordField ('Mot de passe', validators=[DataRequired()])
     confirm_password = PasswordField ('Confirmer mot de passe', validators=[DataRequired()])
     next = HiddenField()
     inscription = SubmitField()
+
 
 class EventForm(FlaskForm):
     title = StringField('Titre de l\'événement', validators=[DataRequired()])

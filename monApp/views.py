@@ -4,7 +4,7 @@ from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm
 from .connexionPythonSQL import *
-from monApp.modelBD import MembreBD, AdminBD
+from monApp.modelBD import MembreBD, AdminBD, Inscription
 
 @app.route("/")
 @app.route("/index/")
@@ -222,9 +222,38 @@ def login():
         
     return render_template("login.html", title=TITLE + "- Connexion", form=form)
 
-@app.route("/inscription/")
+@app.route("/inscription/", methods=["GET", "POST"])  # Accepte GET et POST
 def inscription():
     unForm = InscriptionForm()
+    if unForm.validate_on_submit():
+        existing_inscription = db.session.scalar(
+            db.select(Inscription).where(Inscription.email == unForm.Login.data)
+        )
+        existing_membre = db.session.scalar(
+            db.select(MembreBD).where(MembreBD.email == unForm.Login.data)
+        )
+        if existing_inscription or existing_membre:
+            return render_template("inscription.html", title=TITLE+"- Inscriptions", form=unForm)
+        if unForm.password.data != unForm.confirm_password.data:
+            return render_template("inscription.html", title=TITLE+"- Inscriptions", form=unForm)
+        new_inscription = Inscription(
+            email=unForm.Login.data,           
+            nom=unForm.nom.data,
+            prenom=unForm.prenom.data,
+            ddn=unForm.date_naissance.data,
+            sexe=unForm.sexe.data,
+            mdp_hash=unForm.password.data,
+            acceptee=False
+        )
+        try:
+            db.session.add(new_inscription)
+            db.session.commit()
+            
+            return redirect(url_for('index'))
+        except Exception as e:
+            db.session.rollback()
+
+    # Si c'est une requête GET (premier affichage) ou si le formulaire n'est pas valide
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
 
 @app.route("/logout/")

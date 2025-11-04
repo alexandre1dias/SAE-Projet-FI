@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inscription.css') }}">
+{% endblock %}
+
 {% block main %}
 <div class="page-login">
     <div class="inscription-container">
@@ -18,10 +22,17 @@
                 {{ form.prenom(class="form-input", placeholder="Rentrer votre prenom") }}
             </div>
             <div class="form-group">
-                {{ form.date_naissance(class="form-input", placeholder="Rentrer votre date de naissance") }}
+                {{ form.date_naissance(
+                    class="form-input", 
+                    type="text", 
+                    placeholder="Rentrer votre date de naissance", 
+                    onfocus="(this.type='date')", 
+                    onblur="(if(!this.value) this.type='text')"
+                ) }}
             </div>
-
-
+            <div class="form-group">
+                {{ form.sexe(class="form-input form-select form-select-white-arrow", placeholder="Choisir votre sexe") }}
+            </div>
             <div class="form-group">
                 {{ form.password(class="form-input", placeholder="Rentrer votre mot de passe") }}
             </div>
@@ -30,7 +41,15 @@
             </div>
             
             <div class="form-group">
-               <button type="button" class="btn-inscription" data-bs-toggle="modal" data-bs-target="#conditionModal" data-url="#">CONDITIONS D'INSCRIPTION</button>
+                <div class="form-check text-white">
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" required>
+                    <label class="form-check-label" for="flexCheckDefault">
+                        J'accepte les 
+                        <a href="#" class="link-light" data-bs-toggle="modal" data-bs-target="#conditionModal">
+                            conditions d'inscription
+                        </a>
+                    </label>
+                </div>
             </div>
             <div class="form-group">
                 {{ form.inscription(class="btn-connecter", value="S'INSCRIRE") }}
@@ -40,24 +59,22 @@
     </div>
 </div>
 
-<!-- Modale de Confirmation de Refus -->
-        <div class="modal fade" id="conditionModal" tabindex="-1"  aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="refusModalLabel">Condition d'inscription</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form id="refusForm" method="POST" action="">
-                        <div class="modal-body">
-                            <p>Mettre les conditions</p>
-                        </div>
-                        <div class="modal-footer justify-content-center">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <button type="submit" class="btn btn-success">Accepter les conditions</button>
-                        </div>
-                    </form>
-                </div>
+<!-- Modale des Conditions d'inscription -->
+<div class="modal fade" id="conditionModal" tabindex="-1" aria-labelledby="conditionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="conditionModalLabel">Conditions d'Inscription</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>titre</strong></p>
+                <p></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
+    </div>
+</div>
 {% endblock %}
