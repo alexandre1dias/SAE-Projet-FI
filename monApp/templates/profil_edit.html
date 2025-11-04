@@ -65,9 +65,16 @@
                     <!-- Seul un admin peut changer ce champ-->
                     <div class="mb-3 row">
                         <label for="statut" class="col-sm-4 col-form-label text-muted">Statut :</label>
+                        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
                         <div class="col-sm-8">
                             {{updateForm.statut(class_="form-control")}}
                         </div>
+                        {% endif %}
+                        {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
+                        <div class="col-sm-8">
+                            {{selectedMembre.statut}}
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="mb-3">
                         <textarea class="form-control" rows="5" placeholder="Décrivez la raison de la modification" required></textarea>
@@ -75,10 +82,14 @@
 
                     <div class="text-center mt-4">
                         <!-- Pour Admin -->
+                        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
                         <input class ="btn btn-success" type="submit" value ="Enregistrer les modifications">
+                        {% endif %}
                         <!-- Pour Membre -->
-                         <button type="submit" class="btn btn-success">Valider la demande de modifications</button>
-                        <a href="{{ url_for('profil_view', user_id=selectedMembre.id) }}" class="btn btn-secondary">Annuler</a>
+                        {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
+                        <button type="submit" class="btn btn-success">Valider la demande de modifications</button>
+                        {% endif %}
+                        <a href="{{ url_for('profil_view', idM=selectedMembre.id) }}" class="btn btn-secondary">Annuler</a>
                     </div>
                 </form>
             </div>
