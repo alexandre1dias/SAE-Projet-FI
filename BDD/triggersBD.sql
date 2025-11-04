@@ -302,3 +302,24 @@ END;
 //
 
 DELIMITER ;
+
+
+-- definie compétition comme passée si sa date de fin est plus petite qu'aujourd'hui
+
+DELIMITER //
+
+-- Création de l'événement planifié
+CREATE OR REPLACE EVENT mettre_a_jour_statut_competition
+ON SCHEDULE EVERY 1 MINUTE STARTS NOW()
+DO
+BEGIN
+    -- Met à jour la colonne 'passeeCO' à vrai (1) pour toutes les compétitions
+    -- dont la date de fin est antérieure à la date actuelle
+    -- et qui ne sont pas déjà marquées comme passées.
+    UPDATE COMPETITION
+    SET passeeCO = 1
+    WHERE dateFinCO < CURDATE() AND (passeeCO = 0 OR passeeCO IS NULL);
+END;
+//
+
+DELIMITER ;

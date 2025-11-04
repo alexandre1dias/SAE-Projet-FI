@@ -180,6 +180,7 @@ create table COMPETITION(
     descriptionCO varchar(200), 
     niveauCO varchar(15),
     classementCO varchar(20),
+    passeeCO boolean,
     idEvent integer,
     PRIMARY KEY(idCompetition)
 );

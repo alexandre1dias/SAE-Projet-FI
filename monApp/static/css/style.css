@@ -1063,6 +1063,15 @@ body.dark-mode .fc-daygrid-day {
     }
 }
 
+/* Rendre les filtres "sticky" sur les écrans de taille moyenne et plus */
+@media (min-width: 768px) { /* Applique à partir de la taille "md" de Bootstrap */
+    .filtres-box {
+        position: sticky;
+        top: 100px; /* Distance par rapport au haut de la fenêtre lorsque l'élément devient sticky */
+        z-index: 100; /* Assure que les filtres restent au-dessus des autres contenus lors du défilement */
+    }
+}
+
 /* CSS Compétitions */
 
 /* Filtres aside */
