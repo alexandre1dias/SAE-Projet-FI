@@ -112,7 +112,7 @@ AFTER INSERT ON INSCRIPTION
 FOR EACH ROW
 BEGIN
     INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, IdAdmin)
-    VALUES ('Inscription', CONCAT('Nouvelle inscription : ', NEW.nomI, ' ', NEW.prenomI), 0, NEW.idMembre, 1); -- ici IdAdmin = 1 par exemple
+    VALUES ('Inscription', CONCAT('Nouvelle inscription : ', NEW.nomI, ' ', NEW.prenomI), 0, NULL, 1); -- ici IdAdmin = 1 par exemple
     
 END;
 //
