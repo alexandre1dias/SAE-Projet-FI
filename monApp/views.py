@@ -147,8 +147,35 @@ def formulaire_view():
 #Vue pour la gestion des Profils
 @app.route("/gerer_profils/")
 def gerer_profils():
-    lesMembres = db.session.query(MembreBD).filter(MembreBD.activite == True).all()
-    return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres)
+    # On commence la requête de base pour les membres actifs
+    query = db.session.query(MembreBD).filter(MembreBD.activite == True)
+
+    # On récupère les arguments de la requête GET
+    search_term = request.args.get('recherche')
+    sexes = request.args.getlist('sexe')
+    niveaux = request.args.getlist('niveau')
+
+    # Filtrage par barre de recherche (nom, prénom, email)
+    if search_term:
+        search_like = f"%{search_term}%"
+        query = query.filter(
+            db.or_(
+                MembreBD.nom.like(search_like),
+                MembreBD.prenom.like(search_like),
+                MembreBD.email.like(search_like)
+            )
+        )
+
+    # Filtrage par sexe
+    if sexes:
+        query = query.filter(MembreBD.sexe.in_(sexes))
+
+    # Filtrage par niveau
+    if niveaux:
+        query = query.filter(MembreBD.niveau.in_(niveaux))
+
+    lesMembres = query.all()
+    return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres, filtres=request.args)
 
 @app.route("/gerer_profils/ancien/")
 def gerer_ancien_profils():
@@ -172,14 +199,14 @@ def profil_edit(idM, origine):
         return redirect(url_for('gerer_profils'))
     return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
 
-@app.route('/auteurs/<idA>/desinscrit/')
+@app.route('/profil_edit/<int:idM>/desinscrit/')
 def desinscritProfil(idM):
     membreDesinscrit = db.session.get(MembreBD, idM)
     membreDesinscrit.activite = False
     db.session.commit()
     return redirect(url_for('gerer_profils'))
 
-@app.route('/auteurs/<idA>/reinscrit/')
+@app.route('/profil_edit/<int:idM>/reinscrit/')
 def reinscritProfil(idM):
     membreReinscrit = db.session.get(MembreBD, idM)
     membreReinscrit.activite = True

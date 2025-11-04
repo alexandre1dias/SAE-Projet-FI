@@ -57,7 +57,12 @@
                     <div class="mb-3 row">
                         <label for="email" class="col-sm-4 col-form-label text-muted">Email :</label>
                         <div class="col-sm-8">
-                            {{updateForm.email(size =50, class_="form-control")}}
+                            {{updateForm.email(size =50, class_="form-control" + (" is-invalid" if updateForm.email.errors else ""))}}
+                            {% if updateForm.email.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in updateForm.email.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
 

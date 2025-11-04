@@ -9,7 +9,7 @@
         <input type="text" class="form-control search-input" placeholder="Rechercher...">
     </div>
     
-        <a href="{{ url_for('gerer_ancien_profils') }}" class="btn btn-secondary">Voir la liste des ancien membres</a>
+        <a href="{{ url_for('gerer_ancien_profils') }}" class="btn btn-secondary">Voir la liste des anciens membres</a>
     </div>
 
         <div class="row"><!--colonne pour les filtres à gauche -->
@@ -155,7 +155,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <a href="{{ url_for('desinscritProfil', idM=unMembre.id) }}" class="btn btn-success">Confirmer</a>
+                            <button type="button" class="btn btn-success" data-bs-dismiss="modal">Confirmer</button>
                         </div>
                     </form>
                 </div>
