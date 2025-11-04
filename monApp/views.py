@@ -4,8 +4,9 @@ from config import TITLE
 from flask_login import logout_user, login_user, login_required
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm
 from .connexionPythonSQL import *
-from monApp.modelBD import MembreBD
-from monApp.modelBD import Reunion
+from monApp.modelBD import MembreBD,Reunion
+
+from datetime import datetime
 
 from .forms import LoginForm, EventForm
 from flask import jsonify
@@ -86,10 +87,9 @@ def club_update():
 @app.route("/reunion/")
 def reunion():
     reunions = Reunion.query.all()
-    from datetime import datetime
     today = datetime.now().date() #on s'assure d'avoir un objet date
-    prochaines_reunions = [r for r in reunions if r.dateRE and r.dateRE > today]
-    anciennes_reunions = [r for r in reunions if r.dateRE and r.dateRE <= today]
+    prochaines_reunions = [r for r in reunions if r.dateRE and r.dateRE >= today]
+    anciennes_reunions = [r for r in reunions if r.dateRE and r.dateRE < today]
     return render_template("reunion.html", title=TITLE + "- Réunion", prochaines_reunions=prochaines_reunions, anciennes_reunions=anciennes_reunions)
 
 @app.route("/reunion_view/<int:idReunion>")
@@ -113,7 +113,6 @@ def reunion_update(idReunion):
         reunion.nom = request.form['nom']
         reunion.lieu = request.form['lieu']
         # Pour la date, il faut la convertir de string en objet date
-        from datetime import datetime
         reunion.dateRE = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         reunion.rapportRE = request.form['description']
         db.session.commit()
