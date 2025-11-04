@@ -5,8 +5,11 @@ from flask_login import logout_user, login_user, login_required
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm
 from .connexionPythonSQL import *
 from monApp.modelBD import MembreBD
+from monApp.models import Reunion
 
-
+from .forms import LoginForm, EventForm
+from flask import jsonify
+#from .models import Event
 
 @app.route("/")
 @app.route("/index/")
@@ -84,6 +87,10 @@ def club_update():
 def reunion():
     return render_template("reunion.html",title=TITLE+"- Reunion")
 
+@app.route("/reunion_view/<int:idReunionu>")
+def reunion_view(idReunionu):
+    reunion = Reunion.query.get(idReunionu)
+    return render_template("reunion_view.html",title=TITLE+"- Consultatiion d'une réunion", selectedReunion = reunion)
 @app.route("/reunion_view/")
 def reunion_view():
     return render_template("reunion_view.html",title=TITLE+"- Consultatiion d'une réunion")
