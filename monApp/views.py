@@ -4,8 +4,15 @@ from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm
 from .connexionPythonSQL import *
-from monApp.modelBD import MembreBD, AdminBD, CompetitionBD , InscriptionBD
 
+from monApp.modelBD import MembreBD,ReunionBD,CompetitionBD,InscriptionBD
+
+from datetime import datetime
+
+
+from .forms import LoginForm, EventForm
+from flask import jsonify
+#from .models import Event
 
 @app.route("/")
 @app.route("/index/")
@@ -82,15 +89,39 @@ def club_update():
 
 @app.route("/reunion/")
 def reunion():
-    return render_template("reunion.html",title=TITLE+"- Reunion")
+    reunions = ReunionBD.query.all()
+    today = datetime.now().date() #on s'assure d'avoir un objet date
+    prochaines_reunions = [r for r in reunions if r.dateRE and r.dateRE >= today]
+    anciennes_reunions = [r for r in reunions if r.dateRE and r.dateRE < today]
+    return render_template("reunion.html", title=TITLE + "- Réunion", prochaines_reunions=prochaines_reunions, anciennes_reunions=anciennes_reunions)
 
-@app.route("/reunion_view/")
-def reunion_view():
-    return render_template("reunion_view.html",title=TITLE+"- Consultatiion d'une réunion")
+@app.route("/reunion_view/<int:idReunion>")
+def reunion_view(idReunion):
+    reunion = ReunionBD.query.get(idReunion)
+    return render_template("reunion_view.html",title=TITLE+"- Consultatiion d'une réunion", selectedReunion = reunion)
 
-@app.route("/reunion_update/")
-def reunion_update():
-    return render_template("reunion_update.html",title=TITLE+"- Modification d'une réunion")
+@app.route("/reunion_delete/<int:idReunion>", methods=['POST'])
+def reunion_delete(idReunion):
+    reunion = ReunionBD.query.get_or_404(idReunion)
+    db.session.delete(reunion)
+    db.session.commit()
+    flash('La réunion a été supprimée avec succès.', 'success')
+    return redirect(url_for('reunion'))
+
+
+@app.route("/reunion_update/<int:idReunion>", methods=['GET', 'POST'])
+def reunion_update(idReunion):
+    reunion = ReunionBD.query.get_or_404(idReunion)
+    if request.method == 'POST':
+        reunion.nom = request.form['nom']
+        reunion.lieu = request.form['lieu']
+        # Pour la date, il faut la convertir de string en objet date
+        reunion.dateRE = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+        reunion.rapportRE = request.form['description']
+        db.session.commit()
+        flash('La réunion a été mise à jour avec succès.', 'success')
+        return redirect(url_for('reunion_view', idReunion=reunion.id))
+    return render_template("reunion_update.html", title=TITLE + "- Modification d'une réunion", reunion=reunion)
 
 #Vues pour le Profil
 @app.route("/resultat_membre/")

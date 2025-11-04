@@ -22,6 +22,20 @@ class MembreBD(UserMixin, db.Model):
     activite = db.Column(db.Boolean)
 
 
+class ReunionBD(UserMixin, db.Model):
+    __tablename__ = 'REUNION'
+
+    id = db.Column('idReunion', db.Integer, primary_key=True)
+    nom= db.Column('nomRE' , db.String(41))
+    lieu = db.Column('lieuRE', db.String(20))
+    dateRE = db.Column(db.Date)
+    heureDebutRE = db.Column('heureDebutRE', db.String(5))
+    nbParticipantsRE = db.Column('nbParticipantsRE', db.Integer)
+    typeReunionRE = db.Column('typeReunionRE', db.String(15))
+    rapportRE = db.Column('rapportRE', db.String(200))
+    niveauRE = db.Column('niveauRE', db.String(15)) 
+    idEvent = db.Column('idEvent', db.Integer) 
+
 
 class EvenementnBD(UserMixin, db.Model):
     """
@@ -89,4 +103,3 @@ class InscriptionBD(db.Model):
     mdp_hash = db.Column('mdpI', db.String(128), nullable=False)
     sexe = db.Column('sexeI', db.String(5))
     acceptee = db.Column(db.Boolean, nullable=False, default=False)
-
