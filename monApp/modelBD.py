@@ -37,7 +37,7 @@ class ReunionBD(UserMixin, db.Model):
     idEvent = db.Column('idEvent', db.Integer) 
 
 
-class EvenementnBD(UserMixin, db.Model):
+class EvenementBD(UserMixin, db.Model):
     """
     Modèle SQLAlchemy pour la table EVENEMENT, compatible Flask-Login.
     """
@@ -74,7 +74,7 @@ class CompetitionBD(UserMixin, db.Model):
     passee = db.Column('passeeCO', db.Boolean)
     #Clé étrangère
     id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
-    evenement = db.relationship('EvenementnBD', backref=db.backref('competitions', lazy=True))
+    evenement = db.relationship('EvenementBD', backref=db.backref('competitions', lazy=True))
 
     
 class AdminBD(UserMixin, db.Model):
@@ -88,9 +88,9 @@ class AdminBD(UserMixin, db.Model):
     email = db.Column('emailA', db.String(41), unique=True, nullable=False)
     mdp_hash = db.Column('mdpA', db.String(64))
 
-class InscriptionBD(db.Model):
+class InscriptionBD(UserMixin, db.Model):
     """
-    Modèle SQLAlchemy pour la table INSCRIPTION.
+    Modèle SQLAlchemy pour la table INSCRIPTION, compatible Flask-Login.
     """
     __tablename__ = 'INSCRIPTION'
     
@@ -103,3 +103,16 @@ class InscriptionBD(db.Model):
     mdp_hash = db.Column('mdpI', db.String(128), nullable=False)
     sexe = db.Column('sexeI', db.String(5))
     acceptee = db.Column(db.Boolean, nullable=False, default=False)
+
+class ParticiperBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table PARTICIPER, compatible Flask-Login.
+    Lie un Membre à un Evenement.
+    """
+    __tablename__ = 'PARTICIPER'
+
+    id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'), primary_key=True)
+    id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'), primary_key=True)
+
+    membre = db.relationship('MembreBD', backref=db.backref('evenements_inscrits', lazy='dynamic'))
+    evenement = db.relationship('EvenementBD', backref=db.backref('participants', lazy='dynamic'))
