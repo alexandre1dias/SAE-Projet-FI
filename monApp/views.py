@@ -143,30 +143,48 @@ def gerer_formulaires():
 def formulaire_view():
     return render_template("formulaire_view.html",title=TITLE+"- Consultation de Formulaire")
 
+
+#Vue pour la gestion des Profils
 @app.route("/gerer_profils/")
 def gerer_profils():
-    lesMembres = db.session.query(MembreBD).all()
+    lesMembres = db.session.query(MembreBD).filter(MembreBD.activite == True).all()
     return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres)
 
-@app.route("/gerer_ancier_profils/")
-def gerer_ancier_profils():
-    return render_template("gerer_ancier_profils.html",title=TITLE+"- Géstion des Anciens Profils")
+@app.route("/gerer_profils/ancien/")
+def gerer_ancien_profils():
+    lesMembres = db.session.query(MembreBD).filter(MembreBD.activite == False).all()
+    return render_template("gerer_ancien_profils.html",title=TITLE+"- Géstion des Anciens Profils", membres = lesMembres)
 
-@app.route("/profil_view/<int:idM>")
-def profil_view(idM):
+@app.route("/profil_view/<int:idM>/<int:origine>")
+def profil_view(idM, origine):
+    # origine corresponds à l'origine de l'utilisateur. 0 correspond au menu de Membre: Vos information,
+    # 1 corresponds à gerer_profils et 2 à gerer_ancien_profil
     unMembre = db.session.get(MembreBD,idM)
-    return render_template("profil_view.html", title=TITLE + "- Profil Membre", selectedMembre=unMembre)
+    return render_template("profil_view.html", title=TITLE + "- Profil Membre", selectedMembre=unMembre, origine = origine)
 
-
-@app.route("/profil_edit/<int:idM>", methods=["GET", "POST"])
-def profil_edit(idM):
+@app.route("/profil_edit/<int:idM>/<int:origine>", methods=["GET", "POST"])
+def profil_edit(idM, origine):
     unMembre = db.session.get(MembreBD,idM)
     unForm = MembreForm(obj=unMembre)
     if unForm.validate_on_submit():
         unForm.populate_obj(unMembre)
         db.session.commit()
         return redirect(url_for('gerer_profils'))
-    return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm)
+    return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
+
+@app.route('/auteurs/<idA>/desinscrit/')
+def desinscritProfil(idM):
+    membreDesinscrit = db.session.get(MembreBD, idM)
+    membreDesinscrit.activite = False
+    db.session.commit()
+    return redirect(url_for('gerer_profils'))
+
+@app.route('/auteurs/<idA>/reinscrit/')
+def reinscritProfil(idM):
+    membreReinscrit = db.session.get(MembreBD, idM)
+    membreReinscrit.activite = True
+    db.session.commit()
+    return redirect(url_for('gerer_ancien_profils'))
 
 
 

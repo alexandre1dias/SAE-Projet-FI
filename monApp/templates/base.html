@@ -72,7 +72,7 @@
                                 <ul class="dropdown-menu" aria-labelledby="profilDropdown">
                                     <li><a class="dropdown-item" href="{{ url_for('resultat_membre') }}">Vos résultat</a></li>
                                     <li><a class="dropdown-item" href="{{ url_for('evenement_membre') }}">Vos évènements</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('profil_view', idM=current_user.id) }}">Vos informations</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('profil_view', idM=current_user.id, origine = 0) }}">Vos informations</a></li>
                                 </ul> 
                             </li> 
                         {% endif %}

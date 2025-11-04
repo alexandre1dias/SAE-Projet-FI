@@ -55,16 +55,22 @@
     <!--Pour Membre-->
     {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
     <div class="text-center mt-4">
-        <a href="{{ url_for('profil_edit', idM=selectedMembre.id) }}" class="btn btn-primary me-2">Formuler une demande de modification du profil</a>
+        <a href="{{ url_for('profil_edit', idM=selectedMembre.id, origine = origine) }}" class="btn btn-primary me-2">Formuler une demande de modification du profil</a>
     </div>
     {% endif %}
 
     <!--Pour Admin-->
     {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
     <div class="text-center mt-4">
+        {%if origine == 1%}
         <a href="{{ url_for('gerer_profils') }}" class="btn btn-secondary me-2">Retour à la liste</a>
-        <a href="{{ url_for('profil_edit', idM=selectedMembre.id) }}" class="btn btn-primary me-2">Modifier ce profil</a>
-        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal">Désinscrire</button>     
+        <a href="{{ url_for('profil_edit', idM=selectedMembre.id, origine = origine) }}" class="btn btn-primary me-2">Modifier ce profil</a>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal">Désinscrire</button>   
+        {% endif %}
+        {%if origine == 2%}
+        <a href="{{ url_for('gerer_ancien_profils') }}" class="btn btn-secondary me-2">Retour à la liste</a>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#desinscriptionModal">Réinscrire</button>    
+        {% endif %}        
     </div>
     {% endif %}
 </div>

@@ -6,7 +6,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow-sm p-4">
-                <form method="POST" action="{{ url_for('profil_edit', idM=selectedMembre.id) }}">
+                <form method="POST" action="{{ url_for('profil_edit', idM=selectedMembre.id, origine = origine) }}">
                     {{ updateForm.hidden_tag () }}
                     <div class="mb-3 row">
         
@@ -89,7 +89,7 @@
                         {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
                         <button type="submit" class="btn btn-success">Valider la demande de modifications</button>
                         {% endif %}
-                        <a href="{{ url_for('profil_view', idM=selectedMembre.id) }}" class="btn btn-secondary">Annuler</a>
+                        <a href="{{ url_for('profil_view', idM=selectedMembre.id, origine=origine) }}" class="btn btn-secondary">Annuler</a>
                     </div>
                 </form>
             </div>
