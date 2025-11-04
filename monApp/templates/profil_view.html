@@ -54,14 +54,14 @@
     </div>
     <!--Pour Membre-->
     <div class="text-center mt-4">
-        <a href="{{ url_for('profil_edit', user_id=user.id) }}" class="btn btn-primary me-2">Formuler une demande de modification du profil</a>
+        <a href="{{ url_for('profil_edit', idM=user.id) }}" class="btn btn-primary me-2">Formuler une demande de modification du profil</a>
     </div>
 
 
     <!--Pour Admin-->
     <div class="text-center mt-4">
         <a href="{{ url_for('gerer_profils') }}" class="btn btn-secondary me-2">Retour à la liste</a>
-        <a href="{{ url_for('profil_edit', user_id=user.id) }}" class="btn btn-primary me-2">Modifier ce profil</a>
+        <a href="{{ url_for('profil_edit', idM=user.id) }}" class="btn btn-primary me-2">Modifier ce profil</a>
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal">Désinscrire</button>     
     </div>
     </div>

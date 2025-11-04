@@ -2,7 +2,7 @@ from .app import app, db
 from flask import render_template, request, url_for, redirect, flash, session
 from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
-from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm
+from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm
 from .connexionPythonSQL import *
 from monApp.modelBD import MembreBD, AdminBD
 
@@ -167,21 +167,19 @@ def profil_view(user_id):
     }
     return render_template("profil_view.html", title=TITLE + "- Profil Membre", user=current_user)
 
-@app.route("/profil_edit/<int:user_id>", methods=["GET", "POST"])
-def profil_edit(user_id):
-    current_user = {
-        'id': user_id,
-        'nom': 'Doe',
-        'prenom': 'John',
-        'age': 30,
-        'date_naissance': '1994-05-15',
-        'categorie': 'Senior',
-        'niveau': 'National',
-        'email': 'john.doe@example.com',
-        'statut': 'Membre Actif'
-    }
+@app.route("/profil_edit/<int:idM>", methods=["GET", "POST"])
+def profil_edit(idM):
+    unMembre = db.session.get(MembreBD,idM)
+    unForm = MembreForm(obj=unMembre)
+    if unForm.validate_on_submit():
+        unForm.populate_obj(unMembre)
+        db.session.commit()
+        return redirect(url_for('gerer_profils'))
 
-    return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", user=current_user)
+    return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm)
+
+
+
 
 @app.route("/gerer_inscriptions/")
 def gerer_inscriptions():

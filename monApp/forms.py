@@ -16,6 +16,25 @@ class PasswordChangeForm(FlaskForm):
     next = HiddenField()
     connecter = SubmitField()
 
+class MembreForm(FlaskForm):
+    nom = StringField ('nom' ,validators= [DataRequired()])
+    prenom = StringField ('prenom' ,validators= [DataRequired()])
+    ddn = StringField ('date de naissance' ,validators= [DataRequired()])
+    sexe = SelectField('Sexe concerné', choices=[
+        ('Homme', 'Homme'),
+        ('Femme', 'Femme')
+    ], validators=[DataRequired()])
+    email = StringField ('Email' ,validators= [DataRequired()])
+    statut = SelectField('Statut', choices=[
+        ('Membre', 'Membre'),
+        ('Secrétaire Général', 'Secrétaire Général'),
+        ('Trésorier Général', 'Trésorier Général'),
+        ('Vice-président', 'Vice-président'),
+        ('Président', 'Président')
+    ], validators=[DataRequired()])
+    
+
+
 class InscriptionForm(FlaskForm):
     Login = StringField ('Email' ,validators= [DataRequired(), Email()])
     nom = StringField ('nom' ,validators= [DataRequired()])
