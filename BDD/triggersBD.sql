@@ -2,11 +2,11 @@ DELIMITER // -- les délimiters MySQL se présentent ainsi, avec des // ou des $
 
 CREATE OR REPLACE TRIGGER verif_genre_competition
 BEFORE INSERT ON PARTICIPER
+
 FOR EACH ROW
 BEGIN
     DECLARE genre_membre VARCHAR(255);
     DECLARE genre_competition VARCHAR(255);
-
     -- Récupérer le genre requis pour la compétition, s'il y en a un.
     -- Si l'événement n'est pas une compétition, genre_competition restera NULL.
     SELECT sexeCO INTO genre_competition
