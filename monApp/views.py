@@ -160,6 +160,8 @@ def profil_view(user_id):
         'prenom': 'John',
         'age': 30,
         'date_naissance': '15/05/1994',
+        'sexe': 'Homme',
+        'date_inscription': '15/05/2023',
         'categorie': 'Senior',
         'niveau': 'National',
         'email': 'john.doe@example.com',

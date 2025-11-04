@@ -37,6 +37,16 @@
                         </div>
                     </div>
 
+                    <div class="mb-3 row">
+                        <label for="sexe" class="col-sm-4 col-form-label text-muted">Sexe :</label>
+                        <div class="col-sm-8">
+                            <select class="form-select" id="sexe" name="sexe" value="{{ user.sexe }}" required>
+                                    <option value="Homme" {% if user.sexe == 'Homme' %}selected{% endif %}>Homme</option>
+                                    <option value="Femme" {% if user.sexe == 'Femme' %}selected{% endif %}>Femme</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- Statut - Seul un admin peut changer ce champ-->
                     <!-- Pourrait être automatiquement fait avec un trigger-->
                     <div class="mb-3 row">
