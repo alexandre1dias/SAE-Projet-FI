@@ -8,6 +8,17 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <h1 class="text-center mb-4">Nous Contacter</h1>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} text-center" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
             <p class="text-center lead mb-5">
                 Pour toute question concernant les inscriptions, les horaires ou nos activités, n'hésitez pas à nous joindre. Notre équipe se fera un plaisir de vous répondre.
             </p>
@@ -64,7 +75,7 @@
                     <div class="mb-3">
                         {{ form.sujet(class="form-control" + (" is-invalid" if form.sujet.errors else ""), placeholder="Sujet") }}
                         {% if form.sujet.errors %}
-                            <div class="invalid-feedback">
+                            <div class="invalid-feedback d-block">
                                 {% for error in form.sujet.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
@@ -75,7 +86,7 @@
                     <div class="mb-3">
                         {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Entrez une adresse email valide") }}
                         {% if form.email.errors %}
-                            <div class="invalid-feedback">
+                            <div class="invalid-feedback d-block">
                                 {% for error in form.email.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
@@ -86,7 +97,7 @@
                     <div class="mb-3">
                         {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows="5", placeholder="Entrez votre message") }}
                         {% if form.description.errors %}
-                            <div class="invalid-feedback">
+                            <div class="invalid-feedback d-block">
                                 {% for error in form.description.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}

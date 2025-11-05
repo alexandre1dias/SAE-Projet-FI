@@ -24,7 +24,7 @@ def contact():
     if form.validate_on_submit():
         try:
             nouveau_message = FormulaireBD(
-                type_form=form.type_form.data,
+                type=form.type_form.data,
                 sujet=form.sujet.data,
                 email=form.email.data,
                 description=form.description.data,
