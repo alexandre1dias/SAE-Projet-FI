@@ -2,11 +2,10 @@ from .app import app, db
 from flask import render_template, request, url_for, redirect, flash, session
 from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
-from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm,ContactForm
+from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm,ContactForm,ParametresForm, Parametres_updateForm
 from .connexionPythonSQL import *
-from monApp.modelBD import MembreBD, ReunionBD, CompetitionBD, InscriptionBD, AdminBD, EvenementBD, ParticiperBD, FormulaireBD,FormulaireContactBD,EventClubBD
+from monApp.modelBD import MembreBD, ReunionBD, CompetitionBD, InscriptionBD, AdminBD, EvenementBD, ParticiperBD, FormulaireBD,EventClubBD
 from datetime import datetime
-from .forms import LoginForm, EventForm
 from flask import jsonify
 #from .models import Event
 
@@ -24,7 +23,7 @@ def contact():
     form = ContactForm()
     if form.validate_on_submit():
         try:
-            nouveau_message = FormulaireContactBD(
+            nouveau_message = FormulaireBD(
                 type_form=form.type_form.data,
                 sujet=form.sujet.data,
                 email=form.email.data,
@@ -202,7 +201,6 @@ def evenement_membre():
 
 @app.route('/parametres/')
 def parametres():
-    from .forms import ParametresForm
     form = ParametresForm()
     return render_template("parametres.html", 
                          title=TITLE+"- Paramètres du Membre", 
@@ -210,7 +208,6 @@ def parametres():
 
 @app.route('/parametres_update/')
 def parametres_update():
-    from .forms import Parametres_updateForm
     form = Parametres_updateForm()
     return render_template("parametres_update.html", 
                          title=TITLE+"- Paramètres du Membre", 
@@ -380,20 +377,10 @@ def login():
         
     return render_template("login.html", title=TITLE + "- Connexion", form=form)
 
-@app.route("/inscription/", methods=["GET", "POST"])  # Accepte GET et POST
+@app.route("/inscription/", methods=["GET", "POST"])
 def inscription():
     unForm = InscriptionForm()
     if unForm.validate_on_submit():
-        existing_inscription = db.session.scalar(
-            db.select(InscriptionBD).where(InscriptionBD.email == unForm.Login.data)
-        )
-        existing_membre = db.session.scalar(
-            db.select(MembreBD).where(MembreBD.email == unForm.Login.data)
-        )
-        if existing_inscription or existing_membre:
-            return render_template("inscription.html", title=TITLE+"- Inscriptions", form=unForm)
-        if unForm.password.data != unForm.confirm_password.data:
-            return render_template("inscription.html", title=TITLE+"- Inscriptions", form=unForm)
         new_inscription = InscriptionBD(
             email=unForm.Login.data,           
             nom=unForm.nom.data,
@@ -406,10 +393,12 @@ def inscription():
         try:
             db.session.add(new_inscription)
             db.session.commit()
-            
             return redirect(url_for('index'))
         except Exception as e:
             db.session.rollback()
+            
+    # Si le formulaire n'est PAS valide, la page est re-rendue
+    # et les erreurs s'afficheront grâce aux modifs du Problème n°1
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
 
 @app.route("/logout/")

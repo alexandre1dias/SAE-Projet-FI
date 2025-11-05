@@ -12,32 +12,106 @@
         
         <form method="POST" action="" style="width: 100%;">
             {{ form.hidden_tag() }}
+            
             <div class="form-group">
-                {{ form.Login(class="form-input", placeholder="Rentrer votre email") }}
+                {{ form.Login(
+                    class="form-input" + (" is-invalid" if form.Login.errors else ""), 
+                    placeholder="Rentrer votre email"
+                ) }}
+                {% if form.Login.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.Login.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
+
             <div class="form-group">
-                {{ form.nom(class="form-input", placeholder="Rentrer votre nom") }}
+                {{ form.nom(
+                    class="form-input" + (" is-invalid" if form.nom.errors else ""), 
+                    placeholder="Rentrer votre nom"
+                ) }}
+                {% if form.nom.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.nom.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
+
             <div class="form-group">
-                {{ form.prenom(class="form-input", placeholder="Rentrer votre prenom") }}
+                {{ form.prenom(
+                    class="form-input" + (" is-invalid" if form.prenom.errors else ""), 
+                    placeholder="Rentrer votre prenom"
+                ) }}
+                {% if form.prenom.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.prenom.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
+
             <div class="form-group">
                 {{ form.date_naissance(
-                    class="form-input", 
+                    class="form-input" + (" is-invalid" if form.date_naissance.errors else ""), 
                     type="text", 
                     placeholder="Rentrer votre date de naissance", 
                     onfocus="(this.type='date')", 
                     onblur="(if(!this.value) this.type='text')"
                 ) }}
+                {% if form.date_naissance.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.date_naissance.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
+
             <div class="form-group">
-                {{ form.sexe(class="form-input form-select form-select-white-arrow", placeholder="Choisir votre sexe") }}
+                {{ form.sexe(
+                    class="form-input form-select form-select-white-arrow" + (" is-invalid" if form.sexe.errors else ""), 
+                    placeholder="Choisir votre sexe"
+                ) }}
+                {% if form.sexe.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.sexe.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
+
             <div class="form-group">
-                {{ form.password(class="form-input", placeholder="Rentrer votre mot de passe") }}
+                {{ form.password(
+                    class="form-input" + (" is-invalid" if form.password.errors else ""), 
+                    placeholder="Rentrer votre mot de passe"
+                ) }}
+                {% if form.password.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.password.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
+
             <div class="form-group">
-                {{ form.confirm_password(class="form-input", placeholder="Confirmer votre mot de passe") }}
+                {{ form.confirm_password(
+                    class="form-input" + (" is-invalid" if form.confirm_password.errors else ""), 
+                    placeholder="Confirmer votre mot de passe"
+                ) }}
+                {% if form.confirm_password.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.confirm_password.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
             
             <div class="form-group">
@@ -59,22 +133,4 @@
     </div>
 </div>
 
-<!-- Modale des Conditions d'inscription -->
-<div class="modal fade" id="conditionModal" tabindex="-1" aria-labelledby="conditionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="conditionModalLabel">Conditions d'Inscription</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>titre</strong></p>
-                <p></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}

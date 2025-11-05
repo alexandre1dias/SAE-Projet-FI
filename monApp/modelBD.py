@@ -135,19 +135,21 @@ class RemplirBD(db.Model):
     id_formulaire = db.Column('idFormulaire', db.Integer, db.ForeignKey('FORMULAIRE_CONTACT.idFormulaire'), primary_key=True)
     id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'), primary_key=True)
 
-
 class FormulaireBD(UserMixin, db.Model):
     """
-    Modèle SQLAlchemy pour la table FORMULAIRE_CONTACT, compatible Flask-Login.
+    Modèle SQLAlchemy pour la table FORMULAIRE_CONTACT.
+    Combine les champs pour l'admin et pour la soumission.
     """
     __tablename__ = 'FORMULAIRE_CONTACT'
 
     id = db.Column('idFormulaire', db.Integer, primary_key=True)
-    typeFC = db.Column(db.String(20))
-    sujetFC = db.Column(db.String(100))
-    mailFC = db.Column(db.String(41))
-    descriptionFC = db.Column(db.String(500))
-    dateFC = db.Column(db.Date)
+    
+    type_form = db.Column('typeFC', db.String(20))
+    sujet = db.Column('sujetFC', db.String(100))
+    email = db.Column('mailFC', db.String(41))
+    description = db.Column('descriptionFC', db.String(500))
+    date = db.Column('dateFC', db.Date)
+    
     idMembre = db.Column(db.Integer, db.ForeignKey('MEMBRE.idMembre'))
     idAdmin = db.Column(db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'))
 
@@ -156,21 +158,6 @@ class FormulaireBD(UserMixin, db.Model):
 
     reponses = db.relationship('RepondreBD', backref='formulaire', cascade="all, delete-orphan")
     remplissages = db.relationship('RemplirBD', backref='formulaire', cascade="all, delete-orphan")
-
-class FormulaireContactBD(db.Model):
-    """
-    Modèle SQLAlchemy pour la table FORMULAIRE_CONTACT.
-    """
-    __tablename__ = 'FORMULAIRE_CONTACT'
-    
-    id = db.Column('idFormulaire', db.Integer, primary_key=True, autoincrement=True)
-    type_form = db.Column('typeFC', db.String(15), nullable=False)
-    sujet = db.Column('sujetFC', db.String(20), nullable=False)
-    email = db.Column('mailFC', db.String(41), nullable=False)
-    description = db.Column('descriptionFC', db.String(200), nullable=False)
-    date = db.Column('dateFC', db.Date, nullable=False, default=func.now())
-
-
 
 class EventClubBD(UserMixin, db.Model):
     """
