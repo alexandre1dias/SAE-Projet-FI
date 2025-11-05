@@ -181,7 +181,7 @@ class FormulaireBD(UserMixin, db.Model):
 
 class EventClubBD(UserMixin, db.Model):
     """
-    Modèle SQLAlchemy pour la table COMPETITION, compatible Flask-Login.
+    Modèle SQLAlchemy pour la table EventClub, compatible Flask-Login.
     """
     __tablename__ = 'EVENTCLUB'
     
@@ -218,3 +218,30 @@ class ResultatBD(db.Model):
 
     competition = db.relationship('CompetitionBD', backref='resultats')
     membre = db.relationship('MembreBD', backref='resultats')
+
+class InformationBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table INFORMATION, compatible Flask-Login.
+    """
+    __tablename__ = 'INFORMATION'
+    
+    # Mappage des colonnes SQL
+    idInformation = db.Column(db.Integer, primary_key=True)
+    dateIN = db.Column(db.Date)
+    heureIN = db.Column(db.String(5))
+    titreIN = db.Column(db.String(50))
+    contenuIN = db.Column(db.String(600))
+
+class PresseBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table PRESSE, compatible Flask-Login.
+    """
+    __tablename__ = 'PRESSE'
+    
+    # Mappage des colonnes SQL
+    idPresse = db.Column(db.Integer, primary_key=True)
+    dateP = db.Column(db.Date)
+    heureP = db.Column(db.String(5))
+    titreP = db.Column(db.String(50))
+    contenuP = db.Column(db.String(600))
+    lienP = db.Column(db.String(255))

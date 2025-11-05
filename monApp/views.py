@@ -4,7 +4,7 @@ from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
 from .forms import LoginForm, EventForm, PasswordChangeForm, InscriptionForm, MembreForm, ContactForm, ParametresForm, Parametres_updateForm
 from .connexionPythonSQL import *
-from monApp.modelBD import MembreBD, ReunionBD, CompetitionBD, InscriptionBD, AdminBD, EvenementBD, ParticiperBD, ModifBD, FormulaireBD, EventClubBD, ResultatBD
+from monApp.modelBD import *
 from datetime import datetime
 from flask import jsonify
 #from .models import Event
@@ -265,10 +265,17 @@ def changer_mdp():
 def parametres_notifs():
     return render_template("parametres_notifs.html",title=TITLE+"- Paramètres notifications")
 
-#Vues pour Article 
-@app.route("/articles/")
-def articles():
-    return render_template("articles.html",title=TITLE+"- Articles")
+#Vues pour Informations
+@app.route("/informations/")
+def informations():
+    lesInformations = InformationBD.query.all()
+    return render_template("informations.html",title=TITLE+"- Informations",informations=lesInformations)
+
+#Vues pour Presse
+@app.route("/presse/")
+def presse():
+    lesArticles = PresseBD.query.all()
+    return render_template("presse.html",title=TITLE+"- Presse",articles = lesArticles)
 
 #Vues pour Admin
 @app.route("/gerer_formulaires/")

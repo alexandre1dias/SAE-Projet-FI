@@ -1,0 +1,23 @@
+{%extends "base.html"%}
+
+    {%block main%}
+        <h1>Informations</h1>
+        <p>
+            Retrouvez ici toutes les actualités importantes du club : les événements annulés et les annonces importantes.
+        </p>
+         <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
+        {% for information in informations %}
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{information.titreIN}}</h5>
+                        <p class="card-text">{{information.contenuIN}}</p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Publié le {{information.dateIN}}</small>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+         </div>
+    {%endblock%}
