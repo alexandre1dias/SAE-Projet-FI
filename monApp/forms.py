@@ -1,6 +1,6 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField
+from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 from . modelBD import MembreBD
 from datetime import date
@@ -58,6 +58,16 @@ class InscriptionForm(FlaskForm):
     next = HiddenField()
     inscription = SubmitField()
 
+class ContactForm(FlaskForm):
+    type_form = RadioField('Type de formulaire', choices=[
+        ('Question', 'Question'),
+        ('Demande', 'Demande'),
+        ('Signalement', 'Signalement')
+        ], validators=[DataRequired()])
+    sujet = StringField('Sujet', validators=[DataRequired()])
+    email = StringField('Votre Email', validators=[DataRequired(), Email()])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    submit = SubmitField('Envoyer')
 
 class EventForm(FlaskForm):
     title = StringField('Titre de l\'événement', validators=[DataRequired()])

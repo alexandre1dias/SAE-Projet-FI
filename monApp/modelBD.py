@@ -1,6 +1,7 @@
 
 from .app import db
 from flask_login import UserMixin
+from sqlalchemy.sql import func
 
 class MembreBD(UserMixin, db.Model):
     """
@@ -119,6 +120,20 @@ class ParticiperBD(UserMixin, db.Model):
     evenement = db.relationship('EvenementBD', backref=db.backref('participants', lazy='dynamic'))
 
 
+class FormulaireContactBD(db.Model):
+    """
+    Modèle SQLAlchemy pour la table FORMULAIRE_CONTACT.
+    """
+    __tablename__ = 'FORMULAIRE_CONTACT'
+    
+    id = db.Column('idFormulaire', db.Integer, primary_key=True, autoincrement=True)
+    type_form = db.Column('typeFC', db.String(15), nullable=False)
+    sujet = db.Column('sujetFC', db.String(20), nullable=False)
+    email = db.Column('mailFC', db.String(41), nullable=False)
+    description = db.Column('descriptionFC', db.String(200), nullable=False)
+    date = db.Column('dateFC', db.Date, nullable=False, default=func.now())
+
+
 
 class EventClubBD(UserMixin, db.Model):
     """
@@ -142,3 +157,4 @@ class EventClubBD(UserMixin, db.Model):
     #Clé étrangère
     id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
     evenement = db.relationship('EvenementBD', backref=db.backref('eventclub', lazy=True))
+

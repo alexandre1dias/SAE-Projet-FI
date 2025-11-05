@@ -2,10 +2,11 @@ from .app import app, db
 from flask import render_template, request, url_for, redirect, flash, session
 from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
-from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm
+from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm,ContactForm
 from .connexionPythonSQL import *
 
-from monApp.modelBD import MembreBD,ReunionBD,CompetitionBD,InscriptionBD,AdminBD,EvenementBD,ParticiperBD,EventClubBD
+from monApp.modelBD import MembreBD,ReunionBD,CompetitionBD,InscriptionBD,AdminBD,EvenementBD,ParticiperBD,FormulaireContactBD,EventClubBD
+
 
 from datetime import datetime
 
@@ -23,9 +24,24 @@ def index():
 def about():
     return render_template("about.html",title=TITLE+"- A propos")
 
-@app.route("/contact/")
+@app.route("/contact/", methods=['GET', 'POST'])
 def contact():
-    return render_template("contact.html",title=TITLE+"- Conctact")
+    form = ContactForm()
+    if form.validate_on_submit():
+        try:
+            nouveau_message = FormulaireContactBD(
+                type_form=form.type_form.data,
+                sujet=form.sujet.data,
+                email=form.email.data,
+                description=form.description.data,
+                date=datetime.now().date()
+            )
+            db.session.add(nouveau_message)
+            db.session.commit()
+            return redirect(url_for('contact'))
+        except Exception as e:
+            db.session.rollback()
+    return render_template("contact.html", title=TITLE+"- Contact", form=form)
 
 @app.route("/escrime-feminin/")
 def escrime_feminin():
