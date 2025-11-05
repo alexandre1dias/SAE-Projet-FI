@@ -119,6 +119,7 @@ class ParticiperBD(UserMixin, db.Model):
     membre = db.relationship('MembreBD', backref=db.backref('evenements_inscrits', lazy='dynamic'))
     evenement = db.relationship('EvenementBD', backref=db.backref('participants', lazy='dynamic'))
 
+
 class FormulaireContactBD(db.Model):
     """
     Modèle SQLAlchemy pour la table FORMULAIRE_CONTACT.
@@ -131,3 +132,29 @@ class FormulaireContactBD(db.Model):
     email = db.Column('mailFC', db.String(41), nullable=False)
     description = db.Column('descriptionFC', db.String(200), nullable=False)
     date = db.Column('dateFC', db.Date, nullable=False, default=func.now())
+
+
+
+class EventClubBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table COMPETITION, compatible Flask-Login.
+    """
+    __tablename__ = 'EVENTCLUB'
+    
+    # Mappage des colonnes SQL
+    idEventClub = db.Column(db.Integer, primary_key=True)
+    NomEV = db.Column(db.String(50))
+    villeEV = db.Column(db.String(50))
+    adresseEV = db.Column(db.String(50))
+    dateDebutEV = db.Column(db.Date)
+    heureDebutEV = db.Column(db.String(5))
+    dateFinEV = db.Column(db.Date)
+    heureFinEV = db.Column(db.String(5))
+    nbParticipantEV = db.Column(db.Integer)
+    descriptionEV = db.Column(db.String(255))
+    niveauxEV = db.Column(db.String(45))
+    passeeEV = db.Column(db.Boolean)
+    #Clé étrangère
+    id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
+    evenement = db.relationship('EvenementBD', backref=db.backref('eventclub', lazy=True))
+
