@@ -71,10 +71,19 @@
         {% else %}
             <a href="{{ url_for('reunion') }}" class="btn btn-secondary">Retour</a>
         {% endif %}
-        <a href="" class="btn btn-success">S'inscrire</a>
-        <!-- boutons Admin-->
-        <a href="{{ url_for('club_update', idEventClub=selectedEventClub.idEventClub)  }}" class="btn btn-primary">Modifier évènement</a>
-        <a href="{{ url_for('club_delete', idEventClub=selectedEventClub.idEventClub)  }}" class="btn btn-danger">Supprimer évènement</a>
+        {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
+            {% if not selectedEventClub.passeeEV %}
+                {% if deja_inscrit %}
+                    <a href="{{ url_for('desinscrire_club', idEventClub=selectedEventClub.idEventClub) }}" class="btn btn-danger me-2">Se désinscrire</a>
+                {% else %}
+                    <a href="{{ url_for('inscrire_club', idEventClub=selectedEventClub.idEventClub) }}" class="btn btn-success me-2">S'inscrire</a>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+            <a href="{{ url_for('club_update', idEventClub=selectedEventClub.idEventClub)  }}" class="btn btn-primary me-2">Modifier évènement</a>
+            <a href="{{ url_for('club_delete', idEventClub=selectedEventClub.idEventClub)  }}" class="btn btn-danger">Supprimer évènement</a>
+        {% endif %}
     </div>
 
 {% endblock %}

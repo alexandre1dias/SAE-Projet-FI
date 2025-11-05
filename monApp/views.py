@@ -105,49 +105,122 @@ def competition_update(idCompetition):
 @app.route("/competition_delete/<int:idCompetition>", methods=['POST'])
 @login_required # Assure que seul un utilisateur connecté peut supprimer
 def competition_delete(idCompetition):
-    competition_to_delete = CompetitionBD.query.get_or_404(idCompetition)
-    db.session.delete(competition_to_delete)
+    competition_a_supprimer = CompetitionBD.query.get_or_404(idCompetition)
+    db.session.delete(competition_a_supprimer)
     db.session.commit()
-    return redirect(url_for('competitions')) # Redirige vers la liste des compétitions
+    return redirect(url_for('competitions'))
 
 @app.route("/evenement_club/")
 def evenement_club():
     lesEventClubs = EventClubBD.query.all()
-    return render_template("evenement_club.html",title=TITLE+"- Evenements du Club",eventsclub=lesEventClubs)
+    ids_evenements_inscrits = set()
+    if current_user.is_authenticated and session.get('user_type') == 'membre':
+        participations = ParticiperBD.query.filter_by(id_membre=current_user.id).all()
+        ids_evenements_inscrits = {p.id_event for p in participations}
+    return render_template("evenement_club.html",title=TITLE+"- Evenements du Club",eventsclub=lesEventClubs, user_registered_event_ids=ids_evenements_inscrits)
 
 @app.route("/evenement_club/<int:idEventClub>/club_view/")
 def club_view(idEventClub):
     unEventClub = EventClubBD.query.get(idEventClub)
-    origine = request.args.get('origine', 'default')
-    return render_template("club_view.html",title=TITLE+"- un évenement du club",selectedEventClub=unEventClub, origine=origine)
+
+    deja_inscrit = False
+    if current_user.is_authenticated and session.get('user_type') == 'membre':
+        participation = ParticiperBD.query.filter_by(id_membre=current_user.id, id_event=unEventClub.id_event).first()
+        deja_inscrit = participation is not None
+        origine = request.args.get('origine', 'default')
+    return render_template("club_view.html",title=TITLE+"- un évenement du club",selectedEventClub=unEventClub, deja_inscrit=deja_inscrit, origine=origine)
+
+ 
+
 
 @app.route("/evenement_club/<int:idEventClub>/club_update/", methods=['GET', 'POST'])
 @login_required
 def club_update(idEventClub):
     unEventClub = EventClubBD.query.get_or_404(idEventClub)
-    # Logique de mise à jour à implémenter
-    return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club", eventClub=unEventClub)
+
+    if request.method == 'POST':
+        try:
+            unEventClub.NomEV = request.form['nom']
+            unEventClub.adresseEV = request.form['lieu']
+            unEventClub.nbParticipantEV = request.form['participants']
+            unEventClub.descriptionEV = request.form['description']
+            unEventClub.dateDebutEV = datetime.strptime(request.form['date_debut'], '%Y-%m-%d').date()
+            unEventClub.heureDebutEV = request.form['heure_debut']
+            unEventClub.dateFinEV = datetime.strptime(request.form['date_fin'], '%Y-%m-%d').date()
+            unEventClub.heureFinEV = request.form['heure_fin']
+            
+            db.session.commit()
+            return redirect(url_for('club_view', idEventClub=unEventClub.idEventClub))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Une erreur est survenue lors de la mise à jour : {e}", 'danger')
+
+    participations = ParticiperBD.query.filter_by(id_event=unEventClub.id_event).all()
+    participants = [p.membre for p in participations]
+    return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club", eventClub=unEventClub, participants=participants)
 
 @app.route("/evenement_club/<int:idEventClub>/club_delete/", methods=['POST'])
 @login_required
 def club_delete(idEventClub):
-    event_to_delete = EventClubBD.query.get_or_404(idEventClub)
-    db.session.delete(event_to_delete)
+    evenement_a_supprimer = EventClubBD.query.get_or_404(idEventClub)
+    db.session.delete(evenement_a_supprimer)
     db.session.commit()
     flash('L\'événement a été supprimé avec succès.', 'success')
     return redirect(url_for('evenement_club'))
 
+@app.route("/inscrire/club/<int:idEventClub>", methods=['GET'])
+@login_required
+def inscrire_club(idEventClub):
+    if session.get('user_type') != 'membre':
+        flash("Seuls les membres peuvent s'inscrire.", "warning")
+        return redirect(url_for('evenement_club'))
+
+    evenement_club_obj = EventClubBD.query.get_or_404(idEventClub)
+    id_evenement_a_inscrire = evenement_club_obj.id_event
+
+    deja_inscrit = ParticiperBD.query.filter_by(
+        id_membre=current_user.id,
+        id_event=id_evenement_a_inscrire
+    ).first()
+
+    if deja_inscrit:
+        flash('Vous êtes déjà inscrit à cet événement.', 'info')
+    else:
+        try:
+            nouvelle_participation = ParticiperBD(id_membre=current_user.id, id_event=id_evenement_a_inscrire)
+            db.session.add(nouvelle_participation)
+            db.session.commit()
+            flash('Vous avez été inscrit avec succès !', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Une erreur est survenue lors de l'inscription: {e}", 'danger')
+    
+    return redirect(url_for('club_view', idEventClub=idEventClub))
+
+@app.route("/desinscrire/club/<int:idEventClub>", methods=['GET'])
+@login_required
+def desinscrire_club(idEventClub):
+    evenement_club_obj = EventClubBD.query.get_or_404(idEventClub)
+    participation = ParticiperBD.query.filter_by(id_membre=current_user.id, id_event=evenement_club_obj.id_event).first()
+    if participation:
+        db.session.delete(participation)
+        db.session.commit()
+        flash('Vous avez été désinscrit de l\'événement.', 'success')
+    else:
+        flash('Vous n\'étiez pas inscrit à cet événement.', 'info')
+    return redirect(url_for('club_view', idEventClub=idEventClub))
+
 @app.route("/reunion/")
 def reunion():
     reunions = ReunionBD.query.all()
-    today = datetime.now().date()
-    prochaines_reunions = [r for r in reunions if r.dateDebutRE and r.dateDebutRE >= today]
-    anciennes_reunions = [r for r in reunions if r.dateDebutRE and r.dateDebutRE < today]
-    user_registered_event_ids = set()
+    aujourdhui = datetime.now().date()
+    prochaines_reunions = [r for r in reunions if r.dateRE and r.dateRE >= aujourdhui]
+    anciennes_reunions = [r for r in reunions if r.dateRE and r.dateRE < aujourdhui]
+    ids_evenements_inscrits = set()
     if current_user.is_authenticated and session.get('user_type') == 'membre':
         participations = ParticiperBD.query.filter_by(id_membre=current_user.id).all()
-        user_registered_event_ids = {p.id_event for p in participations}
-    return render_template("reunion.html", title=TITLE + "- Réunion", prochaines_reunions=prochaines_reunions, anciennes_reunions=anciennes_reunions,user_registered_event_ids = user_registered_event_ids)
+        ids_evenements_inscrits = {p.id_event for p in participations}
+    return render_template("reunion.html", title=TITLE + "- Réunion", prochaines_reunions=prochaines_reunions, anciennes_reunions=anciennes_reunions,user_registered_event_ids = ids_evenements_inscrits)
 
 @app.route("/reunion_view/<int:idReunion>")
 def reunion_view(idReunion):
@@ -166,21 +239,19 @@ def reunion_delete(idReunion):
 @app.route("/inscrire/reunion/<int:idReunion>", methods=['GET'])
 @login_required
 def inscrire_reunion(idReunion):
-    reunion_obj = ReunionBD.query.get_or_404(idReunion)
-    event_id_to_register = reunion_obj.idEvent
+    reunion_objet = ReunionBD.query.get_or_404(idReunion)
+    id_evenement_a_inscrire = reunion_objet.idEvent
 
     deja_inscrit = ParticiperBD.query.filter_by(
         id_membre=current_user.id,
-        id_event=event_id_to_register
+        id_event=id_evenement_a_inscrire
     ).first()
     if deja_inscrit:
         flash('Vous êtes déjà inscrit à cet événement.', 'info')
     else:
         try:
-            nouvelle_participation = ParticiperBD(
-                id_membre=current_user.id,
-                id_event=event_id_to_register
-            )
+            nouvelle_participation = ParticiperBD(id_membre=current_user.id,
+                                                  id_event=id_evenement_a_inscrire)
             db.session.add(nouvelle_participation)
             db.session.commit()
         except Exception as e:
@@ -190,9 +261,9 @@ def inscrire_reunion(idReunion):
 @app.route("/reunion/desinscrire/<int:idReunion>", methods=['GET'])
 @login_required
 def desinscrire_reunion(idReunion):
-    reunion_obj = ReunionBD.query.get_or_404(idReunion)
-    event_id = reunion_obj.idEvent
-    participation = ParticiperBD.query.filter_by(id_membre=current_user.id, id_event=event_id).first()
+    reunion_objet = ReunionBD.query.get_or_404(idReunion)
+    id_evenement = reunion_objet.idEvent
+    participation = ParticiperBD.query.filter_by(id_membre=current_user.id, id_event=id_evenement).first()
     if participation:
         try:
             db.session.delete(participation)
@@ -229,22 +300,27 @@ def resultat_membre():
 @app.route("/evenement_membre/")
 @login_required
 def evenement_membre():
+    # Protection pour s'assurer que seul un membre peut accéder à cette page
+    if session.get('user_type') != 'membre':
+        flash("Cette page est réservée aux membres.", "warning")
+        return redirect(url_for('index'))
 
-    today = datetime.now().date()
+    aujourdhui = datetime.now().date()
     participations = ParticiperBD.query.filter_by(id_membre=current_user.id).all()
-    event_ids = [p.id_event for p in participations]
+    ids_evenements = [p.id_event for p in participations]
 
-    events = []
-    if event_ids:
-        competitions = CompetitionBD.query.filter(CompetitionBD.id_event.in_(event_ids)).all()
-        reunions = ReunionBD.query.filter(ReunionBD.idEvent.in_(event_ids)).all()
-        event_clubs = EventClubBD.query.filter(EventClubBD.id_event.in_(event_ids)).all()
-        events.extend(competitions)
-        events.extend(reunions)
-        events.extend(event_clubs)
+    evenements = []
+    if ids_evenements:
+        les_competitions = CompetitionBD.query.filter(CompetitionBD.id_event.in_(ids_evenements)).all()
+        les_reunions = ReunionBD.query.filter(ReunionBD.idEvent.in_(ids_evenements)).all()
+        les_evenements_club = EventClubBD.query.filter(EventClubBD.id_event.in_(ids_evenements)).all()
+        evenements.extend(les_competitions)
+        evenements.extend(les_reunions)
+        evenements.extend(les_evenements_club)
 
-    events_a_venir = [e for e in events if (getattr(e, 'date_debut', None) or getattr(e, 'dateRE', None) or getattr(e, 'dateDebutEV', None)) >= today]
-    events_passes = [e for e in events if (getattr(e, 'date_debut', None) or getattr(e, 'dateRE', None) or getattr(e, 'dateDebutEV', None)) < today]
+    events_a_venir = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateRE', None) or getattr(e, 'dateDebutEV', None)) >= aujourdhui]
+    events_passes = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateRE', None) or getattr(e, 'dateDebutEV', None)) < aujourdhui]
+
 
     return render_template("evenement_membre.html", title=TITLE+"- Vos Évènements",
                            events_a_venir=events_a_venir, events_passes=events_passes)
@@ -322,8 +398,8 @@ def formulaire_view(idFormulaire):
 @app.route("/formulaire_delete/<int:idFormulaire>", methods=['POST'])
 @login_required
 def formulaire_delete(idFormulaire):
-    formulaire_a_supprimer = FormulaireBD.query.get_or_404(idFormulaire)
-    db.session.delete(formulaire_a_supprimer)
+    formulaire = FormulaireBD.query.get_or_404(idFormulaire)
+    db.session.delete(formulaire)
     db.session.commit()
     return redirect(url_for('gerer_formulaires'))
 
@@ -419,27 +495,27 @@ def login():
     
     form = LoginForm()
     if form.validate_on_submit():
-        # 1. Essayer de trouver un membre
-        user = MembreBD.query.filter_by(email=form.email.data).first()
-        is_admin = False
+        # 1. Essayer de trouver un utilisateur (membre ou admin)
+        utilisateur = MembreBD.query.filter_by(email=form.email.data).first()
+        est_admin = False
         
         # 2. Si ce n'est pas un membre, essayer de trouver un admin
-        if user is None:
-            user = AdminBD.query.filter_by(email=form.email.data).first()
-            is_admin = True
+        if utilisateur is None:
+            utilisateur = AdminBD.query.filter_by(email=form.email.data).first()
+            est_admin = True
 
         # 3. Vérifier si un utilisateur a été trouvé et si le mot de passe est correct
         # La vérification du mot de passe est une comparaison directe
-        if user is None or user.mdp_hash != form.password.data:
+        if utilisateur is None or utilisateur.mdp_hash != form.password.data:
             return redirect(url_for('login'))
         
         # Connexion de l'utilisateur
-        login_user(user)
+        login_user(utilisateur)
         
         # Stocker le type d'utilisateur dans la session
-        session['user_type'] = 'admin' if is_admin else 'membre'
+        session['user_type'] = 'admin' if est_admin else 'membre'
 
-        # Redirection vers la page suivante ou l'accueil
+        # Redirection vers la page demandée ou l'accueil
         next_page = request.args.get('next')
         return redirect(next_page) if next_page else redirect(url_for('index'))
         
@@ -449,23 +525,21 @@ def login():
 def inscription():
     unForm = InscriptionForm()
     if unForm.validate_on_submit():
-        new_inscription = InscriptionBD(
+        nouvelle_inscription = InscriptionBD(
             email=unForm.Login.data,           
             nom=unForm.nom.data,
             prenom=unForm.prenom.data,
             ddn=unForm.date_naissance.data,
             sexe=unForm.sexe.data,
-            mdp_hash=unForm.password.data
+            mdp_hash=unForm.password.data # Note: Le mot de passe devrait être haché ici
         )
         try:
-            db.session.add(new_inscription)
+            db.session.add(nouvelle_inscription)
             db.session.commit()
             return redirect(url_for('index'))
         except Exception as e:
             db.session.rollback()
             
-    # Si le formulaire n'est PAS valide, la page est re-rendue
-    # et les erreurs s'afficheront grâce aux modifs du Problème n°1
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
 
 @app.route("/logout/")
