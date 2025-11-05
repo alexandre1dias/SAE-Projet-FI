@@ -17,7 +17,11 @@ INSERT INTO MEMBRE (nomM, prenomM, emailM, mdpM, date_inscription, sexeM, ddnM, 
 ('Dupont', 'Jean', 'jean.dupont@email.com', 'mdp123', '2023-01-15', 'Homme', '1995-05-20', 'Senior', 'Membre', 1, NULL),
 ('Durand', 'Marie', 'marie.durand@email.com', 'mdp456', '2023-02-20', 'Femme', '2008-08-10', 'M17', 'Membre', 1, NULL),
 ('Martin', 'Paul', 'paul.martin@email.com', 'mdp789', '2022-09-01', 'Homme', '2015-03-25', 'M9', 'Ancien Membre', 0, NULL),
-('Eche', 'Régis', 'regis.eche@email.com', 'mdp741', '2000-01-01', 'Homme', '1975-02-07', 'Vétéran', 'Président', 1, NULL);
+('Eche', 'Régis', 'regis.eche@email.com', 'mdp741', '2000-01-01', 'Homme', '1975-02-07', 'Vétéran', 'Président', 1, NULL),
+('Dominique', 'MARQUET', 'dom.mar@email.com', 'mdp442', '2006-01-01', 'Homme', '1974-02-07', 'Vétéran', 'Vice-Président', 1, NULL),
+('Bernard', 'DELADERIERE', 'ber.del@email.com', 'mdp5231', '1999-01-01', 'Homme', '1976-02-07', 'Vétéran', 'Trésorier Général', 1, NULL),
+('Pascale', 'LHOMME', 'pas.lhm@email.com', 'mdp433', '2002-01-01', 'Femme', '1978-02-07', 'Vétéran', 'Secrétaire Générale', 1, NULL),
+('Christophe', 'LECHOPIER', 'chr.lec@email.com', 'mdp541', '2005-01-01', 'Homme', '1969-02-07', 'Vétéran', 'Membre Directeur', 1, NULL);
 
 -- Insertion des paramètres de notification pour les membres
 INSERT INTO PARAMETRE_NOTIF_MEMBRE (eventInscriptionSite, evenementInscriptionMail, eventNouveauSite, eventNouveauMail, eventAnnulationSite, eventAnnulationMail, resultatNouveauSite, resuletatNouveauMail, reponseFormulaireSite, reponseFormulaireMail, modifProfilSite, modifProfilMail, idMembre) VALUES
