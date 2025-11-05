@@ -1,6 +1,7 @@
 
 from .app import db
 from flask_login import UserMixin
+from sqlalchemy.sql import func
 
 class MembreBD(UserMixin, db.Model):
     """
@@ -17,6 +18,7 @@ class MembreBD(UserMixin, db.Model):
     date_inscription = db.Column(db.Date)
     sexe = db.Column('sexeM', db.String(5))
     ddn = db.Column('ddnM', db.Date)
+    age = db.Column(db.Integer)
     niveau = db.Column(db.String(15))
     statut = db.Column(db.String(30))
     activite = db.Column(db.Boolean)
@@ -154,3 +156,42 @@ class FormulaireBD(UserMixin, db.Model):
 
     reponses = db.relationship('RepondreBD', backref='formulaire', cascade="all, delete-orphan")
     remplissages = db.relationship('RemplirBD', backref='formulaire', cascade="all, delete-orphan")
+
+class FormulaireContactBD(db.Model):
+    """
+    Modèle SQLAlchemy pour la table FORMULAIRE_CONTACT.
+    """
+    __tablename__ = 'FORMULAIRE_CONTACT'
+    
+    id = db.Column('idFormulaire', db.Integer, primary_key=True, autoincrement=True)
+    type_form = db.Column('typeFC', db.String(15), nullable=False)
+    sujet = db.Column('sujetFC', db.String(20), nullable=False)
+    email = db.Column('mailFC', db.String(41), nullable=False)
+    description = db.Column('descriptionFC', db.String(200), nullable=False)
+    date = db.Column('dateFC', db.Date, nullable=False, default=func.now())
+
+
+
+class EventClubBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table COMPETITION, compatible Flask-Login.
+    """
+    __tablename__ = 'EVENTCLUB'
+    
+    # Mappage des colonnes SQL
+    idEventClub = db.Column(db.Integer, primary_key=True)
+    NomEV = db.Column(db.String(50))
+    villeEV = db.Column(db.String(50))
+    adresseEV = db.Column(db.String(50))
+    dateDebutEV = db.Column(db.Date)
+    heureDebutEV = db.Column(db.String(5))
+    dateFinEV = db.Column(db.Date)
+    heureFinEV = db.Column(db.String(5))
+    nbParticipantEV = db.Column(db.Integer)
+    descriptionEV = db.Column(db.String(255))
+    niveauxEV = db.Column(db.String(45))
+    passeeEV = db.Column(db.Boolean)
+    #Clé étrangère
+    id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
+    evenement = db.relationship('EvenementBD', backref=db.backref('eventclub', lazy=True))
+

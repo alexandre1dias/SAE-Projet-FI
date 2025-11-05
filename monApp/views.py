@@ -2,13 +2,10 @@ from .app import app, db
 from flask import render_template, request, url_for, redirect, flash, session
 from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
-from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm
+from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm,ContactForm
 from .connexionPythonSQL import *
-from monApp.modelBD import MembreBD, ReunionBD, CompetitionBD, InscriptionBD, AdminBD, EvenementBD, ParticiperBD, FormulaireBD
-
+from monApp.modelBD import MembreBD, ReunionBD, CompetitionBD, InscriptionBD, AdminBD, EvenementBD, ParticiperBD, FormulaireBD,FormulaireContactBD,EventClubBD
 from datetime import datetime
-
-
 from .forms import LoginForm, EventForm
 from flask import jsonify
 #from .models import Event
@@ -22,9 +19,24 @@ def index():
 def about():
     return render_template("about.html",title=TITLE+"- A propos")
 
-@app.route("/contact/")
+@app.route("/contact/", methods=['GET', 'POST'])
 def contact():
-    return render_template("contact.html",title=TITLE+"- Conctact")
+    form = ContactForm()
+    if form.validate_on_submit():
+        try:
+            nouveau_message = FormulaireContactBD(
+                type_form=form.type_form.data,
+                sujet=form.sujet.data,
+                email=form.email.data,
+                description=form.description.data,
+                date=datetime.now().date()
+            )
+            db.session.add(nouveau_message)
+            db.session.commit()
+            return redirect(url_for('contact'))
+        except Exception as e:
+            db.session.rollback()
+    return render_template("contact.html", title=TITLE+"- Contact", form=form)
 
 @app.route("/escrime-feminin/")
 def escrime_feminin():
@@ -77,15 +89,29 @@ def competition_update():
 
 @app.route("/evenement_club/")
 def evenement_club():
-    return render_template("evenement_club.html",title=TITLE+"- Evenements du Club")
+    lesEventClubs = EventClubBD.query.all()
+    return render_template("evenement_club.html",title=TITLE+"- Evenements du Club",eventsclub=lesEventClubs)
 
-@app.route("/club_view/")
-def club_view():
-    return render_template("club_view.html",title=TITLE+"- un évenement du club")
+@app.route("/evenement_club/<int:idEventClub>/club_view/")
+def club_view(idEventClub):
+    unEventClub = EventClubBD.query.get(idEventClub)
+    return render_template("club_view.html",title=TITLE+"- un évenement du club",selectedEventClub=unEventClub)
 
-@app.route("/club_update/")
-def club_update():
-    return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club")
+@app.route("/evenement_club/<int:idEventClub>/club_update/", methods=['GET', 'POST'])
+@login_required
+def club_update(idEventClub):
+    unEventClub = EventClubBD.query.get_or_404(idEventClub)
+    # Logique de mise à jour à implémenter
+    return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club", eventClub=unEventClub)
+
+@app.route("/evenement_club/<int:idEventClub>/club_delete/", methods=['POST'])
+@login_required
+def club_delete(idEventClub):
+    event_to_delete = EventClubBD.query.get_or_404(idEventClub)
+    db.session.delete(event_to_delete)
+    db.session.commit()
+    flash('L\'événement a été supprimé avec succès.', 'success')
+    return redirect(url_for('evenement_club'))
 
 @app.route("/reunion/")
 def reunion():
