@@ -195,7 +195,8 @@ create table EVENTCLUB(
     heureFinEV varchar(5),
     nbParticipantEV integer,
     descriptionEV varchar(200),
-    niveauxEV varchar(15),
+    niveauxEV varchar(45),
+    passeeEV boolean,
     idEvent integer,
     PRIMARY KEY(idEventClub)
 );
