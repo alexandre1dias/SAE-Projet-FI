@@ -152,12 +152,13 @@ create table PARTICIPER(
 create table ENTRAINEMENT(
     idEntrainement integer AUTO_INCREMENT,
     jourEN varchar(8),
-    lieuEN varchar(20),
+    villeEN varchar(50),
+    adresseEN varchar(50),
     dateEN date,
     heureDebutEN varchar(5),
     heureFinEN varchar(5),
     typeArmeEN varchar(12),
-    niveauEN varchar(15),
+    niveauEN varchar(45),
     idEvent integer,
     PRIMARY KEY(idEntrainement)
 
@@ -165,14 +166,17 @@ create table ENTRAINEMENT(
 
 create table REUNION(
     idReunion integer AUTO_INCREMENT,
-    nomRE varchar(20),
-    lieuRE varchar(20),
-    dateRE date,
+    nomRE varchar(100),
+    villeRE varchar(50),
+    adresseRE varchar(50),
+    datedebutRE date,
     heureDebutRE varchar(5),
+    dateFinRE date,
+    heureFinRE varchar(5),
     nbParticipantsRE integer,
     typeReunionRE varchar(15),
     rapportRE varchar(200),
-    niveauRE varchar(15),
+    niveauRE varchar(45),
     idEvent integer,
     PRIMARY KEY(idReunion)
 
@@ -192,7 +196,7 @@ create table COMPETITION(
     sexeCO varchar(5),
     typeCompete varchar(15),
     descriptionCO varchar(200), 
-    niveauCO varchar(15),
+    niveauCO varchar(45),
     classementCO varchar(20),
     passeeCO boolean,
     idEvent integer,

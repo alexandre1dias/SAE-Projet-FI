@@ -16,7 +16,7 @@
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 text-center shadow-sm">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    <h5 class="card-title">Adresse {{selectedEventClub.adresseEV}}</h5>
+                    <h5 class="card-title">{{selectedEventClub.adresseEV}} à {{selectedEventClub.villeEV}}</h5>
                 </div>
             </div>
         </div>
@@ -66,7 +66,11 @@
 
     
     <div class="d-flex justify-content-center">
-        <a href="{{ url_for('evenement_club') }}" class="btn btn-secondary">Retour</a>
+        {% if origine == 'calendrier' %}
+            <a href="{{ url_for('calendrier') }}" class="btn btn-secondary">Retour</a>
+        {% else %}
+            <a href="{{ url_for('reunion') }}" class="btn btn-secondary">Retour</a>
+        {% endif %}
         <a href="" class="btn btn-success">S'inscrire</a>
         <!-- boutons Admin-->
         <a href="{{ url_for('club_update', idEventClub=selectedEventClub.idEventClub)  }}" class="btn btn-primary">Modifier évènement</a>

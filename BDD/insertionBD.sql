@@ -58,12 +58,12 @@ INSERT INTO COMPETITION (nomCO, villeCO, adresseCO, dateDebutCO, heureDebutCO, d
 ('Mémorial Jean Moulin', 'Montargis', '7 Rue de la Résistance', '2023-11-11', '09:00', '2023-11-11', '18:00', 'Toutes', 90, 'Mixte', 'Régional', 'Tournoi commémoratif toutes armes.', 'Tous', 'Terminé', 1, 15);
 
 -- Insertion des entraînements
-INSERT INTO ENTRAINEMENT (jourEN, lieuEN, dateEN, heureDebutEN, heureFinEN, typeArmeEN, niveauEN, idEvent) VALUES
-('Lundi', 'Gymnase A', '2024-04-29', '18:00', '20:00', 'Sabre', 'Tous', 3);
+INSERT INTO ENTRAINEMENT (jourEN, villeEN, adresseEN, dateEN, heureDebutEN, heureFinEN, typeArmeEN, niveauEN, idEvent) VALUES
+('Lundi', 'Blois', '5 rue de la salle', '2024-04-29', '18:00', '20:00', 'Sabre', 'Tous', 3);
 
 -- Insertion des réunions
-INSERT INTO REUNION (nomRE, lieuRE, dateRE, heureDebutRE, nbParticipantsRE, typeReunionRE, rapportRE, niveauRE, idEvent) VALUES
-('AG Annuelle', 'Salle du Club', '2024-09-05', '19:00', 50, 'Assemblée', 'Rapport annuel des activités et finances.', 'Tous', 4);
+INSERT INTO REUNION (nomRE, villeRE, adresseRE, dateDebutRE, heureDebutRE, dateFinRE, heureFinRE, nbParticipantsRE, typeReunionRE, rapportRE, niveauRE, idEvent) VALUES
+('AG Annuelle', 'Blois', '5 rue de la salle', '2024-09-05', '19:00', '2024-09-05', '21:00', 10050, 'Assemblée', 'Rapport annuel des activités et finances.', 'Tous', 4);
 
 -- Insertion des événements de club (6 passés, 6 à venir)
 INSERT INTO EVENTCLUB (NomEV, villeEV, adresseEV, dateDebutEV, heureDebutEV, dateFinEV, heureFinEV, nbParticipantEV, descriptionEV, niveauxEV, passeeEV, idEvent) VALUES
