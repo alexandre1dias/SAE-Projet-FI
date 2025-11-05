@@ -95,9 +95,17 @@
         </button>
     </div>
     <!--Fin Carousel-->
-    <a href="{{ url_for('competitions') }}" class="btn btn-outline-primary btn-custom">retour</a>
-    <!-- boutons Admin-->
-    <a href="#" class="btn btn-danger">supprimer competition</a>
-    <a href="{{ url_for('competition_update', idCompetition=competition.id) }}" class="btn btn-primary">modifier competition</a>
+
+    <div class="d-flex justify-content-center">
+        {% if origine == 'calendrier' %}
+            <a href="{{ url_for('calendrier') }}" class="btn btn-secondary">Retour</a>
+        {% else %}
+            <a href="{{ url_for('reunion') }}" class="btn btn-secondary">Retour</a>
+        {% endif %}
+        <a href="" class="btn btn-success">S'inscrire</a>
+        <!-- boutons Admin-->
+        <a href="{{ url_for('competition_update') }}" class="btn btn-primary">modifier competition</a>
+        <a href="{{ url_for('competitions') }}" class="btn btn-danger">supprimer competition</a>
+    </div>
 
 {% endblock %}

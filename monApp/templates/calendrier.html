@@ -5,8 +5,7 @@
     <div class="container-fluid py-5">
         <h1 class="text-center mb-5">Calendrier des Évènements</h1>
         
-        <div class="row">  <!--colonne pour les filtres à gauche -->
-            <div class="col-lg-2 col-md-3 mb-4">
+        <div class="row">  <div class="col-lg-2 col-md-3 mb-4">
                 <h5 class="filtres-titre">Filtres</h5>
                     
                     <div class="filtre-categorie">
@@ -109,17 +108,17 @@
                         </div>
                     </div>
 
-    
+                    {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
                     <div class="mt-4">
                         <a href="{{ url_for('add_event') }}" class="btn btn-primary w-100">
                             Ajouter un événement
                         </a>
-                </div>
+                    </div>
+                    {% endif %}
             </div>
 
             
-            <div class="col-lg-10 col-md-9"> <!-- pour la colonne du calendrier à droite -->
-                <div class="calendrier-wrapper">
+            <div class="col-lg-10 col-md-9"> <div class="calendrier-wrapper">
                     <div id='calendar'></div>
                 </div>
             </div>
@@ -133,38 +132,44 @@
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth', // Vue par défaut
-            locale: 'fr', // Mettre le calendrier en français
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            firstDay: 1,
             height: 700,
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
             },
-            buttonText: { // Traduction des boutons
+            buttonText: {
                 today: "Aujourd'hui",
                 month: 'Mois',
                 week: 'Semaine',
                 day: 'Jour',
                 list: 'Liste'
             },
-            /*events: '/api/events', // Charger les événements depuis cette URL
+            events: '/api/events',
             eventClick: function(info) {
-                let event = info.event;
-                let startDate = event.start ? event.start.toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' }) : 'Non spécifié';
-                let endDate = event.end ? event.end.toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' }) : 'Non spécifié';
-                let description = event.extendedProps.description || 'Aucune description';
-                let category = event.extendedProps.category || 'Non classé';
-                let levels = event.extendedProps.level || 'Non spécifié';
-
-                let alertMessage = `Événement: ${event.title}
-                                    Début: ${startDate}
-                                    Fin: ${endDate}
-                                    Description: ${description}
-                                    Catégorie: ${category};
-                                    Niveaux: ${levels}`;
-                alert(alertMessage);
-            }*/
+                if (info.event.extendedProps.url) {
+                    window.location.href = info.event.extendedProps.url;
+                }
+                else {
+                    let event = info.event;
+                    let props = event.extendedProps;
+                    let startDate = event.start ? event.start.toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' }) : 'Non spécifié';
+                    let endDate = event.end ? event.end.toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' }) : 'Non spécifié';
+                    let description = props.description || 'Aucune description';
+                    let category = props.type || 'Non classé';
+                    let levels = props.niveaux || 'Non spécifié';
+                    let alertMessage = `Événement: ${event.title}\n` +
+                                       `Type: ${category}\n` +
+                                       `Début: ${startDate}\n` +
+                                       `Fin: ${endDate}\n` +
+                                       `Niveaux: ${levels}\n` +
+                                       `Description: ${description}`;
+                    alert(alertMessage);
+                }
+            }
         });
         calendar.render();
     });

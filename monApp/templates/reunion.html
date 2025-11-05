@@ -13,7 +13,7 @@
                             <h3 class="card-title text-center mb-0">{{ reunion.nom }}</h3>
                         </div>
                         <div class="card-body p-4">
-                            <h2 class="card-title text-center mb-4 h4">{{ reunion.dateRE.strftime('%d/%m/%Y') }} - {{ reunion.heureDebutRE }}</h2>
+                            <h2 class="card-title ...">{{ reunion.dateDebutRE.strftime('%d/%m') }} {{ reunion.heureDebutRE }} - {{ reunion.dateFinRE.strftime('%d/%m') }} {{ reunion.heureFinRE }}</h2>
                             <ul class="feature-list text-center mb-4">
                                 <li>{{ reunion.lieu }}</li>
                             </ul>
@@ -62,7 +62,7 @@
                             <h3 class="card-title text-center mb-0">{{ reunion.nom }}</h3>
                         </div>
                         <div class="card-body p-4">
-                            <h2 class="card-title text-center mb-4 h4">{{ reunion.dateRE.strftime('%d/%m/%Y') }} - {{ reunion.heureDebutRE }}</h2>
+                            <h2 class="card-title ...">{{ reunion.dateDebutRE.strftime('%d/%m') }} {{ reunion.heureDebutRE }} - {{ reunion.dateFinRE.strftime('%d/%m') }} {{ reunion.heureFinRE }}</h2>
                             <ul class="feature-list text-center mb-4">
                                 <li>{{ reunion.lieu }}</li>
                             </ul>

@@ -5,18 +5,19 @@
     
     <div class="card">
         <div class="card-header">
-            <strong>Sujet :</strong> {{ selectedFormulaire.sujetFC }}
+            <strong>Sujet :</strong> {{ selectedFormulaire.sujet }}
         </div>
         <div class="card-body">
-            <p><strong>Type :</strong> {{ selectedFormulaire.typeFC }}</p>
-            <p><strong>Date :</strong> {{ selectedFormulaire.dateFC.strftime('%d/%m/%Y') }}</p>
-            <p><strong>Expéditeur :</strong> {{ selectedFormulaire.mailFC }}</p>
+            <p><strong>Type :</strong> {{ selectedFormulaire.type }}</p>
+            <p><strong>Date :</strong> {{ selectedFormulaire.date.strftime('%d/%m/%Y') }}</p>
+            <p><strong>Expéditeur :</strong> {{ selectedFormulaire.email }}</p>
             <hr>
             <p><strong>Description :</strong></p>
-            <p>{{ selectedFormulaire.descriptionFC }}</p>
+            <p>{{ selectedFormulaire.description }}</p>
         </div>
     </div>
     <form action="{{ url_for('repondre_formulaire', idFormulaire=selectedFormulaire.id) }}" method="post" class="mt-4">
+        {%if selectedFormulaire.repondu == False %}
         <div class="mb-3">
             <label for="reponse" class="form-label"><strong>Votre réponse :</strong></label>
             <textarea id="reponse" name="reponse" class="form-control" rows="5" placeholder="Entrez votre réponse ici..." required></textarea>
@@ -24,9 +25,19 @@
         <div class="d-flex gap-2">
             <a href="{{ url_for('gerer_formulaires') }}" class="btn btn-secondary">Retour</a>
             <button type="submit" class="btn btn-success">Envoyer la réponse</button>
+        </div>
+        {%endif%}
+        {%if selectedFormulaire.repondu == True %}
+        <div class="mb-3">
+            <label for="reponse" class="form-label"><strong>Votre réponse :</strong></label>
+            <p>{{selectedFormulaire.reponse}}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('gerer_anciens_formulaires') }}" class="btn btn-secondary">Retour</a>
             <a href="{{ url_for('formulaire_delete', idFormulaire=selectedFormulaire.id) }}" class="btn btn-danger" 
                onclick="event.preventDefault(); if(confirm('Êtes-vous sûr de vouloir supprimer ce formulaire ?')) { document.getElementById('delete-form-{{ selectedFormulaire.id }}').submit(); }">Supprimer</a>
         </div>
+        {%endif%}
     </form>
     <form id="delete-form-{{ selectedFormulaire.id }}" action="{{ url_for('formulaire_delete', idFormulaire=selectedFormulaire.id) }}" method="post" style="display: none;"></form>
 {% endblock %}
