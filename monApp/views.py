@@ -4,13 +4,8 @@ from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm,ContactForm
 from .connexionPythonSQL import *
-
-from monApp.modelBD import MembreBD,ReunionBD,CompetitionBD,InscriptionBD,AdminBD,EvenementBD,ParticiperBD,FormulaireContactBD,EventClubBD
-
-
+from monApp.modelBD import MembreBD, ReunionBD, CompetitionBD, InscriptionBD, AdminBD, EvenementBD, ParticiperBD, FormulaireBD,FormulaireContactBD,EventClubBD
 from datetime import datetime
-
-
 from .forms import LoginForm, EventForm
 from flask import jsonify
 #from .models import Event
@@ -241,12 +236,36 @@ def articles():
 #Vues pour Admin
 @app.route("/gerer_formulaires/")
 def gerer_formulaires():
-    return render_template("gerer_formulaires.html",title=TITLE+"- Géstion des Formulaires")
+    les_formulaires = FormulaireBD.query.order_by(FormulaireBD.dateFC.desc()).all()
+    return render_template("gerer_formulaires.html", title=TITLE+"- Géstion des Formulaires", formulaires=les_formulaires)
 
-@app.route("/formulaire_view/")
-def formulaire_view():
-    return render_template("formulaire_view.html",title=TITLE+"- Consultation de Formulaire")
+@app.route("/formulaire_view/<int:idFormulaire>")
+def formulaire_view(idFormulaire):
+    unFormulaire = FormulaireBD.query.get_or_404(idFormulaire)
+    return render_template("formulaire_view.html",title=TITLE+"- Consultation de Formulaire", selectedFormulaire=unFormulaire)
 
+@app.route("/formulaire_delete/<int:idFormulaire>", methods=['POST'])
+@login_required
+def formulaire_delete(idFormulaire):
+    formulaire_a_supprimer = FormulaireBD.query.get_or_404(idFormulaire)
+    db.session.delete(formulaire_a_supprimer)
+    db.session.commit()
+    return redirect(url_for('gerer_formulaires'))
+
+@app.route("/repondre_formulaire/<int:idFormulaire>", methods=['POST'])
+@login_required
+def repondre_formulaire(idFormulaire):
+    reponse = request.form.get('reponse')
+    formulaire = FormulaireBD.query.get_or_404(idFormulaire)
+    
+    #Logique d'envoi d'email à ajouter ici
+    # Par exemple : send_email(to=formulaire.mailFC, subject=f"Re: {formulaire.sujetFC}", body=reponse)
+    
+    flash(f"Votre réponse au formulaire de {formulaire.mailFC} a bien été envoyée")
+    #une fois la réponse envoyée, on supprime le formulaire
+    db.session.delete(formulaire)
+    db.session.commit()
+    return redirect(url_for('gerer_formulaires'))
 
 #Vue pour la gestion des Profils
 @app.route("/gerer_profils/")

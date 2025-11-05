@@ -119,6 +119,43 @@ class ParticiperBD(UserMixin, db.Model):
     membre = db.relationship('MembreBD', backref=db.backref('evenements_inscrits', lazy='dynamic'))
     evenement = db.relationship('EvenementBD', backref=db.backref('participants', lazy='dynamic'))
 
+class RepondreBD(db.Model):
+    """
+    Table d'association entre un administrateur et un formulaire auquel il a répondu.
+    """
+    __tablename__ = 'REPONDRE'
+    id_formulaire = db.Column('idFormulaire', db.Integer, db.ForeignKey('FORMULAIRE_CONTACT.idFormulaire'), primary_key=True)
+    id_admin = db.Column('idAdmin', db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'), primary_key=True)
+
+class RemplirBD(db.Model):
+    """
+    Table d'association entre un membre et un formulaire qu'il a rempli.
+    """
+    __tablename__ = 'REMPLIR'
+    id_formulaire = db.Column('idFormulaire', db.Integer, db.ForeignKey('FORMULAIRE_CONTACT.idFormulaire'), primary_key=True)
+    id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'), primary_key=True)
+
+
+class FormulaireBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table FORMULAIRE_CONTACT, compatible Flask-Login.
+    """
+    __tablename__ = 'FORMULAIRE_CONTACT'
+
+    id = db.Column('idFormulaire', db.Integer, primary_key=True)
+    typeFC = db.Column(db.String(20))
+    sujetFC = db.Column(db.String(100))
+    mailFC = db.Column(db.String(41))
+    descriptionFC = db.Column(db.String(500))
+    dateFC = db.Column(db.Date)
+    idMembre = db.Column(db.Integer, db.ForeignKey('MEMBRE.idMembre'))
+    idAdmin = db.Column(db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'))
+
+    membre = db.relationship('MembreBD', backref=db.backref('formulaires', lazy=True))
+    admin = db.relationship('AdminBD', backref=db.backref('formulaires', lazy=True))
+
+    reponses = db.relationship('RepondreBD', backref='formulaire', cascade="all, delete-orphan")
+    remplissages = db.relationship('RemplirBD', backref='formulaire', cascade="all, delete-orphan")
 
 class FormulaireContactBD(db.Model):
     """
