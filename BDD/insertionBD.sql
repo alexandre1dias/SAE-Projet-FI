@@ -145,12 +145,20 @@ INSERT INTO IMAGEAPP (urlI, prive, alt) VALUES
 INSERT INTO IMAGERC (idImage, idCompetition) VALUES (1, 1);
 INSERT INTO IMAGERE (idImage, idEventClub) VALUES (2, 1);
 
--- Insertion des actualités
-INSERT INTO ACTUALITE (dateAC, heureAC, nomAC, categorieAC) VALUES
-('2024-05-12', '10:00', 'Bravo Jean !', 'Résultats');
+-- Insertion dans INFORMATION
+INSERT INTO INFORMATION (dateIN, heureIN, titreIN, contenuIN) VALUES
+('2023-08-15', '10:27','Reception des nouveaux gants','Nous vous informons que les gants que nous attendions sont là');
 
--- Liaison des images aux actualités
-INSERT INTO IMAGERA (idImage, idActualite) VALUES (1, 1);
+-- Liaison des images aux informations
+INSERT INTO IMAGERIN (idImage, idInformation) VALUES (1, 1);
+
+-- Insertion dans PRESSE
+INSERT INTO PRESSE (dateP, heureP, titreP, contenuP,lienP) VALUES
+('2025-11-11','23:23','escrime et passion','le cercle à eu le droit à une article du jornal local','https://www.journaldeBloissabrelaserquitournerigolo.com');
+
+-- Liaison des images aux informations
+INSERT INTO IMAGERP (idImage, idPresse) VALUES (1, 1);
+
 
 -- Réactiver la vérification des clés étrangères
 SET FOREIGN_KEY_CHECKS=1;
