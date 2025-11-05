@@ -5,7 +5,7 @@ from flask_login import logout_user, login_user, login_required, current_user
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm
 from .connexionPythonSQL import *
 
-from monApp.modelBD import MembreBD,ReunionBD,CompetitionBD,InscriptionBD
+from monApp.modelBD import MembreBD,ReunionBD,CompetitionBD,InscriptionBD,AdminBD,EvenementBD,ParticiperBD
 
 from datetime import datetime
 
@@ -91,10 +91,14 @@ def club_update():
 @app.route("/reunion/")
 def reunion():
     reunions = ReunionBD.query.all()
-    today = datetime.now().date() #on s'assure d'avoir un objet date
+    today = datetime.now().date()
     prochaines_reunions = [r for r in reunions if r.dateRE and r.dateRE >= today]
     anciennes_reunions = [r for r in reunions if r.dateRE and r.dateRE < today]
-    return render_template("reunion.html", title=TITLE + "- Réunion", prochaines_reunions=prochaines_reunions, anciennes_reunions=anciennes_reunions)
+    user_registered_event_ids = set()
+    if current_user.is_authenticated and session.get('user_type') == 'membre':
+        participations = ParticiperBD.query.filter_by(id_membre=current_user.id).all()
+        user_registered_event_ids = {p.id_event for p in participations}
+    return render_template("reunion.html", title=TITLE + "- Réunion", prochaines_reunions=prochaines_reunions, anciennes_reunions=anciennes_reunions,user_registered_event_ids = user_registered_event_ids)
 
 @app.route("/reunion_view/<int:idReunion>")
 def reunion_view(idReunion):
@@ -107,6 +111,44 @@ def reunion_delete(idReunion):
     db.session.delete(reunion)
     db.session.commit()
     flash('La réunion a été supprimée avec succès.', 'success')
+    return redirect(url_for('reunion'))
+
+@app.route("/inscrire/reunion/<int:idReunion>", methods=['GET'])
+@login_required
+def inscrire_reunion(idReunion):
+    reunion_obj = ReunionBD.query.get_or_404(idReunion)
+    event_id_to_register = reunion_obj.idEvent
+
+    deja_inscrit = ParticiperBD.query.filter_by(
+        id_membre=current_user.id,
+        id_event=event_id_to_register
+    ).first()
+    if deja_inscrit:
+        flash('Vous êtes déjà inscrit à cet événement.', 'info')
+    else:
+        try:
+            nouvelle_participation = ParticiperBD(
+                id_membre=current_user.id,
+                id_event=event_id_to_register
+            )
+            db.session.add(nouvelle_participation)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+    return redirect(url_for('reunion'))
+
+@app.route("/reunion/desinscrire/<int:idReunion>", methods=['GET'])
+@login_required
+def desinscrire_reunion(idReunion):
+    reunion_obj = ReunionBD.query.get_or_404(idReunion)
+    event_id = reunion_obj.idEvent
+    participation = ParticiperBD.query.filter_by(id_membre=current_user.id, id_event=event_id).first()
+    if participation:
+        try:
+            db.session.delete(participation)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
     return redirect(url_for('reunion'))
 
 
