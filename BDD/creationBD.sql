@@ -44,7 +44,7 @@ create table MEMBRE(
     idMembre integer AUTO_INCREMENT,
     nomM varchar(41),
     prenomM varchar(41),
-    emailM varchar(41),
+    emailM varchar(100),
     mdpM varchar(64),
     date_inscription date,
     sexeM varchar(5),
@@ -106,14 +106,27 @@ create table REMPLIR(
 
 create table INSCRIPTION(
     idInscription integer AUTO_INCREMENT,
-    mailInscr varchar(41),
+    mailInscr varchar(100),
     nomI varchar(41),
     prenomI varchar(41),
     ddnI date,
     mdpI varchar(64),
     sexeI varchar(5),
-    acceptee boolean,
+    dateInscription date,
     PRIMARY KEY(idInscription)
+);
+
+
+create table MODIFICATION(
+    idModif integer AUTO_INCREMENT,
+    nomModif varchar(41),
+    prenomModif varchar(41),
+    emailModif varchar(100),
+    sexeModif varchar(5),
+    ddnModif date,
+    dateModif date,
+    idMembre integer,
+    PRIMARY KEY(idModif)
 );
 
 
@@ -121,7 +134,6 @@ create table GENERER(
     idInscription integer,
     idMembre integer,
     PRIMARY KEY(idInscription, idMembre)
-
 );
 
 create table EVENEMENT(
@@ -277,6 +289,8 @@ create table IMAGERP(
 );
 
 -- Ajout des contraintes de clé étrangère
+
+ALTER TABLE MODIFICATION ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
 
 ALTER TABLE ADMINISTRATEUR ADD FOREIGN KEY (idParamNotifAdmin) REFERENCES PARAMETRE_NOTIF_ADMIN(idParamNotifAdmin);
 

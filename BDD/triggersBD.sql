@@ -88,6 +88,7 @@ DELIMITER ;
 
 DELIMITER //
 
+/**
 CREATE OR REPLACE TRIGGER creation_membre_apres_acceptation
 AFTER UPDATE ON INSCRIPTION
 FOR EACH ROW
@@ -99,6 +100,7 @@ BEGIN
     END IF;
 END;
 //
+**/
 
 DELIMITER ;
 
@@ -192,7 +194,6 @@ FOR EACH ROW
 BEGIN
     DECLARE annee INT;
     DECLARE calcul_age INT;
-
     -- Recalcule le niveau et l'age uniquement si la date de naissance a été modifiée.
     -- Cela évite d'écraser le niveau lors de la mise à jour d'autres champs (ex: statut, email).
     IF NEW.ddnM != OLD.ddnM THEN
@@ -216,8 +217,48 @@ BEGIN
     END IF;
 END;
 //
-
 DELIMITER ;
+
+
+DELIMITER //
+create or replace trigger date_inscription before insert on INSCRIPTION for each ROW
+begin
+    if New.dateInscription IS NULL THEN
+        set New.dateInscription = CURDATE();
+    end if;
+ 
+end;
+//
+DELIMITER ;
+
+DELIMITER //
+create or replace trigger date_modifs before insert on MODIFICATION for each ROW
+begin
+    if New.dateModif IS NULL THEN
+        set New.dateModif = CURDATE();
+    end if;
+end;
+//
+DELIMITER ;
+
+DELIMITER //
+create or replace trigger date_modifs before update on MODIFICATION for each ROW
+begin
+    if New.dateModif IS NULL THEN
+        set New.dateModif = CURDATE();
+    end if;
+end;
+//
+DELIMITER ;
+
+
+
+
+
+
+
+
+
 
 
 -- Quand un formulaire de contact a une réponse
