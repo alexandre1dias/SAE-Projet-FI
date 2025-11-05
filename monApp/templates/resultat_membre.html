@@ -48,25 +48,31 @@
             </aside>
             <div class="col-lg-10 col-md-9">
                 <div class="row row-cols-1 row-cols-md-3 g-4">
+                    {% if resultats %}
+                        {% for resultat in resultats %}
                     <div class="col">
                         <div class="card pricing-card h-100">
                             <div class="card-header pricing-header basic-header p-4">
-                                <h3 class="card-title text-center mb-0">Tournoi club Blois</h3>
+                                <h3 class="card-title text-center mb-0">{{ resultat.competition.nom }}</h3>
                             </div>
                             <div class="card-body p-4">
-                                <h4 class="card-title text-center mb-4 h5">Tous niveaux</h4>
+                                <h4 class="card-title text-center mb-4 h5">{{ resultat.competition.niveaux }}</h4>
                                 <ul class="feature-list text-center mb-4">
-                                    <li>01/10/2025 - 02/10/2025</li>
-                                    <li>sabre</li>
-                                    <li>National</li>
-                                    <li><strong>Votre classement : 5ème</strong></li>
+                                    <li>{{ resultat.competition.date_debut.strftime('%d/%m/%Y') }} - {{ resultat.competition.date_fin.strftime('%d/%m/%Y') }}</li>
+                                    <li>{{ resultat.type_arme }}</li>
+                                    <li>{{ resultat.type_compete }}</li>
+                                    <li><strong>Votre classement : {{ resultat.resultat }}</strong></li>
                                 </ul>
                                 <div class="text-center">
-                                    <a href="{{ url_for('competition_view') }}" class="btn btn-outline-primary btn-custom">Consulter</a>
+                                    <a href="{{ url_for('competition_view', idCompetition=resultat.id_competition) }}" class="btn btn-outline-primary btn-custom">Consulter</a>
                                 </div>
                             </div>
                         </div>
                     </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>Vous n'avez aucun résultat pour le moment.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>

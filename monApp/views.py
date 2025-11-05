@@ -2,9 +2,9 @@ from .app import app, db
 from flask import render_template, request, url_for, redirect, flash, session
 from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
-from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm,ContactForm,ParametresForm, Parametres_updateForm
+from .forms import LoginForm, EventForm, PasswordChangeForm, InscriptionForm, MembreForm, ContactForm, ParametresForm, Parametres_updateForm
 from .connexionPythonSQL import *
-from monApp.modelBD import MembreBD,ReunionBD,CompetitionBD,InscriptionBD,AdminBD,EvenementBD,ParticiperBD,ModifBD, FormulaireBD,EventClubBD
+from monApp.modelBD import MembreBD, ReunionBD, CompetitionBD, InscriptionBD, AdminBD, EvenementBD, ParticiperBD, ModifBD, FormulaireBD, EventClubBD, ResultatBD
 from datetime import datetime
 from flask import jsonify
 #from .models import Event
@@ -214,8 +214,10 @@ def reunion_update(idReunion):
 
 #Vues pour le Profil
 @app.route("/resultat_membre/")
+@login_required
 def resultat_membre():
-    return render_template("resultat_membre.html",title=TITLE+"- Résultat du Membre")
+    les_resultats = ResultatBD.query.filter_by(id_membre=current_user.id).all()
+    return render_template("resultat_membre.html", title=TITLE+"- Résultat du Membre", resultats=les_resultats)
 
 @app.route("/evenement_membre/")
 def evenement_membre():
