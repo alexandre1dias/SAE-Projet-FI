@@ -5,7 +5,7 @@ from flask_login import logout_user, login_user, login_required, current_user
 from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm
 from .connexionPythonSQL import *
 
-from monApp.modelBD import MembreBD,ReunionBD,CompetitionBD,InscriptionBD,AdminBD,EvenementBD,ParticiperBD
+from monApp.modelBD import MembreBD,ReunionBD,CompetitionBD,InscriptionBD,AdminBD,EvenementBD,ParticiperBD,ModifBD
 
 from datetime import datetime
 
@@ -221,35 +221,8 @@ def formulaire_view():
 #Vue pour la gestion des Profils
 @app.route("/gerer_profils/")
 def gerer_profils():
-    # On commence la requête de base pour les membres actifs
-    query = db.session.query(MembreBD).filter(MembreBD.activite == True)
-
-    # On récupère les arguments de la requête GET
-    search_term = request.args.get('recherche')
-    sexes = request.args.getlist('sexe')
-    niveaux = request.args.getlist('niveau')
-
-    # Filtrage par barre de recherche (nom, prénom, email)
-    if search_term:
-        search_like = f"%{search_term}%"
-        query = query.filter(
-            db.or_(
-                MembreBD.nom.like(search_like),
-                MembreBD.prenom.like(search_like),
-                MembreBD.email.like(search_like)
-            )
-        )
-
-    # Filtrage par sexe
-    if sexes:
-        query = query.filter(MembreBD.sexe.in_(sexes))
-
-    # Filtrage par niveau
-    if niveaux:
-        query = query.filter(MembreBD.niveau.in_(niveaux))
-
-    lesMembres = query.all()
-    return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres, filtres=request.args)
+    lesMembres = db.session.query(MembreBD).filter(MembreBD.activite == True).all()
+    return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres)
 
 @app.route("/gerer_profils/ancien/")
 def gerer_ancien_profils():
@@ -288,11 +261,15 @@ def reinscritProfil(idM):
     return redirect(url_for('gerer_ancien_profils'))
 
 
-
-
+#Vue pour la gestion des inscription/modification
 @app.route("/gerer_inscriptions/")
 def gerer_inscriptions():
-    return render_template("gerer_inscriptions.html",title=TITLE+"- Géstion des Inscriptions")
+    lesInscriptions = db.session.query(InscriptionBD).all()
+    lesModifs = db.session.query(ModifBD).all()
+    lesRequetes = lesInscriptions + lesModifs
+    # Trie par date de la liste
+    lesRequetes.sort(key=lambda x: x.date, reverse=True)  
+    return render_template("gerer_inscriptions.html",title=TITLE+"- Géstion des Inscriptions", requetes=lesRequetes)
 
 
 

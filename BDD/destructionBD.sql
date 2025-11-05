@@ -26,5 +26,6 @@ drop table if exists IMAGERC;
 drop table if exists IMAGERE;
 drop table if exists ACTUALITE;
 drop table if exists IMAGERA; 
+drop table if exists MODIFICATION; 
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -88,6 +88,7 @@ DELIMITER ;
 
 DELIMITER //
 
+/**
 CREATE OR REPLACE TRIGGER creation_membre_apres_acceptation
 AFTER UPDATE ON INSCRIPTION
 FOR EACH ROW
@@ -99,6 +100,7 @@ BEGIN
     END IF;
 END;
 //
+**/
 
 DELIMITER ;
 

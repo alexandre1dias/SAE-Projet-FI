@@ -44,41 +44,80 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {%for uneRequete in requetes %}
                         <tr>
-                            <td>Inscription</td>
-                            <td>Jean Dupont</td>
-                            <td>
-                                <strong>Age:</strong> 36<br>
-                                <strong>Date de naissance:</strong> 29/02/1989 <br>
-                                <strong>Email:</strong> jean.dupont@email.com <br>
-                                <strong>Catégorie:</strong> Senior
-                            </td>
-                            <td>15/05/2024</td>
-                            <td>
-                                <a href="#" class="btn btn-success btn-sm">Accepter</a>
-                                <!-- Bouton qui déclenche la modale -->
-                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#refusModal" data-url="#">Refuser</button>
-                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#detailModal" data-url="#">Description</button>
-                            </td>
+                            <!-- Si la requete est une inscription-->
+                            {%if uneRequete.mdp_hash is defined%}
+                                <td>Inscription</td>
+                                <td>{{uneRequete.prenom}} {{uneRequete.nom}}</td>
+                                <td>
+                                    <strong>Age: </strong>{{uneRequete.age}}<br>
+                                    <strong>Date de naissance: </strong>{{uneRequete.ddn}}<br>
+                                    <strong>Email: </strong>{{uneRequete.email}}<br>
+                                    <strong>Catégorie: </strong>{{uneRequete.niveau}}<br>
+                                    <strong>Sexe: </strong>{{uneRequete.sexe}}
+                                </td>
+                                <td>{{uneRequete.date}}</td>
+                                <td>
+                                    <a href="#" class="btn btn-success btn-sm">Accepter</a>
+                                    <!-- Bouton qui déclenche la modale -->
+                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#refusModal" data-url="#">Refuser</button>
+                                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#detailModal" data-url="#">Description</button>
+                                </td>
+
+                            <!-- Si la requete est une modification-->
+                            {%else%}
+                                <td>Modification</td>
+                                <td>{{uneRequete.membre.prenom}} {{uneRequete.membre.nom}}</td>
+
+                                <!-- Verification changement Nom-->
+                                <td>
+                                {%if uneRequete.nom != uneRequete.membre.nom%}
+                                    <strong>Champ:</strong>Nom<br>
+                                    <strong>Ancienne valeur:</strong>{{uneRequete.nom}}<br>
+                                    <strong>Nouvelle valeur:</strong>{{uneRequete.membre.nom}}<br>
+                                {%endif%}
+
+                                 <!-- Verification changement Prenom-->
+                                {%if uneRequete.prenom != uneRequete.membre.prenom%}
+                                    <strong>Champ:</strong>Prenom<br>
+                                    <strong>Ancienne valeur:</strong>{{uneRequete.prenom}}<br>
+                                    <strong>Nouvelle valeur:</strong>{{uneRequete.membre.prenom}}<br>
+                                {%endif%}
+
+                                <!-- Verification changement Sexe-->
+                                {%if uneRequete.sexe != uneRequete.membre.sexe%}
+                                    <strong>Champ:</strong>Sexe<br>
+                                    <strong>Ancienne valeur:</strong>{{uneRequete.sexe}}<br>
+                                    <strong>Nouvelle valeur:</strong>{{uneRequete.membre.sexe}}<br>
+                                {%endif%}
+
+                                <!-- Verification changement Email-->
+                                {%if uneRequete.email != uneRequete.membre.email%}
+                                    <strong>Champ:</strong>Email<br>
+                                    <strong>Ancienne valeur:</strong>{{uneRequete.email}}<br>
+                                    <strong>Nouvelle valeur:</strong>{{uneRequete.membre.email}}<br>
+                                {%endif%}
+
+                                <!-- Verification changement Date de naissance-->
+                                {%if uneRequete.ddn != uneRequete.membre.ddn%}
+                                    <strong>Champ:</strong>Date de naissance<br>
+                                    <strong>Ancienne valeur:</strong>{{uneRequete.ddn}}<br>
+                                    <strong>Nouvelle valeur:</strong>{{uneRequete.membre.ddn}}<br>
+                                {%endif%}
+                                </td>
+                                <td>{{uneRequete.date}}</td>
+                                <td>
+                                    <a href="#" class="btn btn-success btn-sm">Accepter</a>
+                                    <!-- Bouton qui déclenche la modale Refus -->
+                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#refusModal" data-url="#">Refuser</button>
+                                    <!-- Bouton qui déclenche la modale details-->
+                                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#detailModal" data-url="#">Description</button>
+                                
+                                </td>
+                            {%endif%}
                         </tr>
-                        <tr>
-                            <td>Modification</td>
-                            <td>Sophie Martin</td>
-                            <td>
-                                <strong>Champ:</strong> Email<br>
-                                <strong>Ancienne valeur:</strong> sophie.m@email.com<br>
-                                <strong>Nouvelle valeur:</strong> sophie.martin@email.com
-                            </td>
-                            <td>14/05/2024</td>
-                            <td>
-                                <a href="#" class="btn btn-success btn-sm">Accepter</a>
-                                <!-- Bouton qui déclenche la modale Refus -->
-                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#refusModal" data-url="#">Refuser</button>
-                                <!-- Bouton qui déclenche la modale details-->
-                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#detailModal" data-url="#">Description</button>
-                            
-                            </td>
-                        </tr>
+                        {%endfor%}
                     </tbody>
                 </table>
             </div>

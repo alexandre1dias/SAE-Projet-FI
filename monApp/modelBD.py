@@ -2,6 +2,7 @@
 from .app import db
 from flask_login import UserMixin
 
+
 class MembreBD(UserMixin, db.Model):
     """
     Modèle SQLAlchemy pour la table MEMBRE, compatible Flask-Login.
@@ -12,7 +13,7 @@ class MembreBD(UserMixin, db.Model):
     id = db.Column('idMembre', db.Integer, primary_key=True)
     nom = db.Column('nomM', db.String(41))
     prenom = db.Column('prenomM', db.String(41))
-    email = db.Column('emailM', db.String(41), unique=True, nullable=False)
+    email = db.Column('emailM', db.String(100), unique=True, nullable=False)
     mdp_hash = db.Column('mdpM', db.String(128))
     date_inscription = db.Column(db.Date)
     sexe = db.Column('sexeM', db.String(5))
@@ -88,6 +89,7 @@ class AdminBD(UserMixin, db.Model):
     email = db.Column('emailA', db.String(41), unique=True, nullable=False)
     mdp_hash = db.Column('mdpA', db.String(64))
 
+
 class InscriptionBD(UserMixin, db.Model):
     """
     Modèle SQLAlchemy pour la table INSCRIPTION, compatible Flask-Login.
@@ -102,7 +104,25 @@ class InscriptionBD(UserMixin, db.Model):
     ddn = db.Column('ddnI', db.Date)
     mdp_hash = db.Column('mdpI', db.String(128), nullable=False)
     sexe = db.Column('sexeI', db.String(5))
-    acceptee = db.Column(db.Boolean, nullable=False, default=False)
+    date = db.Column('dateInscription', db.Date)
+
+
+class ModifBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table MODIFICATION, compatible Flask-Login.
+    """
+    __tablename__ = 'MODIFICATION'
+    
+    id = db.Column('idModif', db.Integer, primary_key=True)
+    id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'), nullable=False)
+    nom = db.Column('nomModif', db.String(41))
+    prenom = db.Column('prenomModif', db.String(41))
+    email = db.Column('emailModif', db.String(100), unique=True, nullable=False)
+    sexe = db.Column('sexeModif', db.String(5))
+    ddn = db.Column('ddnModif', db.Date)
+    date = db.Column('dateModif', db.Date)
+    membre = db.relationship('MembreBD', backref=db.backref('modifications', lazy='dynamic'))
+
 
 class ParticiperBD(UserMixin, db.Model):
     """
