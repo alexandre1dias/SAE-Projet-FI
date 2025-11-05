@@ -280,8 +280,13 @@ def presse():
 #Vues pour Admin
 @app.route("/gerer_formulaires/")
 def gerer_formulaires():
-    les_formulaires = FormulaireBD.query.order_by(FormulaireBD.dateFC.desc()).all()
+    les_formulaires = FormulaireBD.query.order_by(FormulaireBD.date.desc()).filter(FormulaireBD.repondu == False).all()
     return render_template("gerer_formulaires.html", title=TITLE+"- Géstion des Formulaires", formulaires=les_formulaires)
+
+@app.route("/gerer_anciens_formulaires/")
+def gerer_anciens_formulaires():
+    les_formulaires = FormulaireBD.query.order_by(FormulaireBD.date.desc()).filter(FormulaireBD.repondu == True).all()
+    return render_template("gerer_anciens_formulaires.html", title=TITLE+"- Géstion des Anciens Formulaires", formulaires=les_formulaires)
 
 @app.route("/formulaire_view/<int:idFormulaire>")
 def formulaire_view(idFormulaire):
@@ -300,14 +305,13 @@ def formulaire_delete(idFormulaire):
 @login_required
 def repondre_formulaire(idFormulaire):
     reponse = request.form.get('reponse')
-    formulaire = FormulaireBD.query.get_or_404(idFormulaire)
+    leFormulaire = FormulaireBD.query.get_or_404(idFormulaire)
     
     #Logique d'envoi d'email à ajouter ici
-    # Par exemple : send_email(to=formulaire.mailFC, subject=f"Re: {formulaire.sujetFC}", body=reponse)
-    
-    flash(f"Votre réponse au formulaire de {formulaire.mailFC} a bien été envoyée")
+    # Par exemple : send_email(to=formulaire.email, subject=f"Re: {leFormulaire.sujet}", body=reponse)
     #une fois la réponse envoyée, on supprime le formulaire
-    db.session.delete(formulaire)
+    leFormulaire.reponse = reponse
+    leFormulaire.repondu = True
     db.session.commit()
     return redirect(url_for('gerer_formulaires'))
 

@@ -164,11 +164,14 @@ class FormulaireBD(UserMixin, db.Model):
 
     id = db.Column('idFormulaire', db.Integer, primary_key=True)
     
-    type_form = db.Column('typeFC', db.String(20))
+    type = db.Column('typeFC', db.String(20))
     sujet = db.Column('sujetFC', db.String(100))
     email = db.Column('mailFC', db.String(41))
     description = db.Column('descriptionFC', db.String(500))
     date = db.Column('dateFC', db.Date)
+    reponse = db.Column(db.String(300))
+    repondu = db.Column(db.Boolean)
+
     
     idMembre = db.Column(db.Integer, db.ForeignKey('MEMBRE.idMembre'))
     idAdmin = db.Column(db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'))

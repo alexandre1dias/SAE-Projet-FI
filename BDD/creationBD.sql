@@ -87,6 +87,8 @@ create table FORMULAIRE_CONTACT(
     mailFC varchar(41),
     descriptionFC varchar(200),
     dateFC date,
+    reponse varchar(300),
+    repondu boolean default false,
     idMembre integer,
     idAdmin integer,
     PRIMARY KEY(idFormulaire)
