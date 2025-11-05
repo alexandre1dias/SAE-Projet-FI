@@ -202,6 +202,22 @@ class EventClubBD(UserMixin, db.Model):
     id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
     evenement = db.relationship('EvenementBD', backref=db.backref('eventclub', lazy=True))
 
+class ResultatBD(db.Model):
+    """
+    Modèle SQLAlchemy pour la table RESULTAT.
+    """
+    __tablename__ = 'RESULTAT'
+
+    id = db.Column('idResultat', db.Integer, primary_key=True)
+    resultat = db.Column(db.String(50))
+    date = db.Column('dateRE', db.Date)
+    type_arme = db.Column('typeArmeRE', db.String(12))
+    type_compete = db.Column('typeCompeteRE', db.String(15))
+    id_competition = db.Column('idCompetition', db.Integer, db.ForeignKey('COMPETITION.idCompetition'))
+    id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'))
+
+    competition = db.relationship('CompetitionBD', backref='resultats')
+    membre = db.relationship('MembreBD', backref='resultats')
 
 class InformationBD(UserMixin, db.Model):
     """
