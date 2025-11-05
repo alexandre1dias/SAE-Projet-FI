@@ -82,10 +82,10 @@ create table RECEVOIRA(
 
 create table FORMULAIRE_CONTACT(
     idFormulaire integer AUTO_INCREMENT,
-    typeFC varchar(15),
-    sujetFC varchar(20),
+    typeFC varchar(20),
+    sujetFC varchar(100),
     mailFC varchar(41),
-    descriptionFC varchar(200),
+    descriptionFC varchar(500),
     dateFC date,
     reponse varchar(300),
     repondu boolean default false,
