@@ -49,16 +49,24 @@
             </tr>
         </thead>
         <tbody>
+            {% for formulaire in formulaires %}
             <tr>
-                <td>Question/Demande/Signalement</td>
-                <td>23/10/2025</td>
-                <td>sujet</td>
-                <td>Adresse mail</td>
-                    <td>
-                        <a href="{{ url_for('formulaire_view') }}" class="btn btn-warning">Gérer</a>
-                        <a href="" class="btn btn-danger">Supprimer</a>
-                    </td>
+                <td>{{ formulaire.typeFC }}</td>
+                <td>{{ formulaire.dateFC.strftime('%d/%m/%Y') }}</td>
+                <td>{{ formulaire.sujetFC }}</td>
+                <td>{{ formulaire.mailFC }}</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('formulaire_view', idFormulaire=formulaire.id) }}" class="btn btn-warning btn-sm">Gérer</a>
+                        <form action="{{ url_for('formulaire_delete', idFormulaire=formulaire.id) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce formulaire ?');">
+                            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                        </form>
+                    </div>
+                </td>
             </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-center">Aucun formulaire en attente.</td></tr>
+            {% endfor %}
         </tbody>
     </table>
     </div>
