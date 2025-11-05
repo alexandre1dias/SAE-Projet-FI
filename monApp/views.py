@@ -303,9 +303,23 @@ def profil_edit(idM, origine):
     unMembre = db.session.get(MembreBD,idM)
     unForm = MembreForm(obj=unMembre)
     if unForm.validate_on_submit():
-        unForm.populate_obj(unMembre)
-        db.session.commit()
-        return redirect(url_for('gerer_profils'))
+        action = request.form.get('submit_action')
+        if action == 'admin_save':
+            unForm.populate_obj(unMembre)
+            db.session.commit()
+            return redirect(url_for('gerer_profils'))
+        elif action == 'membre_request':
+            uneModif = unMembre.modifications.first()
+            if not uneModif:
+                uneModif = ModifBD(id_membre=idM)
+                db.session.add(uneModif)
+            uneModif.nom = unForm.nom.data
+            uneModif.prenom = unForm.prenom.data
+            uneModif.email = unForm.email.data
+            uneModif.sexe = unForm.sexe.data
+            uneModif.ddn = unForm.ddn.data
+            db.session.commit()
+            return redirect(url_for('profil_view', idM=unMembre.id, origine=0))
     return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
 
 @app.route('/profil_edit/<int:idM>/desinscrit/')
@@ -380,8 +394,7 @@ def inscription():
             prenom=unForm.prenom.data,
             ddn=unForm.date_naissance.data,
             sexe=unForm.sexe.data,
-            mdp_hash=unForm.password.data,
-            acceptee=False
+            mdp_hash=unForm.password.data
         )
         try:
             db.session.add(new_inscription)
