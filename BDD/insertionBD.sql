@@ -119,8 +119,12 @@ INSERT INTO REMPLIR (idFormulaire, idMembre) VALUES
 (2, 2);
 
 -- Insertion des inscriptions en attente
-INSERT INTO INSCRIPTION (mailInscr, nomI, prenomI, ddnI, mdpI, sexeI, acceptee) VALUES
-('nouveau.membre@email.com', 'Nouveau', 'Alice', '2000-01-01', 'mdpsecure', 'Femme', 0);
+INSERT INTO INSCRIPTION (mailInscr, nomI, prenomI, ddnI, mdpI, sexeI,dateInscription) VALUES
+('nouveau.membre@email.com', 'Nouveau', 'Alice', '2000-01-01', 'mdpsecure', 'Femme', '2025-10-23');
+
+INSERT INTO MODIFICATION (nomModif, prenomModif, emailModif, sexeModif, ddnModif, dateModif, idMembre) VALUES
+('Durand', 'Marie', 'marie.durand45@email.com', 'Homme', '2008-10-10', '2025-10-20', 2);
+
 
 -- Insertion des notifications
 INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, idAdmin) VALUES
