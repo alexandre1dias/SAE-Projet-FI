@@ -33,8 +33,10 @@ UPDATE MEMBRE SET idParamNotifMembre = 3 WHERE idMembre = 3;
 -- Insertion des événements (table parente)
 INSERT INTO EVENEMENT () VALUES
 (), (), (), (), (), (),
--- Ajout de 9 événements pour les nouvelles compétitions
-(), (), (), (), (), (), (), (), ();
+-- Événements pour les compétitions
+(), (), (), (), (), (), (), (), (),
+-- Événements pour les eventclubs
+(), (), (), (), (), (), (), (), (), (), ();
 
 -- Insertion des compétitions
 INSERT INTO COMPETITION (nomCO, villeCO, adresseCO, dateDebutCO, heureDebutCO, dateFinCO, heureFinCO, typeArmeCO, nbParticipantsCO, sexeCO, typeCompete, descriptionCO, niveauCO, classementCO,passeeCO, idEvent) VALUES
@@ -59,9 +61,22 @@ INSERT INTO ENTRAINEMENT (jourEN, lieuEN, dateEN, heureDebutEN, heureFinEN, type
 INSERT INTO REUNION (nomRE, lieuRE, dateRE, heureDebutRE, nbParticipantsRE, typeReunionRE, rapportRE, niveauRE, idEvent) VALUES
 ('AG Annuelle', 'Salle du Club', '2024-09-05', '19:00', 50, 'Assemblée', 'Rapport annuel des activités et finances.', 'Tous', 4);
 
--- Insertion des événements de club
-INSERT INTO EVENTCLUB (NomEV, villeEV, adresseEV, dateDebutEV, heureDebutEV, dateFinEV, heureFinEV, nbParticipantEV, descriptionEV, niveauxEV, idEvent) VALUES
-('Fête du Club', 'Orléans', '789 Boulevard de la Fête', '2024-07-01', '12:00', '2024-07-01', '22:00', 100, 'Journée festive pour tous les membres et leurs familles.', 'Tous', 5);
+-- Insertion des événements de club (6 passés, 6 à venir)
+INSERT INTO EVENTCLUB (NomEV, villeEV, adresseEV, dateDebutEV, heureDebutEV, dateFinEV, heureFinEV, nbParticipantEV, descriptionEV, niveauxEV, passeeEV, idEvent) VALUES
+-- 6 événements passés
+('Fête du Club 2023', 'Orléans', '789 Boulevard de la Fête', '2023-07-01', '12:00', '2023-07-01', '22:00', 100, 'Journée festive pour tous les membres et leurs familles.', 'Tous', 1, 5),
+('Stage de Pâques', 'Orléans', 'Gymnase A', '2024-04-15', '09:00', '2024-04-19', '17:00', 20, 'Stage intensif toutes armes pour les jeunes.', 'M13,M15,M17', 1, 16),
+('Portes Ouvertes', 'Orléans', 'Gymnase A', '2023-09-09', '10:00', '2023-09-09', '17:00', 50, 'Journée découverte de l''escrime pour le public.', 'Tous', 1, 17),
+('Téléthon Escrime', 'Orléans', 'Place du Martroi', '2023-12-02', '10:00', '2023-12-02', '18:00', 150, 'Démonstrations et initiations au profit du Téléthon.', 'Tous', 1, 18),
+('Galette des Rois', 'Salle du Club', 'Orléans', '2024-01-13', '16:00', '2024-01-13', '18:00', 60, 'Partage de la galette des rois avec les membres.', 'Tous', 1, 19),
+('Tournoi Interne de Noël', 'Gymnase A', 'Orléans', '2023-12-16', '14:00', '2023-12-16', '18:00', 40, 'Petit tournoi amical pour finir l''année.', 'Tous', 1, 20),
+-- 6 événements à venir
+('Fête du Club 2024', 'Orléans', '789 Boulevard de la Fête', '2024-07-06', '12:00', '2024-07-06', '22:00', 100, 'Journée festive pour tous les membres et leurs familles.', 'Tous', 0, 21),
+('Stage d''été', 'Orléans', 'Gymnase A', '2024-08-19', '09:00', '2024-08-23', '17:00', 25, 'Stage de pré-saison pour tous les compétiteurs.', 'M15,M17,M20,Senior', 0, 22),
+('Journée Portes Ouvertes 2024', 'Orléans', 'Gymnase A', '2024-09-07', '10:00', '2024-09-07', '17:00', 50, 'Venez découvrir l''escrime et notre club !', 'Tous', 0, 23),
+('Sortie Club à Chambord', 'Chambord', 'Château de Chambord', '2024-10-05', '09:00', '2024-10-05', '18:00', 40, 'Visite du château et pique-nique.', 'Tous', 0, 24),
+('Soirée Halloween', 'Salle du Club', 'Orléans', '2024-10-31', '19:00', '2024-10-31', '23:00', 50, 'Soirée déguisée pour les membres.', 'Tous', 0, 25),
+('Tournoi Interne de la Toussaint', 'Gymnase A', 'Orléans', '2024-11-02', '14:00', '2024-11-02', '18:00', 40, 'Tournoi amical ouvert à tous les membres.', 'Tous', 0, 26);
 
 -- Insertion des participations aux événements
 INSERT INTO PARTICIPER (idEvent, idMembre) VALUES
@@ -69,10 +84,12 @@ INSERT INTO PARTICIPER (idEvent, idMembre) VALUES
 (2, 2), -- Marie participe au Championnat M17
 (3, 1), -- Jean participe à l'entraînement
 (3, 2), -- Marie participe à l'entraînement
-(4, 1), -- Jean participe à l'AG
-(5, 1), -- Jean participe à la Fête du Club
-(5, 2), -- Marie participe à la Fête du Club
-(5, 3); -- Paul participe à la Fête du Club
+(4, 1), -- Jean participe à l'AG (Réunion)
+(5, 1), -- Jean participe à la Fête du Club 2023 (passé)
+(5, 2), -- Marie participe à la Fête du Club 2023 (passé)
+(21, 1), -- Jean participe à la Fête du Club 2024 (futur)
+(21, 2), -- Marie participe à la Fête du Club 2024 (futur)
+(21, 3); -- Paul participe à la Fête du Club 2024 (futur)
 
 -- Insertion des résultats
 INSERT INTO RESULTAT (resultat, dateRE, typeArmeRE, typeCompeteRE, idCompetition, idMembre) VALUES
