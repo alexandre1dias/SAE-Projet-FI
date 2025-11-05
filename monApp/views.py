@@ -80,11 +80,33 @@ def competitions():
 @app.route("/competitions/<int:idCompetition>/competition_view")
 def competition_view(idCompetition):
     uneCompetition = CompetitionBD.query.get(idCompetition)
-    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",selectedCompetition=uneCompetition)
+    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",competition=uneCompetition)
 
-@app.route("/competition_update/")
-def competition_update():
-    return render_template("competition_update.html",title=TITLE+"- Modification de la competition")
+@app.route("/competition_update/<int:idCompetition>", methods=['GET', 'POST'])
+def competition_update(idCompetition):
+    competition = CompetitionBD.query.get_or_404(idCompetition)
+    if request.method == 'POST':
+        competition.nom = request.form['nom']
+        competition.ville = request.form['ville']
+        competition.adresse = request.form['adresse']
+        competition.date_debut = datetime.strptime(request.form['date_debut'], '%Y-%m-%d').date()
+        competition.heure_debut = request.form['heure_debut']
+        competition.date_fin = datetime.strptime(request.form['date_fin'], '%Y-%m-%d').date()
+        competition.heure_fin = request.form['heure_fin']
+        competition.type_arme = request.form['type_arme']
+        competition.sexe = request.form['sexe']
+        competition.description = request.form['description']
+        db.session.commit()
+        return redirect(url_for('competition_view', idCompetition=competition.id))
+    return render_template("competition_update.html",title=TITLE+"- Modification de la competition", competition=competition)
+
+@app.route("/competition_delete/<int:idCompetition>", methods=['POST'])
+@login_required # Assure que seul un utilisateur connecté peut supprimer
+def competition_delete(idCompetition):
+    competition_to_delete = CompetitionBD.query.get_or_404(idCompetition)
+    db.session.delete(competition_to_delete)
+    db.session.commit()
+    return redirect(url_for('competitions')) # Redirige vers la liste des compétitions
 
 @app.route("/evenement_club/")
 def evenement_club():
