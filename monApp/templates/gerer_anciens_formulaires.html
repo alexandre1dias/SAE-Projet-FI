@@ -3,7 +3,7 @@
 {%block main%}
     <div class="header-container">
         <h1> Liste des formulaires en attentes</h1> 
-        <a href="{{ url_for('gerer_anciens_formulaires') }}" class="btn btn-secondary">Voir les formulaires repondus</a>
+        <a href="{{ url_for('gerer_formulaires') }}" class="btn btn-secondary">Voir les formulaires non repondus</a>
     </div>
     <div class="row">  <!--colonne pour les filtres à gauche -->
         <div class="col-lg-3 col-md-4 mb-4">
@@ -61,6 +61,9 @@
                 <td>
                     <div class="d-flex gap-2">
                         <a href="{{ url_for('formulaire_view', idFormulaire=formulaire.id) }}" class="btn btn-warning btn-sm">Gérer</a>
+                        <form action="{{ url_for('formulaire_delete', idFormulaire=formulaire.id) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce formulaire ?');">
+                            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                        </form>
                     </div>
                 </td>
             </tr>

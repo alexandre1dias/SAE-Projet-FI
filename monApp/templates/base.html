@@ -51,6 +51,7 @@
                                 {% if current_user.is_authenticated and (session.get('user_type') == 'admin' or (session.get('user_type') == 'membre' and current_user.statut in ['Président', 'Vice-président', 'Secrétaire Général', 'Trésorier Général','Membre du Comité'])) %}
                                     <li><a class="dropdown-item" href="{{ url_for('reunion') }}">Réunion</a></li>
                                 {% endif %}
+
                               </ul>
                         </li>
                         <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" 
