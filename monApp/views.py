@@ -2,9 +2,9 @@ from .app import app, db
 from flask import render_template, request, url_for, redirect, flash, session
 from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
-from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm,ContactForm,ParametresForm, Parametres_updateForm
+from .forms import LoginForm, EventForm, PasswordChangeForm, InscriptionForm, MembreForm, ContactForm, ParametresForm, Parametres_updateForm
 from .connexionPythonSQL import *
-from monApp.modelBD import MembreBD, ReunionBD, CompetitionBD, InscriptionBD, AdminBD, EvenementBD, ParticiperBD, FormulaireBD,EventClubBD, EntrainementBD
+from monApp.modelBD import *
 from datetime import datetime
 from flask import jsonify
 #from .models import Event
@@ -83,9 +83,32 @@ def competition_view(idCompetition):
     origine = request.args.get('origine', 'default')
     return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",selectedCompetition=uneCompetition, origine=origine)
 
-@app.route("/competition_update/")
-def competition_update():
-    return render_template("competition_update.html",title=TITLE+"- Modification de la competition")
+
+@app.route("/competition_update/<int:idCompetition>", methods=['GET', 'POST'])
+def competition_update(idCompetition):
+    competition = CompetitionBD.query.get_or_404(idCompetition)
+    if request.method == 'POST':
+        competition.nom = request.form['nom']
+        competition.ville = request.form['ville']
+        competition.adresse = request.form['adresse']
+        competition.date_debut = datetime.strptime(request.form['date_debut'], '%Y-%m-%d').date()
+        competition.heure_debut = request.form['heure_debut']
+        competition.date_fin = datetime.strptime(request.form['date_fin'], '%Y-%m-%d').date()
+        competition.heure_fin = request.form['heure_fin']
+        competition.type_arme = request.form['type_arme']
+        competition.sexe = request.form['sexe']
+        competition.description = request.form['description']
+        db.session.commit()
+        return redirect(url_for('competition_view', idCompetition=competition.id))
+    return render_template("competition_update.html",title=TITLE+"- Modification de la competition", competition=competition)
+
+@app.route("/competition_delete/<int:idCompetition>", methods=['POST'])
+@login_required # Assure que seul un utilisateur connecté peut supprimer
+def competition_delete(idCompetition):
+    competition_to_delete = CompetitionBD.query.get_or_404(idCompetition)
+    db.session.delete(competition_to_delete)
+    db.session.commit()
+    return redirect(url_for('competitions')) # Redirige vers la liste des compétitions
 
 @app.route("/evenement_club/")
 def evenement_club():
@@ -198,12 +221,33 @@ def reunion_update(idReunion):
 
 #Vues pour le Profil
 @app.route("/resultat_membre/")
+@login_required
 def resultat_membre():
-    return render_template("resultat_membre.html",title=TITLE+"- Résultat du Membre")
+    les_resultats = ResultatBD.query.filter_by(id_membre=current_user.id).all()
+    return render_template("resultat_membre.html", title=TITLE+"- Résultat du Membre", resultats=les_resultats)
 
 @app.route("/evenement_membre/")
+@login_required
 def evenement_membre():
-    return render_template("evenement_membre.html",title=TITLE+"- Résultat du Membre")
+
+    today = datetime.now().date()
+    participations = ParticiperBD.query.filter_by(id_membre=current_user.id).all()
+    event_ids = [p.id_event for p in participations]
+
+    events = []
+    if event_ids:
+        competitions = CompetitionBD.query.filter(CompetitionBD.id_event.in_(event_ids)).all()
+        reunions = ReunionBD.query.filter(ReunionBD.idEvent.in_(event_ids)).all()
+        event_clubs = EventClubBD.query.filter(EventClubBD.id_event.in_(event_ids)).all()
+        events.extend(competitions)
+        events.extend(reunions)
+        events.extend(event_clubs)
+
+    events_a_venir = [e for e in events if (getattr(e, 'date_debut', None) or getattr(e, 'dateRE', None) or getattr(e, 'dateDebutEV', None)) >= today]
+    events_passes = [e for e in events if (getattr(e, 'date_debut', None) or getattr(e, 'dateRE', None) or getattr(e, 'dateDebutEV', None)) < today]
+
+    return render_template("evenement_membre.html", title=TITLE+"- Vos Évènements",
+                           events_a_venir=events_a_venir, events_passes=events_passes)
 
 @app.route('/parametres/')
 def parametres():
@@ -219,11 +263,27 @@ def parametres_update():
                          title=TITLE+"- Paramètres du Membre", 
                          form=form)
 
-@app.route("/changer_mdp/")
+@app.route("/changer_mdp/", methods=['GET', 'POST'])
+@login_required
 def changer_mdp():
-    unForm = PasswordChangeForm()
-    #Code à faire
-    return render_template ("changer_mdp.html",form=unForm, title=TITLE+"- Changer mot de passe")
+    form = PasswordChangeForm()
+    if form.validate_on_submit():
+        # Vérifier si l'ancien mot de passe est correct
+        if current_user.mdp_hash != form.old_password.data:
+            flash("L'ancien mot de passe est incorrect.", 'danger')
+            return redirect(url_for('changer_mdp'))
+
+        # Vérifier si les nouveaux mots de passe correspondent
+        if form.new_password.data != form.confirm_new_password.data:
+            flash("Les nouveaux mots de passe ne correspondent pas.", 'danger')
+            return redirect(url_for('changer_mdp'))
+
+        # Mettre à jour le mot de passe
+        current_user.mdp_hash = form.new_password.data
+        db.session.commit()
+        flash("Votre mot de passe a été mis à jour avec succès.", 'success')
+        return redirect(url_for('index'))
+    return render_template("changer_mdp.html", form=form, title=TITLE+"- Changer mot de passe")
 
 
 #Vues notification
@@ -231,16 +291,28 @@ def changer_mdp():
 def parametres_notifs():
     return render_template("parametres_notifs.html",title=TITLE+"- Paramètres notifications")
 
-#Vues pour Article 
-@app.route("/articles/")
-def articles():
-    return render_template("articles.html",title=TITLE+"- Articles")
+#Vues pour Informations
+@app.route("/informations/")
+def informations():
+    lesInformations = InformationBD.query.all()
+    return render_template("informations.html",title=TITLE+"- Informations",informations=lesInformations)
+
+#Vues pour Presse
+@app.route("/presse/")
+def presse():
+    lesArticles = PresseBD.query.all()
+    return render_template("presse.html",title=TITLE+"- Presse",articles = lesArticles)
 
 #Vues pour Admin
 @app.route("/gerer_formulaires/")
 def gerer_formulaires():
-    les_formulaires = FormulaireBD.query.order_by(FormulaireBD.dateFC.desc()).all()
+    les_formulaires = FormulaireBD.query.order_by(FormulaireBD.date.desc()).filter(FormulaireBD.repondu == False).all()
     return render_template("gerer_formulaires.html", title=TITLE+"- Géstion des Formulaires", formulaires=les_formulaires)
+
+@app.route("/gerer_anciens_formulaires/")
+def gerer_anciens_formulaires():
+    les_formulaires = FormulaireBD.query.order_by(FormulaireBD.date.desc()).filter(FormulaireBD.repondu == True).all()
+    return render_template("gerer_anciens_formulaires.html", title=TITLE+"- Géstion des Anciens Formulaires", formulaires=les_formulaires)
 
 @app.route("/formulaire_view/<int:idFormulaire>")
 def formulaire_view(idFormulaire):
@@ -259,49 +331,21 @@ def formulaire_delete(idFormulaire):
 @login_required
 def repondre_formulaire(idFormulaire):
     reponse = request.form.get('reponse')
-    formulaire = FormulaireBD.query.get_or_404(idFormulaire)
+    leFormulaire = FormulaireBD.query.get_or_404(idFormulaire)
     
     #Logique d'envoi d'email à ajouter ici
-    # Par exemple : send_email(to=formulaire.mailFC, subject=f"Re: {formulaire.sujetFC}", body=reponse)
-    
-    flash(f"Votre réponse au formulaire de {formulaire.mailFC} a bien été envoyée")
+    # Par exemple : send_email(to=formulaire.email, subject=f"Re: {leFormulaire.sujet}", body=reponse)
     #une fois la réponse envoyée, on supprime le formulaire
-    db.session.delete(formulaire)
+    leFormulaire.reponse = reponse
+    leFormulaire.repondu = True
     db.session.commit()
     return redirect(url_for('gerer_formulaires'))
 
 #Vue pour la gestion des Profils
 @app.route("/gerer_profils/")
 def gerer_profils():
-    # On commence la requête de base pour les membres actifs
-    query = db.session.query(MembreBD).filter(MembreBD.activite == True)
-
-    # On récupère les arguments de la requête GET
-    search_term = request.args.get('recherche')
-    sexes = request.args.getlist('sexe')
-    niveaux = request.args.getlist('niveau')
-
-    # Filtrage par barre de recherche (nom, prénom, email)
-    if search_term:
-        search_like = f"%{search_term}%"
-        query = query.filter(
-            db.or_(
-                MembreBD.nom.like(search_like),
-                MembreBD.prenom.like(search_like),
-                MembreBD.email.like(search_like)
-            )
-        )
-
-    # Filtrage par sexe
-    if sexes:
-        query = query.filter(MembreBD.sexe.in_(sexes))
-
-    # Filtrage par niveau
-    if niveaux:
-        query = query.filter(MembreBD.niveau.in_(niveaux))
-
-    lesMembres = query.all()
-    return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres, filtres=request.args)
+    lesMembres = db.session.query(MembreBD).filter(MembreBD.activite == True).all()
+    return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres)
 
 @app.route("/gerer_profils/ancien/")
 def gerer_ancien_profils():
@@ -320,9 +364,23 @@ def profil_edit(idM, origine):
     unMembre = db.session.get(MembreBD,idM)
     unForm = MembreForm(obj=unMembre)
     if unForm.validate_on_submit():
-        unForm.populate_obj(unMembre)
-        db.session.commit()
-        return redirect(url_for('gerer_profils'))
+        action = request.form.get('submit_action')
+        if action == 'admin_save':
+            unForm.populate_obj(unMembre)
+            db.session.commit()
+            return redirect(url_for('gerer_profils'))
+        elif action == 'membre_request':
+            uneModif = unMembre.modifications.first()
+            if not uneModif:
+                uneModif = ModifBD(id_membre=idM)
+                db.session.add(uneModif)
+            uneModif.nom = unForm.nom.data
+            uneModif.prenom = unForm.prenom.data
+            uneModif.email = unForm.email.data
+            uneModif.sexe = unForm.sexe.data
+            uneModif.ddn = unForm.ddn.data
+            db.session.commit()
+            return redirect(url_for('profil_view', idM=unMembre.id, origine=0))
     return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
 
 @app.route('/profil_edit/<int:idM>/desinscrit/')
@@ -340,11 +398,15 @@ def reinscritProfil(idM):
     return redirect(url_for('gerer_ancien_profils'))
 
 
-
-
+#Vue pour la gestion des inscription/modification
 @app.route("/gerer_inscriptions/")
 def gerer_inscriptions():
-    return render_template("gerer_inscriptions.html",title=TITLE+"- Géstion des Inscriptions")
+    lesInscriptions = db.session.query(InscriptionBD).all()
+    lesModifs = db.session.query(ModifBD).all()
+    lesRequetes = lesInscriptions + lesModifs
+    # Trie par date de la liste
+    lesRequetes.sort(key=lambda x: x.date, reverse=True)  
+    return render_template("gerer_inscriptions.html",title=TITLE+"- Géstion des Inscriptions", requetes=lesRequetes)
 
 
 
@@ -393,8 +455,7 @@ def inscription():
             prenom=unForm.prenom.data,
             ddn=unForm.date_naissance.data,
             sexe=unForm.sexe.data,
-            mdp_hash=unForm.password.data,
-            acceptee=False
+            mdp_hash=unForm.password.data
         )
         try:
             db.session.add(new_inscription)

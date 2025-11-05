@@ -88,6 +88,7 @@ DELIMITER ;
 
 DELIMITER //
 
+/**
 CREATE OR REPLACE TRIGGER creation_membre_apres_acceptation
 AFTER UPDATE ON INSCRIPTION
 FOR EACH ROW
@@ -99,6 +100,7 @@ BEGIN
     END IF;
 END;
 //
+**/
 
 DELIMITER ;
 
@@ -147,7 +149,6 @@ DELIMITER ;
 
 -- Trigger pour calculer le niveau d’un membre à partir de sa date de naissance
 DELIMITER //
-
 CREATE OR REPLACE TRIGGER calcul_niveau_age_membre
 BEFORE INSERT ON MEMBRE
 FOR EACH ROW
@@ -173,7 +174,6 @@ BEGIN
     END IF;
 END;
 //
-
 DELIMITER ;
 
 DELIMITER //
@@ -183,7 +183,6 @@ BEFORE UPDATE ON MEMBRE
 FOR EACH ROW
 BEGIN
     DECLARE calcul_age INT;
-
     IF NEW.ddnM != OLD.ddnM THEN
         SET calcul_age = (YEAR(CURDATE()) - YEAR(NEW.ddnM)) - (CASE WHEN DATE_FORMAT(CURDATE(), '%m%d') < DATE_FORMAT(NEW.ddnM, '%m%d') THEN 1 ELSE 0 END);
 
@@ -201,8 +200,48 @@ BEGIN
     END IF;
 END;
 //
-
 DELIMITER ;
+
+
+DELIMITER //
+create or replace trigger date_inscription before insert on INSCRIPTION for each ROW
+begin
+    if New.dateInscription IS NULL THEN
+        set New.dateInscription = CURDATE();
+    end if;
+ 
+end;
+//
+DELIMITER ;
+
+DELIMITER //
+create or replace trigger date_modifs before insert on MODIFICATION for each ROW
+begin
+    if New.dateModif IS NULL THEN
+        set New.dateModif = CURDATE();
+    end if;
+end;
+//
+DELIMITER ;
+
+DELIMITER //
+create or replace trigger date_modifs before update on MODIFICATION for each ROW
+begin
+    if New.dateModif IS NULL THEN
+        set New.dateModif = CURDATE();
+    end if;
+end;
+//
+DELIMITER ;
+
+
+
+
+
+
+
+
+
 
 
 -- Quand un formulaire de contact a une réponse

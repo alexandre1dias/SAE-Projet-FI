@@ -13,11 +13,15 @@ INSERT INTO PARAMETRE_NOTIF_ADMIN (idParamNotifAdmin, formulaireDemandeSite, for
 UPDATE ADMINISTRATEUR SET idParamNotifAdmin = 1 WHERE idAdmin = 1;
 
 -- Insertion des membres (avec idParamNotifMembre initialement à NULL)
-INSERT INTO MEMBRE (nomM, prenomM, emailM, mdpM, date_inscription, sexeM, ddnM, niveau, statut, activite, idParamNotifMembre) VALUES
-('Dupont', 'Jean', 'jean.dupont@email.com', 'mdp123', '2023-01-15', 'Homme', '1995-05-20', 'Senior', 'Membre', 1, NULL),
-('Durand', 'Marie', 'marie.durand@email.com', 'mdp456', '2023-02-20', 'Femme', '2008-08-10', 'M17', 'Membre', 1, NULL),
-('Martin', 'Paul', 'paul.martin@email.com', 'mdp789', '2022-09-01', 'Homme', '2015-03-25', 'M9', 'Ancien Membre', 0, NULL),
-('Eche', 'Régis', 'regis.eche@email.com', 'mdp741', '2000-01-01', 'Homme', '1975-02-07', 'Vétéran', 'Président', 1, NULL);
+INSERT INTO MEMBRE (nomM, prenomM, emailM, mdpM, date_inscription, sexeM, ddnM, statut, activite, idParamNotifMembre) VALUES
+('Dupont', 'Jean', 'jean.dupont@email.com', 'mdp123', '2023-01-15', 'Homme', '1995-05-20', 'Membre', 1, NULL),
+('Durand', 'Marie', 'marie.durand@email.com', 'mdp456', '2023-02-20', 'Femme', '2008-08-10', 'Membre', 1, NULL),
+('Martin', 'Paul', 'paul.martin@email.com', 'mdp789', '2022-09-01', 'Homme', '2015-03-25', 'Ancien Membre', 0, NULL),
+('Eche', 'Régis', 'regis.eche@email.com', 'mdp741', '2000-01-01', 'Homme', '1975-02-07','Président', 1, NULL),
+('Dominique', 'MARQUET', 'dom.mar@email.com', 'mdp442', '2006-01-01', 'Homme', '1974-02-07','Vice-Président', 1, NULL),
+('Bernard', 'DELADERIERE', 'ber.del@email.com', 'mdp5231', '1999-01-01', 'Homme', '1976-02-07','Trésorier Général', 1, NULL),
+('Pascale', 'LHOMME', 'pas.lhm@email.com', 'mdp433', '2002-01-01', 'Femme', '1978-02-07','Secrétaire Générale', 1, NULL),
+('Christophe', 'LECHOPIER', 'chr.lec@email.com', 'mdp541', '2005-01-01', 'Homme', '1969-02-07','Membre du Comité', 1, NULL);
 
 -- Insertion des paramètres de notification pour les membres
 INSERT INTO PARAMETRE_NOTIF_MEMBRE (eventInscriptionSite, evenementInscriptionMail, eventNouveauSite, eventNouveauMail, eventAnnulationSite, eventAnnulationMail, resultatNouveauSite, resuletatNouveauMail, reponseFormulaireSite, reponseFormulaireMail, modifProfilSite, modifProfilMail, idMembre) VALUES
@@ -119,8 +123,12 @@ INSERT INTO REMPLIR (idFormulaire, idMembre) VALUES
 (2, 2);
 
 -- Insertion des inscriptions en attente
-INSERT INTO INSCRIPTION (mailInscr, nomI, prenomI, ddnI, mdpI, sexeI, acceptee) VALUES
-('nouveau.membre@email.com', 'Nouveau', 'Alice', '2000-01-01', 'mdpsecure', 'Femme', 0);
+INSERT INTO INSCRIPTION (mailInscr, nomI, prenomI, ddnI, mdpI, sexeI,dateInscription) VALUES
+('nouveau.membre@email.com', 'Nouveau', 'Alice', '2000-01-01', 'mdpsecure', 'Femme', '2025-10-23');
+
+INSERT INTO MODIFICATION (nomModif, prenomModif, emailModif, sexeModif, ddnModif, dateModif, idMembre) VALUES
+('Durand', 'Marie', 'marie.durand45@email.com', 'Homme', '2008-10-10', '2025-10-20', 2);
+
 
 -- Insertion des notifications
 INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, idAdmin) VALUES
@@ -145,12 +153,20 @@ INSERT INTO IMAGEAPP (urlI, prive, alt) VALUES
 INSERT INTO IMAGERC (idImage, idCompetition) VALUES (1, 1);
 INSERT INTO IMAGERE (idImage, idEventClub) VALUES (2, 1);
 
--- Insertion des actualités
-INSERT INTO ACTUALITE (dateAC, heureAC, nomAC, categorieAC) VALUES
-('2024-05-12', '10:00', 'Bravo Jean !', 'Résultats');
+-- Insertion dans INFORMATION
+INSERT INTO INFORMATION (dateIN, heureIN, titreIN, contenuIN) VALUES
+('2023-08-15', '10:27','Reception des nouveaux gants','Nous vous informons que les gants que nous attendions sont là');
 
--- Liaison des images aux actualités
-INSERT INTO IMAGERA (idImage, idActualite) VALUES (1, 1);
+-- Liaison des images aux informations
+INSERT INTO IMAGERIN (idImage, idInformation) VALUES (1, 1);
+
+-- Insertion dans PRESSE
+INSERT INTO PRESSE (dateP, heureP, titreP, contenuP,lienP) VALUES
+('2025-11-11','23:23','escrime et passion','le cercle à eu le droit à une article du jornal local','https://www.journaldeBloissabrelaserquitournerigolo.com');
+
+-- Liaison des images aux informations
+INSERT INTO IMAGERP (idImage, idPresse) VALUES (1, 1);
+
 
 -- Réactiver la vérification des clés étrangères
 SET FOREIGN_KEY_CHECKS=1;

@@ -11,11 +11,11 @@ class LoginForm(FlaskForm):
     connecter = SubmitField('Se connecter')
 
 class PasswordChangeForm(FlaskForm):
-    Login = StringField ('Email' ,validators= [DataRequired(), Email()])
-    old_password = PasswordField ('Ancient mot de passe', validators=[DataRequired()])
+    old_password = PasswordField ('Ancien mot de passe', validators=[DataRequired()])
     new_password = PasswordField ('Nouveau mot de passe', validators=[DataRequired()])
+    confirm_new_password = PasswordField('Confirmer le nouveau mot de passe', validators=[DataRequired()])
     next = HiddenField()
-    connecter = SubmitField()
+    submit = SubmitField('Valider la modification')
 
 class MembreForm(FlaskForm):
     nom = StringField ('nom' ,validators= [DataRequired()])
@@ -28,6 +28,7 @@ class MembreForm(FlaskForm):
     email = StringField ('Email' ,validators= [DataRequired(), Email()])
     statut = SelectField('Statut', choices=[
         ('Membre', 'Membre'),
+        ('Membre du comité', 'Membre du comité'),
         ('Secrétaire Général', 'Secrétaire Général'),
         ('Trésorier Général', 'Trésorier Général'),
         ('Vice-président', 'Vice-président'),

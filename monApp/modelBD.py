@@ -3,6 +3,7 @@ from .app import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 
+
 class MembreBD(UserMixin, db.Model):
     """
     Modèle SQLAlchemy pour la table MEMBRE, compatible Flask-Login.
@@ -13,7 +14,7 @@ class MembreBD(UserMixin, db.Model):
     id = db.Column('idMembre', db.Integer, primary_key=True)
     nom = db.Column('nomM', db.String(41))
     prenom = db.Column('prenomM', db.String(41))
-    email = db.Column('emailM', db.String(41), unique=True, nullable=False)
+    email = db.Column('emailM', db.String(100), unique=True, nullable=False)
     mdp_hash = db.Column('mdpM', db.String(128))
     date_inscription = db.Column(db.Date)
     sexe = db.Column('sexeM', db.String(5))
@@ -112,6 +113,7 @@ class AdminBD(UserMixin, db.Model):
     email = db.Column('emailA', db.String(41), unique=True, nullable=False)
     mdp_hash = db.Column('mdpA', db.String(64))
 
+
 class InscriptionBD(UserMixin, db.Model):
     """
     Modèle SQLAlchemy pour la table INSCRIPTION, compatible Flask-Login.
@@ -126,7 +128,25 @@ class InscriptionBD(UserMixin, db.Model):
     ddn = db.Column('ddnI', db.Date)
     mdp_hash = db.Column('mdpI', db.String(128), nullable=False)
     sexe = db.Column('sexeI', db.String(5))
-    acceptee = db.Column(db.Boolean, nullable=False, default=False)
+    date = db.Column('dateInscription', db.Date)
+
+
+class ModifBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table MODIFICATION, compatible Flask-Login.
+    """
+    __tablename__ = 'MODIFICATION'
+    
+    id = db.Column('idModif', db.Integer, primary_key=True)
+    id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'), nullable=False)
+    nom = db.Column('nomModif', db.String(41))
+    prenom = db.Column('prenomModif', db.String(41))
+    email = db.Column('emailModif', db.String(100), unique=True, nullable=False)
+    sexe = db.Column('sexeModif', db.String(5))
+    ddn = db.Column('ddnModif', db.Date)
+    date = db.Column('dateModif', db.Date)
+    membre = db.relationship('MembreBD', backref=db.backref('modifications', lazy='dynamic'))
+
 
 class ParticiperBD(UserMixin, db.Model):
     """
@@ -166,11 +186,14 @@ class FormulaireBD(UserMixin, db.Model):
 
     id = db.Column('idFormulaire', db.Integer, primary_key=True)
     
-    type_form = db.Column('typeFC', db.String(20))
+    type = db.Column('typeFC', db.String(20))
     sujet = db.Column('sujetFC', db.String(100))
     email = db.Column('mailFC', db.String(41))
     description = db.Column('descriptionFC', db.String(500))
     date = db.Column('dateFC', db.Date)
+    reponse = db.Column(db.String(300))
+    repondu = db.Column(db.Boolean)
+
     
     idMembre = db.Column(db.Integer, db.ForeignKey('MEMBRE.idMembre'))
     idAdmin = db.Column(db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'))
@@ -183,7 +206,7 @@ class FormulaireBD(UserMixin, db.Model):
 
 class EventClubBD(UserMixin, db.Model):
     """
-    Modèle SQLAlchemy pour la table COMPETITION, compatible Flask-Login.
+    Modèle SQLAlchemy pour la table EventClub, compatible Flask-Login.
     """
     __tablename__ = 'EVENTCLUB'
     
@@ -204,3 +227,46 @@ class EventClubBD(UserMixin, db.Model):
     id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
     evenement = db.relationship('EvenementBD', backref=db.backref('eventclub', lazy=True))
 
+class ResultatBD(db.Model):
+    """
+    Modèle SQLAlchemy pour la table RESULTAT.
+    """
+    __tablename__ = 'RESULTAT'
+
+    id = db.Column('idResultat', db.Integer, primary_key=True)
+    resultat = db.Column(db.String(50))
+    date = db.Column('dateRE', db.Date)
+    type_arme = db.Column('typeArmeRE', db.String(12))
+    type_compete = db.Column('typeCompeteRE', db.String(15))
+    id_competition = db.Column('idCompetition', db.Integer, db.ForeignKey('COMPETITION.idCompetition'))
+    id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'))
+
+    competition = db.relationship('CompetitionBD', backref='resultats')
+    membre = db.relationship('MembreBD', backref='resultats')
+
+class InformationBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table INFORMATION, compatible Flask-Login.
+    """
+    __tablename__ = 'INFORMATION'
+    
+    # Mappage des colonnes SQL
+    idInformation = db.Column(db.Integer, primary_key=True)
+    dateIN = db.Column(db.Date)
+    heureIN = db.Column(db.String(5))
+    titreIN = db.Column(db.String(50))
+    contenuIN = db.Column(db.String(600))
+
+class PresseBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table PRESSE, compatible Flask-Login.
+    """
+    __tablename__ = 'PRESSE'
+    
+    # Mappage des colonnes SQL
+    idPresse = db.Column(db.Integer, primary_key=True)
+    dateP = db.Column(db.Date)
+    heureP = db.Column(db.String(5))
+    titreP = db.Column(db.String(50))
+    contenuP = db.Column(db.String(600))
+    lienP = db.Column(db.String(255))
