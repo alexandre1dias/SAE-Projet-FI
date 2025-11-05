@@ -25,7 +25,7 @@ class MembreForm(FlaskForm):
         ('Homme', 'Homme'),
         ('Femme', 'Femme')
     ], validators=[DataRequired()])
-    email = StringField ('Email' ,validators= [DataRequired()])
+    email = StringField ('Email' ,validators= [DataRequired(), Email()])
     statut = SelectField('Statut', choices=[
         ('Membre', 'Membre'),
         ('Secrétaire Général', 'Secrétaire Général'),

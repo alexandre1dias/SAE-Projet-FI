@@ -217,30 +217,75 @@ def gerer_formulaires():
 def formulaire_view():
     return render_template("formulaire_view.html",title=TITLE+"- Consultation de Formulaire")
 
+
+#Vue pour la gestion des Profils
 @app.route("/gerer_profils/")
 def gerer_profils():
-    lesMembres = db.session.query(MembreBD).all()
-    return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres)
+    # On commence la requête de base pour les membres actifs
+    query = db.session.query(MembreBD).filter(MembreBD.activite == True)
 
-@app.route("/gerer_ancier_profils/")
-def gerer_ancier_profils():
-    return render_template("gerer_ancier_profils.html",title=TITLE+"- Géstion des Anciens Profils")
+    # On récupère les arguments de la requête GET
+    search_term = request.args.get('recherche')
+    sexes = request.args.getlist('sexe')
+    niveaux = request.args.getlist('niveau')
 
-@app.route("/profil_view/<int:idM>")
-def profil_view(idM):
+    # Filtrage par barre de recherche (nom, prénom, email)
+    if search_term:
+        search_like = f"%{search_term}%"
+        query = query.filter(
+            db.or_(
+                MembreBD.nom.like(search_like),
+                MembreBD.prenom.like(search_like),
+                MembreBD.email.like(search_like)
+            )
+        )
+
+    # Filtrage par sexe
+    if sexes:
+        query = query.filter(MembreBD.sexe.in_(sexes))
+
+    # Filtrage par niveau
+    if niveaux:
+        query = query.filter(MembreBD.niveau.in_(niveaux))
+
+    lesMembres = query.all()
+    return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres, filtres=request.args)
+
+@app.route("/gerer_profils/ancien/")
+def gerer_ancien_profils():
+    lesMembres = db.session.query(MembreBD).filter(MembreBD.activite == False).all()
+    return render_template("gerer_ancien_profils.html",title=TITLE+"- Géstion des Anciens Profils", membres = lesMembres)
+
+@app.route("/profil_view/<int:idM>/<int:origine>")
+def profil_view(idM, origine):
+    # origine corresponds à l'origine de l'utilisateur. 0 correspond au menu de Membre: Vos information,
+    # 1 corresponds à gerer_profils et 2 à gerer_ancien_profil
     unMembre = db.session.get(MembreBD,idM)
-    return render_template("profil_view.html", title=TITLE + "- Profil Membre", selectedMembre=unMembre)
+    return render_template("profil_view.html", title=TITLE + "- Profil Membre", selectedMembre=unMembre, origine = origine)
 
-
-@app.route("/profil_edit/<int:idM>", methods=["GET", "POST"])
-def profil_edit(idM):
+@app.route("/profil_edit/<int:idM>/<int:origine>", methods=["GET", "POST"])
+def profil_edit(idM, origine):
     unMembre = db.session.get(MembreBD,idM)
     unForm = MembreForm(obj=unMembre)
     if unForm.validate_on_submit():
         unForm.populate_obj(unMembre)
         db.session.commit()
         return redirect(url_for('gerer_profils'))
-    return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm)
+    return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
+
+@app.route('/profil_edit/<int:idM>/desinscrit/')
+def desinscritProfil(idM):
+    membreDesinscrit = db.session.get(MembreBD, idM)
+    membreDesinscrit.activite = False
+    db.session.commit()
+    return redirect(url_for('gerer_profils'))
+
+@app.route('/profil_edit/<int:idM>/reinscrit/')
+def reinscritProfil(idM):
+    membreReinscrit = db.session.get(MembreBD, idM)
+    membreReinscrit.activite = True
+    db.session.commit()
+    return redirect(url_for('gerer_ancien_profils'))
 
 
 
