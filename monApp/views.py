@@ -213,11 +213,27 @@ def parametres_update():
                          title=TITLE+"- Paramètres du Membre", 
                          form=form)
 
-@app.route("/changer_mdp/")
+@app.route("/changer_mdp/", methods=['GET', 'POST'])
+@login_required
 def changer_mdp():
-    unForm = PasswordChangeForm()
-    #Code à faire
-    return render_template ("changer_mdp.html",form=unForm, title=TITLE+"- Changer mot de passe")
+    form = PasswordChangeForm()
+    if form.validate_on_submit():
+        # Vérifier si l'ancien mot de passe est correct
+        if current_user.mdp_hash != form.old_password.data:
+            flash("L'ancien mot de passe est incorrect.", 'danger')
+            return redirect(url_for('changer_mdp'))
+        
+        # Vérifier si les nouveaux mots de passe correspondent
+        if form.new_password.data != form.confirm_new_password.data:
+            flash("Les nouveaux mots de passe ne correspondent pas.", 'danger')
+            return redirect(url_for('changer_mdp'))
+
+        # Mettre à jour le mot de passe
+        current_user.mdp_hash = form.new_password.data
+        db.session.commit()
+        flash("Votre mot de passe a été mis à jour avec succès.", 'success')
+        return redirect(url_for('index'))
+    return render_template("changer_mdp.html", form=form, title=TITLE+"- Changer mot de passe")
 
 
 #Vues notification
