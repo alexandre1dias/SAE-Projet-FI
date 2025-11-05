@@ -220,8 +220,27 @@ def resultat_membre():
     return render_template("resultat_membre.html", title=TITLE+"- Résultat du Membre", resultats=les_resultats)
 
 @app.route("/evenement_membre/")
+@login_required
 def evenement_membre():
-    return render_template("evenement_membre.html",title=TITLE+"- Résultat du Membre")
+
+    today = datetime.now().date()
+    participations = ParticiperBD.query.filter_by(id_membre=current_user.id).all()
+    event_ids = [p.id_event for p in participations]
+
+    events = []
+    if event_ids:
+        competitions = CompetitionBD.query.filter(CompetitionBD.id_event.in_(event_ids)).all()
+        reunions = ReunionBD.query.filter(ReunionBD.idEvent.in_(event_ids)).all()
+        event_clubs = EventClubBD.query.filter(EventClubBD.id_event.in_(event_ids)).all()
+        events.extend(competitions)
+        events.extend(reunions)
+        events.extend(event_clubs)
+
+    events_a_venir = [e for e in events if (getattr(e, 'date_debut', None) or getattr(e, 'dateRE', None) or getattr(e, 'dateDebutEV', None)) >= today]
+    events_passes = [e for e in events if (getattr(e, 'date_debut', None) or getattr(e, 'dateRE', None) or getattr(e, 'dateDebutEV', None)) < today]
+
+    return render_template("evenement_membre.html", title=TITLE+"- Vos Évènements",
+                           events_a_venir=events_a_venir, events_passes=events_passes)
 
 @app.route('/parametres/')
 def parametres():
@@ -246,7 +265,7 @@ def changer_mdp():
         if current_user.mdp_hash != form.old_password.data:
             flash("L'ancien mot de passe est incorrect.", 'danger')
             return redirect(url_for('changer_mdp'))
-        
+
         # Vérifier si les nouveaux mots de passe correspondent
         if form.new_password.data != form.confirm_new_password.data:
             flash("Les nouveaux mots de passe ne correspondent pas.", 'danger')

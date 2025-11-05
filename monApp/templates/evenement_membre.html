@@ -95,49 +95,81 @@
             <div class="col-lg-10 col-md-9">
                 <h3 class="mb-4">Évènements à venir</h3>
                 <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
-                    <div class="col">
-                        <div class="card pricing-card h-100">
-                            <div class="card-header pricing-header basic-header p-4">
-                                <h3 class="card-title text-center mb-0">Duc De guise Mer</h3>
-                            </div>
-                            <div class="card-body p-4">
-                                <h4 class="card-title text-center mb-4 h5">Tous niveaux</h4>
-                                <ul class="feature-list text-center mb-4">
-                                    <li>18/10/2025 - 19/10/2025</li>
-                                    <li>Sabre</li>
-                                    <li>National</li>
-                                    <li>Participants du cercle : 15</li>
-                                </ul>
-                                <div class="text-center d-flex justify-content-center gap-2">
-                                    <a href="{{ url_for('competition_view') }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
-                                    <a href="#" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
+                    {% for event in events_a_venir %}
+                        <div class="col">
+                            <div class="card pricing-card h-100">
+                                <div class="card-header pricing-header basic-header p-4">
+                                    <h3 class="card-title text-center mb-0">
+                                        {% if event.__tablename__ == 'COMPETITION' %}{{ event.nom }}{% endif %}
+                                        {% if event.__tablename__ == 'REUNION' %}{{ event.nom }}{% endif %}
+                                        {% if event.__tablename__ == 'EVENTCLUB' %}{{ event.NomEV }}{% endif %}
+                                    </h3>
+                                </div>
+                                <div class="card-body p-4">
+                                    <h4 class="card-title text-center mb-4 h5">
+                                        {% if event.__tablename__ == 'COMPETITION' %}{{ event.niveaux }}{% endif %}
+                                        {% if event.__tablename__ == 'REUNION' %}{{ event.niveauRE }}{% endif %}
+                                        {% if event.__tablename__ == 'EVENTCLUB' %}{{ event.niveauxEV }}{% endif %}
+                                    </h4>
+                                    <ul class="feature-list text-center mb-4">
+                                        {% if event.__tablename__ == 'COMPETITION' %}
+                                            <li>{{ event.date_debut.strftime('%d/%m/%Y') }} - {{ event.date_fin.strftime('%d/%m/%Y') }}</li>
+                                            <li>{{ event.type_arme }}</li>
+                                            <li>{{ event.typeComp }}</li>
+                                        {% elif event.__tablename__ == 'REUNION' %}
+                                            <li>{{ event.dateRE.strftime('%d/%m/%Y') }}</li>
+                                            <li>{{ event.typeReunionRE }}</li>
+                                        {% elif event.__tablename__ == 'EVENTCLUB' %}
+                                            <li>{{ event.dateDebutEV.strftime('%d/%m/%Y') }} - {{ event.dateFinEV.strftime('%d/%m/%Y') }}</li>
+                                            <li>Évènement de club</li>
+                                        {% endif %}
+                                    </ul>
+                                    <div class="text-center d-flex justify-content-center gap-2">
+                                        {% if event.__tablename__ == 'COMPETITION' %}
+                                            <a href="{{ url_for('competition_view', idCompetition=event.id) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                            {# Le lien de désinscription n'est pas encore implémenté #}
+                                            <a href="#" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
+                                        {% elif event.__tablename__ == 'REUNION' %}
+                                            <a href="{{ url_for('reunion_view', idReunion=event.id) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                            <a href="{{ url_for('desinscrire_reunion', idReunion=event.id) }}" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
+                                        {% elif event.__tablename__ == 'EVENTCLUB' %}
+                                            <a href="{{ url_for('club_view', idEventClub=event.idEventClub) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                            {# Le lien de désinscription n'est pas encore implémenté #}
+                                            <a href="#" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    {% else %}
+                        <p>Vous n'êtes inscrit à aucun événement à venir.</p>
+                    {% endfor %}
                 </div>
 
                 <h3 class="mb-4">Évènements passés</h3>
                 <div class="row row-cols-1 row-cols-md-3 g-4">
-                <div class="col">
-                    <div class="card pricing-card h-100">
-                        <div class="card-header pricing-header basic-header p-4">
-                            <h3 class="card-title text-center mb-0">Tournoi club Blois</h3>
-                        </div>
-                        <div class="card-body p-4">
-                                <h4 class="card-title text-center mb-4 h5">Tous niveaux</h4>
-                            <ul class="feature-list text-center mb-4">
-                                <li>01/10/2025 - 02/10/2025</li>
-                                <li>sabre</li>
-                                    <li>National</li>
-                                    <li>Votre classement : 5ème</li>
-                            </ul>
-                            <div class="text-center">
-                                <a href="{{ url_for('competition_view') }}" class="btn btn-outline-primary btn-custom">Consulter</a>
+                    {% for event in events_passes %}
+                        <div class="col">
+                            <div class="card pricing-card h-100">
+                                <div class="card-header pricing-header basic-header p-4">
+                                    <h3 class="card-title text-center mb-0">
+                                        {% if event.__tablename__ == 'COMPETITION' %}{{ event.nom }}{% endif %}
+                                        {% if event.__tablename__ == 'REUNION' %}{{ event.nom }}{% endif %}
+                                        {% if event.__tablename__ == 'EVENTCLUB' %}{{ event.NomEV }}{% endif %}
+                                    </h3>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="text-center">
+                                        {% if event.__tablename__ == 'COMPETITION' %}<a href="{{ url_for('competition_view', idCompetition=event.id) }}" class="btn btn-outline-primary btn-custom">Consulter</a>{% endif %}
+                                        {% if event.__tablename__ == 'REUNION' %}<a href="{{ url_for('reunion_view', idReunion=event.id) }}" class="btn btn-outline-primary btn-custom">Consulter</a>{% endif %}
+                                        {% if event.__tablename__ == 'EVENTCLUB' %}<a href="{{ url_for('club_view', idEventClub=event.idEventClub) }}" class="btn btn-outline-primary btn-custom">Consulter</a>{% endif %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    {% else %}
+                        <p>Vous n'avez participé à aucun événement pour le moment.</p>
+                    {% endfor %}
                 </div>
             </div>
         </div>
