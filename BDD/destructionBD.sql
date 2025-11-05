@@ -24,8 +24,12 @@ drop table if exists AVOIR;
 drop table if exists IMAGEAPP;
 drop table if exists IMAGERC;
 drop table if exists IMAGERE;
+drop table if exists IMAGERA;
+drop table if exists INFORMATION;
+drop table if exists IMAGERIN;
+drop table if exists PRESSE;
+drop table if exists IMAGERP;
 drop table if exists ACTUALITE;
-drop table if exists IMAGERA; 
 drop table if exists MODIFICATION; 
 
 SET FOREIGN_KEY_CHECKS = 1;
