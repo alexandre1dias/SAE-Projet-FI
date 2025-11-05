@@ -49,6 +49,7 @@ create table MEMBRE(
     date_inscription date,
     sexeM varchar(5),
     ddnM date,
+    age integer,
     niveau varchar(15),
     statut varchar(30),
     activite boolean,
@@ -207,7 +208,8 @@ create table EVENTCLUB(
     heureFinEV varchar(5),
     nbParticipantEV integer,
     descriptionEV varchar(200),
-    niveauxEV varchar(15),
+    niveauxEV varchar(45),
+    passeeEV boolean,
     idEvent integer,
     PRIMARY KEY(idEventClub)
 );

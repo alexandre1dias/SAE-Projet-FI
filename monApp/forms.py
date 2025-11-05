@@ -1,8 +1,8 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField
+from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
-from . modelBD import MembreBD
+from . modelBD import MembreBD, InscriptionBD
 from datetime import date
 
 class LoginForm(FlaskForm):
@@ -34,30 +34,51 @@ class MembreForm(FlaskForm):
         ('Président', 'Président')
     ], validators=[DataRequired()])
     
-# cette fonction permet de vérifier que l'utilisateur a au moins 8 ans
-def validate_age(form, field):
-    """
-    Vérification que l'utilisateur a au moins 8 ans.
-    """
-    if field.data:
-        today = date.today()
-        # Calcul de l'âge
-        age = today.year - field.data.year - ((today.month, today.day) < (field.data.month, field.data.day))
-        if age < 8:
-            raise ValidationError()
+
 
 
 class InscriptionForm(FlaskForm):
+    # cette fonction permet de vérifier que l'utilisateur a au moins 8 ans
+    def validate_age(form, field):
+        """
+        Vérification que l'utilisateur a au moins 8 ans.
+        """
+        if field.data:
+            today = date.today()
+            # Calcul de l'âge
+            age = today.year - field.data.year - ((today.month, today.day) < (field.data.month, field.data.day))
+            if age < 8:
+                raise ValidationError()
+            
+     # cette fonction permet de vérifier que l'utilisateur a entré les même mot de passe
+    def validate_confirm_password(self, confirm_password):
+        """
+        Vérifie si les mots de passe correspondent.
+        """
+        if self.password.data != confirm_password.data:
+            # Ce message s'affichera sous le champ de confirmation
+            raise ValidationError('Les mots de passe ne correspondent pas.')
+        
     Login = StringField ('Email' ,validators= [DataRequired(), Email()])
     nom = StringField ('nom' ,validators= [DataRequired()])
     prenom = StringField ('prenom' ,validators= [DataRequired()])
-    date_naissance = DateField ('date de naissance' , format='%d-%m-%y', validators=[DataRequired(), validate_age])
+    date_naissance = DateField ('date de naissance' , format='%Y-%m-%d', validators=[DataRequired(), validate_age])
     sexe = SelectField ('sexe' , choices=[('Homme', 'Homme'), ('Femme', 'Femme')], validators=[DataRequired()])
     password = PasswordField ('Mot de passe', validators=[DataRequired()])
     confirm_password = PasswordField ('Confirmer mot de passe', validators=[DataRequired()])
     next = HiddenField()
     inscription = SubmitField()
 
+class ContactForm(FlaskForm):
+    type_form = RadioField('Type de formulaire', choices=[
+        ('Question', 'Question'),
+        ('Demande', 'Demande'),
+        ('Signalement', 'Signalement')
+        ], validators=[DataRequired()])
+    sujet = StringField('Sujet', validators=[DataRequired()])
+    email = StringField('Votre Email', validators=[DataRequired(), Email()])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    submit = SubmitField('Envoyer')
 
 class EventForm(FlaskForm):
     title = StringField('Titre de l\'événement', validators=[DataRequired()])

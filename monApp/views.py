@@ -2,15 +2,10 @@ from .app import app, db
 from flask import render_template, request, url_for, redirect, flash, session
 from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
-from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm
+from .forms import LoginForm, EventForm,PasswordChangeForm,InscriptionForm, MembreForm,ContactForm,ParametresForm, Parametres_updateForm
 from .connexionPythonSQL import *
-
-from monApp.modelBD import MembreBD,ReunionBD,CompetitionBD,InscriptionBD,AdminBD,EvenementBD,ParticiperBD,ModifBD
-
+from monApp.modelBD import MembreBD,ReunionBD,CompetitionBD,InscriptionBD,AdminBD,EvenementBD,ParticiperBD,ModifBD, FormulaireBD,EventClubBD
 from datetime import datetime
-
-
-from .forms import LoginForm, EventForm
 from flask import jsonify
 #from .models import Event
 
@@ -23,9 +18,24 @@ def index():
 def about():
     return render_template("about.html",title=TITLE+"- A propos")
 
-@app.route("/contact/")
+@app.route("/contact/", methods=['GET', 'POST'])
 def contact():
-    return render_template("contact.html",title=TITLE+"- Conctact")
+    form = ContactForm()
+    if form.validate_on_submit():
+        try:
+            nouveau_message = FormulaireBD(
+                type_form=form.type_form.data,
+                sujet=form.sujet.data,
+                email=form.email.data,
+                description=form.description.data,
+                date=datetime.now().date()
+            )
+            db.session.add(nouveau_message)
+            db.session.commit()
+            return redirect(url_for('contact'))
+        except Exception as e:
+            db.session.rollback()
+    return render_template("contact.html", title=TITLE+"- Contact", form=form)
 
 @app.route("/escrime-feminin/")
 def escrime_feminin():
@@ -78,15 +88,29 @@ def competition_update():
 
 @app.route("/evenement_club/")
 def evenement_club():
-    return render_template("evenement_club.html",title=TITLE+"- Evenements du Club")
+    lesEventClubs = EventClubBD.query.all()
+    return render_template("evenement_club.html",title=TITLE+"- Evenements du Club",eventsclub=lesEventClubs)
 
-@app.route("/club_view/")
-def club_view():
-    return render_template("club_view.html",title=TITLE+"- un évenement du club")
+@app.route("/evenement_club/<int:idEventClub>/club_view/")
+def club_view(idEventClub):
+    unEventClub = EventClubBD.query.get(idEventClub)
+    return render_template("club_view.html",title=TITLE+"- un évenement du club",selectedEventClub=unEventClub)
 
-@app.route("/club_update/")
-def club_update():
-    return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club")
+@app.route("/evenement_club/<int:idEventClub>/club_update/", methods=['GET', 'POST'])
+@login_required
+def club_update(idEventClub):
+    unEventClub = EventClubBD.query.get_or_404(idEventClub)
+    # Logique de mise à jour à implémenter
+    return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club", eventClub=unEventClub)
+
+@app.route("/evenement_club/<int:idEventClub>/club_delete/", methods=['POST'])
+@login_required
+def club_delete(idEventClub):
+    event_to_delete = EventClubBD.query.get_or_404(idEventClub)
+    db.session.delete(event_to_delete)
+    db.session.commit()
+    flash('L\'événement a été supprimé avec succès.', 'success')
+    return redirect(url_for('evenement_club'))
 
 @app.route("/reunion/")
 def reunion():
@@ -177,7 +201,6 @@ def evenement_membre():
 
 @app.route('/parametres/')
 def parametres():
-    from .forms import ParametresForm
     form = ParametresForm()
     return render_template("parametres.html", 
                          title=TITLE+"- Paramètres du Membre", 
@@ -185,7 +208,6 @@ def parametres():
 
 @app.route('/parametres_update/')
 def parametres_update():
-    from .forms import Parametres_updateForm
     form = Parametres_updateForm()
     return render_template("parametres_update.html", 
                          title=TITLE+"- Paramètres du Membre", 
@@ -211,12 +233,36 @@ def articles():
 #Vues pour Admin
 @app.route("/gerer_formulaires/")
 def gerer_formulaires():
-    return render_template("gerer_formulaires.html",title=TITLE+"- Géstion des Formulaires")
+    les_formulaires = FormulaireBD.query.order_by(FormulaireBD.dateFC.desc()).all()
+    return render_template("gerer_formulaires.html", title=TITLE+"- Géstion des Formulaires", formulaires=les_formulaires)
 
-@app.route("/formulaire_view/")
-def formulaire_view():
-    return render_template("formulaire_view.html",title=TITLE+"- Consultation de Formulaire")
+@app.route("/formulaire_view/<int:idFormulaire>")
+def formulaire_view(idFormulaire):
+    unFormulaire = FormulaireBD.query.get_or_404(idFormulaire)
+    return render_template("formulaire_view.html",title=TITLE+"- Consultation de Formulaire", selectedFormulaire=unFormulaire)
 
+@app.route("/formulaire_delete/<int:idFormulaire>", methods=['POST'])
+@login_required
+def formulaire_delete(idFormulaire):
+    formulaire_a_supprimer = FormulaireBD.query.get_or_404(idFormulaire)
+    db.session.delete(formulaire_a_supprimer)
+    db.session.commit()
+    return redirect(url_for('gerer_formulaires'))
+
+@app.route("/repondre_formulaire/<int:idFormulaire>", methods=['POST'])
+@login_required
+def repondre_formulaire(idFormulaire):
+    reponse = request.form.get('reponse')
+    formulaire = FormulaireBD.query.get_or_404(idFormulaire)
+    
+    #Logique d'envoi d'email à ajouter ici
+    # Par exemple : send_email(to=formulaire.mailFC, subject=f"Re: {formulaire.sujetFC}", body=reponse)
+    
+    flash(f"Votre réponse au formulaire de {formulaire.mailFC} a bien été envoyée")
+    #une fois la réponse envoyée, on supprime le formulaire
+    db.session.delete(formulaire)
+    db.session.commit()
+    return redirect(url_for('gerer_formulaires'))
 
 #Vue pour la gestion des Profils
 @app.route("/gerer_profils/")
@@ -308,20 +354,10 @@ def login():
         
     return render_template("login.html", title=TITLE + "- Connexion", form=form)
 
-@app.route("/inscription/", methods=["GET", "POST"])  # Accepte GET et POST
+@app.route("/inscription/", methods=["GET", "POST"])
 def inscription():
     unForm = InscriptionForm()
     if unForm.validate_on_submit():
-        existing_inscription = db.session.scalar(
-            db.select(InscriptionBD).where(InscriptionBD.email == unForm.Login.data)
-        )
-        existing_membre = db.session.scalar(
-            db.select(MembreBD).where(MembreBD.email == unForm.Login.data)
-        )
-        if existing_inscription or existing_membre:
-            return render_template("inscription.html", title=TITLE+"- Inscriptions", form=unForm)
-        if unForm.password.data != unForm.confirm_password.data:
-            return render_template("inscription.html", title=TITLE+"- Inscriptions", form=unForm)
         new_inscription = InscriptionBD(
             email=unForm.Login.data,           
             nom=unForm.nom.data,
@@ -334,10 +370,12 @@ def inscription():
         try:
             db.session.add(new_inscription)
             db.session.commit()
-            
             return redirect(url_for('index'))
         except Exception as e:
             db.session.rollback()
+            
+    # Si le formulaire n'est PAS valide, la page est re-rendue
+    # et les erreurs s'afficheront grâce aux modifs du Problème n°1
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
 
 @app.route("/logout/")

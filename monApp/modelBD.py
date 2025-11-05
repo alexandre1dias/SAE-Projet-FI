@@ -1,6 +1,7 @@
 
 from .app import db
 from flask_login import UserMixin
+from sqlalchemy.sql import func
 
 
 class MembreBD(UserMixin, db.Model):
@@ -18,6 +19,7 @@ class MembreBD(UserMixin, db.Model):
     date_inscription = db.Column(db.Date)
     sexe = db.Column('sexeM', db.String(5))
     ddn = db.Column('ddnM', db.Date)
+    age = db.Column(db.Integer)
     niveau = db.Column(db.String(15))
     statut = db.Column(db.String(30))
     activite = db.Column(db.Boolean)
@@ -136,3 +138,67 @@ class ParticiperBD(UserMixin, db.Model):
 
     membre = db.relationship('MembreBD', backref=db.backref('evenements_inscrits', lazy='dynamic'))
     evenement = db.relationship('EvenementBD', backref=db.backref('participants', lazy='dynamic'))
+
+class RepondreBD(db.Model):
+    """
+    Table d'association entre un administrateur et un formulaire auquel il a répondu.
+    """
+    __tablename__ = 'REPONDRE'
+    id_formulaire = db.Column('idFormulaire', db.Integer, db.ForeignKey('FORMULAIRE_CONTACT.idFormulaire'), primary_key=True)
+    id_admin = db.Column('idAdmin', db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'), primary_key=True)
+
+class RemplirBD(db.Model):
+    """
+    Table d'association entre un membre et un formulaire qu'il a rempli.
+    """
+    __tablename__ = 'REMPLIR'
+    id_formulaire = db.Column('idFormulaire', db.Integer, db.ForeignKey('FORMULAIRE_CONTACT.idFormulaire'), primary_key=True)
+    id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'), primary_key=True)
+
+class FormulaireBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table FORMULAIRE_CONTACT.
+    Combine les champs pour l'admin et pour la soumission.
+    """
+    __tablename__ = 'FORMULAIRE_CONTACT'
+
+    id = db.Column('idFormulaire', db.Integer, primary_key=True)
+    
+    type_form = db.Column('typeFC', db.String(20))
+    sujet = db.Column('sujetFC', db.String(100))
+    email = db.Column('mailFC', db.String(41))
+    description = db.Column('descriptionFC', db.String(500))
+    date = db.Column('dateFC', db.Date)
+    
+    idMembre = db.Column(db.Integer, db.ForeignKey('MEMBRE.idMembre'))
+    idAdmin = db.Column(db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'))
+
+    membre = db.relationship('MembreBD', backref=db.backref('formulaires', lazy=True))
+    admin = db.relationship('AdminBD', backref=db.backref('formulaires', lazy=True))
+
+    reponses = db.relationship('RepondreBD', backref='formulaire', cascade="all, delete-orphan")
+    remplissages = db.relationship('RemplirBD', backref='formulaire', cascade="all, delete-orphan")
+
+class EventClubBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table COMPETITION, compatible Flask-Login.
+    """
+    __tablename__ = 'EVENTCLUB'
+    
+    # Mappage des colonnes SQL
+    idEventClub = db.Column(db.Integer, primary_key=True)
+    NomEV = db.Column(db.String(50))
+    villeEV = db.Column(db.String(50))
+    adresseEV = db.Column(db.String(50))
+    dateDebutEV = db.Column(db.Date)
+    heureDebutEV = db.Column(db.String(5))
+    dateFinEV = db.Column(db.Date)
+    heureFinEV = db.Column(db.String(5))
+    nbParticipantEV = db.Column(db.Integer)
+    descriptionEV = db.Column(db.String(255))
+    niveauxEV = db.Column(db.String(45))
+    passeeEV = db.Column(db.Boolean)
+    #Clé étrangère
+    id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
+    evenement = db.relationship('EvenementBD', backref=db.backref('eventclub', lazy=True))
+
