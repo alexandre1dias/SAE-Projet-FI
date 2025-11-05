@@ -4,9 +4,11 @@ insert into ADMINISTRATEUR (IdAdmin, emailA, mdpA)
 values (1, 'a','a');
 
 -- INSERTIONS POUR TESTER LE TRIGGER DE CALCUL DE NIVEAU MEMBRE
+
 -- Membres de différents âges pour tester le calcul automatique du niveau.
 insert into MEMBRE (idMembre, nomM, prenomM, emailM, mdpM, date_inscription, sexeM, ddnM, statut, activite, IdParamNotifMembre)
 values (2, 'Jeune', 'Membre', 'jeune.membre@gmail.com', 'password', '2023-01-01', 'M', '2010-01-01', 'Membre', 1, NULL);
+
 insert into MEMBRE (idMembre, nomM, prenomM, emailM, mdpM, date_inscription, sexeM, ddnM, statut, activite, IdParamNotifMembre)
 values (3, 'Adulte', 'Membre', 'adulte.membre@gmail.com', 'password', '2023-01-01', 'M', '1990-01-01', 'Membre', 1, NULL);
 

@@ -17,6 +17,7 @@ class MembreBD(UserMixin, db.Model):
     date_inscription = db.Column(db.Date)
     sexe = db.Column('sexeM', db.String(5))
     ddn = db.Column('ddnM', db.Date)
+    age = db.Column(db.Integer)
     niveau = db.Column(db.String(15))
     statut = db.Column(db.String(30))
     activite = db.Column(db.Boolean)

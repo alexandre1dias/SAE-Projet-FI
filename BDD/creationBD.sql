@@ -49,6 +49,7 @@ create table MEMBRE(
     date_inscription date,
     sexeM varchar(5),
     ddnM date,
+    age integer,
     niveau varchar(15),
     statut varchar(30),
     activite boolean,
