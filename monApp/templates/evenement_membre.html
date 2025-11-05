@@ -127,15 +127,15 @@
                                     <div class="text-center d-flex justify-content-center gap-2">
                                         {% if event.__tablename__ == 'COMPETITION' %}
                                             <a href="{{ url_for('competition_view', idCompetition=event.id) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
-                                            {# Le lien de désinscription n'est pas encore implémenté #}
+          
                                             <a href="#" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
                                         {% elif event.__tablename__ == 'REUNION' %}
                                             <a href="{{ url_for('reunion_view', idReunion=event.id) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
                                             <a href="{{ url_for('desinscrire_reunion', idReunion=event.id) }}" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
                                         {% elif event.__tablename__ == 'EVENTCLUB' %}
                                             <a href="{{ url_for('club_view', idEventClub=event.idEventClub) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
-                                            {# Le lien de désinscription n'est pas encore implémenté #}
-                                            <a href="#" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
+
+                                            <a href="{{ url_for('desinscrire_club', idEventClub=event.idEventClub) }}" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
                                         {% endif %}
                                     </div>
                                 </div>
