@@ -146,24 +146,17 @@ END;
 DELIMITER ;
 
 -- Trigger pour calculer le niveau d’un membre à partir de sa date de naissance
-
-
 DELIMITER //
 
 CREATE OR REPLACE TRIGGER calcul_niveau_age_membre
 BEFORE INSERT ON MEMBRE
 FOR EACH ROW
 BEGIN
-    DECLARE annee INT;
     DECLARE calcul_age INT;
 
-    -- Calcule le niveau et l'age uniquement si aucun n'est fourni lors de l'insertion.
-    -- Cela permet de forcer un niveau pour les tests ou des cas spécifiques.
-    IF NEW.niveau  IS NULL THEN
-        SET annee = YEAR(NEW.ddnM);
-        SET calcul_age = (YEAR(CURDATE()) - YEAR(NEW.ddnM)) - (CASE WHEN DATE_FORMAT(CURDATE(), '%m%d') < DATE_FORMAT(NEW.ddnM, '%m%d') THEN 1 ELSE 0 END);
+    SET calcul_age = (YEAR(CURDATE()) - YEAR(NEW.ddnM)) - (CASE WHEN DATE_FORMAT(CURDATE(), '%m%d') < DATE_FORMAT(NEW.ddnM, '%m%d') THEN 1 ELSE 0 END);
 
-        -- Détermination du niveau selon l'age
+    IF NEW.niveau IS NULL THEN
         SET NEW.niveau = CASE
             WHEN calcul_age < 10 THEN 'M9'
             WHEN calcul_age BETWEEN 10 AND 11 THEN 'M11'
@@ -175,9 +168,8 @@ BEGIN
             ELSE 'Vétéran'
         END;
     END IF;
-
     IF NEW.age IS NULL THEN
-        SET New.age = calcul_age;
+        SET NEW.age = calcul_age;
     END IF;
 END;
 //
@@ -190,16 +182,11 @@ CREATE OR REPLACE TRIGGER mise_a_jour_niveau_membre
 BEFORE UPDATE ON MEMBRE
 FOR EACH ROW
 BEGIN
-    DECLARE annee INT;
     DECLARE calcul_age INT;
 
-    -- Recalcule le niveau et l'age uniquement si la date de naissance a été modifiée.
-    -- Cela évite d'écraser le niveau lors de la mise à jour d'autres champs (ex: statut, email).
     IF NEW.ddnM != OLD.ddnM THEN
-        SET annee = YEAR(NEW.ddnM);
         SET calcul_age = (YEAR(CURDATE()) - YEAR(NEW.ddnM)) - (CASE WHEN DATE_FORMAT(CURDATE(), '%m%d') < DATE_FORMAT(NEW.ddnM, '%m%d') THEN 1 ELSE 0 END);
 
-        -- Détermination du niveau selon l'age
         SET NEW.niveau = CASE
             WHEN calcul_age < 10 THEN 'M9'
             WHEN calcul_age BETWEEN 10 AND 11 THEN 'M11'
@@ -210,9 +197,7 @@ BEGIN
             WHEN calcul_age BETWEEN 20 AND 39 THEN 'Senior'
             ELSE 'Vétéran'
         END;
-    END IF;
-    IF NEW.age IS NULL THEN
-        SET New.age = calcul_age;
+        SET NEW.age = calcul_age;
     END IF;
 END;
 //

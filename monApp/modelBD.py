@@ -28,15 +28,19 @@ class ReunionBD(UserMixin, db.Model):
     __tablename__ = 'REUNION'
 
     id = db.Column('idReunion', db.Integer, primary_key=True)
-    nom= db.Column('nomRE' , db.String(41))
-    lieu = db.Column('lieuRE', db.String(20))
-    dateRE = db.Column(db.Date)
-    heureDebutRE = db.Column('heureDebutRE', db.String(5))
-    nbParticipantsRE = db.Column('nbParticipantsRE', db.Integer)
-    typeReunionRE = db.Column('typeReunionRE', db.String(15))
-    rapportRE = db.Column('rapportRE', db.String(200))
-    niveauRE = db.Column('niveauRE', db.String(15)) 
-    idEvent = db.Column('idEvent', db.Integer) 
+    nom = db.Column('nomRE' , db.String(41))
+    ville = db.Column('villeRE', db.String(50))
+    adresse = db.Column('adresseRE', db.String(50))
+    dateDebutRE = db.Column(db.Date)
+    heureDebutRE = db.Column(db.String(5))
+    dateFinRE = db.Column(db.Date)
+    heureFinRE = db.Column(db.String(5))
+    nbParticipantsRE = db.Column(db.Integer)
+    typeReunionRE = db.Column(db.String(15))
+    rapportRE = db.Column(db.String(200))
+    niveauRE = db.Column(db.String(15)) 
+    idEvent = db.Column(db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
+    evenement = db.relationship('EvenementBD', backref=db.backref('reunions', lazy=True))
 
 
 class EvenementBD(UserMixin, db.Model):
@@ -78,7 +82,25 @@ class CompetitionBD(UserMixin, db.Model):
     id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
     evenement = db.relationship('EvenementBD', backref=db.backref('competitions', lazy=True))
 
-    
+class EntrainementBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table ENTRAINEMENT.
+    """
+    __tablename__ = 'ENTRAINEMENT'
+
+    id = db.Column('idEntrainement', db.Integer, primary_key=True)
+    jour = db.Column('jourEN', db.String(8))
+    ville = db.Column('villeEN', db.String(50))
+    adresse = db.Column('adresseEN', db.String(50))
+    date = db.Column('dateEN', db.Date)
+    heure_debut = db.Column('heureDebutEN', db.String(5))
+    heure_fin = db.Column('heureFinEN', db.String(5))
+    type_arme = db.Column('typeArmeEN', db.String(12))
+    niveau = db.Column('niveauEN', db.String(15))
+    id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
+    evenement = db.relationship('EvenementBD', backref=db.backref('entrainements', lazy=True))
+
+
 class AdminBD(UserMixin, db.Model):
     """
     Modèle SQLAlchemy pour la table ADMINISTRATEUR, compatible Flask-Login.

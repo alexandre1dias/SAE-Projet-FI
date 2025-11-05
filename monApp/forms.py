@@ -1,6 +1,6 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField
+from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField, widgets
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 from . modelBD import MembreBD, InscriptionBD
 from datetime import date
@@ -33,9 +33,6 @@ class MembreForm(FlaskForm):
         ('Vice-président', 'Vice-président'),
         ('Président', 'Président')
     ], validators=[DataRequired()])
-    
-
-
 
 class InscriptionForm(FlaskForm):
     # cette fonction permet de vérifier que l'utilisateur a au moins 8 ans
@@ -91,31 +88,75 @@ class EventForm(FlaskForm):
         ('Evenement du club', 'Evenement du club')
     ], validators=[DataRequired()])
     level = SelectMultipleField('Niveaux concernés', choices=[
-        ('M9', 'M9'),
-        ('M11', 'M11'),
-        ('M13', 'M13'),
-        ('M15', 'M15'),
-        ('M17', 'M17'),
-        ('M20', 'M20'),
-        ('Senior', 'Senior'),
-        ('Veteran', 'Veteran')
-    ], validators=[DataRequired()])
+        ('M9', 'M9'), ('M11', 'M11'), ('M13', 'M13'), ('M15', 'M15'),
+        ('M17', 'M17'), ('M20', 'M20'), ('Senior', 'Senior'), ('Veteran', 'Veteran')
+    ], 
+    validators=[Optional()],
+    widget=widgets.ListWidget(prefix_label=False),
+    option_widget=widgets.CheckboxInput()
+    ) 
+    
     sexe = SelectField('Sexe concerné', choices=[
-        ('Masculin', 'Masculin'),
-        ('Féminin', 'Féminin'),
-        ('Mixte', 'Mixte')
-    ], validators=[DataRequired()])
+        ('Homme', 'Homme'), ('Femme', 'Femme')
+    ], validators=[Optional()]) 
+    
     arme = SelectField('Arme concernée', choices=[
-        ('Fleuret', 'Fleuret'),
-        ('Épée', 'Épée'),
-        ('Sabre', 'Sabre')
-    ], validators=[DataRequired()])
+        ('Fleuret', 'Fleuret'), ('Épée', 'Épée'), ('Sabre', 'Sabre')
+    ], validators=[Optional()])
+    
     type = SelectField('Type d\'événement', choices=[
-        ('Regionale', 'Regionale'),
-        ('National', 'National')
-    ], validators=[DataRequired()])
+        ('Regionale', 'Regionale'), ('National', 'National')
+    ], validators=[Optional()])
+    ville = StringField('Ville de l\'événement', validators=[DataRequired()])
+    adresse = StringField('Adresse de l\'événement', validators=[DataRequired()])
     description = TextAreaField('Description (optionnel)')
     submit = SubmitField('Ajouter l\'événement')
+    
+    def validate_level(self, level):
+        """
+        Valide le champ 'level'.
+        1. Vérifie s'il est requis pour la catégorie.
+        2. Vérifie qu'il n'y a pas de niveaux consécutifs pour une compétition.
+        """
+        selected_category = self.category.data
+        selected_levels_data = level.data
+        if selected_category in ['Compétition', 'Entraînement', 'Evenement du club'] and not selected_levels_data:
+            raise ValidationError('Le niveau est requis pour ce type d\'événement.')
+        if selected_category == 'Compétition' and selected_levels_data:
+            selected_levels = set(selected_levels_data)
+            consecutive_pairs = [
+                {'M9', 'M11'},
+                {'M11', 'M13'},
+                {'M13', 'M15'},
+                {'M15', 'M17'},
+                {'M17', 'M20'},
+                {'M20', 'Senior'},
+                {'Senior', 'Vétéran'}
+            ]
+            for pair in consecutive_pairs:
+                if selected_levels.issuperset(pair):
+                    friendly_pair = " et ".join(sorted(list(pair)))
+                    raise ValidationError(f'Règle de surclassement : Les niveaux {friendly_pair} ne peuvent pas être sélectionnés ensemble.')
+
+    def validate_sexe(self, sexe):
+        if self.category.data == 'Compétition' and not sexe.data:
+            raise ValidationError('Le sexe est requis pour une compétition.')
+
+    def validate_arme(self, arme):
+        if self.category.data in ['Compétition', 'Entraînement'] and not arme.data:
+            raise ValidationError('L\'arme est requise pour ce type d\'événement.')
+
+    def validate_type(self, type):
+        if self.category.data == 'Compétition' and not type.data:
+            raise ValidationError('Le type (Régional/National) est requis for une compétition.')
+
+    def validate_ville(self, ville):
+        if self.category.data in ['Compétition', 'Evenement du club'] and not ville.data:
+            raise ValidationError('La ville est requise pour ce type d\'événement.')
+
+    def validate_adresse(self, adresse):
+        if self.category.data in ['Compétition', 'Evenement du club'] and not adresse.data:
+            raise ValidationError('L\'adresse est requise pour ce type d\'événement.')
  
 
 class ParametresForm(FlaskForm):

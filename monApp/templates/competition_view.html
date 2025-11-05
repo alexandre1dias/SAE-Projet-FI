@@ -99,7 +99,11 @@
     </div>
     <!--Fin Carousel-->
     <div class="d-flex justify-content-center">
-        <a href="{{ url_for('competitions') }}" class="btn btn-secondary">retour</a>
+        {% if origine == 'calendrier' %}
+            <a href="{{ url_for('calendrier') }}" class="btn btn-secondary">Retour</a>
+        {% else %}
+            <a href="{{ url_for('reunion') }}" class="btn btn-secondary">Retour</a>
+        {% endif %}
         <a href="" class="btn btn-success">S'inscrire</a>
         <!-- boutons Admin-->
         <a href="{{ url_for('competition_update') }}" class="btn btn-primary">modifier competition</a>
