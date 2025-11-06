@@ -31,7 +31,7 @@ create table PARAMETRE_NOTIF_MEMBRE(
     eventAnnulationSite boolean not null,
     eventAnnulationMail boolean not null,
     resultatNouveauSite boolean not null,
-    resuletatNouveauMail boolean not null,
+    resultatNouveauMail boolean not null,
     reponseFormulaireSite boolean not null,
     reponseFormulaireMail boolean not null,
     modifProfilSite boolean not null,

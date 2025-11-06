@@ -270,3 +270,50 @@ class PresseBD(UserMixin, db.Model):
     titreP = db.Column(db.String(50))
     contenuP = db.Column(db.String(600))
     lienP = db.Column(db.String(255))
+
+
+class ParametreNotifAdminBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table PARAMETRE_NOTIF_ADMIN, compatible Flask-Login.
+    """
+    __tablename__ = 'PARAMETRE_NOTIF_ADMIN'
+    
+    # Mappage des colonnes SQL  
+    idParamNotifAdmin = db.Column(db.Integer, primary_key=True)
+    formulaireDemandeSite = db.Column(db.Boolean)
+    formulaireDemandeMail = db.Column(db.Boolean)
+    formulaireQuestionSite = db.Column(db.Boolean)
+    formulaireQuestionMail = db.Column(db.Boolean)
+    formulaireSignalementSite = db.Column(db.Boolean)
+    formulaireSignalementMail = db.Column(db.Boolean)
+    demandeModifSite = db.Column(db.Boolean)
+    demandeModifMail = db.Column(db.Boolean)
+    demandeInscriptionSite = db.Column(db.Boolean)
+    demandeInscriptionMail = db.Column(db.Boolean)
+    idAdmin = db.Column(db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'))
+    admin = db.relationship('AdminBD', backref=db.backref('parametres_notif_admin', uselist=False))
+
+
+
+class ParametreNotifMembreBD(UserMixin, db.Model):
+    """
+    Modèle SQLAlchemy pour la table PARAMETRE_NOTIF_MEMBRE, compatible Flask-Login.
+    """
+    __tablename__ = 'PARAMETRE_NOTIF_MEMBRE'
+    
+    # Mappage des colonnes SQL
+    idParamNotifMembre = db.Column(db.Integer, primary_key=True)
+    eventInscriptionSite = db.Column(db.Boolean)
+    evenementInscriptionMail = db.Column(db.Boolean)
+    eventNouveauSite = db.Column(db.Boolean)
+    eventNouveauMail = db.Column(db.Boolean)
+    eventAnnulationSite = db.Column(db.Boolean)
+    eventAnnulationMail = db.Column(db.Boolean)
+    resultatNouveauSite = db.Column(db.Boolean)
+    resultatNouveauMail = db.Column(db.Boolean)
+    reponseFormulaireSite = db.Column(db.Boolean)
+    reponseFormulaireMail = db.Column(db.Boolean)
+    modifProfilSite = db.Column(db.Boolean)
+    modifProfilMail = db.Column(db.Boolean)
+    idMembre = db.Column(db.Integer, db.ForeignKey('MEMBRE.idMembre'))
+    membre = db.relationship('MembreBD', backref=db.backref('parametres_notif_membre', uselist=False))
