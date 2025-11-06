@@ -400,8 +400,8 @@ def evenement_membre():
         evenements.extend(les_reunions)
         evenements.extend(les_evenements_club)
 
-    events_a_venir = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateRE', None) or getattr(e, 'dateDebutEV', None)) >= aujourdhui]
-    events_passes = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateRE', None) or getattr(e, 'dateDebutEV', None)) < aujourdhui]
+    events_a_venir = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateDebutRE', None) or getattr(e, 'dateDebutEV', None)) >= aujourdhui]
+    events_passes = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateDebutRE', None) or getattr(e, 'dateDebutEV', None)) < aujourdhui]
 
 
     return render_template("evenement_membre.html", title=TITLE+"- Vos Évènements",
