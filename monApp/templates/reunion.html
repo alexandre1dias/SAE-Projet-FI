@@ -13,10 +13,17 @@
                             <h3 class="card-title text-center mb-0">{{ reunion.nom }}</h3>
                         </div>
                         <div class="card-body p-4">
-                            <h2 class="card-title ...">{{ reunion.dateDebutRE.strftime('%d/%m') }} {{ reunion.heureDebutRE }} - {{ reunion.dateFinRE.strftime('%d/%m') }} {{ reunion.heureFinRE }}</h2>
-                            <ul class="feature-list text-center mb-4">
-                                <li>{{ reunion.lieu }}</li>
-                            </ul>
+                                <ul class="feature-list text-center mb-4">
+                                    <li>
+                                        <h3>{{ reunion.dateDebutRE.strftime('%d/%m') }} {{ reunion.heureDebutRE }} <br> {{ reunion.dateFinRE.strftime('%d/%m') }} {{ reunion.heureFinRE }}</h3>
+                                    </li>
+                                    <li>
+                                        <h3>{{ reunion.ville }}</h3>  
+                                    </li>
+                                    <li>
+                                        <h3>{{ reunion.adresse }}</h3>  
+                                    </li>
+                                </ul>
                             <div class="text-center">
                                 {% if current_user.is_authenticated %}
                                     
@@ -62,10 +69,17 @@
                             <h3 class="card-title text-center mb-0">{{ reunion.nom }}</h3>
                         </div>
                         <div class="card-body p-4">
-                            <h2 class="card-title ...">{{ reunion.dateDebutRE.strftime('%d/%m') }} {{ reunion.heureDebutRE }} - {{ reunion.dateFinRE.strftime('%d/%m') }} {{ reunion.heureFinRE }}</h2>
-                            <ul class="feature-list text-center mb-4">
-                                <li>{{ reunion.lieu }}</li>
-                            </ul>
+                                <ul class="feature-list text-center mb-4">
+                                    <li>
+                                        <h3>{{ reunion.dateDebutRE.strftime('%d/%m') }} {{ reunion.heureDebutRE }} <br> {{ reunion.dateFinRE.strftime('%d/%m') }} {{ reunion.heureFinRE }}</h3>
+                                    </li>
+                                    <li>
+                                        <h3>{{ reunion.ville }}</h3>  
+                                    </li>
+                                    <li>
+                                        <h3>{{ reunion.adresse }}</h3>  
+                                    </li>
+                                </ul>
                             <div class="text-center">
                                 <a href="{{ url_for('reunion_view', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">consulter rapport</a>
                             </div>

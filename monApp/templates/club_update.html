@@ -74,6 +74,7 @@
     </div>
 </form>
 
+{% if participants %}
 <h2 class="mt-5">Liste des inscrits</h2>
 
     <!-- Tableau des inscrits -->
@@ -93,20 +94,23 @@
                 <td>{{ participant.nom }}</td>
                 <td>{{ participant.prenom }}</td>
                 <td>
-                    <a href="{{ url_for('profil_view', idM=participant.id, origine=1) }}" class="btn btn-primary">Consulter</a>
-                    <a class="btn btn-danger">Supprimer</a> {# La logique de suppression est à implémenter #}
+                    <a href="{{ url_for('profil_view', idM=participant.id, origine='club_update', idEventClub=eventClub.idEventClub) }}" class="btn btn-primary">Consulter</a>
+                    <form class="d-inline" action="{{ url_for('delete_membre_eventClub', idEventClub=eventClub.idEventClub, idM=participant.id) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce participant ?');">
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="5" class="text-center">
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inscrireMembreModal">Inscrire un membre</button>
-                </td>
-            </tr>
-        </tfoot>
     </table>
+    {%else%}
+    <div class="text-center mt-3">
+        <h2 class="mt-5">Il n'y a pas encore de participants à cet événement</h2>
+    </div>
+    {%endif%}
+    <div class="text-center mt-3">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inscrireMembreModal">Inscrire un membre</button>
+    </div><br>
     <!--Fin Tableau-->
     <!-- Carousel d'images -->
      <div class="text-center"><button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#gererImagesModal">Gérer les images</button></div>
@@ -146,6 +150,13 @@
         {# Les boutons Retour et Supprimer sont maintenant gérés plus haut ou via des actions séparées #}
         {# <a href="{{ url_for('club_delete', idEventClub=eventClub.idEventClub) }}" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">Supprimer l'événement</a> #}
     </div>
+    <div class="d-flex justify-content-center">
+        <a href="{{ url_for('club_view', idEventClub=eventClub.idEventClub) }}" class="btn btn-secondary me-2">Retour</a>
+        <form action="{{ url_for('club_delete', idEventClub=eventClub.idEventClub) }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer cet événement ?');" class="d-inline">
+            <button type="submit" class="btn btn-danger">Supprimer évènement</button>
+        </form>
+    </div>
+</div>
 
     <!-- Modale pour inscrire un membre -->
     <div class="modal fade" id="inscrireMembreModal" >

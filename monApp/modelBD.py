@@ -24,6 +24,7 @@ class MembreBD(UserMixin, db.Model):
     niveau = db.Column(db.String(15))
     statut = db.Column(db.String(30), server_default='Membre')
     activite = db.Column(db.Boolean, server_default='1')
+    
 
 
 class ReunionBD(UserMixin, db.Model):
@@ -243,7 +244,7 @@ class ResultatBD(db.Model):
     id_competition = db.Column('idCompetition', db.Integer, db.ForeignKey('COMPETITION.idCompetition'))
     id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'))
 
-    membre = db.relationship('MembreBD', backref='resultats')
+    membre = db.relationship('MembreBD', backref=db.backref('resultats', lazy=True))
 
 class InformationBD(UserMixin, db.Model):
     """

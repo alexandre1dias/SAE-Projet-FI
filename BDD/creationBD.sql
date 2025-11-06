@@ -223,7 +223,7 @@ create table EVENTCLUB(
 
 create table RESULTAT(
     idResultat integer AUTO_INCREMENT,
-    resultat varchar(50),
+    resultat integer,
     dateRE date,
     typeArmeRE varchar(12),
     typeCompeteRE varchar(15),

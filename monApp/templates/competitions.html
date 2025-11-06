@@ -12,7 +12,7 @@
                     <div class="col">
                         <div class="card pricing-card h-100">
                             <div class="card-header pricing-header basic-header p-4">
-                                <h3 class="card-title text-center mb-0"> {{uneCompetition.nom}} {{uneCompetition.ville}}</h3>
+                                <h3 class="card-title text-center mb-0"> {{uneCompetition.nom}} <br> {{uneCompetition.ville}}</h3>
                             </div>
                             <div class="card-body p-4 d-flex flex-column">
                                 <h4 class="card-title text-center mb-4 h5">{{uneCompetition.niveaux}}</h4>
@@ -20,7 +20,7 @@
                                     <li>{{uneCompetition.date_debut}} - {{uneCompetition.date_fin}}</li>
                                     <li>{{uneCompetition.type_arme}}</li>
                                     <li>{{uneCompetition.typeComp}}</li>
-                                    <li>Participants du cercle : {{uneCompetition.nb_participants}}</li>
+                                    <li>Participants du cercle : {{ uneCompetition.evenement.participants.count() }}</li>
                                 </ul>
                                 <div class="text-center mt-auto">
                                     <a href="{{ url_for('competition_view', idCompetition=uneCompetition.id) }}" class="btn btn-outline-primary btn-custom">Consulter</a>
@@ -115,7 +115,7 @@
                                 <div class="col">
                                     <div class="card pricing-card h-100">
                                         <div class="card-header pricing-header basic-header p-4">
-                                            <h3 class="card-title text-center mb-0">{{uneCompetition.nom}} {{uneCompetition.ville}}</h3>
+                                            <h3 class="card-title text-center mb-0">{{uneCompetition.nom}} <br> {{uneCompetition.ville}}</h3>
                                         </div>
                                         <div class="card-body p-4 d-flex flex-column">
                                             <h4 class="card-title text-center mb-4 h5">{{uneCompetition.niveaux}}</h4>
@@ -123,7 +123,7 @@
                                                 <li>{{uneCompetition.date_debut}} - {{uneCompetition.date_fin}}</li>
                                                 <li>{{uneCompetition.type_arme}}</li>
                                                 <li>{{uneCompetition.typeComp}}</li>
-                                                <li>Participants du cercle : {{uneCompetition.nb_participants}}</li>
+                                                <li>Participants du cercle : {{ uneCompetition.evenement.participants.count() }}</li>
                                             </ul>
                                             <div class="text-center mt-auto">
                                                 <a href="{{ url_for('competition_view', idCompetition=uneCompetition.id) }}" class="btn btn-outline-primary btn-custom">Consulter</a>
