@@ -24,7 +24,7 @@ INSERT INTO MEMBRE (nomM, prenomM, emailM, mdpM, date_inscription, sexeM, ddnM, 
 ('Christophe', 'LECHOPIER', 'chr.lec@email.com', 'mdp541', '2005-01-01', 'Homme', '1969-02-07','Membre du Comité', 1, NULL);
 
 -- Insertion des paramètres de notification pour les membres
-INSERT INTO PARAMETRE_NOTIF_MEMBRE (eventInscriptionSite, evenementInscriptionMail, eventNouveauSite, eventNouveauMail, eventAnnulationSite, eventAnnulationMail, resultatNouveauSite, resuletatNouveauMail, reponseFormulaireSite, reponseFormulaireMail, modifProfilSite, modifProfilMail, idMembre) VALUES
+INSERT INTO PARAMETRE_NOTIF_MEMBRE (eventInscriptionSite, evenementInscriptionMail, eventNouveauSite, eventNouveauMail, eventAnnulationSite, eventAnnulationMail, resultatNouveauSite, resultatNouveauMail, reponseFormulaireSite, reponseFormulaireMail, modifProfilSite, modifProfilMail, idMembre) VALUES
 (1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1),
 (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2),
 (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3);
