@@ -96,16 +96,33 @@
     </div>
     <!--Fin Carousel-->
 
-    <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center" style="gap: 10px;">
+        
         {% if origine == 'calendrier' %}
             <a href="{{ url_for('calendrier') }}" class="btn btn-secondary">Retour</a>
+        
+        {% elif origine == 'index' %}
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Retour</a>
+        
         {% else %}
-            <a href="{{ url_for('reunion') }}" class="btn btn-secondary">Retour</a>
+            <a href="{{ url_for('competitions') }}" class="btn btn-secondary">Retour</a>
         {% endif %}
-        <a href="" class="btn btn-success">S'inscrire</a>
-        <!-- boutons Admin-->
-        <a href="{{ url_for('competition_update') }}" class="btn btn-primary">modifier competition</a>
-        <a href="{{ url_for('competitions') }}" class="btn btn-danger">supprimer competition</a>
+        
+        {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
+            
+            {% if deja_inscrit %}
+                <a href="{{ url_for('desinscrire_competition', idCompetition=competition.id) }}" class="btn btn-warning">Se désinscrire</a>
+            {% else %}
+                <a href="{{ url_for('inscrire_competition', idCompetition=competition.id) }}" class="btn btn-success">S'inscrire</a>
+            {% endif %}
+
+        {% endif %}
+        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+            <a href="{{ url_for('competition_update', idCompetition=competition.id) }}" class="btn btn-primary">Modifier</a>
+            <form action="{{ url_for('competition_delete', idCompetition=competition.id) }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer cette compétition ?');">
+                <button type="submit" class="btn btn-danger">Supprimer</button>
+            </form>
+        {% endif %}
     </div>
 
 {% endblock %}

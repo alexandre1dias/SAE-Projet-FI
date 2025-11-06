@@ -79,9 +79,9 @@ class CompetitionBD(UserMixin, db.Model):
     niveaux = db.Column('niveauCo', db.String(15))
     classement = db.Column('classementCo', db.String(20))
     passee = db.Column('passeeCO', db.Boolean)
-    #Clé étrangère
     id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
     evenement = db.relationship('EvenementBD', backref=db.backref('competitions', lazy=True))
+    resultats = db.relationship('ResultatBD', backref='competition', lazy=True, cascade='all, delete-orphan')
 
 class EntrainementBD(UserMixin, db.Model):
     """
@@ -241,7 +241,6 @@ class ResultatBD(db.Model):
     id_competition = db.Column('idCompetition', db.Integer, db.ForeignKey('COMPETITION.idCompetition'))
     id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'))
 
-    competition = db.relationship('CompetitionBD', backref='resultats')
     membre = db.relationship('MembreBD', backref='resultats')
 
 class InformationBD(UserMixin, db.Model):

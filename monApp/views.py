@@ -12,7 +12,10 @@ from flask import jsonify
 @app.route("/")
 @app.route("/index/")
 def index():
-    return render_template("index.html", title = TITLE)
+    les_derniers_articles = PresseBD.query.order_by(PresseBD.dateP.desc()).limit(3).all()
+    les_dernieres_informations = InformationBD.query.order_by(InformationBD.dateIN.desc()).limit(3).all()
+    les_dernieres_competitions = CompetitionBD.query.filter_by(passee=True).order_by(CompetitionBD.date_debut.desc()).limit(3).all()
+    return render_template("index.html", title = TITLE, articles=les_derniers_articles, informations=les_dernieres_informations, competitions=les_dernieres_competitions)
 
 @app.route("/about/")
 def about():
@@ -82,8 +85,46 @@ def competitions():
 def competition_view(idCompetition):
     uneCompetition = CompetitionBD.query.get(idCompetition)
     origine = request.args.get('origine', 'default')
-    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",selectedCompetition=uneCompetition, origine=origine)
+    deja_inscrit = False
+    if current_user.is_authenticated and session.get('user_type') == 'membre':
+        participation = ParticiperBD.query.filter_by(
+            id_membre=current_user.id, 
+            id_event=uneCompetition.id_event
+        ).first()
+        deja_inscrit = participation is not None
+    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",competition=uneCompetition,origine=origine,deja_inscrit=deja_inscrit)
 
+@app.route("/inscrire/competition/<int:idCompetition>", methods=['GET'])
+@login_required
+def inscrire_competition(idCompetition):
+    if session.get('user_type') != 'membre':
+        return redirect(url_for('competitions'))
+    competition_obj = CompetitionBD.query.get_or_404(idCompetition)
+    id_evenement_a_inscrire = competition_obj.id_event
+    deja_inscrit = ParticiperBD.query.filter_by(
+        id_membre=current_user.id,
+        id_event=id_evenement_a_inscrire
+    ).first()
+    try:
+        nouvelle_participation = ParticiperBD(id_membre=current_user.id, id_event=id_evenement_a_inscrire)
+        db.session.add(nouvelle_participation)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+    return redirect(url_for('competition_view', idCompetition=idCompetition))
+
+@app.route("/desinscrire/competition/<int:idCompetition>", methods=['GET'])
+@login_required
+def desinscrire_competition(idCompetition):
+    competition_obj = CompetitionBD.query.get_or_404(idCompetition)
+    participation = ParticiperBD.query.filter_by(id_membre=current_user.id, id_event=competition_obj.id_event).first()
+    if participation:
+        try:
+            db.session.delete(participation)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+    return redirect(url_for('competition_view', idCompetition=idCompetition))
 
 @app.route("/competition_update/<int:idCompetition>", methods=['GET', 'POST'])
 def competition_update(idCompetition):
@@ -104,11 +145,20 @@ def competition_update(idCompetition):
     return render_template("competition_update.html",title=TITLE+"- Modification de la competition", competition=competition)
 
 @app.route("/competition_delete/<int:idCompetition>", methods=['POST'])
-@login_required # Assure que seul un utilisateur connecté peut supprimer
+@login_required
 def competition_delete(idCompetition):
     competition_a_supprimer = CompetitionBD.query.get_or_404(idCompetition)
-    db.session.delete(competition_a_supprimer)
-    db.session.commit()
+    id_event_parent = competition_a_supprimer.id_event
+    try:
+        ParticiperBD.query.filter_by(id_event=id_event_parent).delete()
+        db.session.delete(competition_a_supprimer)
+        if id_event_parent:
+            evenement_parent = EvenementBD.query.get(id_event_parent)
+            if evenement_parent:
+                db.session.delete(evenement_parent)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
     return redirect(url_for('competitions'))
 
 @app.route("/evenement_club/")
