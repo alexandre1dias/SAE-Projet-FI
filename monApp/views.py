@@ -28,7 +28,8 @@ def contact():
                 sujet=form.sujet.data,
                 email=form.email.data,
                 description=form.description.data,
-                date=datetime.now().date()
+                date=datetime.now().date(),
+                repondu=False
             )
             db.session.add(nouveau_message)
             db.session.commit()
