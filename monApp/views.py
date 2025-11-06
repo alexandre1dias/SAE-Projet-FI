@@ -434,9 +434,63 @@ def changer_mdp():
 
 
 #Vues notification
-@app.route("/parametres_notifs/")
+@app.route("/parametres_notifs/", methods=["GET", "POST"])
+@login_required
 def parametres_notifs():
-    return render_template("parametres_notifs.html",title=TITLE+"- Paramètres notifications")
+    user_type = session.get('user_type')
+    parametres = None
+
+    if user_type == 'membre':
+        # Récupère les paramètres de l'utilisateur membre, ou en crée de nouveaux si non existants
+        parametres = ParametreNotifMembreBD.query.filter_by(idMembre=current_user.id).first()
+        if not parametres:
+            parametres = ParametreNotifMembreBD(idMembre=current_user.id)
+            db.session.add(parametres)
+            db.session.commit()
+
+        if request.method == 'POST':
+            # Mettre à jour les préférences du membre
+            parametres.eventInscriptionSite = 'event_insc_site' in request.form
+            parametres.evenementInscriptionMail = 'event_insc_mail' in request.form
+            parametres.eventNouveauSite = 'event_new_site' in request.form
+            parametres.eventNouveauMail = 'event_new_mail' in request.form
+            parametres.eventAnnulationSite = 'event_cancel_site' in request.form
+            parametres.eventAnnulationMail = 'event_cancel_mail' in request.form
+            parametres.resultatNouveauSite = 'result_new_site' in request.form
+            parametres.resultatNouveauMail = 'result_new_mail' in request.form
+            parametres.reponseFormulaireSite = 'form_resp_site' in request.form
+            parametres.reponseFormulaireMail = 'form_resp_mail' in request.form
+            parametres.modifProfilSite = 'profile_mod_site' in request.form
+            parametres.modifProfilMail = 'profile_mod_mail' in request.form
+            db.session.commit()
+            flash('Vos préférences de notification ont été mises à jour.', 'success')
+            return redirect(url_for('parametres_notifs'))
+
+    elif user_type == 'admin':
+        # Récupère les paramètres de l'utilisateur admin, ou en crée de nouveaux si non existants
+        parametres = ParametreNotifAdminBD.query.filter_by(idAdmin=current_user.id).first()
+        if not parametres:
+            parametres = ParametreNotifAdminBD(idAdmin=current_user.id)
+            db.session.add(parametres)
+            db.session.commit()
+
+        if request.method == 'POST':
+            # Mettre à jour les préférences de l'admin
+            parametres.formulaireDemandeSite = 'form_req_site' in request.form
+            parametres.formulaireDemandeMail = 'form_req_mail' in request.form
+            parametres.formulaireQuestionSite = 'form_question_site' in request.form
+            parametres.formulaireQuestionMail = 'form_question_mail' in request.form
+            parametres.formulaireSignalementSite = 'form_report_site' in request.form
+            parametres.formulaireSignalementMail = 'form_report_mail' in request.form
+            parametres.demandeModifSite = 'profile_change_site' in request.form
+            parametres.demandeModifMail = 'profile_change_mail' in request.form
+            parametres.demandeInscriptionSite = 'signup_req_site' in request.form
+            parametres.demandeInscriptionMail = 'signup_req_mail' in request.form
+            db.session.commit()
+            flash('Vos préférences de notification ont été mises à jour.', 'success')
+            return redirect(url_for('parametres_notifs'))
+
+    return render_template("parametres_notifs.html", title=TITLE+"- Paramètres notifications", parametres=parametres)
 
 #Vues pour Informations
 @app.route("/informations/")
@@ -517,6 +571,7 @@ def profil_view(idM, origine):
     # 1 corresponds à gerer_profils et 2 à gerer_ancien_profil
     unMembre = db.session.get(MembreBD,idM)
     return render_template("profil_view.html", title=TITLE + "- Profil Membre", selectedMembre=unMembre, origine = origine)
+
 
 @app.route("/profil_edit/<int:idM>/<int:origine>", methods=["GET", "POST"])
 @login_required
