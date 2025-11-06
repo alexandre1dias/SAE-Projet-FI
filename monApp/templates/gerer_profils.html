@@ -123,42 +123,40 @@
                         <td>{{unMembre.statut}}</td>
                         <td>{{unMembre.sexe}}</td>
                         <td class="actions">
-                            <a href="{{ url_for('profil_view', idM=unMembre.id, origine = 1)}}" class="btn btn-warning">Consulter</a>
-                            <a href="{{ url_for('profil_edit', idM=unMembre.id, origine = 1) }}" class="btn btn-primary">Modifier</a>
-                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal">Désinscrire</button>                
+                            <a href="{{ url_for('profil_view', idM=unMembre.id, origine = 'gestion_actifs')}}" class="btn btn-warning">Consulter</a>
+                            <a href="{{ url_for('profil_edit', idM=unMembre.id, origine = 'gestion_actifs') }}" class="btn btn-primary">Modifier</a>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal-{{ unMembre.id }}">Désinscrire</button>
                         </td>
                     </tr>
+
+                    <!-- Modale raison de la désinscription pour chaque membre -->
+                    <div class="modal fade" id="desinscriptionModal-{{ unMembre.id }}" tabindex="-1" aria-labelledby="desinscriptionModalLabel-{{ unMembre.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="desinscriptionModalLabel-{{ unMembre.id }}">Désinscrire {{ unMembre.prenom }} {{ unMembre.nom }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form method="POST" action="{{ url_for('desinscritProfil', idM=unMembre.id) }}">
+                                    <div class="modal-body">
+                                        <p>Êtes-vous sûr de vouloir désinscrire ce membre ?</p>
+                                        <!-- Champ pour la raison -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Raison de la désinscription:</label>
+                                            <textarea class="form-control" id="justification-{{ unMembre.id }}" name="justification" rows="4"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer justify-content-center" >
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                        <button type="submit" class="btn btn-danger">Confirmer la désinscription</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-    </div>
-
-
-
-
-    <!-- Modale raison de la désinscription -->
-        <div class="modal fade" id="desinscriptionModal" tabindex="-1" aria-labelledby="desinscriptionModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="desinscriptionModalLabel">Raison de la désinscription</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form id="refusForm" method="POST" action="">
-                        <div class="modal-body">
-                            <p>Veuillez indiquer la raison de la désinscription.</p>
-                            <div class="mb-3">
-                                <textarea class="form-control" id="justification" name="justification" rows="4" required></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <button type="button" class="btn btn-success" data-bs-dismiss="modal">Confirmer</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
 {% endblock %}

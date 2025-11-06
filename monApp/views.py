@@ -549,7 +549,7 @@ def formulaire_delete(idFormulaire):
     formulaire = FormulaireBD.query.get_or_404(idFormulaire)
     db.session.delete(formulaire)
     db.session.commit()
-    return redirect(url_for('gerer_formulaires'))
+    return redirect(url_for('gerer_anciens_formulaires'))
 
 @app.route("/repondre_formulaire/<int:idFormulaire>", methods=['POST'])
 @login_required
@@ -574,6 +574,25 @@ def gerer_profils():
     lesMembres = db.session.query(MembreBD).filter(MembreBD.activite == True).all()
     return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres)
 
+@app.route ('/gerer_profils/desinscrire/<int:idM>', methods =("POST" ,))
+@login_required
+@admin_required
+def desinscrireMembre(idM):
+    membre = db.session.get(MembreBD, idM)
+    membre.activite = False
+    db.session.commit()
+    return redirect(url_for('gerer_profils'))
+
+@app.route ('/gerer_anciens_profils/reinscrire/<int:idM>', methods =("POST" ,))
+@login_required
+@admin_required
+def reinscrireMembre(idM):
+    membre = db.session.get(MembreBD, idM)
+    membre.activite = True
+    db.session.commit()
+    return redirect(url_for('gerer_ancien_profils'))
+
+
 @app.route("/gerer_profils/ancien/")
 @login_required
 @admin_required
@@ -581,19 +600,21 @@ def gerer_ancien_profils():
     lesMembres = db.session.query(MembreBD).filter(MembreBD.activite == False).all()
     return render_template("gerer_ancien_profils.html",title=TITLE+"- Géstion des Anciens Profils", membres = lesMembres)
 
-@app.route("/profil_view/<int:idM>/<int:origine>")
-def profil_view(idM, origine):
-    # origine corresponds à l'origine de l'utilisateur. 0 correspond au menu de Membre: Vos information,
-    # 1 corresponds à gerer_profils et 2 à gerer_ancien_profil
+@app.route("/profil_view/<int:idM>")
+def profil_view(idM):
+    # origine corresponds à l'origine de l'utilisateur. 
+    origine = request.args.get('origine', 'profil')
     unMembre = db.session.get(MembreBD,idM)
     return render_template("profil_view.html", title=TITLE + "- Profil Membre", selectedMembre=unMembre, origine = origine)
 
 
-@app.route("/profil_edit/<int:idM>/<int:origine>", methods=["GET", "POST"])
+@app.route("/profil_edit/<int:idM>", methods=["GET", "POST"])
 @login_required
-def profil_edit(idM, origine):
+def profil_edit(idM):
     unMembre = db.session.get(MembreBD,idM)
     unForm = MembreForm(obj=unMembre)
+    origine = request.args.get('origine', 'profil')
+
     if unForm.validate_on_submit():
         action = request.form.get('submit_action')
         if action == 'admin_save':
@@ -611,10 +632,11 @@ def profil_edit(idM, origine):
             uneModif.sexe = unForm.sexe.data
             uneModif.ddn = unForm.ddn.data
             db.session.commit()
-            return redirect(url_for('profil_view', idM=unMembre.id, origine=0))
+            return redirect(url_for('profil_view', idM=unMembre.id, origine='profil'))
     return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
 
-@app.route('/profil_edit/<int:idM>/desinscrit/')
+@app.route('/profil_edit/<int:idM>/desinscrit/', methods=["GET", "POST"])
+@login_required
 def desinscritProfil(idM):
     membreDesinscrit = db.session.get(MembreBD, idM)
     membreDesinscrit.activite = False
@@ -740,22 +762,29 @@ def login():
             utilisateur = AdminBD.query.filter_by(email=form.email.data).first()
             est_admin = True
 
-        # 3. Vérifier si un utilisateur a été trouvé et si le mot de passe est correct
-        # La vérification du mot de passe est une comparaison directe
-        if utilisateur is None or utilisateur.mdp_hash != form.password.data:
-            return redirect(url_for('login'))
+        # 3. Vérifier si un utilisateur a été trouvé 
+        if utilisateur is None: 
+            return redirect(url_for('login', message = "emailIncorrect"))
         
+        # 4. Vérifier si le mot de passe est correct
+        # La vérification du mot de passe est une comparaison directe
+        if utilisateur.mdp_hash != form.password.data:
+            return redirect(url_for('login', message = "mdpIncorrect"))
+        
+        # 5. Vérifier si le compte membre est actif
+        if not est_admin and not utilisateur.activite:
+            return redirect(url_for('login', message = "desincrit"))
+
         # Connexion de l'utilisateur
         login_user(utilisateur)
-        
         # Stocker le type d'utilisateur dans la session
         session['user_type'] = 'admin' if est_admin else 'membre'
-
         # Redirection vers la page demandée ou l'accueil
         next_page = request.args.get('next')
-        return redirect(next_page) if next_page else redirect(url_for('index'))
-        
-    return render_template("login.html", title=TITLE + "- Connexion", form=form)
+        return redirect(next_page) if next_page else redirect(url_for('index'))  
+    
+    message = request.args.get('message')
+    return render_template("login.html", title=TITLE + "- Connexion", form=form, message=message)
 
 @app.route("/inscription/", methods=["GET", "POST"])
 def inscription():
@@ -770,6 +799,11 @@ def inscription():
             mdp_hash=unForm.password.data # Note: Le mot de passe devrait être haché ici
         )
         try:
+            """
+            if unForm.inscription.data() == "INSCRIRE LE MEMBRE":
+                ...
+            else:
+            """
             db.session.add(nouvelle_inscription)
             db.session.commit()
             return redirect(url_for('index'))
