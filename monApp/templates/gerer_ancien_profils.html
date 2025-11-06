@@ -1,9 +1,8 @@
 {%extends "base.html"%}
 
 {%block main%}
-    
     <div class="header-container">
-    <h1>Liste des profils des membres</h1>
+    <h1>Gestion des anciens profils</h1>
     
     <div class="search-container">
         <input type="text" class="form-control search-input" placeholder="Rechercher...">
@@ -101,7 +100,6 @@
                         <th>Prénom</th>
                         <th>Age</th>
                         <th>Date de naissance</th>
-                        <th>Date de désinscription</th>
                         <th>Niveau</th>
                         <th>Email</th>
                         <th>Statut</th>
@@ -116,7 +114,6 @@
                         <td>{{unMembre.prenom}}</td>
                         <td>{{unMembre.age}}</td>
                         <td>{{unMembre.ddn}}</td>
-                        <td>NULL</td>
                         <td>{{unMembre.niveau}}</td>
                         <td>{{unMembre.email}}</td>
                         <td>{{unMembre.statut}}</td>

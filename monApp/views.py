@@ -2,7 +2,7 @@ from .app import app, db
 from flask import render_template, request, url_for, redirect, flash, session, abort
 from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
-from .forms import LoginForm, EventForm, PasswordChangeForm, InscriptionForm, MembreForm, ContactForm, ParametresForm, Parametres_updateForm
+from .forms import *
 from .connexionPythonSQL import *
 from monApp.modelBD import *
 from datetime import datetime
@@ -612,7 +612,7 @@ def profil_view(idM):
 @login_required
 def profil_edit(idM):
     unMembre = db.session.get(MembreBD,idM)
-    unForm = MembreForm(obj=unMembre)
+    unForm = ModifForm(obj=unMembre)
     origine = request.args.get('origine', 'profil')
 
     if unForm.validate_on_submit():
@@ -631,20 +631,22 @@ def profil_edit(idM):
             uneModif.email = unForm.email.data
             uneModif.sexe = unForm.sexe.data
             uneModif.ddn = unForm.ddn.data
+            uneModif.date = datetime.now()
+            uneModif.justification = unForm.justification.data
             db.session.commit()
             return redirect(url_for('profil_view', idM=unMembre.id, origine='profil'))
     return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
 
 @app.route('/profil_edit/<int:idM>/desinscrit/', methods=["GET", "POST"])
 @login_required
-def desinscritProfil(idM):
+def desinscrit_profil(idM):
     membreDesinscrit = db.session.get(MembreBD, idM)
     membreDesinscrit.activite = False
     db.session.commit()
     return redirect(url_for('gerer_profils'))
 
 @app.route('/profil_edit/<int:idM>/reinscrit/')
-def reinscritProfil(idM):
+def reinscrit_profil(idM):
     membreReinscrit = db.session.get(MembreBD, idM)
     membreReinscrit.activite = True
     db.session.commit()
@@ -663,6 +665,62 @@ def gerer_inscriptions():
     lesRequetes.sort(key=lambda x: x.date, reverse=True)  
     return render_template("gerer_inscriptions.html",title=TITLE+"- Géstion des Inscriptions", requetes=lesRequetes)
 
+@app.route ('/accepter_inscription/<int:idI>', methods =("POST" ,))
+@login_required
+@admin_required
+def accepter_inscription(idI):
+    inscription = db.session.get(InscriptionBD, idI)
+    nouveauMembre = MembreBD(
+        nom=inscription.nom,
+        prenom=inscription.prenom,
+        email=inscription.email,
+        ddn=inscription.ddn,
+        sexe=inscription.sexe,
+        mdp_hash=inscription.mdp_hash
+    )
+    db.session.add(nouveauMembre)
+    db.session.delete(inscription)
+    db.session.commit()
+    return redirect(url_for('gerer_inscriptions'))
+
+@app.route ('/accepter_modifications/<int:idModif>', methods =("POST" ,))
+@login_required
+@admin_required
+def accepter_modifications(idModif):
+    modifications = db.session.get(ModifBD, idModif)
+    membreModifier = MembreBD(
+        nom=modifications.nom,
+        prenom=modifications.prenom,
+        email=modifications.email,
+        ddn=modifications.ddn,
+        sexe=modifications.sexe,
+    )
+    db.session.add(membreModifier)
+    db.session.delete(modifications)
+    db.session.commit()
+    return redirect(url_for('gerer_inscriptions'))
+
+@app.route('/refuser_inscription/<int:idI>', methods=["POST"])
+@login_required
+@admin_required
+def refuser_inscription(idI):
+    #La justification, elle est pour l'instant inutile et devrat plus tard etre envoyer par mail
+    justification = request.form.get('justification')
+    inscription_a_supprimer = db.session.get(InscriptionBD, idI)
+    db.session.delete(inscription_a_supprimer)
+    db.session.commit()
+    return redirect(url_for('gerer_inscriptions'))
+
+@app.route('/refuser_modification/<int:idM>', methods=["POST"])
+@login_required
+@admin_required
+def refuser_modification(idModif):
+    #La justification, elle est pour l'instant inutile et devrat plus tard etre envoyer par mail
+    justification = request.form.get('justification')
+    modification_a_supprimer = db.session.get(ModifBD, idModif)
+    db.session.delete(modification_a_supprimer)
+    db.session.commit()
+    return redirect(url_for('gerer_inscriptions'))
 
 
 # Route pour ajouter un événement
@@ -799,18 +857,28 @@ def inscription():
             mdp_hash=unForm.password.data # Note: Le mot de passe devrait être haché ici
         )
         try:
-            """
-            if unForm.inscription.data() == "INSCRIRE LE MEMBRE":
-                ...
+            if current_user.is_authenticated and session.get('user_type') == 'admin':
+                nouveauMembre = MembreBD(
+                    nom=nouvelle_inscription.nom,
+                    prenom=nouvelle_inscription.prenom,
+                    email=nouvelle_inscription.email,
+                    ddn=nouvelle_inscription.ddn,
+                    sexe=nouvelle_inscription.sexe,
+                    mdp_hash=nouvelle_inscription.mdp_hash
+                )
+                db.session.add(nouveauMembre)
+                db.session.commit()
+                return redirect(url_for('gerer_profils'))
             else:
-            """
-            db.session.add(nouvelle_inscription)
-            db.session.commit()
-            return redirect(url_for('index'))
+                db.session.add(nouvelle_inscription)
+                db.session.commit()
+                return redirect(url_for('index'))
         except Exception as e:
             db.session.rollback()
-            
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
+
+
+
 
 @app.route("/logout/")
 @login_required

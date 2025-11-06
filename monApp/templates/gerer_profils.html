@@ -137,7 +137,7 @@
                                     <h5 class="modal-title" id="desinscriptionModalLabel-{{ unMembre.id }}">Désinscrire {{ unMembre.prenom }} {{ unMembre.nom }}</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <form method="POST" action="{{ url_for('desinscritProfil', idM=unMembre.id) }}">
+                                <form method="POST" action="{{ url_for('desinscrit_profil', idM=unMembre.id) }}">
                                     <div class="modal-body">
                                         <p>Êtes-vous sûr de vouloir désinscrire ce membre ?</p>
                                         <!-- Champ pour la raison -->

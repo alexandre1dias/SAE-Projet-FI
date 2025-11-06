@@ -16,13 +16,14 @@ class MembreBD(UserMixin, db.Model):
     prenom = db.Column('prenomM', db.String(41))
     email = db.Column('emailM', db.String(100), unique=True, nullable=False)
     mdp_hash = db.Column('mdpM', db.String(128))
-    date_inscription = db.Column(db.Date)
+    #On est obliger de définire les valeurs de date_inscription, statut et activite malgre les Default dans la table Membre car l'ORM ecrase toute les valeurs de la table
+    date_inscription = db.Column(db.Date, server_default=func.current_date())
     sexe = db.Column('sexeM', db.String(5))
     ddn = db.Column('ddnM', db.Date)
     age = db.Column(db.Integer)
     niveau = db.Column(db.String(15))
-    statut = db.Column(db.String(30))
-    activite = db.Column(db.Boolean)
+    statut = db.Column(db.String(30), server_default='Membre')
+    activite = db.Column(db.Boolean, server_default='1')
 
 
 class ReunionBD(UserMixin, db.Model):
@@ -145,6 +146,7 @@ class ModifBD(UserMixin, db.Model):
     sexe = db.Column('sexeModif', db.String(5))
     ddn = db.Column('ddnModif', db.Date)
     date = db.Column('dateModif', db.Date)
+    justification = db.Column('justificationModif', db.String(200))
     membre = db.relationship('MembreBD', backref=db.backref('modifications', lazy='dynamic'))
 
 

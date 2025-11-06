@@ -64,14 +64,14 @@
     <div class="text-center mt-4">
         {%if selectedMembre.activite == False %}
             <a href="{{ url_for('gerer_ancien_profils') }}" class="btn btn-secondary me-2">Retour à la liste</a>
-            <form class="d-inline" action="{{ url_for('reinscrireMembre', idM = selectedMembre.id)}}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir réinscire ce membre ?');">
+            <form class="d-inline" action="{{ url_for('reinscrit_profil', idM = selectedMembre.id)}}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir réinscire ce membre ?');">
                 <button type="submit" class="btn btn-success">Réinscrire</button>
             </form>  
         {% endif %}  
         {%if selectedMembre.activite == True %}
         <a href="{{ url_for('gerer_profils') }}" class="btn btn-secondary me-2">Retour à la liste</a>
         <a href="{{ url_for('profil_edit', idM=selectedMembre.id, origine = origine) }}" class="btn btn-primary me-2">Modifier ce profil</a>
-        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal-{{ selectedMembre.id }}">Désinscrire</button>        
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal-{{ selectedMembre.id }}">Désinscrire</button>
         {% endif %} 
     </div>
     {% endif %}
@@ -83,7 +83,7 @@
                     <h5 class="modal-title" id="desinscriptionModalLabel-{{ selectedMembre.id }}">Désinscrire {{ selectedMembre.prenom }} {{ selectedMembre.nom }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ url_for('desinscritProfil', idM=selectedMembre.id) }}">
+                <form method="POST" action="{{ url_for('desinscrit_profil', idM=selectedMembre.id) }}">
                     <div class="modal-body">
                         <p>Êtes-vous sûr de vouloir désinscrire ce membre ?</p>
                         <!-- Champ pour la raison -->
