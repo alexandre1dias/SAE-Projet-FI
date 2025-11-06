@@ -1,5 +1,5 @@
 from .app import app, db
-from flask import render_template, request, url_for, redirect, flash, session
+from flask import render_template, request, url_for, redirect, flash, session, abort
 from config import TITLE
 from flask_login import logout_user, login_user, login_required, current_user
 from .forms import LoginForm, EventForm, PasswordChangeForm, InscriptionForm, MembreForm, ContactForm, ParametresForm, Parametres_updateForm
@@ -7,7 +7,19 @@ from .connexionPythonSQL import *
 from monApp.modelBD import *
 from datetime import datetime
 from flask import jsonify
+from functools import wraps
+
 #from .models import Event
+
+# Décorateur pour vérifier si l'utilisateur est un admin
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or session.get('user_type') != 'admin':
+            abort(403)  # Déclenche une erreur "Accès Interdit"
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @app.route("/")
 @app.route("/index/")
@@ -145,7 +157,9 @@ def competition_update(idCompetition):
     return render_template("competition_update.html",title=TITLE+"- Modification de la competition", competition=competition)
 
 @app.route("/competition_delete/<int:idCompetition>", methods=['POST'])
-@login_required
+
+@login_required # Assure que seul un utilisateur connecté peut supprimer
+@admin_required
 def competition_delete(idCompetition):
     competition_a_supprimer = CompetitionBD.query.get_or_404(idCompetition)
     id_event_parent = competition_a_supprimer.id_event
@@ -186,6 +200,7 @@ def club_view(idEventClub):
 
 @app.route("/evenement_club/<int:idEventClub>/club_update/", methods=['GET', 'POST'])
 @login_required
+@admin_required
 def club_update(idEventClub):
     unEventClub = EventClubBD.query.get_or_404(idEventClub)
 
@@ -212,6 +227,7 @@ def club_update(idEventClub):
 
 @app.route("/evenement_club/<int:idEventClub>/club_delete/", methods=['POST'])
 @login_required
+@admin_required
 def club_delete(idEventClub):
     evenement_a_supprimer = EventClubBD.query.get_or_404(idEventClub)
     db.session.delete(evenement_a_supprimer)
@@ -280,6 +296,8 @@ def reunion_view(idReunion):
     return render_template("reunion_view.html",title=TITLE+"- Consultatiion d'une réunion", selectedReunion = reunion, origine=origine)
 
 @app.route("/reunion_delete/<int:idReunion>", methods=['POST'])
+@login_required
+@admin_required
 def reunion_delete(idReunion):
     reunion = ReunionBD.query.get_or_404(idReunion)
     db.session.delete(reunion)
@@ -325,6 +343,8 @@ def desinscrire_reunion(idReunion):
 
 
 @app.route("/reunion_update/<int:idReunion>", methods=['GET', 'POST'])
+@login_required
+@admin_required
 def reunion_update(idReunion):
     reunion = ReunionBD.query.get_or_404(idReunion)
     if request.method == 'POST':
@@ -432,22 +452,29 @@ def presse():
 
 #Vues pour Admin
 @app.route("/gerer_formulaires/")
+@login_required
+@admin_required
 def gerer_formulaires():
     les_formulaires = FormulaireBD.query.order_by(FormulaireBD.date.desc()).filter(FormulaireBD.repondu == False).all()
     return render_template("gerer_formulaires.html", title=TITLE+"- Géstion des Formulaires", formulaires=les_formulaires)
 
 @app.route("/gerer_anciens_formulaires/")
+@login_required
+@admin_required
 def gerer_anciens_formulaires():
     les_formulaires = FormulaireBD.query.order_by(FormulaireBD.date.desc()).filter(FormulaireBD.repondu == True).all()
     return render_template("gerer_anciens_formulaires.html", title=TITLE+"- Géstion des Anciens Formulaires", formulaires=les_formulaires)
 
 @app.route("/formulaire_view/<int:idFormulaire>")
+@login_required
+@admin_required
 def formulaire_view(idFormulaire):
     unFormulaire = FormulaireBD.query.get_or_404(idFormulaire)
     return render_template("formulaire_view.html",title=TITLE+"- Consultation de Formulaire", selectedFormulaire=unFormulaire)
 
 @app.route("/formulaire_delete/<int:idFormulaire>", methods=['POST'])
 @login_required
+@admin_required
 def formulaire_delete(idFormulaire):
     formulaire = FormulaireBD.query.get_or_404(idFormulaire)
     db.session.delete(formulaire)
@@ -456,6 +483,7 @@ def formulaire_delete(idFormulaire):
 
 @app.route("/repondre_formulaire/<int:idFormulaire>", methods=['POST'])
 @login_required
+@admin_required
 def repondre_formulaire(idFormulaire):
     reponse = request.form.get('reponse')
     leFormulaire = FormulaireBD.query.get_or_404(idFormulaire)
@@ -470,11 +498,15 @@ def repondre_formulaire(idFormulaire):
 
 #Vue pour la gestion des Profils
 @app.route("/gerer_profils/")
+@login_required
+@admin_required
 def gerer_profils():
     lesMembres = db.session.query(MembreBD).filter(MembreBD.activite == True).all()
     return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres)
 
 @app.route("/gerer_profils/ancien/")
+@login_required
+@admin_required
 def gerer_ancien_profils():
     lesMembres = db.session.query(MembreBD).filter(MembreBD.activite == False).all()
     return render_template("gerer_ancien_profils.html",title=TITLE+"- Géstion des Anciens Profils", membres = lesMembres)
@@ -487,6 +519,7 @@ def profil_view(idM, origine):
     return render_template("profil_view.html", title=TITLE + "- Profil Membre", selectedMembre=unMembre, origine = origine)
 
 @app.route("/profil_edit/<int:idM>/<int:origine>", methods=["GET", "POST"])
+@login_required
 def profil_edit(idM, origine):
     unMembre = db.session.get(MembreBD,idM)
     unForm = MembreForm(obj=unMembre)
@@ -527,6 +560,8 @@ def reinscritProfil(idM):
 
 #Vue pour la gestion des inscription/modification
 @app.route("/gerer_inscriptions/")
+@login_required
+@admin_required
 def gerer_inscriptions():
     lesInscriptions = db.session.query(InscriptionBD).all()
     lesModifs = db.session.query(ModifBD).all()
@@ -534,6 +569,85 @@ def gerer_inscriptions():
     # Trie par date de la liste
     lesRequetes.sort(key=lambda x: x.date, reverse=True)  
     return render_template("gerer_inscriptions.html",title=TITLE+"- Géstion des Inscriptions", requetes=lesRequetes)
+
+
+
+# Route pour ajouter un événement
+@app.route("/add_event/", methods=["GET", "POST"])
+@login_required
+@admin_required
+def add_event():
+    form = EventForm()
+    if form.validate_on_submit():
+        try:
+            new_event = EvenementBD()
+            db.session.add(new_event)
+            db.session.commit() 
+            
+            event_id = new_event.id
+            category = form.category.data
+            
+            if category == 'Compétition':
+                new_specific_event = CompetitionBD(
+                    id_event=event_id,
+                    nom=form.title.data,
+                    date_debut=form.start_date.data.date(),
+                    heure_debut=form.start_date.data.time().strftime('%H:%M'),
+                    date_fin=form.end_date.data.date(),
+                    heure_fin=form.end_date.data.time().strftime('%H:%M'),
+                    description=form.description.data,
+                    niveaux=", ".join(form.level.data),
+                    sexe=form.sexe.data,
+                    type_arme=form.arme.data,
+                    typeComp=form.type.data,
+                    passee=False,
+                    ville=form.ville.data,
+                    adresse=form.adresse.data
+                )
+            elif category == 'Réunion':
+                new_specific_event = ReunionBD(
+                    idEvent=event_id,
+                    nom=form.title.data,
+                    dateDebutRE=form.start_date.data.date(),
+                    heureDebutRE=form.start_date.data.time().strftime('%H:%M'),
+                    dateFinRE=form.end_date.data.date(),
+                    heureFinRE=form.end_date.data.time().strftime('%H:%M'),
+                    niveauRE=", ".join(form.level.data),
+                    ville=form.ville.data,
+                    adresse=form.adresse.data
+                )
+            elif category == 'Evenement du club':
+                new_specific_event = EventClubBD(
+                    id_event=event_id,
+                    NomEV=form.title.data,
+                    dateDebutEV=form.start_date.data.date(),
+                    heureDebutEV=form.start_date.data.time().strftime('%H:%M'),
+                    dateFinEV=form.end_date.data.date(),
+                    heureFinEV=form.end_date.data.time().strftime('%H:%M'),
+                    descriptionEV=form.description.data,
+                    niveauxEV=", ".join(form.level.data),
+                    passeeEV=False,
+                    villeEV=form.ville.data,
+                    adresseEV=form.adresse.data
+                )
+            elif category == 'Entraînement':
+                new_specific_event = EntrainementBD(
+                    id_event=event_id,
+                    date=form.start_date.data.date(),
+                    heure_debut=form.start_date.data.time().strftime('%H:%M'),
+                    heure_fin=form.end_date.data.time().strftime('%H:%M'),
+                    type_arme=form.arme.data,
+                    niveau=", ".join(form.level.data),
+                    jour=form.start_date.data.strftime('%A'),
+                    ville=form.ville.data,
+                    adresse=form.adresse.data
+                )
+            db.session.add(new_specific_event)
+            db.session.commit()
+            return redirect(url_for('calendrier'))
+        except Exception as e:
+            db.session.rollback()
+    return render_template("add_event.html", title=TITLE + "- Ajouter un événement", form=form)
 
 
 
@@ -664,80 +778,33 @@ def get_events():
     return jsonify(all_events)
 
 
-# Route pour ajouter un événement
-@app.route("/add_event/", methods=["GET", "POST"])
-def add_event():
-    form = EventForm()
-    if form.validate_on_submit():
-        try:
-            new_event = EvenementBD()
-            db.session.add(new_event)
-            db.session.commit() 
-            
-            event_id = new_event.id
-            category = form.category.data
-            
-            if category == 'Compétition':
-                new_specific_event = CompetitionBD(
-                    id_event=event_id,
-                    nom=form.title.data,
-                    date_debut=form.start_date.data.date(),
-                    heure_debut=form.start_date.data.time().strftime('%H:%M'),
-                    date_fin=form.end_date.data.date(),
-                    heure_fin=form.end_date.data.time().strftime('%H:%M'),
-                    description=form.description.data,
-                    niveaux=", ".join(form.level.data),
-                    sexe=form.sexe.data,
-                    type_arme=form.arme.data,
-                    typeComp=form.type.data,
-                    passee=False,
-                    ville=form.ville.data,
-                    adresse=form.adresse.data
-                )
-            elif category == 'Réunion':
-                new_specific_event = ReunionBD(
-                    idEvent=event_id,
-                    nom=form.title.data,
-                    dateDebutRE=form.start_date.data.date(),
-                    heureDebutRE=form.start_date.data.time().strftime('%H:%M'),
-                    dateFinRE=form.end_date.data.date(),
-                    heureFinRE=form.end_date.data.time().strftime('%H:%M'),
-                    niveauRE=", ".join(form.level.data),
-                    ville=form.ville.data,
-                    adresse=form.adresse.data
-                )
-            elif category == 'Evenement du club':
-                new_specific_event = EventClubBD(
-                    id_event=event_id,
-                    NomEV=form.title.data,
-                    dateDebutEV=form.start_date.data.date(),
-                    heureDebutEV=form.start_date.data.time().strftime('%H:%M'),
-                    dateFinEV=form.end_date.data.date(),
-                    heureFinEV=form.end_date.data.time().strftime('%H:%M'),
-                    descriptionEV=form.description.data,
-                    niveauxEV=", ".join(form.level.data),
-                    passeeEV=False,
-                    villeEV=form.ville.data,
-                    adresseEV=form.adresse.data
-                )
-            elif category == 'Entraînement':
-                new_specific_event = EntrainementBD(
-                    id_event=event_id,
-                    date=form.start_date.data.date(),
-                    heure_debut=form.start_date.data.time().strftime('%H:%M'),
-                    heure_fin=form.end_date.data.time().strftime('%H:%M'),
-                    type_arme=form.arme.data,
-                    niveau=", ".join(form.level.data),
-                    jour=form.start_date.data.strftime('%A'),
-                    ville=form.ville.data,
-                    adresse=form.adresse.data
-                )
-            db.session.add(new_specific_event)
-            db.session.commit()
-            return redirect(url_for('calendrier'))
-        except Exception as e:
-            db.session.rollback()
-    return render_template("add_event.html", title=TITLE + "- Ajouter un événement", form=form)
+# Vues pour la gestion des erreurs
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('gestion_erreur.html',
+                           error_code=404,
+                           error_title="Page non trouvée",
+                           error_message="Désolé, la page que vous cherchez n'existe pas ou a été déplacée."), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    db.session.rollback() # important pour annuler les transactions en cas d'erreur BDD
+    return render_template('gestion_erreur.html',
+                           error_code=500,
+                           error_title="Erreur interne du serveur",
+                           error_message="Une erreur inattendue s'est produite. Notre équipe technique a été notifiée."), 500
+
+@app.errorhandler(403)
+def forbidden_access(e):
+    return render_template('gestion_erreur.html',
+                           error_code=403,
+                           error_title="Accès Interdit",
+                           error_message="Vous n'avez pas les autorisations nécessaires pour accéder à cette page."), 403
+
+
+@app.route("/test-500/")
+def test_500():
+    raise Exception("Test pour déclencher une erreur 500.")
 
 if __name__ == "__main__":
     app.run()
