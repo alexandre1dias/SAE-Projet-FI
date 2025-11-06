@@ -109,13 +109,13 @@
         {% endif %}
         
         {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
-            
-            {% if deja_inscrit %}
-                <a href="{{ url_for('desinscrire_competition', idCompetition=competition.id) }}" class="btn btn-warning">Se désinscrire</a>
-            {% else %}
-                <a href="{{ url_for('inscrire_competition', idCompetition=competition.id) }}" class="btn btn-success">S'inscrire</a>
+            {% if est_eligible %}
+                {% if deja_inscrit %}
+                    <a href="{{ url_for('desinscrire_competition', idCompetition=competition.id) }}" class="btn btn-warning">Se désinscrire</a>
+                {% else %}
+                    <a href="{{ url_for('inscrire_competition', idCompetition=competition.id) }}" class="btn btn-success">S'inscrire</a>
+                {% endif %}
             {% endif %}
-
         {% endif %}
         {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
             <a href="{{ url_for('competition_update', idCompetition=competition.id) }}" class="btn btn-primary">Modifier</a>

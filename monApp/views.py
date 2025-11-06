@@ -98,13 +98,24 @@ def competition_view(idCompetition):
     uneCompetition = CompetitionBD.query.get(idCompetition)
     origine = request.args.get('origine', 'default')
     deja_inscrit = False
+    est_eligible = False
     if current_user.is_authenticated and session.get('user_type') == 'membre':
         participation = ParticiperBD.query.filter_by(
             id_membre=current_user.id, 
             id_event=uneCompetition.id_event
         ).first()
         deja_inscrit = participation is not None
-    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",competition=uneCompetition,origine=origine,deja_inscrit=deja_inscrit)
+        membre_niveau = current_user.niveau
+        competition_niveaux = uneCompetition.niveaux
+        surclassement_map = {'M9': 'M11', 'M11': 'M13', 'M13': 'M15', 'M15': 'M17','M17': 'M20', 'M20': 'Senior', 'Senior': 'Vétéran'}
+        surclassement_niveau = surclassement_map.get(membre_niveau)
+        if competition_niveaux:
+            niveaux_liste = competition_niveaux.split(',')
+            if membre_niveau in niveaux_liste:
+                est_eligible = True
+            elif surclassement_niveau and surclassement_niveau in niveaux_liste:
+                est_eligible = True
+    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",competition=uneCompetition,origine=origine,deja_inscrit=deja_inscrit,est_eligible=est_eligible)
 
 @app.route("/inscrire/competition/<int:idCompetition>", methods=['GET'])
 @login_required
