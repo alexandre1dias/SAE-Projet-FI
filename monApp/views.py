@@ -150,21 +150,26 @@ def desinscrire_competition(idCompetition):
     return redirect(url_for('competition_view', idCompetition=idCompetition))
 
 @app.route("/competition_update/<int:idCompetition>", methods=['GET', 'POST'])
+@login_required
+@admin_required
 def competition_update(idCompetition):
     competition = CompetitionBD.query.get_or_404(idCompetition)
     if request.method == 'POST':
-        competition.nom = request.form['nom']
-        competition.ville = request.form['ville']
-        competition.adresse = request.form['adresse']
-        competition.date_debut = datetime.strptime(request.form['date_debut'], '%Y-%m-%d').date()
-        competition.heure_debut = request.form['heure_debut']
-        competition.date_fin = datetime.strptime(request.form['date_fin'], '%Y-%m-%d').date()
-        competition.heure_fin = request.form['heure_fin']
-        competition.type_arme = request.form['type_arme']
-        competition.sexe = request.form['sexe']
-        competition.description = request.form['description']
-        db.session.commit()
-        return redirect(url_for('competition_view', idCompetition=competition.id))
+        try:
+            competition.nom = request.form['nom']
+            competition.ville = request.form['ville']
+            competition.adresse = request.form['adresse']
+            competition.date_debut = datetime.strptime(request.form['date_debut'], '%Y-%m-%d').date()
+            competition.heure_debut = request.form['heure_debut']
+            competition.date_fin = datetime.strptime(request.form['date_fin'], '%Y-%m-%d').date()
+            competition.heure_fin = request.form['heure_fin']
+            competition.type_arme = request.form['type_arme']
+            competition.sexe = request.form['sexe']
+            competition.description = request.form['description']
+            db.session.commit()
+            return redirect(url_for('competition_view', idCompetition=competition.id))
+        except Exception as e:
+            db.session.rollback()
     return render_template("competition_update.html",title=TITLE+"- Modification de la competition", competition=competition)
 
 @app.route("/competition_delete/<int:idCompetition>", methods=['POST'])
