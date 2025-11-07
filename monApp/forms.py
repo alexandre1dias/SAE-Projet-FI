@@ -2,7 +2,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField, widgets
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
-from . modelBD import MembreBD, InscriptionBD
 from datetime import date
 
 class LoginForm(FlaskForm):
@@ -17,7 +16,7 @@ class PasswordChangeForm(FlaskForm):
     next = HiddenField()
     submit = SubmitField('Valider la modification')
 
-class MembreForm(FlaskForm):
+class ModifForm(FlaskForm):
     nom = StringField ('nom' ,validators= [DataRequired()])
     prenom = StringField ('prenom' ,validators= [DataRequired()])
     ddn = StringField ('date de naissance' ,validators= [DataRequired()])
@@ -33,7 +32,8 @@ class MembreForm(FlaskForm):
         ('Trésorier Général', 'Trésorier Général'),
         ('Vice-président', 'Vice-président'),
         ('Président', 'Président')
-    ], validators=[DataRequired()])
+    ], validators=[DataRequired()]) 
+    justification = TextAreaField('Justification de la demande (optionnel)', validators=[Optional()])
 
 class InscriptionForm(FlaskForm):
     # cette fonction permet de vérifier que l'utilisateur a au moins 8 ans

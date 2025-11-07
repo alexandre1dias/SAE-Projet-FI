@@ -1,9 +1,8 @@
 {%extends "base.html"%}
 
 {%block main%}
-    
     <div class="header-container">
-    <h1>Liste des profils des membres</h1>
+    <h1>Gestion des anciens profils</h1>
     
     <div class="search-container">
         <input type="text" class="form-control search-input" placeholder="Rechercher...">
@@ -101,7 +100,6 @@
                         <th>Prénom</th>
                         <th>Age</th>
                         <th>Date de naissance</th>
-                        <th>Date de désinscription</th>
                         <th>Niveau</th>
                         <th>Email</th>
                         <th>Statut</th>
@@ -116,14 +114,15 @@
                         <td>{{unMembre.prenom}}</td>
                         <td>{{unMembre.age}}</td>
                         <td>{{unMembre.ddn}}</td>
-                        <td>NULL</td>
                         <td>{{unMembre.niveau}}</td>
                         <td>{{unMembre.email}}</td>
                         <td>{{unMembre.statut}}</td>
                         <td>{{unMembre.sexe}}</td>
                         <td class="actions">
-                            <a href="{{ url_for('profil_view', idM=unMembre.id, origine = 2) }}" class="btn btn-warning">Consulter</a>
-                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reinscriptionModal">Réinscrire</button>                
+                            <a href="{{ url_for('profil_view', idM=unMembre.id, origine = 'gestion_anciens') }}" class="btn btn-warning">Consulter</a>
+                            <form action="{{ url_for('reinscrireMembre', idM = unMembre.id)}}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir réinscire ce membre ?');">
+                                <button type="submit" class="btn btn-success">Réinscrire</button>
+                            </form>        
                         </td>
                     </tr>
                     {% endfor %}
@@ -132,30 +131,6 @@
         </div>
     </div>
     </div>
-
-
-
-
-    <!-- Modale pour confirmer la reinscription -->
-        <div class="modal fade" id="reinscriptionModal" tabindex="-1" aria-labelledby="reinscriptionModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg"> 
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="reinscriptionModalLabel">Confirmation de réinscription</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Êtes-vous sûr de vouloir réinscrire ce membre ?</p>
-                    </div>
-                    <div class="modal-footer justify-content-center">
-                        <form id="reinscriptionForm" method="POST" action="">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <button type="submit" class="btn btn-success">Confirmer</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
 {% endblock %}
 
 

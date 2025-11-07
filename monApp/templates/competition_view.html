@@ -31,36 +31,35 @@
 <h2>Description :</h2>
 <p>{{ competition.description or "Aucune description disponible." }}</p>
 
-<div class="table-responsive"></div>
-<h2>Classement du Club</h2>
-<table class="table table-striped table-hover">
-    <thead class="thead-dark">
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">Nom du tireur</th>
-            <th scope="col">classement</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th scope="row">1</th>
-            <td>Dupont Jean</td>
-            <td>2</td>
-        </tr>
-        <tr>
-            <th scope="row">2</th>
-            <td>Martin Sophie</td>
-            <td>3</td>
-        </tr>
-    </tbody>
-    <tfoot>
-        <tr>
-            <td colspan="3" class="text-center">
-                <a href="#" class="btn btn-outline-primary btn-custom">Voir classement complet</a>
-            </td>
-        </tr>
-    </tfoot>
-</table>
+{% if lesResultats %}
+    <h2>Classement du Club</h2>
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nom du tireur</th>
+                <th scope="col">Prenom du tireur</th>
+                <th scope="col">Place au classement</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for resultat in lesResultats %}
+            <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{resultat.membre.nom}}</td>
+                <td>{{resultat.membre.prenom}}</td>
+                <td>{{resultat.resultat}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% if competition.passee %}
+<div class="text-center mt-3">
+    <button type="button" class="btn btn-outline-primary btn-custom">Voir classement complet</button>
+</div>
+{% endif %}
+
 <div id="carouselTop" class="carousel slide mb-3" data-bs-ride="carousel">
     <div class="carousel-indicators">
         <button type="button" data-bs-target="#carouselTop" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
@@ -106,14 +105,14 @@
     {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
         {% if est_eligible %}
             {% if deja_inscrit %}
-                <a href="{{ url_for('desinscrire_competition', idCompetition=competition.id) }}" class="btn btn-warning">Se désinscrire</a>
+                <a href="{{ url_for('desinscrire_competition', idCompetition=competition.id) }}" class="btn btn-danger">Se désinscrire</a>
             {% else %}
                 <a href="{{ url_for('inscrire_competition', idCompetition=competition.id) }}" class="btn btn-success">S'inscrire</a>
             {% endif %}
         {% endif %}
     {% endif %}
     {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
-        <a href="{{ url_for('competition_update', idCompetition=competition.id) }}" class="btn btn-primary">Modifier</a>
+        <a href="{{ url_for('competition_update', idCompetition=competition.id, origine=origine) }}" class="btn btn-primary">Modifier</a>
         <form action="{{ url_for('competition_delete', idCompetition=competition.id) }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer cette compétition ?');">
             <button type="submit" class="btn btn-danger">Supprimer</button>
         </form>

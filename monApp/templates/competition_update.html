@@ -74,14 +74,14 @@
     </div>
 
     <div class="d-flex justify-content-center gap-2 mt-4">
-        <a href="{{ url_for('competition_view', idCompetition=competition.id) }}" class="btn btn-secondary">Annuler</a>
+        <a href="{{ url_for('competition_view', idCompetition=competition.id, origine=origine) }}" class="btn btn-secondary">Annuler</a>
         <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
     </div>
 
 </form>
 
+{% if lesParticipants %}
 <h2 class="mt-5">Classement du Club</h2>
-
     <!-- Tableau de classement -->
     <table class="table table-striped table-hover">
         <thead class="thead-dark">
@@ -94,38 +94,41 @@
             </tr>
         </thead>
         <tbody>
+            {% for participant in lesParticipants %}
             <tr>
-                <th scope="row">1</th>
-                <td>Dupont</td>
-                <td>Jean</td>
-                <td>2</td>
-                <td> 
-                    <a href="{{ url_for('profil_view', idM=1, origine=1) }}" class="btn btn-primary">Consulter</a>
-                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#classementModal">Classer</button>
-                    <a class="btn btn-danger">Supprimer</a>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{participant.nom}}</td>
+                <td>{{participant.prenom}}</td>
+                <td>
+                    {% set res = participant.resultats|selectattr('id_competition', 'equalto', competition.id)|first %}
+                    {% if res %}
+                        {{ res.resultat }}
+                    {% else %}
+                        Non classé
+                    {% endif %}
                 </td>
-            </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>Martin</td>
-                <td>Sophie</td>
-                <td>3</td>
                 <td> 
-                    <a href="{{ url_for('profil_view', idM=2, origine=1) }}" class="btn btn-primary">Consulter</a>
-                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#classementModal">Classer</button>
-                    <a class="btn btn-danger">Supprimer</a>
+                    <a href="{{ url_for('profil_view', idM=participant.id, origine='competition_update', idCompetition=competition.id) }}" class="btn btn-primary">Consulter</a>
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#classementModal-{{ participant.id }}">Classer</button>
+                    <form class="d-inline" action="{{ url_for('delete_membre_competition', idC=competition.id, idM=participant.id) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce participant ?');">
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
                 </td>
+                
             </tr>
+            {% endfor %}
         </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="5" class="text-center">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#classementPDFModal">Mettre/Modifier le classement complet</button>
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inscrireMembreModal">Inscrire un membre</button>
-                </td>
-            </tr>
-        </tfoot>
     </table>
+    {%else%}
+    <div class="text-center mt-3">
+        <h2 class="mt-5">Il n'y a pas encore de participants à cette compétition</h2>
+    </div>
+    {%endif%}
+    <div class="text-center mt-3">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#classementPDFModal">Mettre/Modifier le classement complet</button>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inscrireMembreModal">Inscrire un membre</button>
+    </div>
+
     <!--Fin Tableau-->
     <!-- Carousel d'images - Gardé tel quel car non lié à la modification des champs de la compétition -->
     <div class="text-center mt-4"><button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#gererImagesModal">Gérer les images</button></div>
@@ -284,26 +287,30 @@
         </div>
     </div>
 
-    <!-- Modale pour modifier le classement-->
-    <div class="modal fade" id="classementModal" tabindex="-1">
+    <!-- Modale pour modifier le classement de membres-->
+    {% for participant in lesParticipants %}
+    <div class="modal fade" id="classementModal-{{ participant.id }}" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="classementModalLabel">Modifier le classement du membre</h5>
+                    <h5 class="modal-title" id="classementModalLabel-{{ participant.id }}">Classer {{ participant.prenom }} {{ participant.nom }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="refusForm" method="POST" action="">
+                <form method="POST" action="{{ url_for('classer_membre', idCompetition=competition.id, idMembre=participant.id) }}">
                     <div class="modal-body">
                         <div class="mb-3">
-                         <input type="text" class="form-control" id="nom" name="nom" value="[nb classement]" required>
+                            <label for="classement-{{ participant.id }}" class="form-label">Classement</label>
+                            {% set res = participant.resultats|selectattr('id_competition', 'equalto', competition.id)|first %}
+                            <input type="text" class="form-control" id="classement-{{ participant.id }}" name="classement" value="{{ res.resultat if res else '' }}" placeholder="ex: 5" required>
                         </div> 
                     </div>
                     <div class="modal-footer justify-content-center">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-success">Confirmer</button>
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+    {% endfor %}
 {% endblock %}

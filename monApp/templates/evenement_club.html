@@ -19,7 +19,7 @@
                                     <li>{{unEventClub.dateDebutEV}} - {{unEventClub.dateFinEV}}</li>
                                     <li>{{unEventClub.heureDebutEV}} à {{unEventClub.heureFinEV}}</li>
                                     <li> de {{unEventClub.adresseEV}}</li>
-                                    <li>Participants du cercle : {{unEventClub.nbParticipantEV}}</li>
+                                    <li>Participants du cercle : {{unEventClub.evenement.participants.count()}}</li>
                                 </ul>
                                 <div class="text-center mt-auto">
                                     <a href="{{ url_for('club_view', idEventClub=unEventClub.idEventClub) }}" class="btn btn-outline-primary btn-custom">Consulter</a>
@@ -57,7 +57,7 @@
                                     <li>{{unEventClub.dateDebutEV}} - {{unEventClub.dateFinEV}}</li>
                                     <li>{{unEventClub.heureDebutEV}} à {{unEventClub.heureFinEV}}</li>
                                     <li> de {{unEventClub.adresseEV}}</li>
-                                    <li>Participants du cercle : {{unEventClub.nbParticipantEV}}</li>
+                                    <li>Participants du cercle : {{unEventClub.evenement.participants.count()}}</li>
                                 </ul>
                                 <div class="text-center mt-auto">
                                     <a href="{{ url_for('club_view', idEventClub=unEventClub.idEventClub) }}" class="btn btn-outline-primary btn-custom">Consulter</a>

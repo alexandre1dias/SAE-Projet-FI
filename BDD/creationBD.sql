@@ -46,13 +46,13 @@ create table MEMBRE(
     prenomM varchar(41),
     emailM varchar(100),
     mdpM varchar(64),
-    date_inscription date,
+    date_inscription date DEFAULT CURRENT_DATE,
     sexeM varchar(5),
     ddnM date,
     age integer,
     niveau varchar(15),
-    statut varchar(30),
-    activite boolean,
+    statut varchar(30) DEFAULT "Membre",
+    activite boolean DEFAULT True,
     idParamNotifMembre integer,
     PRIMARY KEY(idMembre)
 );
@@ -127,6 +127,7 @@ create table MODIFICATION(
     sexeModif varchar(5),
     ddnModif date,
     dateModif date,
+    justificationModif varchar(500),
     idMembre integer,
     PRIMARY KEY(idModif)
 );
@@ -222,7 +223,7 @@ create table EVENTCLUB(
 
 create table RESULTAT(
     idResultat integer AUTO_INCREMENT,
-    resultat varchar(50),
+    resultat integer,
     dateRE date,
     typeArmeRE varchar(12),
     typeCompeteRE varchar(15),
