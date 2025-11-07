@@ -164,9 +164,9 @@ INSERT INTO COMPETITION (nomCO, villeCO, adresseCO, dateDebutCO, heureDebutCO, d
 
 -- Insertion des entraînements (existants)
 INSERT INTO ENTRAINEMENT (jourEN, villeEN, adresseEN, dateEN, heureDebutEN, heureFinEN, typeArmeEN, niveauEN, idEvent) VALUES
-('Lundi', 'Blois', '5 rue de la salle', '2024-04-29', '18:00', '20:00', 'Sabre', 'Tous', 3),
-('Mardi', 'Orléans', 'Gymnase A', NULL, '18:00', '20:00', 'Fleuret', 'M13,M15', 31),
-('Jeudi', 'Orléans', 'Gymnase A', NULL, '19:00', '21:30', 'Épée', 'M17,M20,Senior', 32);
+('Lundi', 'Blois', '5 rue de la salle', '2025-11-10', '18:00', '20:00', 'Sabre', 'Tous', 3),
+('Mardi', 'Orléans', 'Gymnase A', '2025-11-11', '18:00', '20:00', 'Fleuret', 'M13,M15', 31),
+('Jeudi', 'Orléans', 'Gymnase A', '2025-11-13', '19:00', '21:30', 'Épée', 'M17,M20,Senior', 32);
 
 
 -- Insertion des réunions (existante)

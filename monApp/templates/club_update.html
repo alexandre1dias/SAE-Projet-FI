@@ -105,7 +105,7 @@
     </div>
     {%endif%}
     <div class="text-center mt-3">
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inscrireMembreModal">Inscrire un membre</button>
+        <a href="{{ url_for('inscrire_membres_event_club', idEventClub=eventClub.idEventClub) }}" class="btn btn-success">Inscrire des membres</a>
     </div><br>
     <!--Fin Tableau-->
     <!-- Carousel d'images -->
@@ -143,57 +143,12 @@
     </div>
     <!--Fin Carousel-->
     <div class="d-flex justify-content-center">
-        {# Les boutons Retour et Supprimer sont maintenant gérés plus haut ou via des actions séparées #}
-        {# <a href="{{ url_for('club_delete', idEventClub=eventClub.idEventClub) }}" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">Supprimer l'événement</a> #}
-    </div>
-    <div class="d-flex justify-content-center">
         <a href="{{ url_for('club_view', idEventClub=eventClub.idEventClub) }}" class="btn btn-secondary me-2">Retour</a>
         <form action="{{ url_for('club_delete', idEventClub=eventClub.idEventClub) }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer cet événement ?');" class="d-inline">
             <button type="submit" class="btn btn-danger">Supprimer évènement</button>
         </form>
     </div>
 </div>
-
-    <!-- Modale pour inscrire un membre -->
-    <div class="modal fade" id="inscrireMembreModal" >
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="inscrireMembreModalLabel">Inscription d'un membre</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="refusForm" method="POST" action="">
-                    <div class="modal-body">
-                        <input type="text" class="modal-title search-input" id="inscrireMembreModalRecherche" placeholder="Rechercher...">
-                        <div class="mb-3">
-                             <table class="table table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Nom</th>
-                                        <th>Prenom</th>
-                                        <th>Niveau</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th>Jean</th>
-                                        <td>Dupont</td>
-                                        <td>M17</td>
-                                        <td><a class="btn btn-success">Ajouter</a></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="modal-footer justify-content-center">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-success">Confirmer</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <!-- Modale pour gérer les images -->
     <div class="modal fade" id="gererImagesModal" tabindex="-1" aria-labelledby="gererImagesModalLabel" aria-hidden="true">
@@ -246,4 +201,23 @@
             </div>
         </div>
     </div>
+
+<script>
+    function enleverMembreVisuellement(id) {
+        // Trouve la ligne par son ID
+        var ligne = document.getElementById('row-membre-' + id);
+        
+        // Cache la ligne
+        if (ligne) {
+            ligne.style.display = 'none';
+        }
+        
+        // IMPORTANT : Ceci est juste VISUEL.
+        // Le membre est toujours dans la liste sur le serveur.
+        // Pour le supprimer "pour de vrai", vous devez aussi 
+        // le retirer d'un <input type="hidden"> qui sera soumis plus tard.
+    }
+</script>
+
+
 {% endblock %}
