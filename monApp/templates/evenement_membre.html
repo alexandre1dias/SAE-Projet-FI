@@ -117,7 +117,7 @@
                                             <li>{{ event.type_arme }}</li>
                                             <li>{{ event.typeComp }}</li>
                                         {% elif event.__tablename__ == 'REUNION' %}
-                                            <li>{{ event.dateRE.strftime('%d/%m/%Y') }}</li>
+                                            <li>{{ event.dateDebutRE.strftime('%d/%m/%Y') }}</li>
                                             <li>{{ event.typeReunionRE }}</li>
                                         {% elif event.__tablename__ == 'EVENTCLUB' %}
                                             <li>{{ event.dateDebutEV.strftime('%d/%m/%Y') }} - {{ event.dateFinEV.strftime('%d/%m/%Y') }}</li>

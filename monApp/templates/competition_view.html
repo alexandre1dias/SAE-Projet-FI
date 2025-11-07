@@ -104,10 +104,12 @@
     
     {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
         {% if est_eligible %}
-            {% if deja_inscrit %}
-                <a href="{{ url_for('desinscrire_competition', idCompetition=competition.id) }}" class="btn btn-danger">Se désinscrire</a>
-            {% else %}
-                <a href="{{ url_for('inscrire_competition', idCompetition=competition.id) }}" class="btn btn-success">S'inscrire</a>
+            {% if not competition.passee %}
+                {% if deja_inscrit %}
+                    <a href="{{ url_for('desinscrire_competition', idCompetition=competition.id) }}" class="btn btn-danger">Se désinscrire</a>
+                {% else %}
+                    <a href="{{ url_for('inscrire_competition', idCompetition=competition.id) }}" class="btn btn-success">S'inscrire</a>
+                {% endif %}
             {% endif %}
         {% endif %}
     {% endif %}
