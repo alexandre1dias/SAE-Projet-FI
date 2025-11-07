@@ -1,7 +1,7 @@
 CREATE TABLE ADMINISTRATEUR(
     idAdmin integer AUTO_INCREMENT,
-    emailA varchar(41),
-    mdpA varchar(64),
+    emailA varchar(41) unique,
+    mdpA varchar(64) not null,
     idParamNotifAdmin integer,
     PRIMARY KEY(idAdmin)
 );
@@ -42,15 +42,15 @@ create table PARAMETRE_NOTIF_MEMBRE(
     
 create table MEMBRE(
     idMembre integer AUTO_INCREMENT,
-    nomM varchar(41),
-    prenomM varchar(41),
-    emailM varchar(100),
-    mdpM varchar(64),
+    nomM varchar(41) not null,
+    prenomM varchar(41) not null,
+    emailM varchar(100) unique,
+    mdpM varchar(64) not null,
     date_inscription date DEFAULT CURRENT_DATE,
-    sexeM varchar(5),
-    ddnM date,
-    age integer,
-    niveau varchar(15),
+    sexeM varchar(5) not null,
+    ddnM date not null,
+    age integer not null,
+    niveau varchar(15) not null,
     statut varchar(30) DEFAULT "Membre",
     activite boolean DEFAULT True,
     idParamNotifMembre integer,
@@ -59,9 +59,9 @@ create table MEMBRE(
 
 create table NOTIFS(
     idNotifs integer AUTO_INCREMENT,
-    typeN varchar(19),
-    sourceN varchar(255),
-    lue boolean,
+    typeN varchar(19) not null,
+    sourceN varchar(255) not null,
+    lue boolean DEFAULT false,
     idMembre integer,
     idAdmin integer,
     PRIMARY KEY(idNotifs)
@@ -82,9 +82,9 @@ create table RECEVOIRA(
 
 create table FORMULAIRE_CONTACT(
     idFormulaire integer AUTO_INCREMENT,
-    typeFC varchar(20),
-    sujetFC varchar(100),
-    mailFC varchar(41),
+    typeFC varchar(20) not null,
+    sujetFC varchar(100) not null,
+    mailFC varchar(41) not null,
     descriptionFC varchar(500),
     dateFC date,
     reponse varchar(300),
@@ -108,13 +108,13 @@ create table REMPLIR(
 
 create table INSCRIPTION(
     idInscription integer AUTO_INCREMENT,
-    mailInscr varchar(100),
-    nomI varchar(41),
-    prenomI varchar(41),
-    ddnI date,
-    mdpI varchar(64),
-    sexeI varchar(5),
-    dateInscription date,
+    mailInscr varchar(100) unique,
+    nomI varchar(41) not null,
+    prenomI varchar(41) not null,
+    ddnI date not null,
+    mdpI varchar(64) not null,
+    sexeI varchar(5) not null,
+    dateInscription date not null,
     PRIMARY KEY(idInscription)
 );
 
@@ -122,7 +122,7 @@ create table INSCRIPTION(
 create table MODIFICATION(
     idModif integer AUTO_INCREMENT,
     nomModif varchar(41),
-    prenomModif varchar(41),
+    prenomModif varchar(41) ,
     emailModif varchar(100),
     sexeModif varchar(5),
     ddnModif date,
@@ -152,14 +152,14 @@ create table PARTICIPER(
 
 create table ENTRAINEMENT(
     idEntrainement integer AUTO_INCREMENT,
-    jourEN varchar(8),
-    villeEN varchar(50),
-    adresseEN varchar(50),
-    dateEN date,
-    heureDebutEN varchar(5),
-    heureFinEN varchar(5),
-    typeArmeEN varchar(12),
-    niveauEN varchar(45),
+    jourEN varchar(8) not null,
+    villeEN varchar(50) not null,
+    adresseEN varchar(50) not null,
+    dateEN date not null,
+    heureDebutEN varchar(5) not null,
+    heureFinEN varchar(5) not null,
+    typeArmeEN varchar(12) not null,
+    niveauEN varchar(45) not null,
     idEvent integer,
     PRIMARY KEY(idEntrainement)
 
@@ -167,15 +167,15 @@ create table ENTRAINEMENT(
 
 create table REUNION(
     idReunion integer AUTO_INCREMENT,
-    nomRE varchar(100),
-    villeRE varchar(50),
-    adresseRE varchar(50),
-    datedebutRE date,
-    heureDebutRE varchar(5),
-    dateFinRE date,
-    heureFinRE varchar(5),
+    nomRE varchar(100) not null,
+    villeRE varchar(50) not null,
+    adresseRE varchar(50) not null,
+    datedebutRE date not null,
+    heureDebutRE varchar(5) not null,
+    dateFinRE date not null,
+    heureFinRE varchar(5) not null,
     nbParticipantsRE integer,
-    typeReunionRE varchar(15),
+    typeReunionRE varchar(15) not null,
     rapportRE varchar(200),
     niveauRE varchar(45),
     idEvent integer,
@@ -185,19 +185,19 @@ create table REUNION(
 
 create table COMPETITION(
     idCompetition integer AUTO_INCREMENT,
-    nomCO varchar(50),
-    villeCO varchar(50),
-    adresseCO varchar(50),
-    dateDebutCO date,
-    heureDebutCO varchar(5),
-    dateFinCO date,
-    heureFinCO varchar(5),
-    typeArmeCO varchar(12),
+    nomCO varchar(50) not null,
+    villeCO varchar(50) not null,
+    adresseCO varchar(50) not null,
+    dateDebutCO date not null,
+    heureDebutCO varchar(5) not null,
+    dateFinCO date not null,
+    heureFinCO varchar(5) not null,
+    typeArmeCO varchar(12) not null,
     nbParticipantsCO integer,
-    sexeCO varchar(5),
-    typeCompete varchar(15),
+    sexeCO varchar(5) not null,
+    typeCompete varchar(15) not null,
     descriptionCO varchar(200), 
-    niveauCO varchar(45),
+    niveauCO varchar(45) not null,
     classementCO varchar(20),
     passeeCO boolean,
     idEvent integer,
@@ -206,16 +206,16 @@ create table COMPETITION(
 
 create table EVENTCLUB(
     idEventClub integer AUTO_INCREMENT,
-    NomEV varchar(50),
-    villeEV varchar(50),
-    adresseEV varchar(50),
-    dateDebutEV date,
-    heureDebutEV varchar(5),
-    dateFinEV date,
-    heureFinEV varchar(5),
+    NomEV varchar(50) not null,
+    villeEV varchar(50) not null,
+    adresseEV varchar(50) not null,
+    dateDebutEV date not null,
+    heureDebutEV varchar(5) not null,
+    dateFinEV date not null,
+    heureFinEV varchar(5) not null,
     nbParticipantEV integer,
-    descriptionEV varchar(200),
-    niveauxEV varchar(45),
+    descriptionEV varchar(200) not null,
+    niveauxEV varchar(45) not null,
     passeeEV boolean,
     idEvent integer,
     PRIMARY KEY(idEventClub)
@@ -224,9 +224,9 @@ create table EVENTCLUB(
 create table RESULTAT(
     idResultat integer AUTO_INCREMENT,
     resultat integer,
-    dateRE date,
-    typeArmeRE varchar(12),
-    typeCompeteRE varchar(15),
+    dateRE date not null,
+    typeArmeRE varchar(12) not null,
+    typeCompeteRE varchar(15) not null,
     idCompetition integer,
     idMembre integer,
     PRIMARY KEY(idResultat)
@@ -246,7 +246,7 @@ create table AVOIR(
 
 create table IMAGEAPP(
     idImage integer AUTO_INCREMENT,
-    urlI varchar(255),
+    urlI varchar(255) not null,
     prive boolean,
     alt varchar(21),
     PRIMARY KEY(idImage)
@@ -266,9 +266,9 @@ create table IMAGERE(
 
 create table INFORMATION(
     idInformation integer AUTO_INCREMENT,
-    dateIN date,
-    heureIN varchar(5),
-    titreIN varchar(50),
+    dateIN date not null,
+    heureIN varchar(5) not null,
+    titreIN varchar(50) not null,
     contenuIN varchar(600),
     PRIMARY KEY(idInformation)
 );
@@ -282,10 +282,10 @@ create table IMAGERIN(
 create table PRESSE(
     idPresse integer AUTO_INCREMENT,
     dateP date,
-    heureP varchar(5),
-    titreP varchar(50),
+    heureP varchar(5) not null,
+    titreP varchar(50) not null,
     contenuP varchar(600),
-    lienP varchar(255),
+    lienP varchar(255) not null,
     PRIMARY KEY(idPresse)
 );
 
