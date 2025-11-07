@@ -143,10 +143,6 @@
     </div>
     <!--Fin Carousel-->
     <div class="d-flex justify-content-center">
-        {# Les boutons Retour et Supprimer sont maintenant gérés plus haut ou via des actions séparées #}
-        {# <a href="{{ url_for('club_delete', idEventClub=eventClub.idEventClub) }}" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">Supprimer l'événement</a> #}
-    </div>
-    <div class="d-flex justify-content-center">
         <a href="{{ url_for('club_view', idEventClub=eventClub.idEventClub) }}" class="btn btn-secondary me-2">Retour</a>
         <form action="{{ url_for('club_delete', idEventClub=eventClub.idEventClub) }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer cet événement ?');" class="d-inline">
             <button type="submit" class="btn btn-danger">Supprimer évènement</button>
@@ -171,24 +167,27 @@
                                     <tr>
                                         <th>Nom</th>
                                         <th>Prenom</th>
-                                        <th>Niveau</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {%for membre in nonParticipant%}
                                     <tr>
-                                        <th>Jean</th>
-                                        <td>Dupont</td>
-                                        <td>M17</td>
-                                        <td><a class="btn btn-success">Ajouter</a></td>
+                                        <th>{{membre.nom}}</th>
+                                        <td>{{membre.prenom}}</td>
+                                        {%if membre in membreAInscrire%}
+                                        <td>
+                                        </td>
+                                        {%endif%}
                                     </tr>
+                                    {%endfor%}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     <div class="modal-footer justify-content-center">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-success">Confirmer</button>
+                        <a href="{{ url_for('club_view', idEventClub=eventClub.idEventClub) }}" class="btn btn-success">Confirmer</a>
                     </div>
                 </form>
             </div>
@@ -246,4 +245,23 @@
             </div>
         </div>
     </div>
+
+<script>
+    function enleverMembreVisuellement(id) {
+        // Trouve la ligne par son ID
+        var ligne = document.getElementById('row-membre-' + id);
+        
+        // Cache la ligne
+        if (ligne) {
+            ligne.style.display = 'none';
+        }
+        
+        // IMPORTANT : Ceci est juste VISUEL.
+        // Le membre est toujours dans la liste sur le serveur.
+        // Pour le supprimer "pour de vrai", vous devez aussi 
+        // le retirer d'un <input type="hidden"> qui sera soumis plus tard.
+    }
+</script>
+
+
 {% endblock %}

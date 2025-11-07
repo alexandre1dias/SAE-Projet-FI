@@ -1,13 +1,13 @@
 from .app import app, db
 from flask import render_template, request, url_for, redirect, session, abort
-from config import TITLE
+from config import TITLE, AUJOURDHUI
 from flask_login import logout_user, login_user, login_required, current_user
 from .forms import *
 from .connexionPythonSQL import *
 from monApp.modelBD import *
-from datetime import datetime
 from flask import jsonify
 from functools import wraps
+from datetime import datetime
 
 # Décorateur pour vérifier si l'utilisateur est un admin
 def admin_required(f):
@@ -242,6 +242,10 @@ def add_event():
 @app.route("/competitions/")
 def competitions():
     lesCompetitions = CompetitionBD.query.all()
+    lesCompetitions.sort(key=lambda x: x.date_debut, reverse=True)
+    
+    #events_a_venir = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateDebutRE', None) or getattr(e, 'dateDebutEV', None)) >= AUJOURDHUI]
+    #events_passes = [e for e in evenements if (getattr(e, 'date_fin', None) or getattr(e, 'dateFinRE', None) or getattr(e, 'dateFinEV', None)) < AUJOURDHUI]
     return render_template("competitions.html", title=TITLE+"- Competitions", competitions=lesCompetitions)
 
 @app.route("/competitions/<int:idCompetition>/view")
@@ -326,6 +330,7 @@ def competition_update(idCompetition):
     # Récupérer la liste des participants
     participations = ParticiperBD.query.filter_by(id_event=competition.id_event).all()
     participants = [p.membre for p in participations]
+
     return render_template("competition_update.html",title=TITLE+"- Modification de la competition", competition=competition, lesParticipants = participants, origine=origine)
 
 @app.route("/competition/<int:idCompetition>/classer/<int:idMembre>", methods=['POST'])
@@ -425,7 +430,25 @@ def club_update(idEventClub):
             db.session.rollback()
     participations = ParticiperBD.query.filter_by(id_event=unEventClub.id_event).all()
     participants = [p.membre for p in participations]
-    return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club", eventClub=unEventClub, participants=participants)
+    lesMembres = MembreBD.query.all()
+    nonParticipant = list(set(lesMembres) - set(participants))
+    membreAInscrire = []
+    return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club", eventClub=unEventClub, participants=participants , nonParticipant=nonParticipant, membreAInscrire = membreAInscrire)
+
+@app.route("/evenement_club/<int:idEventClub>/club_update/incrire_membres", methods=['GET', 'POST'])
+@login_required
+@admin_required
+def incrire_membres_event_club(idEventClub, membreAInscrire):
+    for membre in membreAInscrire:
+        evenement_club_obj = EventClubBD.query.get_or_404(idEventClub)
+        id_evenement_a_inscrire = evenement_club_obj.id_event
+        nouvelle_participation = ParticiperBD(id_membre=membre.id, id_event=id_evenement_a_inscrire)
+        db.session.add(nouvelle_participation)
+    db.session.commit()
+    return redirect(url_for('club_update', idEventClub=idEventClub))
+            
+ 
+        
 
 @app.route("/evenement_club/<int:idEventClub>/delete/<int:idM>", methods=['POST'])
 @login_required
@@ -643,7 +666,6 @@ def resultat_membre():
 @login_required
 @membre_required
 def evenement_membre():
-    aujourdhui = datetime.now().date()
     participations = ParticiperBD.query.filter_by(id_membre=current_user.id).all()
     ids_evenements = [p.id_event for p in participations]
 
@@ -656,8 +678,8 @@ def evenement_membre():
         evenements.extend(les_reunions)
         evenements.extend(les_evenements_club)
 
-    events_a_venir = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateDebutRE', None) or getattr(e, 'dateDebutEV', None)) >= aujourdhui]
-    events_passes = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateDebutRE', None) or getattr(e, 'dateDebutEV', None)) < aujourdhui]
+    events_a_venir = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateDebutRE', None) or getattr(e, 'dateDebutEV', None)) >= AUJOURDHUI]
+    events_passes = [e for e in evenements if (getattr(e, 'date_fin', None) or getattr(e, 'dateFinRE', None) or getattr(e, 'dateFinEV', None)) < AUJOURDHUI]
 
 
     return render_template("evenement_membre.html", title=TITLE+"- Vos Évènements",
@@ -860,10 +882,10 @@ def refuser_inscription(idI):
 @app.route('/refuser_modification/<int:idM>', methods=["POST"])
 @login_required
 @admin_required
-def refuser_modification(idModif):
+def refuser_modification(idM):
     #La justification, elle est pour l'instant inutile et devrat plus tard etre envoyer par mail
     justification = request.form.get('justification')
-    modification_a_supprimer = db.session.get(ModifBD, idModif)
+    modification_a_supprimer = db.session.get(ModifBD, idM)
     db.session.delete(modification_a_supprimer)
     db.session.commit()
     return redirect(url_for('gerer_inscriptions'))
