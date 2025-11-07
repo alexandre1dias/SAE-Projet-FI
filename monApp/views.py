@@ -431,24 +431,38 @@ def club_update(idEventClub):
     participations = ParticiperBD.query.filter_by(id_event=unEventClub.id_event).all()
     participants = [p.membre for p in participations]
     lesMembres = MembreBD.query.all()
-    nonParticipant = list(set(lesMembres) - set(participants))
-    membreAInscrire = []
-    return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club", eventClub=unEventClub, participants=participants , nonParticipant=nonParticipant, membreAInscrire = membreAInscrire)
+    return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club", eventClub=unEventClub, participants=participants)
 
-@app.route("/evenement_club/<int:idEventClub>/club_update/incrire_membres", methods=['GET', 'POST'])
+@app.route("/evenement_club/<int:idEventClub>/inscrire_membres", methods=['GET'])
 @login_required
 @admin_required
-def incrire_membres_event_club(idEventClub, membreAInscrire):
-    for membre in membreAInscrire:
-        evenement_club_obj = EventClubBD.query.get_or_404(idEventClub)
-        id_evenement_a_inscrire = evenement_club_obj.id_event
-        nouvelle_participation = ParticiperBD(id_membre=membre.id, id_event=id_evenement_a_inscrire)
-        db.session.add(nouvelle_participation)
+def inscrire_membres_event_club(idEventClub):
+    event_club = EventClubBD.query.get_or_404(idEventClub)
+    membres_a_inscrire_ids = request.args.getlist('membres_a_inscrire_ids', type=int)
+    if not membres_a_inscrire_ids:
+        membres_a_inscrire_ids = []
+    if 'add' in request.args:
+        membres_a_inscrire_ids.append(int(request.args.get('add')))
+    if 'remove' in request.args:
+        membres_a_inscrire_ids.remove(int(request.args.get('remove')))
+    participations = ParticiperBD.query.filter_by(id_event=event_club.id_event).all()
+    participants_ids = {p.id_membre for p in participations}
+    non_participants = MembreBD.query.filter(MembreBD.id.notin_(participants_ids), MembreBD.activite == True).all()
+    return render_template("club_inscrire_membre.html", title=TITLE+"- Inscrire des membres", eventClub=event_club, non_participants=non_participants, membres_a_inscrire_ids=membres_a_inscrire_ids)
+
+@app.route("/evenement_club/<int:idEventClub>/inscription_membres", methods=['POST'])
+@login_required
+@admin_required
+def inscription_membres_event_club(idEventClub):
+    event_club = EventClubBD.query.get_or_404(idEventClub)
+    membres_a_inscrire_ids = request.form.getlist('membres_a_inscrire')
+    for membre_id in membres_a_inscrire_ids:
+        deja_inscrit = ParticiperBD.query.filter_by(id_membre=membre_id, id_event=event_club.id_event).first()
+        if not deja_inscrit:
+            nouvelle_participation = ParticiperBD(id_membre=membre_id, id_event=event_club.id_event)
+            db.session.add(nouvelle_participation)
     db.session.commit()
     return redirect(url_for('club_update', idEventClub=idEventClub))
-            
- 
-        
 
 @app.route("/evenement_club/<int:idEventClub>/delete/<int:idM>", methods=['POST'])
 @login_required

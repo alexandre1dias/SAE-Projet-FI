@@ -105,7 +105,7 @@
     </div>
     {%endif%}
     <div class="text-center mt-3">
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inscrireMembreModal">Inscrire un membre</button>
+        <a href="{{ url_for('inscrire_membres_event_club', idEventClub=eventClub.idEventClub) }}" class="btn btn-success">Inscrire un membre</a>
     </div><br>
     <!--Fin Tableau-->
     <!-- Carousel d'images -->
@@ -149,50 +149,6 @@
         </form>
     </div>
 </div>
-
-    <!-- Modale pour inscrire un membre -->
-    <div class="modal fade" id="inscrireMembreModal" >
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="inscrireMembreModalLabel">Inscription d'un membre</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="refusForm" method="POST" action="">
-                    <div class="modal-body">
-                        <input type="text" class="modal-title search-input" id="inscrireMembreModalRecherche" placeholder="Rechercher...">
-                        <div class="mb-3">
-                             <table class="table table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Nom</th>
-                                        <th>Prenom</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {%for membre in nonParticipant%}
-                                    <tr>
-                                        <th>{{membre.nom}}</th>
-                                        <td>{{membre.prenom}}</td>
-                                        {%if membre in membreAInscrire%}
-                                        <td>
-                                        </td>
-                                        {%endif%}
-                                    </tr>
-                                    {%endfor%}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="modal-footer justify-content-center">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <a href="{{ url_for('club_view', idEventClub=eventClub.idEventClub) }}" class="btn btn-success">Confirmer</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <!-- Modale pour gérer les images -->
     <div class="modal fade" id="gererImagesModal" tabindex="-1" aria-labelledby="gererImagesModalLabel" aria-hidden="true">
