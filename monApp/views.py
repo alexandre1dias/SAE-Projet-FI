@@ -53,6 +53,7 @@ def comite_ou_admin_required(f):
 #==========================================================#
 #====================   Page Accueil   ====================#
 #==========================================================#
+# Affiche la page d'accueil avec les dernières actualités.
 @app.route("/")
 @app.route("/index/")
 def index():
@@ -64,18 +65,22 @@ def index():
 #==================================================================#
 #====================   Pages Renseignements   ====================#
 #==================================================================#
+# Affiche la page avec l'adresse du club.
 @app.route("/adresse/")
 def adresse():
     return render_template("adresse.html",title=TITLE+"- Adresse")
 
+# Affiche la page des horaires d'entraînement.
 @app.route("/horaires/")
 def horaires():
     return render_template("horaire.html",title=TITLE+"- Horaires")
 
+# Affiche la page avec les informations sur l'adhésion.
 @app.route("/adhesions/")
 def adhesions():
     return render_template("adhesion.html",title=TITLE+"- Adhésions")
 
+# Affiche la page d'information sur le matériel et la location.
 @app.route("/materiel/")
 def materiel():
     return render_template("materiel.html",title=TITLE+"- Matériel et tenues")
@@ -83,6 +88,7 @@ def materiel():
 #==================================================================#
 #====================   Pages Escrim feminin   ====================#
 #==================================================================#
+# Affiche la page dédiée à l'escrime féminine.
 @app.route("/escrime-feminin/")
 def escrime_feminin():
     return render_template("escrime_feminin.html",title=TITLE+"- L'escrime Féminin")
@@ -93,10 +99,12 @@ def escrime_feminin():
 #==============================================================#
 
 #====================   Pages Calendrier   ====================#
+# Affiche le calendrier interactif des événements.
 @app.route("/calendrier/")
 def calendrier():
     return render_template("calendrier.html", title=TITLE+"- Calendrier")
 
+# API pour fournir les données des événements au calendrier FullCalendar.
 @app.route('/api/events')
 def get_events():
     all_events = []
@@ -161,6 +169,7 @@ def get_events():
         })
     return jsonify(all_events)
 
+# Page pour ajouter un nouvel événement - Réservée aux administrateurs.
 @app.route("/add_event/", methods=["GET", "POST"])
 @login_required
 @admin_required
@@ -239,6 +248,7 @@ def add_event():
 
 
 #====================   Pages Competitions   ====================#
+# Affiche la liste de toutes les compétitions.
 @app.route("/competitions/")
 def competitions():
     lesCompetitions = CompetitionBD.query.all()
@@ -248,6 +258,7 @@ def competitions():
     #events_passes = [e for e in evenements if (getattr(e, 'date_fin', None) or getattr(e, 'dateFinRE', None) or getattr(e, 'dateFinEV', None)) < AUJOURDHUI]
     return render_template("competitions.html", title=TITLE+"- Competitions", competitions=lesCompetitions)
 
+# Affiche les détails d'une compétition spécifique.
 @app.route("/competitions/<int:idCompetition>/view")
 def competition_view(idCompetition):
     uneCompetition = CompetitionBD.query.get(idCompetition)
@@ -274,6 +285,7 @@ def competition_view(idCompetition):
     resultats.sort(key=lambda x: x.resultat)
     return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",competition=uneCompetition,origine=origine,deja_inscrit=deja_inscrit,est_eligible=est_eligible, lesResultats = resultats)
 
+# Permet à un membre de s'inscrire à une compétition.
 @app.route("/inscrire/competition/<int:idCompetition>", methods=['GET'])
 @login_required
 @membre_required
@@ -292,6 +304,7 @@ def inscrire_competition(idCompetition):
         db.session.rollback()
     return redirect(url_for('competition_view', idCompetition=idCompetition))
 
+# Permet à un utilisateur (membre ou admin) de se désinscrire d'une compétition.
 @app.route("/desinscrire/competition/<int:idCompetition>", methods=['GET'])
 @login_required
 def desinscrire_competition(idCompetition):
@@ -305,6 +318,7 @@ def desinscrire_competition(idCompetition):
             db.session.rollback()
     return redirect(url_for('competition_view', idCompetition=idCompetition))
 
+# Page de modification d'une compétition - Réservée aux administrateurs.
 @app.route("/competition_update/<int:idCompetition>", methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -333,6 +347,7 @@ def competition_update(idCompetition):
 
     return render_template("competition_update.html",title=TITLE+"- Modification de la competition", competition=competition, lesParticipants = participants, origine=origine)
 
+# Page pour sélectionner les membres à inscrire à une compétition - Réservée aux administrateurs.
 @app.route("/competition/<int:idC>/inscrire_membres", methods=['GET'])
 @login_required
 @admin_required
@@ -360,6 +375,7 @@ def inscrire_membres_competition(idC):
             non_participants_eligibles.append(non_participant)
     return render_template("competition_inscrire_membre.html", title=TITLE+"- Inscrire des membres", competition=competition, non_participants=non_participants_eligibles, membres_a_inscrire_ids=membres_a_inscrire_ids)
 
+# Traite l'inscription de plusieurs membres à une compétition - Réservée aux administrateurs.
 @app.route("/competition/<int:idC>/inscription_membres", methods=['POST'])
 @login_required
 @admin_required
@@ -375,6 +391,7 @@ def inscription_membres_competition(idC):
     db.session.commit()
     return redirect(url_for('competition_update', idCompetition=idC))
 
+# Enregistre ou met à jour le classement d'un membre pour une compétition - Réservée aux administrateurs.
 @app.route("/competition/<int:idCompetition>/classer/<int:idMembre>", methods=['POST'])
 @login_required
 @admin_required
@@ -396,6 +413,7 @@ def classer_membre(idCompetition, idMembre):
     
     return redirect(url_for('competition_update', idCompetition=idCompetition))
 
+# Supprime la participation d'un membre à une compétition - Réservée aux administrateurs.
 @app.route("/competition/<int:idC>/delete/<int:idM>", methods=['POST'])
 @login_required
 @admin_required
@@ -409,6 +427,7 @@ def delete_membre_competition(idC, idM):
         db.session.rollback()
     return redirect(url_for('competition_update', idCompetition=idC))
     
+# Supprime une compétition et toutes ses participations - Réservée aux administrateurs.
 @app.route("/competition_delete/<int:idCompetition>", methods=['POST'])
 @login_required # Assure que seul un utilisateur connecté peut supprimer
 @admin_required
@@ -428,6 +447,7 @@ def competition_delete(idCompetition):
     return redirect(url_for('competitions'))
 
 #====================   Pages Evenement du club   ====================#
+# Affiche la liste des événements du club.
 @app.route("/evenement_club/")
 def evenement_club():
     lesEventClubs = EventClubBD.query.all()
@@ -437,6 +457,7 @@ def evenement_club():
         ids_evenements_inscrits = {p.id_event for p in participations}
     return render_template("evenement_club.html",title=TITLE+"- Evenements du Club",eventsclub=lesEventClubs, user_registered_event_ids=ids_evenements_inscrits)
 
+# Affiche les détails d'un événement de club spécifique.
 @app.route("/evenement_club/<int:idEventClub>/club_view/")
 def club_view(idEventClub):
     unEventClub = EventClubBD.query.get(idEventClub)
@@ -448,7 +469,7 @@ def club_view(idEventClub):
         deja_inscrit = participation is not None
     return render_template("club_view.html",title=TITLE+"- un évenement du club",selectedEventClub=unEventClub, deja_inscrit=deja_inscrit, origine=origine)
 
- 
+# Page de modification d'un événement de club - Réservée aux administrateurs.
 @app.route("/evenement_club/<int:idEventClub>/club_update/", methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -473,6 +494,7 @@ def club_update(idEventClub):
     lesMembres = MembreBD.query.all()
     return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club", eventClub=unEventClub, participants=participants)
 
+# Page pour sélectionner les membres à inscrire à un événement de club - Réservée aux administrateurs.
 @app.route("/evenement_club/<int:idEventClub>/inscrire_membres", methods=['GET'])
 @login_required
 @admin_required
@@ -490,6 +512,7 @@ def inscrire_membres_event_club(idEventClub):
     non_participants = MembreBD.query.filter(MembreBD.id.notin_(participants_ids), MembreBD.activite == True).all()
     return render_template("club_inscrire_membre.html", title=TITLE+"- Inscrire des membres", eventClub=event_club, non_participants=non_participants, membres_a_inscrire_ids=membres_a_inscrire_ids)
 
+# Traite l'inscription de plusieurs membres à un événement de club - Réservée aux administrateurs.
 @app.route("/evenement_club/<int:idEventClub>/inscription_membres", methods=['POST'])
 @login_required
 @admin_required
@@ -504,6 +527,7 @@ def inscription_membres_event_club(idEventClub):
     db.session.commit()
     return redirect(url_for('club_update', idEventClub=idEventClub))
 
+# Supprime la participation d'un membre à un événement de club - Réservée aux administrateurs.
 @app.route("/evenement_club/<int:idEventClub>/delete/<int:idM>", methods=['POST'])
 @login_required
 @admin_required
@@ -517,6 +541,7 @@ def delete_membre_eventClub(idEventClub, idM):
         db.session.rollback()
     return redirect(url_for('club_update', idEventClub=idEventClub))
 
+# Supprime un événement de club - Réservée aux administrateurs.
 @app.route("/evenement_club/<int:idEventClub>/club_delete/", methods=['POST'])
 @login_required
 @admin_required
@@ -526,6 +551,7 @@ def club_delete(idEventClub):
     db.session.commit()
     return redirect(url_for('evenement_club'))
 
+# Permet à un membre de s'inscrire à un événement de club.
 @app.route("/inscrire/club/<int:idEventClub>", methods=['GET'])
 @login_required
 @membre_required
@@ -545,6 +571,7 @@ def inscrire_club(idEventClub):
         db.session.rollback()
     return redirect(url_for('club_view', idEventClub=idEventClub))
 
+# Permet à un membre de se désinscrire d'un événement de club.
 @app.route("/desinscrire/club/<int:idEventClub>", methods=['GET'])
 @login_required
 @membre_required
@@ -558,7 +585,7 @@ def desinscrire_club(idEventClub):
 
 
 #====================   Pages Reunions   ====================#
-#Page affichant toutes les réunions - Reservée à Admin et Membre du Comité
+# Page affichant toutes les réunions - Réservée à Admin et Membre du Comité.
 @app.route("/reunion/")
 @login_required
 @comite_ou_admin_required
@@ -573,7 +600,7 @@ def reunion():
         ids_evenements_inscrits = {p.id_event for p in participations}
     return render_template("reunion.html", title=TITLE + "- Réunion", prochaines_reunions=prochaines_reunions, anciennes_reunions=anciennes_reunions,user_registered_event_ids = ids_evenements_inscrits)
 
-#Page de consultation d'une réunion - Reservée à Admin et Membres du Comité
+# Page de consultation d'une réunion - Réservée à Admin et Membres du Comité.
 @app.route("/reunion/consultation/<int:idReunion>")
 @login_required
 @comite_ou_admin_required
@@ -582,7 +609,7 @@ def reunion_view(idReunion):
     origine = request.args.get('origine', 'default')
     return render_template("reunion_view.html",title=TITLE+"- Consultatiion d'une réunion", selectedReunion = reunion, origine=origine)
 
-#Vue de suppression d'une réunion - Reservée à Admin et Membres du Comité
+# Vue de suppression d'une réunion - Réservée aux administrateurs.
 @app.route("/reunion/delete/<int:idReunion>", methods=['POST'])
 @login_required
 @admin_required
@@ -592,7 +619,7 @@ def reunion_delete(idReunion):
     db.session.commit()
     return redirect(url_for('reunion'))
 
-#Vue d'inscription d'une réunion - Reservée aux Membres du Comité
+# Vue d'inscription à une réunion - Réservée aux membres du comité et aux admins.
 @app.route("/reunion/inscrire/<int:idReunion>", methods=['GET'])
 @login_required
 @comite_ou_admin_required
@@ -612,7 +639,7 @@ def inscrire_reunion(idReunion):
         db.session.rollback()
     return redirect(url_for('reunion'))
 
-#Vue de d'inscription d'une réunion - Reservée aux Membres du Comité
+# Vue de désinscription d'une réunion - Réservée aux membres du comité et aux admins.
 @app.route("/reunion/desinscrire/<int:idReunion>", methods=['GET'])
 @login_required
 @comite_ou_admin_required
@@ -628,7 +655,7 @@ def desinscrire_reunion(idReunion):
             db.session.rollback()
     return redirect(url_for('reunion'))
 
-#Page d'update d'une réunion - Reservée  à l'Admin
+# Page de modification d'une réunion - Réservée à l'Admin.
 @app.route("/reunion/update/<int:idReunion>", methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -652,13 +679,13 @@ def reunion_update(idReunion):
 #==============================================================#
 #====================   Pages Actualités   ====================#
 #==============================================================#
-#Vues pour Informations
+# Affiche la page listant toutes les informations.
 @app.route("/informations/")
 def informations():
     lesInformations = InformationBD.query.all()
     return render_template("informations.html",title=TITLE+"- Informations",informations=lesInformations)
 
-#Vues pour Presse
+# Affiche la page listant tous les articles de presse.
 @app.route("/presse/")
 def presse():
     lesArticles = PresseBD.query.all()
@@ -668,15 +695,17 @@ def presse():
 #============================================================#
 #====================   Pages A propos   ====================#
 #============================================================#
-
+# Affiche la page "À propos".
 @app.route("/about/")
 def about():
     return render_template("about.html",title=TITLE+"- A propos")
 
+# Affiche la page de l'historique du club.
 @app.route("/historique/")
 def historique():
     return render_template("historique.html",title=TITLE+"- Historique") 
 
+# Affiche la page de présentation du comité directeur.
 @app.route("/comite_cercle/")
 def comite_cercle():
     return render_template("comite_cercle.html",title=TITLE+"- Comité directeur du Cercle")
@@ -684,6 +713,7 @@ def comite_cercle():
 #==========================================================#
 #====================   Page Contact   ====================#
 #==========================================================#
+# Affiche le formulaire de contact et traite sa soumission.
 @app.route("/contact/", methods=['GET', 'POST'])
 def contact():
     form = ContactForm()
@@ -708,7 +738,7 @@ def contact():
 #==========================================================#
 #====================   Pages Profil   ====================#
 #==========================================================#
-
+# Affiche les résultats de compétition du membre connecté.
 @app.route("/resultat_membre/")
 @login_required
 @membre_required
@@ -716,6 +746,7 @@ def resultat_membre():
     les_resultats = ResultatBD.query.filter_by(id_membre=current_user.id).all()
     return render_template("resultat_membre.html", title=TITLE+"- Résultat du Membre", resultats=les_resultats)
 
+# Affiche les événements auxquels le membre connecté est inscrit.
 @app.route("/evenement_membre/")
 @login_required
 @membre_required
@@ -739,6 +770,7 @@ def evenement_membre():
     return render_template("evenement_membre.html", title=TITLE+"- Vos Évènements",
                            events_a_venir=events_a_venir, events_passes=events_passes)
 
+# Affiche le profil public d'un membre.
 @app.route("/profil_view/<int:idM>")
 def profil_view(idM):
     # origine corresponds à l'origine de l'utilisateur. 
@@ -751,6 +783,7 @@ def profil_view(idM):
 #==============================================================#
 #====================   Pages Menu Admin   ====================#
 #==============================================================#
+# Affiche les formulaires de contact non répondus - Réservée aux administrateurs.
 @app.route("/gerer_formulaires/")
 @login_required
 @admin_required
@@ -759,6 +792,7 @@ def gerer_formulaires():
     les_formulaires.sort(key=lambda x: x.date, reverse=True) 
     return render_template("gerer_formulaires.html", title=TITLE+"- Géstion des Formulaires", formulaires=les_formulaires)
 
+# Affiche les formulaires de contact déjà traités - Réservée aux administrateurs.
 @app.route("/gerer_anciens_formulaires/")
 @login_required
 @admin_required
@@ -766,6 +800,7 @@ def gerer_anciens_formulaires():
     les_formulaires = FormulaireBD.query.order_by(FormulaireBD.date.desc()).filter(FormulaireBD.repondu == True).all()
     return render_template("gerer_anciens_formulaires.html", title=TITLE+"- Géstion des Anciens Formulaires", formulaires=les_formulaires)
 
+# Affiche le détail d'un formulaire de contact - Réservée aux administrateurs.
 @app.route("/formulaire_view/<int:idFormulaire>")
 @login_required
 @admin_required
@@ -773,6 +808,7 @@ def formulaire_view(idFormulaire):
     unFormulaire = FormulaireBD.query.get_or_404(idFormulaire)
     return render_template("formulaire_view.html",title=TITLE+"- Consultation de Formulaire", selectedFormulaire=unFormulaire)
 
+# Supprime un formulaire de contact - Réservée aux administrateurs.
 @app.route("/formulaire_delete/<int:idFormulaire>", methods=['POST'])
 @login_required
 @admin_required
@@ -782,6 +818,7 @@ def formulaire_delete(idFormulaire):
     db.session.commit()
     return redirect(url_for('gerer_anciens_formulaires'))
 
+# Permet de répondre à un formulaire et de le marquer comme traité - Réservée aux administrateurs.
 @app.route("/repondre_formulaire/<int:idFormulaire>", methods=['POST'])
 @login_required
 @admin_required
@@ -797,7 +834,7 @@ def repondre_formulaire(idFormulaire):
     db.session.commit()
     return redirect(url_for('gerer_formulaires'))
 
-#Vue pour la gestion des Profils
+# Affiche la liste des membres actifs pour la gestion - Réservée aux administrateurs.
 @app.route("/gerer_profils/")
 @login_required
 @admin_required
@@ -806,6 +843,7 @@ def gerer_profils():
     lesMembres.sort(key=lambda x: x.date_inscription, reverse=True) 
     return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres)
 
+# Désactive le compte d'un membre - Réservée aux administrateurs.
 @app.route ('/gerer_profils/desinscrire/<int:idM>', methods =("POST" ,))
 @login_required
 @admin_required
@@ -815,6 +853,7 @@ def desinscrireMembre(idM):
     db.session.commit()
     return redirect(url_for('gerer_profils'))
 
+# Réactive le compte d'un ancien membre - Réservée aux administrateurs.
 @app.route ('/gerer_anciens_profils/reinscrire/<int:idM>', methods =("POST" ,))
 @login_required
 @admin_required
@@ -824,7 +863,7 @@ def reinscrireMembre(idM):
     db.session.commit()
     return redirect(url_for('gerer_ancien_profils'))
 
-
+# Affiche la liste des membres inactifs - Réservée aux administrateurs.
 @app.route("/gerer_profils/ancien/")
 @login_required
 @admin_required
@@ -832,6 +871,7 @@ def gerer_ancien_profils():
     lesMembres = db.session.query(MembreBD).filter(MembreBD.activite == False).all() 
     return render_template("gerer_ancien_profils.html",title=TITLE+"- Géstion des Anciens Profils", membres = lesMembres)
 
+# Page de modification d'un profil, accessible par le membre lui-même ou un admin.
 @app.route("/profil_edit/<int:idM>", methods=["GET", "POST"])
 @login_required
 def profil_edit(idM):
@@ -861,6 +901,7 @@ def profil_edit(idM):
             return redirect(url_for('profil_view', idM=unMembre.id, origine='profil'))
     return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
 
+# Désactive un profil (alternative à la méthode POST de gerer_profils).
 @app.route('/profil_edit/<int:idM>/desinscrit/', methods=["GET", "POST"])
 @login_required
 def desinscrit_profil(idM):
@@ -869,6 +910,7 @@ def desinscrit_profil(idM):
     db.session.commit()
     return redirect(url_for('gerer_profils'))
 
+# Réactive un profil.
 @app.route('/profil_edit/<int:idM>/reinscrit/')
 def reinscrit_profil(idM):
     membreReinscrit = db.session.get(MembreBD, idM)
@@ -876,7 +918,7 @@ def reinscrit_profil(idM):
     db.session.commit()
     return redirect(url_for('gerer_ancien_profils'))
 
-#Vue pour la gestion des inscription/modification
+# Affiche les demandes d'inscription et de modification de profil - Réservée aux administrateurs.
 @app.route("/gerer_inscriptions/")
 @login_required
 @admin_required
@@ -888,6 +930,7 @@ def gerer_inscriptions():
     lesRequetes.sort(key=lambda x: x.date, reverse=True)  
     return render_template("gerer_inscriptions.html",title=TITLE+"- Géstion des Inscriptions", requetes=lesRequetes)
 
+# Accepte une demande d'inscription et crée un nouveau membre - Réservée aux administrateurs.
 @app.route ('/accepter_inscription/<int:idI>', methods =("POST" ,))
 @login_required
 @admin_required
@@ -906,6 +949,7 @@ def accepter_inscription(idI):
     db.session.commit()
     return redirect(url_for('gerer_inscriptions'))
 
+# Accepte une demande de modification de profil - Réservée aux administrateurs.
 @app.route ('/accepter_modifications/<int:idModif>', methods =("POST" ,))
 @login_required
 @admin_required
@@ -922,6 +966,7 @@ def accepter_modifications(idModif):
         db.session.commit()
     return redirect(url_for('gerer_inscriptions'))
 
+# Refuse et supprime une demande d'inscription - Réservée aux administrateurs.
 @app.route('/refuser_inscription/<int:idI>', methods=["POST"])
 @login_required
 @admin_required
@@ -933,6 +978,7 @@ def refuser_inscription(idI):
     db.session.commit()
     return redirect(url_for('gerer_inscriptions'))
 
+# Refuse et supprime une demande de modification - Réservée aux administrateurs.
 @app.route('/refuser_modification/<int:idM>', methods=["POST"])
 @login_required
 @admin_required
@@ -947,6 +993,7 @@ def refuser_modification(idM):
 #==============================================================#
 #====================   Pages Paramètres   ====================#
 #==============================================================#
+# Affiche la page des paramètres du compte (vue générale).
 @app.route('/parametres/')
 def parametres():
     form = ParametresForm()
@@ -954,6 +1001,7 @@ def parametres():
                          title=TITLE+"- Paramètres du Membre", 
                          form=form)
 
+# Gère les paramètres de notification pour les membres et les administrateurs.
 @app.route("/parametres_notifs/", methods=["GET", "POST"])
 @login_required
 def parametres_notifs():
@@ -1010,6 +1058,7 @@ def parametres_notifs():
 
     return render_template("parametres_notifs.html", title=TITLE+"- Paramètres notifications", parametres=parametres)
 
+# Permet à l'utilisateur connecté de changer son mot de passe.
 @app.route("/changer_mdp/", methods=['GET', 'POST'])
 @login_required
 def changer_mdp():
@@ -1030,7 +1079,7 @@ def changer_mdp():
 #=============================================================#
 #====================   Pages Connexion   ====================#
 #=============================================================#
-
+# Gère la connexion des membres et des administrateurs.
 @app.route ("/login/", methods =("GET","POST"))
 def login():
     # Si l'utilisateur est déjà connecté, on le redirige vers l'accueil
@@ -1072,6 +1121,7 @@ def login():
     message = request.args.get('message')
     return render_template("login.html", title=TITLE + "- Connexion", form=form, message=message)
 
+# Gère l'inscription de nouveaux utilisateurs (demande ou création directe par admin).
 @app.route("/inscription/", methods=["GET", "POST"])
 def inscription():
     unForm = InscriptionForm()
@@ -1105,6 +1155,7 @@ def inscription():
             db.session.rollback()
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
 
+# Déconnecte l'utilisateur.
 @app.route("/logout/")
 @login_required
 def logout():
@@ -1115,6 +1166,7 @@ def logout():
 #==========================================================#
 #====================   Pages Erreur   ====================#
 #==========================================================#
+# Page d'erreur pour les ressources non trouvées (404).
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('gestion_erreur.html',
@@ -1122,6 +1174,7 @@ def page_not_found(e):
                            error_title="Page non trouvée",
                            error_message="Désolé, la page que vous cherchez n'existe pas ou a été déplacée."), 404
 
+# Page d'erreur pour les erreurs internes du serveur (500).
 @app.errorhandler(500)
 def internal_server_error(e):
     db.session.rollback() 
@@ -1130,6 +1183,7 @@ def internal_server_error(e):
                            error_title="Erreur interne du serveur",
                            error_message="Une erreur inattendue s'est produite. Notre équipe technique a été notifiée."), 500
 
+# Page d'erreur pour les accès interdits (403).
 @app.errorhandler(403)
 def forbidden_access(e):
     return render_template('gestion_erreur.html',
@@ -1137,6 +1191,7 @@ def forbidden_access(e):
                            error_title="Accès Interdit",
                            error_message="Vous n'avez pas les autorisations nécessaires pour accéder à cette page."), 403
 
+# Page d'erreur spécifique pour les accès réservés aux administrateurs (400).
 @app.errorhandler(400)
 def admin_access(e):
     return render_template('gestion_erreur.html',
@@ -1144,6 +1199,7 @@ def admin_access(e):
                            error_title="Accès Interdit",
                            error_message="Cette page est réservé au compte de type Admin"), 400
 
+# Page d'erreur spécifique pour les accès réservés aux membres (401).
 @app.errorhandler(401)
 def membre_access(e):
     return render_template('gestion_erreur.html',
@@ -1151,6 +1207,7 @@ def membre_access(e):
                            error_title="Accès Interdit",
                            error_message="Cette page est réservé au compte de type Membre"), 401
 
+# Page d'erreur spécifique pour les accès réservés au comité (405).
 @app.errorhandler(405)
 def comite_access(e):
     return render_template('gestion_erreur.html',
