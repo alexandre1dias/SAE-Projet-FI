@@ -1,0 +1,24 @@
+{%extends "base.html"%}
+
+    {%block main%}
+        <h1>Presse</h1>
+        <p>
+            Retrouvez ici tous les articles en rapport avec le Cercle d'Escrime de BLOIS
+        </p>
+         <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
+        {% for article in articles %}
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{article.titreP}}</h5>
+                        <p class="card-text">{{article.contenuP}}</p>
+                        <a href={{article.lienP}} class="btn btn-primary mt-auto">Voir article</a>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Publié le {{article.dateP}}</small>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+         </div>
+    {%endblock%}

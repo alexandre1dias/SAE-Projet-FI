@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inscription.css') }}">
+{% endblock %}
+
 {% block main %}
 <div class="page-login">
     <div class="inscription-container">
@@ -8,56 +12,144 @@
         
         <form method="POST" action="" style="width: 100%;">
             {{ form.hidden_tag() }}
-            <div class="form-group">
-                {{ form.Login(class="form-input", placeholder="Rentrer votre email") }}
-            </div>
-            <div class="form-group">
-                {{ form.nom(class="form-input", placeholder="Rentrer votre nom") }}
-            </div>
-            <div class="form-group">
-                {{ form.prenom(class="form-input", placeholder="Rentrer votre prenom") }}
-            </div>
-            <div class="form-group">
-                {{ form.date_naissance(class="form-input", placeholder="Rentrer votre date de naissance") }}
-            </div>
-
-
-            <div class="form-group">
-                {{ form.password(class="form-input", placeholder="Rentrer votre mot de passe") }}
-            </div>
-            <div class="form-group">
-                {{ form.confirm_password(class="form-input", placeholder="Confirmer votre mot de passe") }}
-            </div>
             
             <div class="form-group">
-               <button type="button" class="btn-inscription" data-bs-toggle="modal" data-bs-target="#conditionModal" data-url="#">CONDITIONS D'INSCRIPTION</button>
+                {{ form.Login(
+                    class="form-input" + (" is-invalid" if form.Login.errors else ""), 
+                    placeholder="Rentrer votre email"
+                ) }}
+                {% if form.Login.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.Login.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
+
             <div class="form-group">
-                {{ form.inscription(class="btn-connecter", value="S'INSCRIRE") }}
+                {{ form.nom(
+                    class="form-input" + (" is-invalid" if form.nom.errors else ""), 
+                    placeholder="Rentrer votre nom"
+                ) }}
+                {% if form.nom.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.nom.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.prenom(
+                    class="form-input" + (" is-invalid" if form.prenom.errors else ""), 
+                    placeholder="Rentrer votre prenom"
+                ) }}
+                {% if form.prenom.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.prenom.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.date_naissance(
+                    class="form-input" + (" is-invalid" if form.date_naissance.errors else ""), 
+                    type="text", 
+                    placeholder="Rentrer votre date de naissance", 
+                    onfocus="(this.type='date')", 
+                    onblur="(if(!this.value) this.type='text')"
+                ) }}
+                {% if form.date_naissance.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.date_naissance.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.sexe(
+                    class="form-input form-select form-select-white-arrow" + (" is-invalid" if form.sexe.errors else ""), 
+                    placeholder="Choisir votre sexe"
+                ) }}
+                {% if form.sexe.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.sexe.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.password(
+                    class="form-input" + (" is-invalid" if form.password.errors else ""), 
+                    placeholder="Rentrer votre mot de passe"
+                ) }}
+                {% if form.password.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.password.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.confirm_password(
+                    class="form-input" + (" is-invalid" if form.confirm_password.errors else ""), 
+                    placeholder="Confirmer votre mot de passe"
+                ) }}
+                {% if form.confirm_password.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.confirm_password.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
             
+            {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+                <div class="form-group">
+                    {{ form.inscription(class="btn-connecter", value="INSCRIRE LE MEMBRE") }}
+                </div>
+            {% else %}
+                <div class="form-group">
+                    <div class="form-check text-white">
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" required>
+                        <label class="form-check-label" for="flexCheckDefault">
+                            J'accepte les <a href="#" data-bs-toggle="modal" data-bs-target="#modalConditions" class="text-white">conditions d'inscription</a>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    {{ form.inscription(class="btn-connecter", value="S'INSCRIRE") }}
+                </div>
+            {% endif %}
         </form>
     </div>
 </div>
 
-<!-- Modale de Confirmation de Refus -->
-        <div class="modal fade" id="conditionModal" tabindex="-1"  aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="refusModalLabel">Condition d'inscription</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form id="refusForm" method="POST" action="">
-                        <div class="modal-body">
-                            <p>Mettre les conditions</p>
-                        </div>
-                        <div class="modal-footer justify-content-center">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <button type="submit" class="btn btn-success">Accepter les conditions</button>
-                        </div>
-                    </form>
-                </div>
+<div class="modal fade" id="modalConditions" tabindex="-1" aria-labelledby="modalConditionsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConditionsLabel">Conditions Générales d'inscription</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Vous devez avoir plus de 8 ans</p>
+                <p>Avant que votre demande soit acceptée, vous devez venir sur place afin de nous présenter vos documents d'identité et un certificat médical. Le règlement se fera également sur place.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
+    </div>
+</div>
 {% endblock %}

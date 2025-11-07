@@ -1,9 +1,24 @@
 {%extends "base.html"%}
 
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}">
+{% endblock %}
+
 {%block main%}
     <div class="row justify-content-center">
         <div class="col-md-8">
             <h1 class="text-center mb-4">Nous Contacter</h1>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} text-center" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
             <p class="text-center lead mb-5">
                 Pour toute question concernant les inscriptions, les horaires ou nos activités, n'hésitez pas à nous joindre. Notre équipe se fera un plaisir de vous répondre.
             </p>
@@ -35,35 +50,62 @@
 
             <div class="col-lg-6 contact-form">
                 <h2>Nous contacter</h2>
-                <form action="#" method="POST">
+                
+                <form action="{{ url_for('contact') }}" method="POST" novalidate>
+                    
+                    {{ form.hidden_tag() }}
+
                     <div class="mb-3">
-                        <h5 class="mb-2">Choisissez le type de mail</h5>
+                        <h5 class="mb-2">{{ form.type_form.label }}</h5>
+                        {% for subfield in form.type_form %}
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="mail_type" id="type_question" value="question" checked>
-                            <label class="form-check-label" for="type_question">Question</label>
+                            {{ subfield(class="form-check-input" + (" is-invalid" if form.type_form.errors else "")) }}
+                            {{ subfield.label(class="form-check-label") }}
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="mail_type" id="type_demande" value="demande">
-                            <label class="form-check-label" for="type_demande">Demande</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="mail_type" id="type_signalement" value="signalement">
-                            <label class="form-check-label" for="type_signalement">Signalement</label>
-                        </div>
+                        {% endfor %}
+                        {% if form.type_form.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.type_form.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
+
                     <div class="mb-3">
-                        <input type="text" class="form-control" placeholder="Entrez votre nom" required>
+                        {{ form.sujet(class="form-control" + (" is-invalid" if form.sujet.errors else ""), placeholder="Sujet") }}
+                        {% if form.sujet.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.sujet.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
+
                     <div class="mb-3">
-                        <input type="sujet" class="form-control" placeholder="Sujet" required>
+                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Entrez une adresse email valide") }}
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
+
                     <div class="mb-3">
-                        <input type="email" class="form-control" placeholder="Entrez une adresse email valide" required>
+                        {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows="5", placeholder="Entrez votre message") }}
+                        {% if form.description.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.description.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
-                    <div class="mb-3">
-                        <textarea class="form-control" rows="5" placeholder="Entrez votre message" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Nous faire parvenir</button>
+                    
+                    {{ form.submit(class="btn btn-primary") }}
                 </form>
             </div>
         </div>

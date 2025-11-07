@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% block main %}
 
-<h1 class="mb-4" >[Nom Evènement]</h1>
+<h1 class="mb-4" >{{selectedEventClub.NomEV}}</h1>
 
 <div class="row justify-content-center">
         <div class="col-lg-4 col-md-6 mb-4">
             <!--Cartes-->
             <div class="card h-100 text-center shadow-sm">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    <h5 class="card-title">[date]</h5>
+                    <h5 class="card-title">Du {{selectedEventClub.dateDebutEV}} au {{selectedEventClub.dateFinEV}}</h5>
                 </div>
             </div>
         </div>
@@ -16,20 +16,20 @@
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 text-center shadow-sm">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    <h5 class="card-title"> [lieu]</h5>
+                    <h5 class="card-title">{{selectedEventClub.adresseEV}} à {{selectedEventClub.villeEV}}</h5>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 text-center shadow-sm">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    <h5 class="card-title">nb participants</h5>
+                    <h5 class="card-title">Nombre de Participants {{selectedEventClub.evenement.participants.count()}}</h5>
                 </div>
             </div>
         </div>
     </div>
     <h2>Description :</h2>
-    <p>[...]</p>
+    <p>{{selectedEventClub.descriptionEV}}</p>
     <!-- Carousel d'images -->
     <div id="carouselTop" class="carousel slide mb-3" data-bs-ride="carousel">
         <div class="carousel-indicators">
@@ -66,11 +66,26 @@
 
     
     <div class="d-flex justify-content-center">
-        <a href="{{ url_for('evenement_club') }}" class="btn btn-secondary">Retour</a>
-        <a href="" class="btn btn-success">S'inscrire</a>
-        <!-- boutons Admin-->
-        <a href="{{ url_for('club_update') }}" class="btn btn-primary">Modifier évènement</a>
-        <a href="{{ url_for('club_view') }}" class="btn btn-danger">Supprimer évènement</a>
+        {% if origine == 'calendrier' %}
+            <a href="{{ url_for('calendrier') }}" class="btn btn-secondary me-2">Retour</a>
+        {% else %}
+            <a href="{{ url_for('evenement_club') }}" class="btn btn-secondary me-2">Retour</a>
+        {% endif %}
+        {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
+            {% if not selectedEventClub.passeeEV %}
+                {% if deja_inscrit %}
+                    <a href="{{ url_for('desinscrire_club', idEventClub=selectedEventClub.idEventClub) }}" class="btn btn-danger me-2">Se désinscrire</a>
+                {% else %}
+                    <a href="{{ url_for('inscrire_club', idEventClub=selectedEventClub.idEventClub) }}" class="btn btn-success me-2">S'inscrire</a>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+            <a href="{{ url_for('club_update', idEventClub=selectedEventClub.idEventClub)  }}" class="btn btn-primary me-2">Modifier évènement</a>
+            <form action="{{ url_for('club_delete', idEventClub=selectedEventClub.idEventClub) }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer cet événement ?');" class="d-inline">
+                <button type="submit" class="btn btn-danger">Supprimer évènement</button>
+            </form>
+        {% endif %}
     </div>
 
 {% endblock %}

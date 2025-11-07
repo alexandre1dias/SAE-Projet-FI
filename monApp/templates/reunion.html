@@ -6,60 +6,46 @@
         <div class="container py-5">
             <h2 class="text-center mb-5">Listes des prochaines réunions</h2>
             <div class="row row-cols-1 row-cols-md-3 g-4">
-                <!--Cartes-->
-                <!--faire une boucle-->
+                {% for reunion in prochaines_reunions %}
                 <div class="col">
-                    <div class="card pricing-card h-80">
+                    <div class="card pricing-card h-100">
                         <div class="card-header pricing-header basic-header p-4">
-                            <h3 class="card-title text-center mb-0">Réunion du comite</h3>
+                            <h3 class="card-title text-center mb-0">{{ reunion.nom }}</h3>
                         </div>
                         <div class="card-body p-4">
-                            <h2 class="card-title text-center mb-4 h4">19/10/2025 - 20h30</h2>
-                            <ul class="feature-list text-center mb-4">
-                                <li>Club House</li>
-                            </ul>
-                             <div class="text-center">
-                                <a href="#" class="btn btn-outline-primary btn-custom">S'inscrire</a>
-                                <a href="{{ url_for('reunion_update') }}" class="btn btn-outline-primary btn-custom">Modifier</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--Fin Carte-->
-
-                <div class="col">
-                    <div class="card pricing-card h-80">
-                        <div class="card-header pricing-header basic-header p-4">
-                            <h3 class="card-title text-center mb-0">Assemblée générale</h3>
-                        </div>
-                        <div class="card-body p-4">
-                            <h2 class="card-title text-center mb-4 h4">31/10/2025 - 19h30</h2>
-                            <ul class="feature-list text-center mb-4">
-                                <li>Club House</li>
-                            </ul>
-                             <div class="text-center">
-                                <a href="#" class="btn btn-outline-primary btn-custom">S'inscrire</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card pricing-card h-80">
-                        <div class="card-header pricing-header basic-header p-4">
-                            <h3 class="card-title text-center mb-0">Election du comité directeur</h3>
-                        </div>
-                        <div class="card-body p-4">
-                            <h2 class="card-title text-center mb-4 h4">19/12/2025 - 18h30</h2>
-                            <ul class="feature-list text-center mb-4">
-                                <li>Gymnase</li>
-                            </ul>
+                                <ul class="feature-list text-center mb-4">
+                                    <li>
+                                        <h3>{{ reunion.dateDebutRE.strftime('%d/%m') }} {{ reunion.heureDebutRE }} <br> {{ reunion.dateFinRE.strftime('%d/%m') }} {{ reunion.heureFinRE }}</h3>
+                                    </li>
+                                    <li>
+                                        <h3>{{ reunion.ville }}</h3>  
+                                    </li>
+                                    <li>
+                                        <h3>{{ reunion.adresse }}</h3>  
+                                    </li>
+                                </ul>
                             <div class="text-center">
-                                <a href="#" class="btn btn-outline-primary btn-custom">S'inscrire</a>
+                                {% if current_user.is_authenticated %}
+                                    
+                                    {% if session.get('user_type') == 'membre' %}
+                                        {% if reunion.idEvent in user_registered_event_ids %}
+                                            <a href="{{ url_for('desinscrire_reunion', idReunion=reunion.id) }}" class="btn btn-outline-danger btn-custom">Se désinscrire</a>
+                                        
+                                        {% else %}
+                                            <a href="{{ url_for('inscrire_reunion', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">S'inscrire</a>
+                                        
+                                        {% endif %}
+
+                                    {% elif session.get('user_type') == 'admin' %}
+                                        <a href="{{ url_for('reunion_update', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">Modifier</a>
+                                    {% endif %}
+
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
 
@@ -76,58 +62,31 @@
             <!--Fin Filtres ordre-->
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <!--Cartes-->
-                <!--faire une boucle-->
+                {% for reunion in anciennes_reunions %}
                 <div class="col">
                     <div class="card pricing-card h-100">
                         <div class="card-header pricing-header basic-header p-4">
-                            <h3 class="card-title text-center mb-0">Election du comité directeur</h3>
+                            <h3 class="card-title text-center mb-0">{{ reunion.nom }}</h3>
                         </div>
                         <div class="card-body p-4">
-                            <h2 class="card-title text-center mb-4 h4">01/10/2024 - 17h30</h2>
-                            <ul class="feature-list text-center mb-4">
-                                <li>Club House</li>
-                            </ul>
+                                <ul class="feature-list text-center mb-4">
+                                    <li>
+                                        <h3>{{ reunion.dateDebutRE.strftime('%d/%m') }} {{ reunion.heureDebutRE }} <br> {{ reunion.dateFinRE.strftime('%d/%m') }} {{ reunion.heureFinRE }}</h3>
+                                    </li>
+                                    <li>
+                                        <h3>{{ reunion.ville }}</h3>  
+                                    </li>
+                                    <li>
+                                        <h3>{{ reunion.adresse }}</h3>  
+                                    </li>
+                                </ul>
                             <div class="text-center">
-                                <a href="{{ url_for('reunion_view') }}" class="btn btn-outline-primary btn-custom">consulter rapport</a>
+                                <a href="{{ url_for('reunion_view', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">consulter rapport</a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!--Fin Carte-->
-
-                <div class="col">
-                    <div class="card pricing-card h-100">
-                        <div class="card-header pricing-header basic-header p-4">
-                            <h3 class="card-title text-center mb-0">Election du comité directeur</h3>
-                        </div>
-                        <div class="card-body p-4">
-                            <h2 class="card-title text-center mb-4 h4">01/10/2024 - 17h30</h2>
-                            <ul class="feature-list text-center mb-4">
-                                <li>Club House</li>
-                            </ul>
-                            <div class="text-center">
-                                <a href="{{ url_for('reunion_view') }}" class="btn btn-outline-primary btn-custom">consulter rapport</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card pricing-card h-100">
-                        <div class="card-header pricing-header basic-header p-4">
-                            <h3 class="card-title text-center mb-0">Election du comité directeur</h3>
-                        </div>
-                        <div class="card-body p-4">
-                            <h2 class="card-title text-center mb-4 h4">01/10/2024 - 17h30</h2>
-                            <ul class="feature-list text-center mb-4">
-                                <li>Club House</li>
-                            </ul>
-                            <div class="text-center">
-                                <a href="{{ url_for('reunion_view') }}" class="btn btn-outline-primary btn-custom">consulter rapport</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     {%endblock%}

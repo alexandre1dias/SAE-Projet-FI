@@ -2,8 +2,8 @@
 
 {%block main%}
     <div class="header-container">
-        <h1>Gestion des formulaires</h1> 
-        <a href="{{ url_for('gerer_anciens_formulaires') }}" class="btn btn-secondary">Voir les formulaires repondus</a>
+        <h1>Gestion des anciens formulaires</h1> 
+        <a href="{{ url_for('gerer_formulaires') }}" class="btn btn-secondary">Voir les formulaires non repondus</a>
     </div>
     <div class="row">  <!--colonne pour les filtres à gauche -->
         <aside class="col-lg-2 col-md-3 mb-4">
@@ -48,7 +48,7 @@
                         <th>Date</th>
                         <th>Sujet</th>
                         <th>Mail envoyeur</th>
-                        <th>Gérer</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,11 +59,14 @@
                         <td>{{ formulaire.sujet }}</td>
                         <td>{{ formulaire.email }}</td>
                         <td class="actions">
-                            <a href="{{ url_for('formulaire_view', idFormulaire=formulaire.id) }}" class="btn btn-warning">Gérer</a>
+                            <a href="{{ url_for('formulaire_view', idFormulaire=formulaire.id) }}" class="btn btn-warning">Consulter</a>
+                            <form class="d-inline" action="{{ url_for('formulaire_delete', idFormulaire=formulaire.id) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce formulaire ?');">
+                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                            </form>
                         </td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="5" class="text-center">Aucun formulaire en attente.</td></tr>
+                    <tr><td colspan="5" class="text-center">Aucun formulaire répondu.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

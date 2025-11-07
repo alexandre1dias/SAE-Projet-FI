@@ -1,30 +1,35 @@
 {% extends "base.html" %}
 {% block main %}
 
-<h1 class="mb-4" >[Nom Réunion]</h1>
+<h1 class="mb-4" >{{selectedReunion.nom}}</h1>
 <div class="row justify-content-center">
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 text-center shadow-sm">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    <h5 class="card-title">[date]</h5>
+                    <h5 class="card-title">Du {{ selectedReunion.dateDebutRE.strftime('%d/%m/%Y') }} à {{ selectedReunion.heureDebutRE }}<br>Au {{ selectedReunion.dateFinRE.strftime('%d/%m/%Y') }} à {{ selectedReunion.heureFinRE }}</h5>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 text-center shadow-sm">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    <h5 class="card-title"> [lieu]</h5>
+                    <h5 class="card-title">{{ selectedReunion.adresse }} à {{ selectedReunion.ville }}</h5>
                 </div>
             </div>
         </div>
     </div>
 <h2>Description:</h2>
-<p>[...]</p>
+<p>{{ selectedReunion.rapportRE or "Aucun rapport disponible." }}</p>
 <div class="d-flex justify-content-center">
-    <a href="{{ url_for('reunion') }}" class="btn btn-secondary">Retour</a>
-    <!-- boutons Admin-->
-    <a href="{{ url_for('reunion_update') }}" class="btn btn-primary">Modifier évènement</a>
-    <a href="{{ url_for('reunion_view') }}" class="btn btn-danger">Supprimer évènement</a>
+    {% if origine == 'calendrier' %}
+        <a href="{{ url_for('calendrier') }}" class="btn btn-secondary">Retour</a>
+    {% else %}
+        <a href="{{ url_for('reunion') }}" class="btn btn-secondary">Retour</a>
+    {% endif %}
+    <a href="{{ url_for('reunion_update', idReunion=selectedReunion.id) }}" class="btn btn-primary ms-2">Modifier évènement</a>
+    <form action="{{ url_for('reunion_delete', idReunion=selectedReunion.id) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réunion ?');" class="ms-2">
+        <button type="submit" class="btn btn-danger">Supprimer évènement</button>
+    </form>
 </div>
     
 {% endblock %}

@@ -5,16 +5,31 @@
         <div class="logo">
             <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="Logo Cercle d'Escrime">
         </div>
-        
         <form method="POST" action="" style="width: 100%;">
-            {{ form.hidden_tag() }}
             
+            {{ form.hidden_tag() }}
+            <!-- Gestion des erreurs de connexion -->
+            {%if message == "desincrit" %}
+                <div class="alert alert-danger" role="alert">Ce compte à été désinscrit, faite un demande via "Contact" pour plus d'information</div>
+            {%endif%}
+            {%if message == "mdpIncorrect" %}
+                <div class="alert alert-danger" role="alert">Ce mot de passe est incorrect</div>
+            {%endif%}
+            {%if message == "emailIncorrect" %}
+                <div class="alert alert-danger" role="alert">Cet email n'est pas enregistrer</div>
+            {% endif %}
             <div class="form-group">
-                {{ form.Login(class="form-input", placeholder="EMAIL") }}
+                {{ form.email(class="form-input" + (" is-invalid" if form.email.errors else ""), placeholder="EMAIL") }}
+                {% for error in form.email.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
             </div>
             
             <div class="form-group">
-                {{ form.password(class="form-input", placeholder="MOT DE PASSE") }}
+                {{ form.password(class="form-input" + (" is-invalid" if form.password.errors else ""), placeholder="MOT DE PASSE") }}
+                {% for error in form.password.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
             </div>
             
             <div class="form-group">
