@@ -113,7 +113,7 @@ DELIMITER ;
 
 
 DELIMITER //
-CREATE OR REPLACE TRIGGER mise_a_jour_niveau_membre
+CREATE OR REPLACE TRIGGER mise_a_jour_niveau_age_membre
 BEFORE UPDATE ON MEMBRE
 FOR EACH ROW
 BEGIN
@@ -147,29 +147,6 @@ begin
 end;
 //
 DELIMITER ;
-
-
-DELIMITER //
-create or replace trigger date_modifs before insert on MODIFICATION for each ROW
-begin
-    if New.dateModif IS NULL THEN
-        set New.dateModif = CURDATE();
-    end if;
-end;
-//
-DELIMITER ;
-
-
-DELIMITER //
-create or replace trigger date_modifs before update on MODIFICATION for each ROW
-begin
-    if New.dateModif IS NULL THEN
-        set New.dateModif = CURDATE();
-    end if;
-end;
-//
-DELIMITER ;
-
 
 -- definie compétition comme passée si sa date de fin est plus petite qu'aujourd'hui
 DELIMITER //
