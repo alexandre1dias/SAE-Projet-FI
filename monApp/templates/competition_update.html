@@ -126,7 +126,7 @@
     {%endif%}
     <div class="text-center mt-3">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#classementPDFModal">Mettre/Modifier le classement complet</button>
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inscrireMembreModal">Inscrire un membre</button>
+        <a href="{{ url_for('inscrire_membres_competition', idC = competition.id) }}" class="btn btn-success">Inscrire des membres</a>
     </div>
 
     <!--Fin Tableau-->

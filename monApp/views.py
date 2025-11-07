@@ -333,6 +333,48 @@ def competition_update(idCompetition):
 
     return render_template("competition_update.html",title=TITLE+"- Modification de la competition", competition=competition, lesParticipants = participants, origine=origine)
 
+@app.route("/competition/<int:idC>/inscrire_membres", methods=['GET'])
+@login_required
+@admin_required
+def inscrire_membres_competition(idC):
+    competition = CompetitionBD.query.get_or_404(idC)
+
+    membres_a_inscrire_ids = request.args.getlist('membres_a_inscrire_ids', type=int)
+    if not membres_a_inscrire_ids:
+        membres_a_inscrire_ids = []
+    if 'add' in request.args:
+        membres_a_inscrire_ids.append(int(request.args.get('add')))
+    if 'remove' in request.args:
+        membres_a_inscrire_ids.remove(int(request.args.get('remove')))
+    participations = ParticiperBD.query.filter_by(id_event=competition.id_event).all()
+    participants_ids = {p.id_membre for p in participations}
+    tous_les_non_participants = MembreBD.query.filter(MembreBD.id.notin_(participants_ids), MembreBD.activite == True).all()
+    surclassement_map = {'M9': 'M11', 'M11': 'M13', 'M13': 'M15', 'M15': 'M17','M17': 'M20', 'M20': 'Senior', 'Senior': 'Vétéran'}   
+    niveaux_liste = [niveau.strip() for niveau in competition.niveaux.split(',')]
+    non_participants_eligibles = []
+    for non_participant in tous_les_non_participants:
+        surclassement_niveau = surclassement_map.get(non_participant.niveau)
+        est_eligible = (non_participant.niveau in niveaux_liste) or \
+                       (surclassement_niveau and surclassement_niveau in niveaux_liste)
+        if est_eligible:
+            non_participants_eligibles.append(non_participant)
+    return render_template("competition_inscrire_membre.html", title=TITLE+"- Inscrire des membres", competition=competition, non_participants=non_participants_eligibles, membres_a_inscrire_ids=membres_a_inscrire_ids)
+
+@app.route("/competition/<int:idC>/inscription_membres", methods=['POST'])
+@login_required
+@admin_required
+def inscription_membres_competition(idC):
+    competition = CompetitionBD.query.get_or_404(idC)
+    membres_a_inscrire_ids = request.form.getlist('membres_a_inscrire')
+
+    for membre_id in membres_a_inscrire_ids:
+        deja_inscrit = ParticiperBD.query.filter_by(id_membre=membre_id, id_event=competition.id_event).first()
+        if not deja_inscrit:
+            nouvelle_participation = ParticiperBD(id_membre=membre_id, id_event=competition.id_event)
+            db.session.add(nouvelle_participation)
+    db.session.commit()
+    return redirect(url_for('competition_update', idCompetition=idC))
+
 @app.route("/competition/<int:idCompetition>/classer/<int:idMembre>", methods=['POST'])
 @login_required
 @admin_required
@@ -341,10 +383,8 @@ def classer_membre(idCompetition, idMembre):
     classement = request.form.get('classement')
     if not classement:
         return redirect(url_for('competition_update', idCompetition=idCompetition))
-    
     if not classement.isdigit():
         return redirect(url_for('competition_update', idCompetition=idCompetition))
-    
     resultat_existant = ResultatBD.query.filter_by(id_competition=idCompetition,id_membre=idMembre).first()
     if resultat_existant:
         resultat_existant.resultat = classement
