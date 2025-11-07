@@ -1,5 +1,4 @@
-DELIMITER // -- les délimiters MySQL se présentent ainsi, avec des // ou des $$. 
-
+DELIMITER //
 CREATE OR REPLACE TRIGGER verif_genre_competition
 BEFORE INSERT ON PARTICIPER
 
@@ -33,11 +32,10 @@ BEGIN
     END IF;
 END;
 //
-
 DELIMITER ;
 
-DELIMITER //
 
+DELIMITER //
 CREATE OR REPLACE TRIGGER verif_niveau_competition
 BEFORE INSERT ON PARTICIPER
 FOR EACH ROW
@@ -83,69 +81,8 @@ BEGIN
     END IF;
 END;
 //
-
 DELIMITER ;
 
-DELIMITER //
-
-/**
-CREATE OR REPLACE TRIGGER creation_membre_apres_acceptation
-AFTER UPDATE ON INSCRIPTION
-FOR EACH ROW
-BEGIN
-    -- Vérifie si l'inscription vient d'être acceptée (passe de 0 à 1)
-    IF NEW.acceptee = 1 AND OLD.acceptee <> 1 THEN -- (OLD.acceptée <> 1 permet de savoir si le membre n'est pas déjà crée)
-        INSERT INTO MEMBRE (nomM, prenomM, emailM, mdpM, ddnM, sexeM, date_inscription, niveau, statut, activite, IdParamNotifMembre)
-        VALUES (NEW.nomI, NEW.prenomI, NEW.mailInscr, NEW.mdpI, NEW.ddnI, NEW.sexeI, NOW(), NULL, 'Membre', 1, NULL);
-    END IF;
-END;
-//
-**/
-
-DELIMITER ;
-
-
--- NOTIFICATION POUR formulaire de contact, inscription , demande de modification 
-
-DELIMITER //
-
-CREATE OR REPLACE TRIGGER notif_admin_inscription
-AFTER INSERT ON INSCRIPTION
-FOR EACH ROW
-BEGIN
-    INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, IdAdmin)
-    VALUES ('Inscription', CONCAT('Nouvelle inscription : ', NEW.nomI, ' ', NEW.prenomI), 0, NULL, 1); -- ici IdAdmin = 1 par exemple
-    
-END;
-//
-
-DELIMITER ;
-
-DELIMITER //
-
-CREATE OR REPLACE TRIGGER notif_admin_formulaire
-AFTER INSERT ON FORMULAIRE_CONTACT
-FOR EACH ROW
-BEGIN
-    INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, IdAdmin)
-    VALUES ('Formulaire', CONCAT('Nouveau formulaire : ', NEW.sujetFC), 0, NEW.idMembre, 1);
-END;
-//
-
-DELIMITER ;
-
-DELIMITER //
-
-CREATE OR REPLACE TRIGGER notif_admin_modif
-AFTER INSERT ON FORMULAIRE_CONTACT
-FOR EACH ROW
-BEGIN
-    INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, IdAdmin)
-    VALUES ('DemandeModification', CONCAT('Nouvelle demande de modification'), 0, NEW.idMembre, 1);
-END;
-//
-
-DELIMITER ;
 
 -- Trigger pour calculer le niveau d’un membre à partir de sa date de naissance
 DELIMITER //
@@ -154,9 +91,7 @@ BEFORE INSERT ON MEMBRE
 FOR EACH ROW
 BEGIN
     DECLARE calcul_age INT;
-
     SET calcul_age = (YEAR(CURDATE()) - YEAR(NEW.ddnM)) - (CASE WHEN DATE_FORMAT(CURDATE(), '%m%d') < DATE_FORMAT(NEW.ddnM, '%m%d') THEN 1 ELSE 0 END);
-
     IF NEW.niveau IS NULL THEN
         SET NEW.niveau = CASE
             WHEN calcul_age < 10 THEN 'M9'
@@ -176,8 +111,8 @@ END;
 //
 DELIMITER ;
 
-DELIMITER //
 
+DELIMITER //
 CREATE OR REPLACE TRIGGER mise_a_jour_niveau_membre
 BEFORE UPDATE ON MEMBRE
 FOR EACH ROW
@@ -209,10 +144,10 @@ begin
     if New.dateInscription IS NULL THEN
         set New.dateInscription = CURDATE();
     end if;
- 
 end;
 //
 DELIMITER ;
+
 
 DELIMITER //
 create or replace trigger date_modifs before insert on MODIFICATION for each ROW
@@ -223,6 +158,7 @@ begin
 end;
 //
 DELIMITER ;
+
 
 DELIMITER //
 create or replace trigger date_modifs before update on MODIFICATION for each ROW
@@ -235,110 +171,8 @@ end;
 DELIMITER ;
 
 
-
-
-
-
-
-
-
-
-
--- Quand un formulaire de contact a une réponse
-/**
-DELIMITER //
-
-CREATE OR REPLACE TRIGGER notif_membre_reponse_formulaire
-AFTER INSERT ON REPONDRE
-FOR EACH ROW
-BEGIN
-    DECLARE membre_id INT;
-
-    -- Récupérer l'idMembre associé à ce résultat depuis la table REPONDRE
-    SELECT idMembre INTO membre_id FROM REPONDRE WHERE idRepondre = NEW.idRepondre;
-    INSERT INTO Notifs (typeN, sourceN, lue, idMembre, IdAdmin)
-    VALUES ('RéponseFormulaire', CONCAT('Votre formulaire a reçu une réponse'), 0, NEW.idMembre, NULL);
-END;
-//
-
-DELIMITER ;
-
--- Quand une demande de modification est acceptée
-
-DELIMITER //
-
-CREATE OR REPLACE TRIGGER notif_membre_modif_acceptee
-AFTER UPDATE ON FORMULAIRE_CONTACT
-FOR EACH ROW
-BEGIN
-    IF NEW.acceptee = 1 AND OLD.acceptee <> 1 THEN -- (OLD.acceptee <> 1 permet de savoir si la demande n'a pas déjà été acceptee)
-        INSERT INTO Notifs (typeN, sourceN, lue, idMembre, IdAdmin)
-        VALUES ('DemandeModif', 'Votre demande de modification a été acceptée', 0, NEW.idMembre, NULL);
-    END IF;
-END;
-//
-
-DELIMITER ;
-**/ 
-
--- Quand de nouveaux résultats sont ajoutés
-
-DELIMITER //
-
-CREATE OR REPLACE TRIGGER notif_membre_nouveau_resultat
-AFTER INSERT ON RESULTER
-FOR EACH ROW
-BEGIN
-    DECLARE membre_id INT;
-
-    -- Récupérer l'idMembre associé à ce résultat depuis la table RESULTAT
-    SELECT idMembre INTO membre_id FROM RESULTAT WHERE idResultat = NEW.idResultat;
-
-    INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, IdAdmin)
-    VALUES ('Resultat', 'Un nouveau résultat a été ajouté', 0, membre_id, NULL);
-END;
-//
-
-DELIMITER ;
-
--- Event Crée
-
-DELIMITER //
-
-CREATE OR REPLACE TRIGGER notif_membre_evenement_cree
-AFTER INSERT ON EVENEMENT
-FOR EACH ROW
-BEGIN
-    -- ici on notifie tous les membres
-    INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, IdAdmin)
-    SELECT 'Evenement', CONCAT('Un nouvel événement est créé'), 0, idMembre, NULL
-    FROM MEMBRE;
-END;
-//
-
-DELIMITER ;
-
-
--- quand un membre s'inscrit à un evenement
-
-DELIMITER //
-
-CREATE OR REPLACE TRIGGER notif_membre_inscription_evenement
-AFTER INSERT ON PARTICIPER
-FOR EACH ROW
-BEGIN
-    INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, IdAdmin)
-    VALUES ('Inscription', 'Vous êtes inscrit à un événement', 0, NEW.idMembre, NULL);
-END;
-//
-
-DELIMITER ;
-
-
 -- definie compétition comme passée si sa date de fin est plus petite qu'aujourd'hui
-
 DELIMITER //
-
 -- Création de l'événement planifié
 CREATE OR REPLACE EVENT mettre_a_jour_statut_competition
 ON SCHEDULE EVERY 1 MINUTE STARTS NOW()
@@ -352,5 +186,4 @@ BEGIN
     WHERE dateFinCO < CURDATE() AND (passeeCO = 0 OR passeeCO IS NULL);
 END;
 //
-
 DELIMITER ;

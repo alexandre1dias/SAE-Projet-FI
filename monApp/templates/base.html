@@ -138,14 +138,16 @@
                                     </ul>
                                 </div>
                             </li>
-                            
+                            {% else %}
                             <!-- Paramètres -->
                             <li class="nav-item">
                                 <a class="btn position-relative" id="param" href="{{ url_for('parametres') }}">
                                     <img src="{{ url_for('static', filename='images/parametres.png') }}" alt="Parametres" style="height: 30px;"/>
                                 </a>
                             </li>
-                        
+                            {% endif %}
+                            
+                        {% if current_user.is_authenticated %}
                             <!-- Logout -->
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Se déconnecter</a></li>
                         {% else %}

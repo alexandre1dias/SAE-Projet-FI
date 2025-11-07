@@ -21,6 +21,7 @@
                 </label>
             </div>    
         </li>
+        {% if current_user.is_authenticated %}
         <li class="list-group-item">
             <h4>Paramètres du site</h4>
             <a href="/parametres_notifs/"><button type="button" class="btn-notif">Aller aux parametres de notifications</button></a>  
@@ -29,7 +30,9 @@
             <h4>Paramètres de confidentialités</h4>
             <a href="/changer_mdp/"><button type="button" class="btn-notif">Changer le mot de passe</button></a>  
         </li>
+        {%endif%}
     </ul>
+
     
 
 

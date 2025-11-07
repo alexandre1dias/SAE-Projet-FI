@@ -1,18 +1,18 @@
 -- Désactivation de la vérification des clés étrangères 
 SET FOREIGN_KEY_CHECKS=0;
 
--- Insertion des administrateurs (avec idParamNotifAdmin initialement à NULL pour éviter la dépendance circulaire)
+-- Insertion des administrateurs (existant)
 INSERT INTO ADMINISTRATEUR (emailA, mdpA, idParamNotifAdmin) VALUES
 ('admin@escrime.com', 'motdepasseadmin', NULL);
 
--- Insertion des paramètres de notification pour les administrateurs
+-- Insertion des paramètres de notification pour les administrateurs (existant)
 INSERT INTO PARAMETRE_NOTIF_ADMIN (idParamNotifAdmin, formulaireDemandeSite, formulaireDemandeMail, formulaireQuestionSite, formulaireQuestionMail, formulaireSignalementSite, formulaireSignalementMail, demandeModifSite, demandeModifMail, demandeInscriptionSite, demandeInscriptionMail, idAdmin) VALUES
 (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 
--- Mise à jour de l'administrateur pour lier ses paramètres de notification
+-- Mise à jour de l'administrateur (existant)
 UPDATE ADMINISTRATEUR SET idParamNotifAdmin = 1 WHERE idAdmin = 1;
 
--- Insertion des membres (avec idParamNotifMembre initialement à NULL)
+-- Insertion des membres (existants 1-8)
 INSERT INTO MEMBRE (nomM, prenomM, emailM, mdpM, date_inscription, sexeM, ddnM, statut, activite, idParamNotifMembre) VALUES
 ('Dupont', 'Jean', 'jean.dupont@email.com', 'mdp123', '2023-01-15', 'Homme', '1995-05-20', 'Membre', 1, NULL),
 ('Durand', 'Marie', 'marie.durand@email.com', 'mdp456', '2023-02-20', 'Femme', '2008-08-10', 'Membre', 1, NULL),
@@ -21,28 +21,128 @@ INSERT INTO MEMBRE (nomM, prenomM, emailM, mdpM, date_inscription, sexeM, ddnM, 
 ('Dominique', 'MARQUET', 'dom.mar@email.com', 'mdp442', '2006-01-01', 'Homme', '1974-02-07','Vice-Président', 1, NULL),
 ('Bernard', 'DELADERIERE', 'ber.del@email.com', 'mdp5231', '1999-01-01', 'Homme', '1976-02-07','Trésorier Général', 1, NULL),
 ('Pascale', 'LHOMME', 'pas.lhm@email.com', 'mdp433', '2002-01-01', 'Femme', '1978-02-07','Secrétaire Générale', 1, NULL),
-('Christophe', 'LECHOPIER', 'chr.lec@email.com', 'mdp541', '2005-01-01', 'Homme', '1969-02-07','Membre du Comité', 1, NULL);
+('Christophe', 'LECHOPIER', 'chr.lec@email.com', 'mdp541', '2005-01-01', 'Homme', '1969-02-07','Membre du Comité', 1, NULL),
+('Petit', 'Lucas', 'lucas.petit@email.com', 'mdpL1', '2024-09-05', 'Homme', '2010-06-15', 'Membre', 1, NULL),
+('Moreau', 'Chloé', 'chloe.moreau@email.com', 'mdpC2', '2024-09-10', 'Femme', '2013-03-10', 'Membre', 1, NULL),
+('Garcia', 'Alice', 'alice.garcia@email.com', 'mdpA3', '2024-09-12', 'Femme', '2000-01-01', 'Membre', 1, NULL),
+('Robert', 'Tom', 'tom.robert@email.com', 'mdT4', '2024-09-15', 'Homme', '1985-11-30', 'Ancien Membre', 0, NULL),
+('Richard', 'Léa', 'lea.richard@email.com', 'mdpL5', '2024-10-01', 'Femme', '2005-07-20', 'Membre', 1, NULL),
+('Garnier', 'Hugo', 'hugo.garnier@email.com', 'mdp14', '2025-01-10', 'Homme', '2008-04-12', 'Membre', 1, NULL), -- M17
+('Roux', 'Manon', 'manon.roux@email.com', 'mdp15', '2025-01-11', 'Femme', '2009-11-01', 'Membre', 1, NULL), -- M17
+('David', 'Léo', 'leo.david@email.com', 'mdp16', '2025-01-12', 'Homme', '2012-07-20', 'Membre', 1, NULL), -- M13
+('Bertrand', 'Camille', 'camille.bertrand@email.com', 'mdp17', '2025-01-13', 'Femme', '2011-01-30', 'Membre', 1, NULL), -- M15
+('Morel', 'Arthur', 'arthur.morel@email.com', 'mdp18', '2025-01-14', 'Homme', '2013-03-15', 'Membre', 1, NULL), -- M13 
+('Fournier', 'Zoé', 'zoe.fournier@email.com', 'mdp19', '2025-01-15', 'Femme', '2005-08-25', 'Membre', 1, NULL), -- M20
+('Girard', 'Jules', 'jules.girard@email.com', 'mdp20', '2025-02-01', 'Homme', '2004-05-10', 'Membre', 1, NULL), -- Senior
+('Bonnet', 'Emma', 'emma.bonnet@email.com', 'mdp21', '2025-02-02', 'Femme', '1999-02-18', 'Membre', 1, NULL), -- Senior
+('Dubois', 'Gabriel', 'gabriel.dubois@email.com', 'mdp22', '2025-02-03', 'Homme', '1980-12-05', 'Membre', 1, NULL), -- Vétéran
+('Leclerc', 'Louise', 'louise.leclerc@email.com', 'mdp23', '2025-02-04', 'Femme', '1975-09-08', 'Membre', 1, NULL), -- Vétéran
+('Meyer', 'Adam', 'adam.meyer@email.com', 'mdp24', '2025-02-05', 'Homme', '2016-01-02', 'Membre', 1, NULL), -- M9
+('Barbier', 'Rose', 'rose.barbier@email.com', 'mdp25', '2025-02-06', 'Femme', '2010-06-19', 'Membre', 1, NULL), -- M15
+('Brun', 'Raphaël', 'raphael.brun@email.com', 'mdp26', '2025-02-07', 'Homme', '2007-03-22', 'Membre', 1, NULL), -- M20
+('Guerin', 'Jade', 'jade.guerin@email.com', 'mdp27', '2025-02-08', 'Femme', '2006-10-14', 'Membre', 1, NULL), -- M20
+('Perrin', 'Louis', 'louis.perrin@email.com', 'mdp28', '2025-02-09', 'Homme', '2002-04-01', 'Membre', 1, NULL), -- Senior
+('Mercier', 'Ambre', 'ambre.mercier@email.com', 'mdp29', '2025-02-10', 'Femme', '1995-07-07', 'Membre', 1, NULL), -- Senior
+('Chevalier', 'Nathan', 'nathan.chevalier@email.com', 'mdp30', '2025-02-11', 'Homme', '2013-08-11', 'Membre', 1, NULL), -- M13
+('Lemoine', 'Anna', 'anna.lemoine@email.com', 'mdp31', '2025-02-12', 'Femme', '2015-05-05', 'Membre', 1, NULL), -- M11
+('Benali', 'Mohamed', 'mohamed.benali@email.com', 'mdp32', '2025-02-13', 'Homme', '1990-11-30', 'Membre', 1, NULL), -- Senior
+('Roy', 'Inès', 'ines.roy@email.com', 'mdp33', '2025-02-14', 'Femme', '1988-01-20', 'Membre', 1, NULL); -- Senior
 
--- Insertion des paramètres de notification pour les membres
+
+-- Insertion des paramètres de notification pour les membres (existants 1-3)
 INSERT INTO PARAMETRE_NOTIF_MEMBRE (eventInscriptionSite, evenementInscriptionMail, eventNouveauSite, eventNouveauMail, eventAnnulationSite, eventAnnulationMail, resultatNouveauSite, resultatNouveauMail, reponseFormulaireSite, reponseFormulaireMail, modifProfilSite, modifProfilMail, idMembre) VALUES
 (1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1),
 (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2),
 (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3);
 
--- Mise à jour des membres pour lier leurs paramètres de notification
+-- Ajouts de paramètres de notification (existants 4-13)
+INSERT INTO PARAMETRE_NOTIF_MEMBRE (eventInscriptionSite, evenementInscriptionMail, eventNouveauSite, eventNouveauMail, eventAnnulationSite, eventAnnulationMail, resultatNouveauSite, resultatNouveauMail, reponseFormulaireSite, reponseFormulaireMail, modifProfilSite, modifProfilMail, idMembre) VALUES
+(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4),
+(1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 5),
+(1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 6),
+(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 7),
+(0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 8),
+(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9),
+(1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 10),
+(1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 11),
+(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12),
+(1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 13),
+(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 14),
+(1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 15),
+(1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 16),
+(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 17),
+(1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 18),
+(1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 19),
+(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 20),
+(1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 21),
+(0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 22),
+(1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 23),
+(1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 24),
+(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 25),
+(1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 26),
+(1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 27),
+(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 28),
+(1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 29),
+(1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 30),
+(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 31),
+(1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 32),
+(1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 33);
+
+
+-- Mise à jour des membres pour lier leurs paramètres de notification (existants 1-3)
 UPDATE MEMBRE SET idParamNotifMembre = 1 WHERE idMembre = 1;
 UPDATE MEMBRE SET idParamNotifMembre = 2 WHERE idMembre = 2;
 UPDATE MEMBRE SET idParamNotifMembre = 3 WHERE idMembre = 3;
+UPDATE MEMBRE SET idParamNotifMembre = 4 WHERE idMembre = 4;
+UPDATE MEMBRE SET idParamNotifMembre = 5 WHERE idMembre = 5;
+UPDATE MEMBRE SET idParamNotifMembre = 6 WHERE idMembre = 6;
+UPDATE MEMBRE SET idParamNotifMembre = 7 WHERE idMembre = 7;
+UPDATE MEMBRE SET idParamNotifMembre = 8 WHERE idMembre = 8;
+UPDATE MEMBRE SET idParamNotifMembre = 9 WHERE idMembre = 9;
+UPDATE MEMBRE SET idParamNotifMembre = 10 WHERE idMembre = 10;
+UPDATE MEMBRE SET idParamNotifMembre = 11 WHERE idMembre = 11;
+UPDATE MEMBRE SET idParamNotifMembre = 12 WHERE idMembre = 12;
+UPDATE MEMBRE SET idParamNotifMembre = 13 WHERE idMembre = 13;
+UPDATE MEMBRE SET idParamNotifMembre = 14 WHERE idMembre = 14;
+UPDATE MEMBRE SET idParamNotifMembre = 15 WHERE idMembre = 15;
+UPDATE MEMBRE SET idParamNotifMembre = 16 WHERE idMembre = 16;
+UPDATE MEMBRE SET idParamNotifMembre = 17 WHERE idMembre = 17;
+UPDATE MEMBRE SET idParamNotifMembre = 18 WHERE idMembre = 18;
+UPDATE MEMBRE SET idParamNotifMembre = 19 WHERE idMembre = 19;
+UPDATE MEMBRE SET idParamNotifMembre = 20 WHERE idMembre = 20;
+UPDATE MEMBRE SET idParamNotifMembre = 21 WHERE idMembre = 21;
+UPDATE MEMBRE SET idParamNotifMembre = 22 WHERE idMembre = 22;
+UPDATE MEMBRE SET idParamNotifMembre = 23 WHERE idMembre = 23;
+UPDATE MEMBRE SET idParamNotifMembre = 24 WHERE idMembre = 24;
+UPDATE MEMBRE SET idParamNotifMembre = 25 WHERE idMembre = 25;
+UPDATE MEMBRE SET idParamNotifMembre = 26 WHERE idMembre = 26;
+UPDATE MEMBRE SET idParamNotifMembre = 27 WHERE idMembre = 27;
+UPDATE MEMBRE SET idParamNotifMembre = 28 WHERE idMembre = 28;
+UPDATE MEMBRE SET idParamNotifMembre = 29 WHERE idMembre = 29;
+UPDATE MEMBRE SET idParamNotifMembre = 30 WHERE idMembre = 30;
+UPDATE MEMBRE SET idParamNotifMembre = 31 WHERE idMembre = 31;
+UPDATE MEMBRE SET idParamNotifMembre = 32 WHERE idMembre = 32;
+UPDATE MEMBRE SET idParamNotifMembre = 33 WHERE idMembre = 33;
 
--- Insertion des événements (table parente)
+
+-- Insertion des événements 
 INSERT INTO EVENEMENT () VALUES
 (), (), (), (), (), (),
--- Événements pour les compétitions
+-- Événements pour les compétitions 
 (), (), (), (), (), (), (), (), (),
--- Événements pour les eventclubs
-(), (), (), (), (), (), (), (), (), (), ();
+-- Événements pour les eventclubs 
+(), (), (), (), (), (), (), (), (), (), (),
+-- Compétitions (IDs 27-30)
+(), (), (), (),
+-- Entraînements (IDs 31-32)
+(), (),
+-- Réunions (IDs 33-34)
+(), (),
+-- EventClubs (IDs 35-37)
+(), (), ();
 
--- Insertion des compétitions
+
+-- Insertion des compétitions (existantes)
 INSERT INTO COMPETITION (nomCO, villeCO, adresseCO, dateDebutCO, heureDebutCO, dateFinCO, heureFinCO, typeArmeCO, sexeCO, typeCompete, descriptionCO, niveauCO, classementCO,passeeCO, idEvent) VALUES
 ('Tournoi Régional', 'Orléans', '123 Rue du Sport', '2024-05-10', '09:00', '2024-05-11', '18:00', 'Épée', 'Mixte', 'Régional', 'Compétition ouverte à tous les niveaux régionaux.', 'Senior', 'En cours', 1,1),
 ('Championnat M17', 'Tours', '456 Avenue de la Victoire', '2024-06-15', '08:30', '2024-06-15', '19:00', 'Fleuret', 'Femme', 'National', 'Championnat national pour la catégorie M17.', 'M17', NULL, 1,2),
@@ -55,17 +155,28 @@ INSERT INTO COMPETITION (nomCO, villeCO, adresseCO, dateDebutCO, heureDebutCO, d
 ('Tournoi de la Chandeleur', 'Vierzon', '4 Rue de la Paix', '2024-02-03', '09:00', '2024-02-04', '17:00', 'Fleuret', 'Mixte', 'Régional', 'Tournoi régional de début d''année.', 'M17', 'Terminé', 1, 12),
 ('Grand Prix de Printemps', 'Chartres', '5 Boulevard de la Liberté', '2024-03-22', '08:30', '2024-03-23', '19:00', 'Sabre', 'Homme', 'National', 'Grand prix national de sabre.', 'Senior', 'Terminé', 1, 13),
 ('Critérium M13', 'Châteauroux', '6 Avenue du Stade', '2024-04-12', '10:00', '2024-04-12', '16:00', 'Épée', 'Femme', 'Départemental', 'Critérium pour les jeunes épéistes.', 'M13', 'Terminé', 1, 14),
-('Mémorial Jean Moulin', 'Montargis', '7 Rue de la Résistance', '2023-11-11', '09:00', '2023-11-11', '18:00', 'Toutes', 'Mixte', 'Régional', 'Tournoi commémoratif toutes armes.', 'Tous', 'Terminé', 1, 15);
+('Mémorial Jean Moulin', 'Montargis', '7 Rue de la Résistance', '2023-11-11', '09:00', '2023-11-11', '18:00', 'Toutes', 'Mixte', 'Régional', 'Tournoi commémoratif toutes armes.', 'Tous', 'Terminé', 1, 15),
+('Tournoi d''Automne M20', 'Orléans', '123 Rue du Sport', '2025-09-27', '09:00', '2025-09-28', '18:00', 'Fleuret', 'Homme', 'Régional', 'Tournoi de début de saison M20 fleuret.', 'M20', NULL, 0, 27),
+('Challenge M13/M15', 'Blois', '1 Rue de la Halle', '2026-02-07', '10:00', '2026-02-07', '17:00', 'Sabre', 'Mixte', 'Départemental', 'Compétition amicale pour M13 et M15.', 'M13,M15', NULL, 0, 28),
+('Coupe de Pâques Senior', 'Tours', '456 Avenue de la Victoire', '2026-04-04', '08:30', '2026-04-05', '19:00', 'Épée', 'Femme', 'Régional', 'Compétition épée dames senior.', 'Senior,Vétéran', NULL, 0, 29),
+('Circuit National Vétérans', 'Paris', '2 Avenue de la Porte', '2025-05-01', '09:00', '2025-05-01', '18:00', 'Toutes', 'Mixte', 'National', 'Étape nationale pour les vétérans.', 'Vétéran', 'Terminé', 1, 30);
 
--- Insertion des entraînements
+
+-- Insertion des entraînements (existants)
 INSERT INTO ENTRAINEMENT (jourEN, villeEN, adresseEN, dateEN, heureDebutEN, heureFinEN, typeArmeEN, niveauEN, idEvent) VALUES
-('Lundi', 'Blois', '5 rue de la salle', '2024-04-29', '18:00', '20:00', 'Sabre', 'Tous', 3);
+('Lundi', 'Blois', '5 rue de la salle', '2024-04-29', '18:00', '20:00', 'Sabre', 'Tous', 3),
+('Mardi', 'Orléans', 'Gymnase A', NULL, '18:00', '20:00', 'Fleuret', 'M13,M15', 31),
+('Jeudi', 'Orléans', 'Gymnase A', NULL, '19:00', '21:30', 'Épée', 'M17,M20,Senior', 32);
 
--- Insertion des réunions
+
+-- Insertion des réunions (existante)
 INSERT INTO REUNION (nomRE, villeRE, adresseRE, dateDebutRE, heureDebutRE, dateFinRE, heureFinRE, nbParticipantsRE, typeReunionRE, rapportRE, niveauRE, idEvent) VALUES
-('AG Annuelle', 'Blois', '5 rue de la salle', '2024-09-05', '19:00', '2024-09-05', '21:00', 10050, 'Assemblée', 'Rapport annuel des activités et finances.', 'Tous', 4);
+('AG Annuelle', 'Blois', '5 rue de la salle', '2024-09-05', '19:00', '2024-09-05', '21:00', 10050, 'Assemblée', 'Rapport annuel des activités et finances.', 'Tous', 4),
+('Réunion Comité Directeur', 'Orléans', 'Salle du Club', '2025-11-15', '20:00', '2025-11-15', '22:00', 8, 'Comité', 'Préparation budget 2026 et calendrier.', 'Comité', 33),
+('Réunion Bénévoles Fête du Club', 'Orléans', 'Salle du Club', '2024-06-20', '19:00', '2024-06-20', '20:00', 15, 'Organisation', 'Répartition des tâches pour la fête du 6 juillet.', 'Tous', 34);
 
--- Insertion des événements de club (6 passés, 6 à venir)
+
+-- Insertion des événements de club (existants)
 INSERT INTO EVENTCLUB (NomEV, villeEV, adresseEV, dateDebutEV, heureDebutEV, dateFinEV, heureFinEV, nbParticipantEV, descriptionEV, niveauxEV, passeeEV, idEvent) VALUES
 -- 6 événements passés
 ('Fête du Club 2023', 'Orléans', '789 Boulevard de la Fête', '2023-07-01', '12:00', '2023-07-01', '22:00', 100, 'Journée festive pour tous les membres et leurs familles.', 'Tous', 1, 5),
@@ -74,69 +185,145 @@ INSERT INTO EVENTCLUB (NomEV, villeEV, adresseEV, dateDebutEV, heureDebutEV, dat
 ('Téléthon Escrime', 'Orléans', 'Place du Martroi', '2023-12-02', '10:00', '2023-12-02', '18:00', 150, 'Démonstrations et initiations au profit du Téléthon.', 'Tous', 1, 18),
 ('Galette des Rois', 'Salle du Club', 'Orléans', '2024-01-13', '16:00', '2024-01-13', '18:00', 60, 'Partage de la galette des rois avec les membres.', 'Tous', 1, 19),
 ('Tournoi Interne de Noël', 'Gymnase A', 'Orléans', '2023-12-16', '14:00', '2023-12-16', '18:00', 40, 'Petit tournoi amical pour finir l''année.', 'Tous', 1, 20),
--- 6 événements à venir
-('Fête du Club 2024', 'Orléans', '789 Boulevard de la Fête', '2024-07-06', '12:00', '2024-07-06', '22:00', 100, 'Journée festive pour tous les membres et leurs familles.', 'Tous', 0, 21),
-('Stage d''été', 'Orléans', 'Gymnase A', '2024-08-19', '09:00', '2024-08-23', '17:00', 25, 'Stage de pré-saison pour tous les compétiteurs.', 'M15,M17,M20,Senior', 0, 22),
-('Journée Portes Ouvertes 2024', 'Orléans', 'Gymnase A', '2024-09-07', '10:00', '2024-09-07', '17:00', 50, 'Venez découvrir l''escrime et notre club !', 'Tous', 0, 23),
-('Sortie Club à Chambord', 'Chambord', 'Château de Chambord', '2024-10-05', '09:00', '2024-10-05', '18:00', 40, 'Visite du château et pique-nique.', 'Tous', 0, 24),
-('Soirée Halloween', 'Salle du Club', 'Orléans', '2024-10-31', '19:00', '2024-10-31', '23:00', 50, 'Soirée déguisée pour les membres.', 'Tous', 0, 25),
-('Tournoi Interne de la Toussaint', 'Gymnase A', 'Orléans', '2024-11-02', '14:00', '2024-11-02', '18:00', 40, 'Tournoi amical ouvert à tous les membres.', 'Tous', 0, 26);
+('Fête du Club 2024', 'Orléans', '789 Boulevard de la Fête', '2024-07-06', '12:00', '2024-07-06', '22:00', 100, 'Journée festive pour tous les membres et leurs familles.', 'Tous', 1, 21),
+('Stage d''été', 'Orléans', 'Gymnase A', '2024-08-19', '09:00', '2024-08-23', '17:00', 25, 'Stage de pré-saison pour tous les compétiteurs.', 'M15,M17,M20,Senior', 1, 22),
+('Journée Portes Ouvertes 2024', 'Orléans', 'Gymnase A', '2024-09-07', '10:00', '2024-09-07', '17:00', 50, 'Venez découvrir l''escrime et notre club !', 'Tous', 1, 23),
+('Sortie Club à Chambord', 'Chambord', 'Château de Chambord', '2024-10-05', '09:00', '2024-10-05', '18:00', 40, 'Visite du château et pique-nique.', 'Tous', 1, 24),
+('Soirée Halloween', 'Salle du Club', 'Orléans', '2024-10-31', '19:00', '2024-10-31', '23:00', 50, 'Soirée déguisée pour les membres.', 'Tous', 1, 25),
+('Tournoi Interne de la Toussaint', 'Gymnase A', 'Orléans', '2024-11-02', '14:00', '2024-11-02', '18:00', 40, 'Tournoi amical ouvert à tous les membres.', 'Tous', 1, 26),
+('Arbre de Noël 2025', 'Orléans', 'Salle du Club', '2025-12-20', '15:00', '2025-12-20', '18:00', 70, 'Goûter de Noël, venue du Père Noël et petits cadeaux.', 'Tous', 0, 35),
+('Stage de Février 2026', 'Orléans', 'Gymnase A', '2026-02-16', '09:00', '2026-02-20', '17:00', 30, 'Stage de perfectionnement multi-armes.', 'M13,M15,M17', 0, 36),
+('Nettoyage de Printemps', 'Orléans', 'Salle du Club', '2025-04-05', '09:00', '2025-04-05', '13:00', 25, 'Matinée rangement et nettoyage du matériel et de la salle.', 'Tous', 1, 37);
 
--- Insertion des participations aux événements
+
+-- Insertion des participations aux événements (corrigée)
 INSERT INTO PARTICIPER (idEvent, idMembre) VALUES
-(1, 1), -- Jean participe au Tournoi Régional
-(2, 2), -- Marie participe au Championnat M17
+(1, 20), -- Jules (Senior/H) participe au Tournoi Régional (Senior)
 (3, 1), -- Jean participe à l'entraînement
 (3, 2), -- Marie participe à l'entraînement
 (4, 1), -- Jean participe à l'AG (Réunion)
 (5, 1), -- Jean participe à la Fête du Club 2023 (passé)
 (5, 2), -- Marie participe à la Fête du Club 2023 (passé)
-(21, 1), -- Jean participe à la Fête du Club 2024 (futur)
-(21, 2), -- Marie participe à la Fête du Club 2024 (futur)
-(21, 3); -- Paul participe à la Fête du Club 2024 (futur)
+(21, 1), -- Jean participe à la Fête du Club 2024 (passé)
+(21, 2), -- Marie participe à la Fête du Club 2024 (passé)
+(21, 3), -- Paul participe à la Fête du Club 2024 (passé)
+(28, 10), -- Lucas (M15/H) s'inscrit au Challenge M13/M15 (Mixte)
+(29, 12), -- Alice (Senior/F) s'inscrit à la Coupe de Pâques (Femme/Senior,Vétéran)
+(29, 7),  -- Pascale (Vétéran/F) s'inscrit à la Coupe de Pâques (Femme/Senior,Vétéran)
+(7, 1),   -- Jean (Senior/H) s'inscrit à l'Open de Blois (Homme/Senior)
+(31, 11), -- Chloé (M13) à l'entraînement Fleuret M13/M15
+(32, 1),  -- Jean (Senior) à l'entraînement Épée M17/M20/Senior
+(32, 12), -- Alice (Senior) à l'entraînement Épée M17/M20/Senior
+(33, 4), (33, 5), (33, 6), (33, 7), (33, 8),
+(37, 1), (37, 2), (37, 4),
+(32, 14), -- Hugo (M17/H) -> Entraînement Épée (idEvent 32: M17,M20,Senior)
+(6, 15),  -- Manon (M17/F) -> Champ M17 Futur (idEvent 6: M17/F)
+(36, 15), -- Manon (M17/F) -> Stage Février 2026 (idEvent 36: M13,M15,M17)
+(28, 16), -- Léo (M13/H) -> Challenge M13/M15 (idEvent 28: M13,M15/Mixte)
+(31, 16), -- Léo (M13/H) -> Entraînement Fleuret (idEvent 31: M13,M15)
+(10, 17), -- Camille (M15/F) -> Challenge Noël M15 (idEvent 10: M15/Mixte)
+(28, 17), -- Camille (M15/F) -> Challenge M13/M15 (idEvent 28: M13,M15/Mixte)
+(36, 17), -- Camille (M15/F) -> Stage Février 2026 (idEvent 36: M13,M15,M17)
+(31, 18), -- Arthur (M13/H) -> Entraînement Fleuret (idEvent 31: M13,M15)
+(28, 18), -- Arthur (M13/H) -> Challenge M13/M15 (idEvent 28: M13,M15/Mixte)
+(32, 19), -- Zoé (M20/F) -> Entraînement Épée (idEvent 32: M17,M20,Senior)
+(7, 20),  -- Jules (Senior/H) -> Open de Blois (idEvent 7: Senior/H)
+(11, 20), -- Jules (Senior/H) -> Coupe Nouvelle Année (idEvent 11: Senior/H)
+(9, 21),  -- Emma (Senior/F) -> Tournoi des Ducs (idEvent 9: Senior/F)
+(29, 21), -- Emma (Senior/F) -> Coupe Pâques Senior (idEvent 29: Senior,Vétéran/F)
+(29, 23), -- Louise (Vétéran/F) -> Coupe Pâques Senior (idEvent 29: Senior,Vétéran/F)
+(10, 25), -- Rose (M15/F) -> Challenge Noël M15 (idEvent 10: M15/Mixte)
+(31, 25), -- Rose (M15/F) -> Entraînement Fleuret (idEvent 31: M13,M15)
+(27, 26), -- Raphaël (M20/H) -> Tournoi Automne M20 (idEvent 27: M20/H)
+(8, 26),  -- Raphaël (M20/H) -> Circuit National M20 (idEvent 8: M20/Mixte)
+(8, 27),  -- Jade (M20/F) -> Circuit National M20 (idEvent 8: M20/Mixte)
+(7, 28),  -- Louis (Senior/H) -> Open de Blois (idEvent 7: Senior/H)
+(9, 29),  -- Ambre (Senior/F) -> Tournoi des Ducs (idEvent 9: Senior/F)
+(28, 30), -- Nathan (M13/H) -> Challenge M13/M15 (idEvent 28: M13,M15/Mixte)
+(11, 32), -- Mohamed (Senior/H) -> Coupe Nouvelle Année (idEvent 11: Senior/H)
+(29, 33); -- Inès (Senior/F) -> Coupe Pâques Senior (idEvent 29: Senior,Vétéran/F)
 
--- Insertion des résultats
+
+
+
+-- Insertion des résultats (existants)
 INSERT INTO RESULTAT (resultat, dateRE, typeArmeRE, typeCompeteRE, idCompetition, idMembre) VALUES
 (2, '2024-05-11', 'Épée', 'Régional', 1, 1),
-(16, '2024-06-15', 'Fleuret', 'National', 2, 2);
+(16, '2024-06-15', 'Fleuret', 'National', 2, 2),
+(5, '2024-02-04', 'Fleuret', 'Régional', 9, 2),
+(12, '2024-03-23', 'Sabre', 'National', 10, 1),
+(3, '2024-04-12', 'Épée', 'Départemental', 11, 2),
+(22, '2025-05-01', 'Sabre', 'National', 16, 6),
+(8, '2025-05-01', 'Fleuret', 'National', 16, 7);
 
--- Tables de liaison pour les résultats (AVOIR, RESULTER)
+
+-- Tables de liaison pour les résultats (AVOIR, RESULTER) (existantes)
 INSERT INTO AVOIR (idResultat, idMembre) VALUES
 (1, 1),
-(2, 2);
+(2, 2),
+(3, 2),
+(4, 1),
+(5, 2),
+(6, 6),
+(7, 7);
 
 INSERT INTO RESULTER (idResultat, idCompetition) VALUES
 (1, 1),
-(2, 2);
+(2, 2),
+(3, 9),
+(4, 10),
+(5, 11),
+(6, 16),
+(7, 16);
 
--- Insertion des formulaires de contact
+
+-- Insertion des formulaires de contact (existants)
 INSERT INTO FORMULAIRE_CONTACT (typeFC, sujetFC, mailFC, descriptionFC, dateFC, idMembre, idAdmin) VALUES
 ('Question', 'Horaires', 'visiteur@email.com', 'Quels sont les horaires pour les débutants ?', '2024-04-10', NULL, 1),
-('Demande', 'Inscription', 'marie.durand@email.com', 'Je souhaite avoir plus d\'informations sur l\'inscription.', '2023-02-15', 2, 1);
+('Demande', 'Inscription', 'marie.durand@email.com', 'Je souhaite avoir plus d\'informations sur l\'inscription.', '2023-02-15', 2, 1),
+('Signalement', 'Matériel défectueux', 'jean.dupont@email.com', 'Le fil de corps n°12 est cassé au niveau de la prise.', '2025-10-28', 1, 1),
+('Question', 'Stage de Février', 'lucas.petit@email.com', 'Le stage de février 2026 est-il ouvert aux M15 ?', '2025-11-06', 9, 1),
+('Demande', 'Photo de profil', 'visiteur.externe@email.com', 'Pouvez-vous supprimer ma photo de la galerie ?', '2025-11-01', NULL, 1);
 
--- Tables de liaison pour les formulaires (REPONDRE, REMPLIR)
+
+-- Tables de liaison pour les formulaires (REPONDRE, REMPLIR) (existantes)
 INSERT INTO REPONDRE (idFormulaire, idAdmin) VALUES
 (1, 1),
-(2, 1);
+(2, 1),
+(3, 1),
+(4, 1),
+(5, 1);
 
 INSERT INTO REMPLIR (idFormulaire, idMembre) VALUES
-(2, 2);
+(2, 2),
+(3, 1),
+(4, 9);
 
--- Insertion des inscriptions en attente
+
+-- Insertion des inscriptions en attente (existante)
 INSERT INTO INSCRIPTION (mailInscr, nomI, prenomI, ddnI, mdpI, sexeI,dateInscription) VALUES
-('nouveau.membre@email.com', 'Nouveau', 'Alice', '2000-01-01', 'mdpsecure', 'Femme', '2025-10-23');
+('nouveau.membre@email.com', 'Nouveau', 'Alice', '2000-01-01', 'mdpsecure', 'Femme', '2025-10-23'),
+('sam.leroy@email.com', 'Leroy', 'Samuel', '1998-12-10', 'mdpSam1', 'Homme', '2025-11-05'),
+('emma.g@email.com', 'Garnier', 'Emma', '2011-02-05', 'mdpEmma2', 'Femme', '2025-11-07');
 
+
+-- Insertion des modifications en attente (existante)
 INSERT INTO MODIFICATION (nomModif, prenomModif, emailModif, sexeModif, ddnModif, dateModif, idMembre) VALUES
-('Durand', 'Marie', 'marie.durand45@email.com', 'Homme', '2008-10-10', '2025-10-20', 2);
+('Durand', 'Marie', 'marie.durand45@email.com', 'Homme', '2008-10-10', '2025-10-20', 2),
+('Dupont', 'Jean', 'jean.dupont.pro@email.com', 'Homme', '1995-05-20', '2025-11-01', 1);
 
 
--- Insertion des notifications
+-- Insertion des notifications (existantes)
 INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, idAdmin) VALUES
 ('Demande Inscription', 'Formulaire', 0, NULL, 1),
 ('Nouveau Résultat', 'Compétition', 0, 1, NULL),
-('Nouveau Résultat', 'Compétition', 1, 2, NULL);
+('Nouveau Résultat', 'Compétition', 1, 2, NULL),
+('Evenement', 'Nouvel événement : Arbre de Noël 2025', 0, 1, NULL),
+('Evenement', 'Nouvel événement : Arbre de Noël 2025', 1, 2, NULL),
+('Admin', 'Maintenance du site prévue le 10/11', 0, 1, 1);
 
--- Tables de liaison pour les notifications (RECEVOIRA, RECEVOIRM)
+
+-- Tables de liaison pour les notifications (RECEVOIRA, RECEVOIRM) (existantes)
 INSERT INTO RECEVOIRA (idNotifs, idAdmin) VALUES
 (1, 1);
 
@@ -144,28 +331,70 @@ INSERT INTO RECEVOIRM (idNotifs, idMembre) VALUES
 (2, 1),
 (3, 2);
 
--- Insertion des images
+-- Ajouts de liaisons notifications (existantes)
+INSERT INTO RECEVOIRM (idNotifs, idMembre) VALUES
+(4, 1),
+(5, 2);
+
+INSERT INTO RECEVOIRA (idNotifs, idAdmin) VALUES
+(6, 1);
+
+
+-- Insertion des images (existantes)
 INSERT INTO IMAGEAPP (urlI, prive, alt) VALUES
 ('/static/images/compet_1.jpg', 0, 'Tournoi régional épée'),
 ('/static/images/fete_club.png', 0, 'Affiche fête du club');
 
--- Liaison des images aux compétitions et événements
+-- Ajouts d'images (existantes)
+INSERT INTO IMAGEAPP (urlI, prive, alt) VALUES
+('/static/images/stage_paques.jpg', 0, 'Stage de Pâques 2024'),
+('/static/images/podium_gp_printemps.jpg', 0, 'Podium GP Printemps'),
+('/static/images/entrainement_jeunes.jpg', 0, 'Entraînement M13/M15'),
+('/static/images/logo_club.png', 0, 'Logo Cercle Escrime');
+
+
+-- Liaison des images aux compétitions et événements (existantes)
 INSERT INTO IMAGERC (idImage, idCompetition) VALUES (1, 1);
 INSERT INTO IMAGERE (idImage, idEventClub) VALUES (2, 1);
 
--- Insertion dans INFORMATION
+-- Ajouts de liaisons images (existantes)
+INSERT INTO IMAGERE (idImage, idEventClub) VALUES (3, 2);
+INSERT INTO IMAGERC (idImage, idCompetition) VALUES (4, 10);
+
+
+-- Insertion dans INFORMATION (existante)
 INSERT INTO INFORMATION (dateIN, heureIN, titreIN, contenuIN) VALUES
 ('2023-08-15', '10:27','Reception des nouveaux gants','Nous vous informons que les gants que nous attendions sont là');
 
--- Liaison des images aux informations
+-- Ajouts d'informations (existantes)
+INSERT INTO INFORMATION (dateIN, heureIN, titreIN, contenuIN) VALUES
+('2025-09-01', '09:00', 'Reprise des entraînements', 'La saison 2025-2026 commence ! Les entraînements reprennent aux horaires habituels dès cette semaine.'),
+('2025-10-30', '14:00', 'Fermeture Toussaint', 'Le gymnase sera fermé le 1er Novembre. Les entraînements du vendredi sont annulés.'),
+('2025-11-05', '11:00', 'Nouvelle boutique club', 'La nouvelle boutique en ligne du club est ouverte. Commandez vos tenues et équipements !');
+
+
+-- Liaison des images aux informations (existante)
 INSERT INTO IMAGERIN (idImage, idInformation) VALUES (1, 1);
 
--- Insertion dans PRESSE
+-- Ajouts de liaisons images-informations (existantes)
+INSERT INTO IMAGERIN (idImage, idInformation) VALUES (5, 2), (6, 4);
+
+
+-- Insertion dans PRESSE (existante)
 INSERT INTO PRESSE (dateP, heureP, titreP, contenuP,lienP) VALUES
 ('2025-11-11','23:23','escrime et passion','le cercle à eu le droit à une article du jornal local','https://www.journaldeBloissabrelaserquitournerigolo.com');
 
--- Liaison des images aux informations
+-- Ajouts d'articles de presse (existants)
+INSERT INTO PRESSE (dateP, heureP, titreP, contenuP,lienP) VALUES
+('2024-06-16', '10:00', 'Marie Durand brille aux Nationaux', 'La jeune Marie Durand du Cercle d''Escrime termine 16ème aux championnats de France M17.', 'https://www.journal-local.fr/marie-durand-nationaux'),
+('2025-09-08', '14:30', 'Portes Ouvertes au Cercle d''Escrime', 'Le club a accueilli de nombreux curieux lors de sa journée portes ouvertes ce week-end.', 'https://www.ville-orleans.fr/portes-ouvertes-escrime');
+
+
+-- Liaison des images aux informations (existante)
 INSERT INTO IMAGERP (idImage, idPresse) VALUES (1, 1);
+
+-- Ajouts de liaisons images-presse (existantes)
+INSERT INTO IMAGERP (idImage, idPresse) VALUES (6, 2), (6, 3);
 
 
 -- Réactiver la vérification des clés étrangères
