@@ -289,12 +289,6 @@ create table PRESSE(
     PRIMARY KEY(idPresse)
 );
 
-create table IMAGERP(
-    idImage integer,
-    idPresse integer,
-    PRIMARY KEY(idImage, idPresse)
-);
-
 CREATE TABLE HORAIRE (
     idHoraire integer AUTO_INCREMENT,
     jour varchar(10) not null,
@@ -313,6 +307,23 @@ CREATE TABLE TARIF (
     categorie varchar(20) not null,
     PRIMARY KEY(idTarif)
 );
+
+CREATE TABLE ARTICLE (
+    idArticle integer AUTO_INCREMENT,
+    titreA varchar(100) not null,
+    contenuA text,
+    dateA date not null,
+    imgA varchar(255),
+    PRIMARY KEY(idArticle)
+);
+
+CREATE TABLE IMAGE_ARTICLE (
+    idImageArticle integer AUTO_INCREMENT,
+    nomI varchar(255) not null,
+    idArticle integer not null,
+    PRIMARY KEY(idImageArticle)
+);
+
 
 -- Ajout des contraintes de clé étrangère
 
@@ -373,5 +384,4 @@ ALTER TABLE IMAGERE ADD FOREIGN KEY (idEventClub) REFERENCES EVENTCLUB(idEventCl
 ALTER TABLE IMAGERIN ADD FOREIGN KEY (idImage) REFERENCES IMAGEAPP(idImage);
 ALTER TABLE IMAGERIN ADD FOREIGN KEY (idInformation) REFERENCES INFORMATION(idInformation);
 
-ALTER TABLE IMAGERP ADD FOREIGN KEY (idImage) REFERENCES IMAGEAPP(idImage);
-ALTER TABLE IMAGERP ADD FOREIGN KEY (idPresse) REFERENCES PRESSE(idPresse);
+ALTER TABLE IMAGE_ARTICLE ADD FOREIGN KEY (idArticle) REFERENCES ARTICLE(idArticle);

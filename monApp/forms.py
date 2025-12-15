@@ -1,8 +1,9 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField, widgets
+from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField, widgets, MultipleFileField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 from datetime import date
+from flask_wtf.file import FileField, FileAllowed
 
 class LoginForm(FlaskForm):
     email = StringField ('Email' ,validators= [DataRequired(), Email()])
@@ -200,3 +201,22 @@ class TarifForm(FlaskForm):
         ('Materiel', 'Matériel')
     ], validators=[DataRequired()])
     submit = SubmitField('Enregistrer')
+
+class InformationForm(FlaskForm):
+    titre = StringField('Titre', validators=[DataRequired()])
+    contenu = TextAreaField('Contenu', validators=[DataRequired()])
+    submit = SubmitField('Publier')
+
+class ArticleForm(FlaskForm):
+    titre = StringField('Titre de l\'article', validators=[DataRequired()])
+    contenu = TextAreaField('Contenu complet', validators=[DataRequired()], render_kw={"rows": 10})
+    images = MultipleFileField('Ajouter des photos', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Images seulement !')
+    ])
+    submit = SubmitField('Publier l\'article')
+
+class PresseForm(FlaskForm):
+    titre = StringField('Titre de l\'article', validators=[DataRequired()])
+    contenu = TextAreaField('Description / Contenu', validators=[DataRequired()], render_kw={"rows": 5})
+    lien = StringField('Lien vers la source (URL)', validators=[DataRequired()])
+    submit = SubmitField('Publier')

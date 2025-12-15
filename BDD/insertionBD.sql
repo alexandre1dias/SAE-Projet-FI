@@ -364,10 +364,7 @@ INSERT INTO IMAGERC (idImage, idCompetition) VALUES (4, 10);
 
 -- Insertion dans INFORMATION (existante)
 INSERT INTO INFORMATION (dateIN, heureIN, titreIN, contenuIN) VALUES
-('2023-08-15', '10:27','Reception des nouveaux gants','Nous vous informons que les gants que nous attendions sont là');
-
--- Ajouts d'informations (existantes)
-INSERT INTO INFORMATION (dateIN, heureIN, titreIN, contenuIN) VALUES
+('2023-08-15', '10:27','Reception des nouveaux gants','Nous vous informons que les gants que nous attendions sont là'),
 ('2025-09-01', '09:00', 'Reprise des entraînements', 'La saison 2025-2026 commence ! Les entraînements reprennent aux horaires habituels dès cette semaine.'),
 ('2025-10-30', '14:00', 'Fermeture Toussaint', 'Le gymnase sera fermé le 1er Novembre. Les entraînements du vendredi sont annulés.'),
 ('2025-11-05', '11:00', 'Nouvelle boutique club', 'La nouvelle boutique en ligne du club est ouverte. Commandez vos tenues et équipements !');
@@ -382,19 +379,8 @@ INSERT INTO IMAGERIN (idImage, idInformation) VALUES (5, 2), (6, 4);
 
 -- Insertion dans PRESSE (existante)
 INSERT INTO PRESSE (dateP, heureP, titreP, contenuP,lienP) VALUES
-('2025-11-11','23:23','escrime et passion','le cercle à eu le droit à une article du jornal local','https://www.journaldeBloissabrelaserquitournerigolo.com');
-
--- Ajouts d'articles de presse (existants)
-INSERT INTO PRESSE (dateP, heureP, titreP, contenuP,lienP) VALUES
-('2024-06-16', '10:00', 'Marie Durand brille aux Nationaux', 'La jeune Marie Durand du Cercle d''Escrime termine 16ème aux championnats de France M17.', 'https://www.journal-local.fr/marie-durand-nationaux'),
-('2025-09-08', '14:30', 'Portes Ouvertes au Cercle d''Escrime', 'Le club a accueilli de nombreux curieux lors de sa journée portes ouvertes ce week-end.', 'https://www.ville-orleans.fr/portes-ouvertes-escrime');
-
-
--- Liaison des images aux informations (existante)
-INSERT INTO IMAGERP (idImage, idPresse) VALUES (1, 1);
-
--- Ajouts de liaisons images-presse (existantes)
-INSERT INTO IMAGERP (idImage, idPresse) VALUES (6, 2), (6, 3);
+('2025-12-15','15:45','WHITELIST','Compléter votre collection en achetant des booster !!!','https://whitelist.fr/'),
+('2025-12-15','15:45','JOBLIFE',"Venez soutenir l'équipe JOBLIFE !!!",'https://joblife.fr/');
 
 -- Insertion des tarifs d'adhésion
 INSERT INTO TARIF (nom, prix, description, categorie) VALUES 

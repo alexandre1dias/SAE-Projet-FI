@@ -335,3 +335,22 @@ class TarifBD(db.Model):
     prix = db.Column(db.Integer)
     description = db.Column(db.String(255))
     categorie = db.Column(db.String(20))
+
+class ImageArticleBD(db.Model):
+    """
+    Table stockant les multiples images d'un article.
+    """
+    __tablename__ = 'IMAGE_ARTICLE'
+    
+    id = db.Column('idImageArticle', db.Integer, primary_key=True)
+    nom = db.Column('nomI', db.String(255))
+    id_article = db.Column('idArticle', db.Integer, db.ForeignKey('ARTICLE.idArticle'))
+
+class ArticleBD(db.Model):
+    __tablename__ = 'ARTICLE'
+    
+    id = db.Column('idArticle', db.Integer, primary_key=True)
+    titre = db.Column('titreA', db.String(100))
+    contenu = db.Column('contenuA', db.Text)
+    date = db.Column('dateA', db.Date)
+    images = db.relationship('ImageArticleBD', backref='article', lazy=True, cascade="all, delete-orphan")
