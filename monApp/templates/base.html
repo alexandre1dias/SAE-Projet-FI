@@ -19,8 +19,8 @@
                 <a class="navbar-brand" href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='images/Logo.png') }}"/></a>
                     <div class="collapse navbar-collapse" id="mainNavbar">
                         <ul class="navbar-nav me-auto mb-2 mb-md-0">
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Accueil</a></li>
-                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" 
+                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Accueil</a></li>
+                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle {% if request.endpoint in ['adresse', 'horaires', 'adhesions', 'materiel'] %}active{% endif %}" href="#" 
                             id="auteursDropdown" role="button" data-bs-toggle="dropdown" 
                             aria-expanded="false">Renseignements</a>
                               <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
@@ -39,9 +39,9 @@
                                 </li>
                               </ul>
                         </li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('escrime_feminin') }}">L'escrime feminin</a></li>
+                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'escrime_feminin' %}active{% endif %}" href="{{ url_for('escrime_feminin') }}">L'escrime feminin</a></li>
                         
-                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" 
+                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle {% if request.endpoint in ['calendrier', 'competitions', 'evenement_club', 'reunion'] %}active{% endif %}" href="#" 
                             id="auteursDropdown" role="button" data-bs-toggle="dropdown" 
                             aria-expanded="false">Évènement</a>
                               <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
@@ -56,7 +56,7 @@
 
                               </ul>
                         </li>
-                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" 
+                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle {% if request.endpoint in ['informations', 'presse'] %}active{% endif %}" href="#" 
                             id="auteursDropdown" role="button" data-bs-toggle="dropdown" 
                             aria-expanded="false">Actualités</a>
                               <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
@@ -68,19 +68,19 @@
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="auteursDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">A propos</a>
+                            <a class="nav-link dropdown-toggle {% if request.endpoint in ['historique', 'comite_cercle'] %}active{% endif %}" href="#" id="auteursDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">A propos</a>
                             <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
                                 <li><a class="dropdown-item" href="{{ url_for('historique') }}">Historique</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('comite_cercle')}}">Comite directeur du cercle</a></li>
                             </ul>
                         </li>
 
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}" href="{{ url_for('contact') }}">Contact</a></li>
 
                         {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
                             <!-- Liens pour les utilisateurs connectés -->
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Profil</a>
+                                <a class="nav-link dropdown-toggle {% if request.endpoint in ['resultat_membre', 'evenement_membre', 'profil_view'] %}active{% endif %}" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Profil</a>
                                 <ul class="dropdown-menu" aria-labelledby="profilDropdown">
                                     <li><a class="dropdown-item" href="{{ url_for('resultat_membre') }}">Vos résultat</a></li>
                                     <li><a class="dropdown-item" href="{{ url_for('evenement_membre') }}">Vos évènements</a></li>
@@ -91,7 +91,7 @@
                         {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
                             <!-- Menu de l'admin - Visible uniquement par un compte admin -->
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Menu Admin</a>
+                                <a class="nav-link dropdown-toggle {% if request.endpoint in ['gerer_formulaires', 'gerer_profils', 'gerer_inscriptions', 'gestion_tarifs', 'gestion_horaires'] %}active{% endif %}" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Menu Admin</a>
                                 <ul class="dropdown-menu" aria-labelledby="profilDropdown">
                                     <li><a class="dropdown-item" href="{{ url_for('gerer_formulaires') }}">Gérer Formulaires</a></li>
                                     <li><a class="dropdown-item" href="{{ url_for('gerer_profils') }}">Gérer Profils</a></li>
@@ -158,7 +158,7 @@
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Se déconnecter</a></li>
                         {% else %}
                             <!-- Login -->
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Se connecter</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'login' %}active{% endif %}" href="{{ url_for('login') }}">Se connecter</a></li>
                         {% endif %}
                     </ul>
                     </div>

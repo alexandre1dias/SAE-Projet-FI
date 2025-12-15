@@ -60,6 +60,12 @@ nav .nav-link {
   font-size: larger;
 }
 
+nav .nav-link.active {
+    color: #000000 !important;
+    font-weight: bold;
+
+}
+
 .navbar-brand img {
     height: 65px; 
     width: auto; 
@@ -731,6 +737,11 @@ body.dark-mode nav {
 
 body.dark-mode a {
     color: whitesmoke;
+}
+
+body.dark-mode nav .nav-link.active {
+    color: #ffc107 !important;
+    font-weight: bold;
 }
 
 body.dark-mode h1,h2,h3,h4 {
