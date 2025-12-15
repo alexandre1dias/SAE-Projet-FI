@@ -8,6 +8,8 @@ from monApp.modelBD import *
 from flask import jsonify
 from functools import wraps
 from datetime import datetime
+from sqlalchemy import or_
+from sqlalchemy import asc, desc
 
 # Décorateur pour vérifier si l'utilisateur est un admin
 def admin_required(f):
@@ -842,14 +844,43 @@ def repondre_formulaire(idFormulaire):
     db.session.commit()
     return redirect(url_for('gerer_formulaires'))
 
+# --- NOUVEAU : La fonction pour calculer le prochain ordre ---
+def calcule_ordre(colonne, triee, order):
+    """
+    Si on trie déjà cette colonne en ASC, le prochain clic sera DESC.
+    Sinon (autre colonne ou déjà DESC), le prochain clic sera ASC.
+    """
+    if triee == colonne and order == 'asc':
+        return 'desc'
+    return 'asc'
+    
 # Affiche la liste des membres actifs pour la gestion - Réservée aux administrateurs.
 @app.route("/gerer_profils/")
 @login_required
 @admin_required
 def gerer_profils():
-    lesMembres = db.session.query(MembreBD).filter(MembreBD.activite == True).all()
-    lesMembres.sort(key=lambda x: x.date_inscription, reverse=True) 
-    return render_template("gerer_profils.html",title=TITLE+"- Géstion des Profils", membres = lesMembres)
+    filtre = FiltreForm(request.args) if request.args else FiltreForm()
+    page = request.args.get('page', 1, type=int)
+    liste = db.session.query(MembreBD)\
+        .filter(MembreBD.activite == True)\
+        .order_by(MembreBD.date_inscription.desc())
+
+    if filtre.sexe.data: 
+        liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
+    if filtre.niveau.data:
+        liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
+    if filtre.recherche.data:
+        terme = f"%{filtre.recherche.data}%"
+        liste = liste.filter(
+            or_(
+                MembreBD.nom.ilike(terme),
+                MembreBD.prenom.ilike(terme),
+                MembreBD.email.ilike(terme)
+            )
+        )
+    pagination = liste.paginate(page=page, per_page=15, error_out=False)
+    return render_template("gerer_profils.html",
+        title=TITLE + "- Gestion des Profils",pagination=pagination,filtre=filtre)
 
 # Désactive le compte d'un membre - Réservée aux administrateurs.
 @app.route ('/gerer_profils/desinscrire/<int:idM>', methods =("POST" ,))
@@ -858,6 +889,7 @@ def gerer_profils():
 def desinscrireMembre(idM):
     membre = db.session.get(MembreBD, idM)
     membre.activite = False
+    membre.statut = "Ancien Membre"
     db.session.commit()
     return redirect(url_for('gerer_profils'))
 
@@ -868,6 +900,7 @@ def desinscrireMembre(idM):
 def reinscrireMembre(idM):
     membre = db.session.get(MembreBD, idM)
     membre.activite = True
+    membre.statut = "Membre"
     db.session.commit()
     return redirect(url_for('gerer_ancien_profils'))
 
@@ -876,8 +909,28 @@ def reinscrireMembre(idM):
 @login_required
 @admin_required
 def gerer_ancien_profils():
-    lesMembres = db.session.query(MembreBD).filter(MembreBD.activite == False).all() 
-    return render_template("gerer_ancien_profils.html",title=TITLE+"- Géstion des Anciens Profils", membres = lesMembres)
+    filtre = FiltreForm(request.args) if request.args else FiltreForm()
+    page = request.args.get('page', 1, type=int)
+    liste = db.session.query(MembreBD)\
+        .filter(MembreBD.activite == False)\
+        .order_by(MembreBD.date_inscription.desc())
+
+    if filtre.sexe.data: 
+        liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
+    if filtre.niveau.data:
+        liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
+    if filtre.recherche.data:
+        terme = f"%{filtre.recherche.data}%"
+        liste = liste.filter(
+            or_(
+                MembreBD.nom.ilike(terme),
+                MembreBD.prenom.ilike(terme),
+                MembreBD.email.ilike(terme)
+            )
+        )
+    pagination = liste.paginate(page=page, per_page=15, error_out=False)
+    return render_template("gerer_ancien_profils.html",
+        title=TITLE + "- Gestion des Anciens Profils",pagination=pagination,filtre=filtre)
 
 # Page de modification d'un profil, accessible par le membre lui-même ou un admin.
 @app.route("/profil_edit/<int:idM>", methods=["GET", "POST"])
@@ -908,23 +961,6 @@ def profil_edit(idM):
             db.session.commit()
             return redirect(url_for('profil_view', idM=unMembre.id, origine='profil'))
     return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
-
-# Désactive un profil (alternative à la méthode POST de gerer_profils).
-@app.route('/profil_edit/<int:idM>/desinscrit/', methods=["GET", "POST"])
-@login_required
-def desinscrit_profil(idM):
-    membreDesinscrit = db.session.get(MembreBD, idM)
-    membreDesinscrit.activite = False
-    db.session.commit()
-    return redirect(url_for('gerer_profils'))
-
-# Réactive un profil.
-@app.route('/profil_edit/<int:idM>/reinscrit/')
-def reinscrit_profil(idM):
-    membreReinscrit = db.session.get(MembreBD, idM)
-    membreReinscrit.activite = True
-    db.session.commit()
-    return redirect(url_for('gerer_ancien_profils'))
 
 # Affiche les demandes d'inscription et de modification de profil - Réservée aux administrateurs.
 @app.route("/gerer_inscriptions/")

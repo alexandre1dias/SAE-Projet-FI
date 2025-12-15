@@ -1,6 +1,6 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField, widgets
+from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField, widgets 
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 from datetime import date
 
@@ -179,3 +179,27 @@ class Parametres_updateForm(FlaskForm):
     email = StringField('Email', validators=[Optional(), Email()])
     password = PasswordField('Nouveau mot de passe', validators=[Optional()])
     submit = SubmitField('Envoyer la requête')
+
+
+class FiltreForm(FlaskForm):
+    CHOIX_SEXE = [('homme', 'Homme'), ('femme', 'Femme')]
+    CHOIX_NIVEAU = [('M9', 'M9'), ('M11', 'M11'), ('M13', 'M13'), ('M15', 'M15'), 
+                    ('M17', 'M17'), ('M20', 'M20'), ('senior', 'Sénior'), ('veteran', 'Vétéran')]
+    
+    sexe = SelectMultipleField(
+        'Sexes',
+        choices=CHOIX_SEXE,
+        default=[c[0] for c in CHOIX_SEXE], 
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
+    
+    niveau = SelectMultipleField(
+        'Niveaux',
+        choices=CHOIX_NIVEAU,
+        default=[c[0] for c in CHOIX_NIVEAU],
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
+    recherche = StringField('Rechercher')
+    submit = SubmitField('Envoyer')
