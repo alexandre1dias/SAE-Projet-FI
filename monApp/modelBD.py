@@ -318,3 +318,20 @@ class ParametreNotifMembreBD(UserMixin, db.Model):
     modifProfilMail = db.Column(db.Boolean)
     idMembre = db.Column(db.Integer, db.ForeignKey('MEMBRE.idMembre'))
     membre = db.relationship('MembreBD', backref=db.backref('parametres_notif_membre', uselist=False))
+
+class HoraireBD(db.Model):
+    __tablename__ = 'HORAIRE'
+    id = db.Column('idHoraire', db.Integer, primary_key=True)
+    jour = db.Column(db.String(10))
+    heure_debut = db.Column('heureDebut', db.String(5))
+    heure_fin = db.Column('heureFin', db.String(5))
+    activite = db.Column(db.String(100))
+    details = db.Column(db.String(255))
+
+class TarifBD(db.Model):
+    __tablename__ = 'TARIF'
+    id = db.Column('idTarif', db.Integer, primary_key=True)
+    nom = db.Column(db.String(50))
+    prix = db.Column(db.Integer)
+    description = db.Column(db.String(255))
+    categorie = db.Column(db.String(20))

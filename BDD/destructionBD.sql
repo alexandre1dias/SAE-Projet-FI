@@ -30,6 +30,8 @@ drop table if exists IMAGERIN;
 drop table if exists PRESSE;
 drop table if exists IMAGERP;
 drop table if exists ACTUALITE;
-drop table if exists MODIFICATION; 
+drop table if exists MODIFICATION;
+drop table if exists HORAIRE;
+drop table if exists TARIF;
 
 SET FOREIGN_KEY_CHECKS = 1;

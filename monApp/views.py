@@ -73,17 +73,30 @@ def adresse():
 # Affiche la page des horaires d'entraînement.
 @app.route("/horaires/")
 def horaires():
-    return render_template("horaire.html",title=TITLE+"- Horaires")
+    les_horaires = HoraireBD.query.all()
+    ordre_jours = {
+        'Lundi': 1, 
+        'Mardi': 2, 
+        'Mercredi': 3, 
+        'Jeudi': 4, 
+        'Vendredi': 5, 
+        'Samedi': 6, 
+        'Dimanche': 7
+    }
+    les_horaires.sort(key=lambda x: (ordre_jours.get(x.jour, 8), x.heure_debut))
+    return render_template("horaire.html", title=TITLE+"- Horaires", horaires=les_horaires)
 
 # Affiche la page avec les informations sur l'adhésion.
 @app.route("/adhesions/")
 def adhesions():
-    return render_template("adhesion.html",title=TITLE+"- Adhésions")
+    tarifs_adhesion = TarifBD.query.filter_by(categorie='Adhesion').all()
+    return render_template("adhesion.html", title=TITLE+"- Adhésions", tarifs=tarifs_adhesion)
 
 # Affiche la page d'information sur le matériel et la location.
 @app.route("/materiel/")
 def materiel():
-    return render_template("materiel.html",title=TITLE+"- Matériel et tenues")
+    tarifs_materiel = TarifBD.query.filter_by(categorie='Materiel').all()
+    return render_template("materiel.html", title=TITLE+"- Matériel et tenues", tarifs=tarifs_materiel)
 
 #==================================================================#
 #====================   Pages Escrim feminin   ====================#
@@ -1000,6 +1013,100 @@ def refuser_modification(idM):
     db.session.delete(modification_a_supprimer)
     db.session.commit()
     return redirect(url_for('gerer_inscriptions'))
+
+@app.route("/admin/gestion_tarifs/", methods=["GET", "POST"])
+@login_required
+@admin_required
+def gestion_tarifs():
+    form = TarifForm()
+    if form.validate_on_submit():
+        nouveau_tarif = TarifBD(
+            nom=form.nom.data,
+            prix=form.prix.data,
+            description=form.description.data,
+            categorie=form.categorie.data
+        )
+        try:
+            db.session.add(nouveau_tarif)
+            db.session.commit()
+            return redirect(url_for('gestion_tarifs'))
+        except Exception as e:
+            db.session.rollback()
+    les_tarifs = TarifBD.query.order_by(TarifBD.categorie, TarifBD.prix).all()
+    return render_template("admin_gestion_tarifs.html", title="Gestion Tarifs", form=form, tarifs=les_tarifs)
+
+@app.route("/admin/delete_tarif/<int:idT>", methods=["POST"])
+@login_required
+@admin_required
+def delete_tarif(idT):
+    tarif = TarifBD.query.get_or_404(idT)
+    try:
+        db.session.delete(tarif)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+    return redirect(url_for('gestion_tarifs'))
+
+@app.route("/admin/edit_tarif/<int:idT>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_tarif(idT):
+    tarif = TarifBD.query.get_or_404(idT)
+    form = TarifForm(obj=tarif)
+    if form.validate_on_submit():
+        form.populate_obj(tarif)
+        db.session.commit()
+        return redirect(url_for('gestion_tarifs'))
+    return render_template("admin_edit_tarif.html", title="Modifier Tarif", form=form)
+
+
+@app.route("/admin/gestion_horaires/", methods=["GET", "POST"])
+@login_required
+@admin_required
+def gestion_horaires():
+    form = HoraireForm()
+    if form.validate_on_submit():
+        nouveau_horaire = HoraireBD(
+            jour=form.jour.data,
+            heure_debut=form.heure_debut.data,
+            heure_fin=form.heure_fin.data,
+            activite=form.activite.data,
+            details=form.details.data
+        )
+        try:
+            db.session.add(nouveau_horaire)
+            db.session.commit()
+            return redirect(url_for('gestion_horaires'))
+        except Exception as e:
+            db.session.rollback()
+    les_horaires = HoraireBD.query.all()
+    ordre_jours = {'Lundi': 1, 'Mardi': 2, 'Mercredi': 3, 'Jeudi': 4, 'Vendredi': 5, 'Samedi': 6, 'Dimanche': 7}
+    les_horaires.sort(key=lambda x: ordre_jours.get(x.jour, 8))
+    return render_template("admin_gestion_horaires.html", title="Gestion Horaires", form=form, horaires=les_horaires)
+
+@app.route("/admin/delete_horaire/<int:idH>", methods=["POST"])
+@login_required
+@admin_required
+def delete_horaire(idH):
+    horaire = HoraireBD.query.get_or_404(idH)
+    try:
+        db.session.delete(horaire)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+    return redirect(url_for('gestion_horaires'))
+
+@app.route("/admin/edit_horaire/<int:idH>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_horaire(idH):
+    horaire = HoraireBD.query.get_or_404(idH)
+    form = HoraireForm(obj=horaire)
+    if form.validate_on_submit():
+        form.populate_obj(horaire)
+        db.session.commit()
+        return redirect(url_for('gestion_horaires'))
+    return render_template("admin_edit_horaire.html", title="Modifier Horaire", form=form)
 
 #==============================================================#
 #====================   Pages Paramètres   ====================#

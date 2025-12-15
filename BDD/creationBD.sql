@@ -295,6 +295,25 @@ create table IMAGERP(
     PRIMARY KEY(idImage, idPresse)
 );
 
+CREATE TABLE HORAIRE (
+    idHoraire integer AUTO_INCREMENT,
+    jour varchar(10) not null,
+    heureDebut varchar(5) not null,
+    heureFin varchar(5) not null,
+    activite varchar(100) not null,
+    details varchar(255),
+    PRIMARY KEY(idHoraire)
+);
+
+CREATE TABLE TARIF (
+    idTarif integer AUTO_INCREMENT,
+    nom varchar(50) not null,
+    prix integer not null,
+    description varchar(255),
+    categorie varchar(20) not null,
+    PRIMARY KEY(idTarif)
+);
+
 -- Ajout des contraintes de clé étrangère
 
 ALTER TABLE MODIFICATION ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);

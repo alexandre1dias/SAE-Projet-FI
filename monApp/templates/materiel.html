@@ -12,19 +12,20 @@
         <div class="section-location">
             <div class="col-12">
                 <h2 class="mb-4">Location de matériel</h2>
-                <div class="box-prix">
+                {% for tarif in tarifs %}
+                <div class="box-prix mb-3">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h4>Location annuelle complète</h4>
-                            <p class="mb-0">Veste, pantalon et sous-cuirasse fournis pour toute l'année</p>
-                            <small class="texte-informatif">⚠️ Le gant n'est pas inclus dans la location</small>
+                            <h4>{{ tarif.nom }}</h4>
+                            <p class="mb-0">{{ tarif.description }}</p>
                         </div>
                         <div class="col-md-4 text-center">
-                            <div class="prix">45,00 €</div>
+                            <div class="prix">{{ tarif.prix }} €</div>
                             <p><small>par an</small></p>
                         </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
 
