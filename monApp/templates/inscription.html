@@ -155,4 +155,7 @@
 {% if message_erreur %}
     <div class="alert alert-danger">{{ message_erreur }}</div>
 {% endif %}
+{% if erreur_nom %}
+    <div class="alert alert-danger">{{ erreur_nom }}</div>
+{% endif %}
 {% endblock %}
