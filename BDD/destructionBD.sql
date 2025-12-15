@@ -34,6 +34,6 @@ drop table if exists MODIFICATION;
 drop table if exists HORAIRE;
 drop table if exists TARIF;
 drop table if exists ARTICLE;
-drop table if exists IMAGE_ARTICLE;
+drop table if exists IMAGEARTICLE;
 
 SET FOREIGN_KEY_CHECKS = 1;

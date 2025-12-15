@@ -317,7 +317,7 @@ CREATE TABLE ARTICLE (
     PRIMARY KEY(idArticle)
 );
 
-CREATE TABLE IMAGE_ARTICLE (
+CREATE TABLE IMAGEARTICLE (
     idImageArticle integer AUTO_INCREMENT,
     nomI varchar(255) not null,
     idArticle integer not null,
