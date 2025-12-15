@@ -709,7 +709,14 @@ def historique():
 # Affiche la page de présentation du comité directeur.
 @app.route("/comite_cercle/")
 def comite_cercle():
-    return render_template("comite_cercle.html",title=TITLE+"- Comité directeur du Cercle")
+    comite = {
+        "president": MembreBD.query.filter_by(statut='Président').first(),
+        "vicePresident": MembreBD.query.filter_by(statut='Vice-Président').first(),
+        "tresorier": MembreBD.query.filter_by(statut='Trésorier Général').first(),
+        "secretaire": MembreBD.query.filter_by(statut='Secrétaire Générale').first()
+    }
+    membres = MembreBD.query.filter_by(statut='Membre du Comité').all()
+    return render_template("comite_cercle.html", title=TITLE+"- Comité directeur du Cercle", comite=comite, membres=membres)
 
 #==========================================================#
 #====================   Page Contact   ====================#
