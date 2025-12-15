@@ -1,8 +1,9 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField, widgets 
+from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField, widgets, MultipleFileField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 from datetime import date
+from flask_wtf.file import FileField, FileAllowed
 
 class LoginForm(FlaskForm):
     email = StringField ('Email' ,validators= [DataRequired(), Email()])
@@ -203,3 +204,43 @@ class FiltreForm(FlaskForm):
     )
     recherche = StringField('Rechercher')
     submit = SubmitField('Envoyer')
+    
+class HoraireForm(FlaskForm):
+    jour = SelectField('Jour', choices=[
+        ('Lundi', 'Lundi'), ('Mardi', 'Mardi'), ('Mercredi', 'Mercredi'),
+        ('Jeudi', 'Jeudi'), ('Vendredi', 'Vendredi'), ('Samedi', 'Samedi'), ('Dimanche', 'Dimanche')
+    ], validators=[DataRequired()])
+    heure_debut = StringField('Heure de début (ex: 19h00)', validators=[DataRequired()])
+    heure_fin = StringField('Heure de fin (ex: 21h15)', validators=[DataRequired()])
+    activite = StringField('Activité (ex: Entraînement Épée)', validators=[DataRequired()])
+    details = TextAreaField('Détails (ex: M17, M20...)', validators=[Optional()])
+    submit = SubmitField('Enregistrer')
+
+class TarifForm(FlaskForm):
+    nom = StringField('Intitulé (ex: Initiation, Location annuelle)', validators=[DataRequired()])
+    prix = IntegerField('Prix (€)', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[Optional()])
+    categorie = SelectField('Catégorie', choices=[
+        ('Adhesion', 'Adhésion'),
+        ('Materiel', 'Matériel')
+    ], validators=[DataRequired()])
+    submit = SubmitField('Enregistrer')
+
+class InformationForm(FlaskForm):
+    titre = StringField('Titre', validators=[DataRequired()])
+    contenu = TextAreaField('Contenu', validators=[DataRequired()])
+    submit = SubmitField('Publier')
+
+class ArticleForm(FlaskForm):
+    titre = StringField('Titre de l\'article', validators=[DataRequired()])
+    contenu = TextAreaField('Contenu complet', validators=[DataRequired()], render_kw={"rows": 10})
+    images = MultipleFileField('Ajouter des photos', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Images seulement !')
+    ])
+    submit = SubmitField('Publier l\'article')
+
+class PresseForm(FlaskForm):
+    titre = StringField('Titre de l\'article', validators=[DataRequired()])
+    contenu = TextAreaField('Description / Contenu', validators=[DataRequired()], render_kw={"rows": 5})
+    lien = StringField('Lien vers la source (URL)', validators=[DataRequired()])
+    submit = SubmitField('Publier')

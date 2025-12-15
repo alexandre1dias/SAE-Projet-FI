@@ -1,7 +1,7 @@
 CREATE TABLE ADMINISTRATEUR(
     idAdmin integer AUTO_INCREMENT,
     emailA varchar(41) unique,
-    mdpA varchar(64) not null,
+    mdpA varchar(256) not null,
     idParamNotifAdmin integer,
     PRIMARY KEY(idAdmin)
 );
@@ -45,7 +45,7 @@ create table MEMBRE(
     nomM varchar(41) not null,
     prenomM varchar(41) not null,
     emailM varchar(100) unique,
-    mdpM varchar(64) not null,
+    mdpM varchar(256) not null,
     date_inscription date DEFAULT CURRENT_DATE,
     sexeM varchar(5) not null,
     ddnM date not null,
@@ -289,11 +289,41 @@ create table PRESSE(
     PRIMARY KEY(idPresse)
 );
 
-create table IMAGERP(
-    idImage integer,
-    idPresse integer,
-    PRIMARY KEY(idImage, idPresse)
+CREATE TABLE HORAIRE (
+    idHoraire integer AUTO_INCREMENT,
+    jour varchar(10) not null,
+    heureDebut varchar(5) not null,
+    heureFin varchar(5) not null,
+    activite varchar(100) not null,
+    details varchar(255),
+    PRIMARY KEY(idHoraire)
 );
+
+CREATE TABLE TARIF (
+    idTarif integer AUTO_INCREMENT,
+    nom varchar(50) not null,
+    prix integer not null,
+    description varchar(255),
+    categorie varchar(20) not null,
+    PRIMARY KEY(idTarif)
+);
+
+CREATE TABLE ARTICLE (
+    idArticle integer AUTO_INCREMENT,
+    titreA varchar(100) not null,
+    contenuA text,
+    dateA date not null,
+    imgA varchar(255),
+    PRIMARY KEY(idArticle)
+);
+
+CREATE TABLE IMAGEARTICLE (
+    idImageArticle integer AUTO_INCREMENT,
+    nomI varchar(255) not null,
+    idArticle integer not null,
+    PRIMARY KEY(idImageArticle)
+);
+
 
 -- Ajout des contraintes de clé étrangère
 
@@ -354,5 +384,4 @@ ALTER TABLE IMAGERE ADD FOREIGN KEY (idEventClub) REFERENCES EVENTCLUB(idEventCl
 ALTER TABLE IMAGERIN ADD FOREIGN KEY (idImage) REFERENCES IMAGEAPP(idImage);
 ALTER TABLE IMAGERIN ADD FOREIGN KEY (idInformation) REFERENCES INFORMATION(idInformation);
 
-ALTER TABLE IMAGERP ADD FOREIGN KEY (idImage) REFERENCES IMAGEAPP(idImage);
-ALTER TABLE IMAGERP ADD FOREIGN KEY (idPresse) REFERENCES PRESSE(idPresse);
+ALTER TABLE IMAGE_ARTICLE ADD FOREIGN KEY (idArticle) REFERENCES ARTICLE(idArticle);

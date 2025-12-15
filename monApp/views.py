@@ -1,5 +1,5 @@
 from .app import app, db
-from flask import render_template, request, url_for, redirect, session, abort
+from flask import render_template, request, url_for, redirect, session, abort, flash
 from config import TITLE, AUJOURDHUI
 from flask_login import logout_user, login_user, login_required, current_user
 from .forms import *
@@ -8,8 +8,13 @@ from monApp.modelBD import *
 from flask import jsonify
 from functools import wraps
 from datetime import datetime
-from sqlalchemy import or_
-from sqlalchemy import asc, desc
+from sqlalchemy import or_,asc, desc
+import shutil
+import os
+from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
+import re
+
 
 # Décorateur pour vérifier si l'utilisateur est un admin
 def admin_required(f):
@@ -51,6 +56,26 @@ def comite_ou_admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+#Vérificateur de mot de passe, vérifie si le mot de passe est complexe
+def est_mot_de_passe_fort(password):
+    # Vérifie la longueur (min 8 caractères)
+    if len(password) < 8:
+        return False
+    # Vérifie la présence d'au moins une minuscule
+    if not re.search(r"[a-z]", password):
+        return False
+    # Vérifie la présence d'au moins une majuscule
+    if not re.search(r"[A-Z]", password):
+        return False
+    # Vérifie la présence d'au moins un chiffre
+    if not re.search(r"[0-9]", password):
+        return False
+    # Vérifie la présence d'au moins un caractère spécial (!@#$%^&*)
+    if not re.search(r"[ !@#$%^&*(),.?\":{}|<>]", password):
+        return False
+    
+    return True
+
 
 #==========================================================#
 #====================   Page Accueil   ====================#
@@ -75,17 +100,30 @@ def adresse():
 # Affiche la page des horaires d'entraînement.
 @app.route("/horaires/")
 def horaires():
-    return render_template("horaire.html",title=TITLE+"- Horaires")
+    les_horaires = HoraireBD.query.all()
+    ordre_jours = {
+        'Lundi': 1, 
+        'Mardi': 2, 
+        'Mercredi': 3, 
+        'Jeudi': 4, 
+        'Vendredi': 5, 
+        'Samedi': 6, 
+        'Dimanche': 7
+    }
+    les_horaires.sort(key=lambda x: (ordre_jours.get(x.jour, 8), x.heure_debut))
+    return render_template("horaire.html", title=TITLE+"- Horaires", horaires=les_horaires)
 
 # Affiche la page avec les informations sur l'adhésion.
 @app.route("/adhesions/")
 def adhesions():
-    return render_template("adhesion.html",title=TITLE+"- Adhésions")
+    tarifs_adhesion = TarifBD.query.filter_by(categorie='Adhesion').all()
+    return render_template("adhesion.html", title=TITLE+"- Adhésions", tarifs=tarifs_adhesion)
 
 # Affiche la page d'information sur le matériel et la location.
 @app.route("/materiel/")
 def materiel():
-    return render_template("materiel.html",title=TITLE+"- Matériel et tenues")
+    tarifs_materiel = TarifBD.query.filter_by(categorie='Materiel').all()
+    return render_template("materiel.html", title=TITLE+"- Matériel et tenues", tarifs=tarifs_materiel)
 
 #==================================================================#
 #====================   Pages Escrim feminin   ====================#
@@ -685,15 +723,221 @@ def reunion_update(idReunion):
 # Affiche la page listant toutes les informations.
 @app.route("/informations/")
 def informations():
-    lesInformations = InformationBD.query.all()
-    return render_template("informations.html",title=TITLE+"- Informations",informations=lesInformations)
+    lesInformations = InformationBD.query.order_by(InformationBD.dateIN.desc(), InformationBD.heureIN.desc()).all()
+    return render_template("informations.html", title=TITLE+"- Informations", informations=lesInformations)
+
+@app.route("/admin/add_information/", methods=["GET", "POST"])
+@login_required
+@admin_required
+def add_information():
+    form = InformationForm()
+    if form.validate_on_submit():
+        now = datetime.now()
+        nouvelle_info = InformationBD(
+            titreIN=form.titre.data,
+            contenuIN=form.contenu.data,
+            dateIN=now.date(),
+            heureIN=now.strftime('%H:%M')
+        )
+        try:
+            db.session.add(nouvelle_info)
+            db.session.commit()
+            return redirect(url_for('informations'))
+        except Exception as e:
+            db.session.rollback()
+    return render_template("admin_form_information.html", title="Ajouter une information", form=form)
+
+@app.route("/admin/edit_information/<int:idI>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_information(idI):
+    info = InformationBD.query.get_or_404(idI)
+    form = InformationForm()
+    if request.method == 'GET':
+        form.titre.data = info.titreIN
+        form.contenu.data = info.contenuIN
+    if form.validate_on_submit():
+        info.titreIN = form.titre.data
+        info.contenuIN = form.contenu.data
+        try:
+            db.session.commit()
+            return redirect(url_for('informations'))
+        except Exception as e:
+            db.session.rollback()
+    return render_template("admin_form_information.html", title="Modifier une information", form=form)
+
+@app.route("/admin/delete_information/<int:idI>", methods=["POST"])
+@login_required
+@admin_required
+def delete_information(idI):
+    info = InformationBD.query.get_or_404(idI)
+    try:
+        db.session.delete(info)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+    return redirect(url_for('informations'))
 
 # Affiche la page listant tous les articles de presse.
 @app.route("/presse/")
 def presse():
-    lesArticles = PresseBD.query.all()
+    lesArticles = PresseBD.query.order_by(PresseBD.dateP.desc()).all()
     return render_template("presse.html",title=TITLE+"- Presse",articles = lesArticles)
 
+@app.route("/admin/add_presse/", methods=["GET", "POST"])
+@login_required
+@admin_required
+def add_presse():
+    form = PresseForm()
+    if form.validate_on_submit():
+        now = datetime.now()
+        nouveau_presse = PresseBD(
+            titreP=form.titre.data,
+            contenuP=form.contenu.data,
+            lienP=form.lien.data,
+            dateP=now.date(),
+            heureP=now.strftime('%H:%M')
+        )
+        try:
+            db.session.add(nouveau_presse)
+            db.session.commit()
+            return redirect(url_for('presse'))
+        except Exception as e:
+            db.session.rollback()
+    return render_template("admin_form_presse.html", title="Ajouter un article de presse", form=form)
+
+@app.route("/admin/edit_presse/<int:idP>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_presse(idP):
+    article_presse = PresseBD.query.get_or_404(idP)
+    form = PresseForm()
+    if request.method == 'GET':
+        # Pré-remplissage du formulaire
+        form.titre.data = article_presse.titreP
+        form.contenu.data = article_presse.contenuP
+        form.lien.data = article_presse.lienP
+    if form.validate_on_submit():
+        article_presse.titreP = form.titre.data
+        article_presse.contenuP = form.contenu.data
+        article_presse.lienP = form.lien.data
+        try:
+            db.session.commit()
+            return redirect(url_for('presse'))
+        except Exception as e:
+            db.session.rollback()
+    return render_template("admin_form_presse.html", title="Modifier l'article de presse", form=form)
+
+@app.route("/admin/delete_presse/<int:idP>", methods=["POST"])
+@login_required
+@admin_required
+def delete_presse(idP):
+    article_presse = PresseBD.query.get_or_404(idP)
+    try:
+        db.session.delete(article_presse)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+    return redirect(url_for('presse'))
+
+@app.route("/articles/")
+def articles():
+    les_articles = ArticleBD.query.order_by(ArticleBD.date.desc()).all()
+    return render_template("articles.html", title=TITLE+"- Articles du Club", articles=les_articles)
+
+@app.route("/article/<int:idA>")
+def article_detail(idA):
+    article = ArticleBD.query.get_or_404(idA)
+    return render_template("article_detail.html", title=article.titre, article=article)
+
+@app.route("/admin/add_article/", methods=["GET", "POST"])
+@login_required
+@admin_required
+def add_article():
+    form = ArticleForm()
+    if form.validate_on_submit():
+        # Créer l'article en base pour avoir l'ID
+        nouveau_article = ArticleBD(
+            titre=form.titre.data,
+            contenu=form.contenu.data,
+            date=datetime.now().date()
+        )
+        db.session.add(nouveau_article)
+        db.session.commit()
+        # Gestion des images
+        if form.images.data:
+            # Création du chemin : static/images/articles/<ID_ARTICLE>
+            dossier_article = os.path.join(app.root_path, 'static/images/articles', str(nouveau_article.id))
+            # On crée le dossier s'il n'existe pas
+            os.makedirs(dossier_article, exist_ok=True)
+            for file in form.images.data:
+                if file.filename:
+                    filename = secure_filename(file.filename)
+                    # Sauvegarde dans le sous-dossier
+                    file.save(os.path.join(dossier_article, filename))
+                    nouvelle_image = ImageArticleBD(nom=filename, id_article=nouveau_article.id)
+                    db.session.add(nouvelle_image)
+            db.session.commit()
+        return redirect(url_for('articles'))
+    return render_template("admin_form_article.html", title="Rédiger un article", form=form)
+
+@app.route("/admin/edit_article/<int:idA>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_article(idA):
+    article = ArticleBD.query.get_or_404(idA)
+    form = ArticleForm(obj=article)
+    if form.validate_on_submit():
+        article.titre = form.titre.data
+        article.contenu = form.contenu.data
+        if form.images.data:
+            # Cible le dossier de l'article existant
+            dossier_article = os.path.join(app.root_path, 'static/images/articles', str(article.id))
+            os.makedirs(dossier_article, exist_ok=True)
+            
+            for file in form.images.data:
+                if file.filename:
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(dossier_article, filename))
+                    nouvelle_image = ImageArticleBD(nom=filename, id_article=article.id)
+                    db.session.add(nouvelle_image)
+        db.session.commit()
+        return redirect(url_for('articles'))
+    return render_template("admin_form_article.html", title="Modifier un article", form=form, article=article)
+
+@app.route("/admin/delete_article/<int:idA>", methods=["POST"])
+@login_required
+@admin_required
+def delete_article(idA):
+    article = ArticleBD.query.get_or_404(idA)
+    # Suppression du dossier complet de l'article (images incluses)
+    dossier_article = os.path.join(app.root_path, 'static/images/articles', str(article.id))
+    if os.path.exists(dossier_article):
+        # Supprime le dossier et tout ce qu'il contient
+        shutil.rmtree(dossier_article)
+    try:
+        db.session.delete(article)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+    return redirect(url_for('articles'))
+
+@app.route("/admin/delete_image_article/<int:idImg>", methods=["POST"])
+@login_required
+@admin_required
+def delete_image_article(idImg):
+    image = ImageArticleBD.query.get_or_404(idImg)
+    article_id = image.id_article
+    # On reconstruit le chemin avec l'ID de l'article
+    chemin_image = os.path.join(app.root_path, 'static/images/articles', str(article_id), image.nom)
+    try:
+        if os.path.exists(chemin_image):
+            os.remove(chemin_image)
+    except:
+        pass
+    db.session.delete(image)
+    db.session.commit()
+    return redirect(url_for('edit_article', idA=article_id))
 
 #============================================================#
 #====================   Pages A propos   ====================#
@@ -783,6 +1027,9 @@ def evenement_membre():
 # Affiche le profil public d'un membre.
 @app.route("/profil_view/<int:idM>")
 def profil_view(idM):
+    if not session.get("user_type") == "admin":
+        if current_user.id != idM:
+            abort(410)
     # origine corresponds à l'origine de l'utilisateur. 
     origine = request.args.get('origine', 'gerer_profils')
     id_competition = request.args.get('idCompetition', type=int)
@@ -1034,6 +1281,100 @@ def refuser_modification(idM):
     db.session.commit()
     return redirect(url_for('gerer_inscriptions'))
 
+@app.route("/admin/gestion_tarifs/", methods=["GET", "POST"])
+@login_required
+@admin_required
+def gestion_tarifs():
+    form = TarifForm()
+    if form.validate_on_submit():
+        nouveau_tarif = TarifBD(
+            nom=form.nom.data,
+            prix=form.prix.data,
+            description=form.description.data,
+            categorie=form.categorie.data
+        )
+        try:
+            db.session.add(nouveau_tarif)
+            db.session.commit()
+            return redirect(url_for('gestion_tarifs'))
+        except Exception as e:
+            db.session.rollback()
+    les_tarifs = TarifBD.query.order_by(TarifBD.categorie, TarifBD.prix).all()
+    return render_template("admin_gestion_tarifs.html", title="Gestion Tarifs", form=form, tarifs=les_tarifs)
+
+@app.route("/admin/delete_tarif/<int:idT>", methods=["POST"])
+@login_required
+@admin_required
+def delete_tarif(idT):
+    tarif = TarifBD.query.get_or_404(idT)
+    try:
+        db.session.delete(tarif)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+    return redirect(url_for('gestion_tarifs'))
+
+@app.route("/admin/edit_tarif/<int:idT>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_tarif(idT):
+    tarif = TarifBD.query.get_or_404(idT)
+    form = TarifForm(obj=tarif)
+    if form.validate_on_submit():
+        form.populate_obj(tarif)
+        db.session.commit()
+        return redirect(url_for('gestion_tarifs'))
+    return render_template("admin_edit_tarif.html", title="Modifier Tarif", form=form)
+
+
+@app.route("/admin/gestion_horaires/", methods=["GET", "POST"])
+@login_required
+@admin_required
+def gestion_horaires():
+    form = HoraireForm()
+    if form.validate_on_submit():
+        nouveau_horaire = HoraireBD(
+            jour=form.jour.data,
+            heure_debut=form.heure_debut.data,
+            heure_fin=form.heure_fin.data,
+            activite=form.activite.data,
+            details=form.details.data
+        )
+        try:
+            db.session.add(nouveau_horaire)
+            db.session.commit()
+            return redirect(url_for('gestion_horaires'))
+        except Exception as e:
+            db.session.rollback()
+    les_horaires = HoraireBD.query.all()
+    ordre_jours = {'Lundi': 1, 'Mardi': 2, 'Mercredi': 3, 'Jeudi': 4, 'Vendredi': 5, 'Samedi': 6, 'Dimanche': 7}
+    les_horaires.sort(key=lambda x: ordre_jours.get(x.jour, 8))
+    return render_template("admin_gestion_horaires.html", title="Gestion Horaires", form=form, horaires=les_horaires)
+
+@app.route("/admin/delete_horaire/<int:idH>", methods=["POST"])
+@login_required
+@admin_required
+def delete_horaire(idH):
+    horaire = HoraireBD.query.get_or_404(idH)
+    try:
+        db.session.delete(horaire)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+    return redirect(url_for('gestion_horaires'))
+
+@app.route("/admin/edit_horaire/<int:idH>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_horaire(idH):
+    horaire = HoraireBD.query.get_or_404(idH)
+    form = HoraireForm(obj=horaire)
+    if form.validate_on_submit():
+        form.populate_obj(horaire)
+        db.session.commit()
+        return redirect(url_for('gestion_horaires'))
+    return render_template("admin_edit_horaire.html", title="Modifier Horaire", form=form)
+
 #==============================================================#
 #====================   Pages Paramètres   ====================#
 #==============================================================#
@@ -1109,14 +1450,21 @@ def changer_mdp():
     form = PasswordChangeForm()
     if form.validate_on_submit():
         # Vérifier si l'ancien mot de passe est correct
-        if current_user.mdp_hash != form.old_password.data:
+        if not check_password_hash(current_user.mdp_hash, form.old_password.data):
+            flash("L'ancien mot de passe est incorrect.", 'danger')
             return redirect(url_for('changer_mdp'))
         # Vérifier si les nouveaux mots de passe correspondent
         if form.new_password.data != form.confirm_new_password.data:
+            flash("Les nouveaux mots de passe ne correspondent pas.", 'danger')
             return redirect(url_for('changer_mdp'))
+        # Vérifier la complexité
+        if not est_mot_de_passe_fort(form.new_password.data):
+             flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
+             return redirect(url_for('changer_mdp'))
         # Mettre à jour le mot de passe
-        current_user.mdp_hash = form.new_password.data
+        current_user.mdp_hash = generate_password_hash(form.new_password.data, method='pbkdf2:sha256')
         db.session.commit()
+        flash("Votre mot de passe a été mis à jour avec succès.", 'success')
         return redirect(url_for('index'))
     return render_template("changer_mdp.html", form=form, title=TITLE+"- Changer mot de passe")
 
@@ -1147,7 +1495,7 @@ def login():
         
         # 4. Vérifier si le mot de passe est correct
         # La vérification du mot de passe est une comparaison directe
-        if utilisateur.mdp_hash != form.password.data:
+        if not check_password_hash(utilisateur.mdp_hash, form.password.data):
             return redirect(url_for('login', message = "mdpIncorrect"))
         
         # 5. Vérifier si le compte membre est actif
@@ -1160,7 +1508,8 @@ def login():
         session['user_type'] = 'admin' if est_admin else 'membre'
         # Redirection vers la page demandée ou l'accueil
         next_page = request.args.get('next')
-        return redirect(next_page) if next_page else redirect(url_for('index'))  
+        if check_password_hash(utilisateur.mdp_hash, form.password.data):
+            return redirect(next_page) if next_page else redirect(url_for('index'))  
     
     message = request.args.get('message')
     return render_template("login.html", title=TITLE + "- Connexion", form=form, message=message)
@@ -1176,8 +1525,28 @@ def inscription():
             prenom=unForm.prenom.data,
             ddn=unForm.date_naissance.data,
             sexe=unForm.sexe.data,
-            mdp_hash=unForm.password.data # Note: Le mot de passe devrait être haché ici
+            mdp_hash= generate_password_hash(unForm.password.data,method='pbkdf2:sha256')
         )
+    if unForm.validate_on_submit():
+        mdp_clair = unForm.password.data
+        utilisateur_existant = MembreBD.query.filter_by(email=nouvelle_inscription.email).first()
+        if not est_mot_de_passe_fort(mdp_clair):
+            # On renvoie une erreur si le mot de passe est trop faible
+            return render_template("inscription.html", 
+                                   title=TITLE+"- Inscriptions", 
+                                   form=unForm, 
+                                   message_erreur="Le mot de passe doit contenir 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.")
+        if not nouvelle_inscription.nom[0].isupper() or not nouvelle_inscription.prenom[0].isupper():
+            #renvoie une erreur si le nom ou le prénom ne commence pas par une majuscule
+            return render_template("inscription.html", 
+                                   title=TITLE+"- Inscriptions", 
+                                   form=unForm,
+                                   erreur_nom ="le Nom et le Prénom doivent commencer par une majuscule.")
+        if utilisateur_existant:
+            return render_template("inscription.html",
+                                  title = TITLE+"- Inscriptions",
+                                  form = unForm,
+                                  erreur_email= "L'email que vous avez rentrez est deja utilisé")
         try:
             if current_user.is_authenticated and session.get('user_type') == 'admin':
                 nouveauMembre = MembreBD(
@@ -1258,6 +1627,13 @@ def comite_access(e):
                            error_code=405,
                            error_title="Accès Interdit",
                            error_message="Cette page est réservé au membre du comité"), 405
+
+@app.errorhandler(410)
+def page_prive(e):
+    return render_template('gestion_erreur.html',
+                           error_code=410,
+                           error_title="Accès Interdit",
+                           error_message="Cette page esyt privée, vous ne pouvez pas y acceder"), 410
 
 if __name__ == "__main__":
     app.run()
