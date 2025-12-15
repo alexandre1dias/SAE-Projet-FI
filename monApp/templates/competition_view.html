@@ -58,7 +58,6 @@
 <div class="text-center mt-3">
     <button type="button" class="btn btn-outline-primary btn-custom">Voir classement complet</button>
 </div>
-{% endif %}
 
 <div id="carouselTop" class="carousel slide mb-3" data-bs-ride="carousel">
     <div class="carousel-indicators">
@@ -81,15 +80,16 @@
             <img src="{{ url_for('static', filename='images/escrime_feminin/image4.png') }}" class="d-block mx-auto" alt="Portrait de deux escrimeuses souriantes">
         </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselTop" data-bs-slide-prev>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselTop" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Previous</span>
     </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselTop" data-bs-slide-next>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselTop" data-bs-slide="next">
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
     </button>
 </div>
+{% endif %}
 <div class="d-flex justify-content-center" style="gap: 10px;">
     
     {% if origine == 'calendrier' %}
