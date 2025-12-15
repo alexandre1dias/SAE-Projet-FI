@@ -138,21 +138,22 @@ def get_events():
                 'niveaux': event.niveauRE
             }
         })
-    query_club = EventClubBD.query.filter(db.or_(EventClubBD.passeeEV == False, EventClubBD.passeeEV == None))
-    for event in query_club.all():
-        all_events.append({
-            'id': f"club_{event.idEventClub}",
-            'title': event.NomEV,
-            'start': f"{event.dateDebutEV.isoformat()}T{event.heureDebutEV}",
-            'end': f"{event.dateFinEV.isoformat()}T{event.heureFinEV}",
-            'color': '#28a745',
-            'extendedProps': {
-                'url': url_for('club_view', idEventClub=event.idEventClub, origine='calendrier'),
-                'type': 'Événement du Club',
-                'description': event.descriptionEV,
-                'niveaux': event.niveauxEV
-            }
-        })
+    if current_user.is_authenticated and session.get('user_type') != 'membre':
+        query_club = EventClubBD.query.filter(db.or_(EventClubBD.passeeEV == False, EventClubBD.passeeEV == None))
+        for event in query_club.all():
+            all_events.append({
+                'id': f"club_{event.idEventClub}",
+                'title': event.NomEV,
+                'start': f"{event.dateDebutEV.isoformat()}T{event.heureDebutEV}",
+                'end': f"{event.dateFinEV.isoformat()}T{event.heureFinEV}",
+                'color': '#28a745',
+                'extendedProps': {
+                    'url': url_for('club_view', idEventClub=event.idEventClub, origine='calendrier'),
+                    'type': 'Événement du Club',
+                    'description': event.descriptionEV,
+                    'niveaux': event.niveauxEV
+                }
+            })
     for event in EntrainementBD.query.all():
         all_events.append({
             'id': f"entrainement_{event.id}",
