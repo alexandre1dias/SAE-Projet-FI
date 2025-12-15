@@ -781,6 +781,9 @@ def evenement_membre():
 # Affiche le profil public d'un membre.
 @app.route("/profil_view/<int:idM>")
 def profil_view(idM):
+    if not session.get("user_type") == "admin":
+        if current_user.id != idM:
+            abort(410)
     # origine corresponds à l'origine de l'utilisateur. 
     origine = request.args.get('origine', 'gerer_profils')
     id_competition = request.args.get('idCompetition', type=int)
@@ -1222,6 +1225,13 @@ def comite_access(e):
                            error_code=405,
                            error_title="Accès Interdit",
                            error_message="Cette page est réservé au membre du comité"), 405
+
+@app.errorhandler(410)
+def page_prive(e):
+    return render_template('gestion_erreur.html',
+                           error_code=410,
+                           error_title="Accès Interdit",
+                           error_message="Cette page esyt privée, vous ne pouvez pas y acceder"), 410
 
 if __name__ == "__main__":
     app.run()

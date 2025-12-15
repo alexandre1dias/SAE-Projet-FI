@@ -1,6 +1,6 @@
 # SAE-Projet-FI
 
-Groupe composé de: Desgranges Lucas, Dias Alxandre, Kurucelik Erman, Schmit Clément
+Groupe composé de: Desgranges Lucas, Dias Alexandre, Kurucelik Erman, Schmit Clément
 
 ## Instruction pour lancer le projet
 ### Les prerequis:
@@ -12,7 +12,7 @@ Ensuite lance votre venv avec la commande:
 * source venv/bin/activate
 Faite bien attention à mettre le bon chemin, ici par exemple, il est dans le dossier courant.
 
-Une fois le venv installer, il vous faut installer tout les framework avec la command
+Une fois le venv installer, il vous faut installer tout les framework avec la commande
 * pip install -r requirement.txt
 
 ### Les configs
