@@ -1,7 +1,7 @@
 CREATE TABLE ADMINISTRATEUR(
     idAdmin integer AUTO_INCREMENT,
     emailA varchar(41) unique,
-    mdpA varchar(64) not null,
+    mdpA varchar(256) not null,
     idParamNotifAdmin integer,
     PRIMARY KEY(idAdmin)
 );
