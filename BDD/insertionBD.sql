@@ -396,6 +396,30 @@ INSERT INTO IMAGERP (idImage, idPresse) VALUES (1, 1);
 -- Ajouts de liaisons images-presse (existantes)
 INSERT INTO IMAGERP (idImage, idPresse) VALUES (6, 2), (6, 3);
 
+-- Insertion des tarifs d'adhésion
+INSERT INTO TARIF (nom, prix, description, categorie) VALUES 
+('Initiation', 225, 'Jeunes et adultes débutants 1ère année', 'Adhesion'),
+('Scolaires', 235, 'Avec certificat de scolarité', 'Adhesion'),
+('Étudiants', 235, 'Université ou grandes écoles', 'Adhesion'),
+('Autres adultes', 255, 'Tarif standard adulte', 'Adhesion');
+
+-- Insertion du tarif matériel
+INSERT INTO TARIF (nom, prix, description, categorie) VALUES 
+('Location annuelle complète', 45, 'Veste, pantalon et sous-cuirasse fournis pour l''année. Le gant n''est pas fourni.', 'Materiel');
+
+-- Insertion des horaires du Mardi
+INSERT INTO HORAIRE (jour, heureDebut, heureFin, activite, details) VALUES 
+('Mardi', '19h00', '21h15', 'Entraînement Épée', 'M17, M20, seniors, vétérans');
+
+-- Insertion des horaires du Mercredi
+INSERT INTO HORAIRE (jour, heureDebut, heureFin, activite, details) VALUES 
+('Mercredi', '17h00', '18h00', 'Initiation Fleuret', 'Débutants jeunes filles et garçons (8 à 12 ans)'),
+('Mercredi', '18h15', '19h45', 'Entraînement Fleuret ou Épée', 'M11 à M20'),
+('Mercredi', '19h45', '21h15', 'Entraînement – Escrime loisir épée', 'Réservé aux débutants ados et adultes H&F');
+
+-- Insertion des horaires du Vendredi
+INSERT INTO HORAIRE (jour, heureDebut, heureFin, activite, details) VALUES 
+('Vendredi', '19h00', '21h15', 'Entraînement Épée', 'Entraînement libre M17 à vétérans');
 
 -- Réactiver la vérification des clés étrangères
 SET FOREIGN_KEY_CHECKS=1;

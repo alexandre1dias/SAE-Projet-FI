@@ -179,3 +179,24 @@ class Parametres_updateForm(FlaskForm):
     email = StringField('Email', validators=[Optional(), Email()])
     password = PasswordField('Nouveau mot de passe', validators=[Optional()])
     submit = SubmitField('Envoyer la requête')
+
+class HoraireForm(FlaskForm):
+    jour = SelectField('Jour', choices=[
+        ('Lundi', 'Lundi'), ('Mardi', 'Mardi'), ('Mercredi', 'Mercredi'),
+        ('Jeudi', 'Jeudi'), ('Vendredi', 'Vendredi'), ('Samedi', 'Samedi'), ('Dimanche', 'Dimanche')
+    ], validators=[DataRequired()])
+    heure_debut = StringField('Heure de début (ex: 19h00)', validators=[DataRequired()])
+    heure_fin = StringField('Heure de fin (ex: 21h15)', validators=[DataRequired()])
+    activite = StringField('Activité (ex: Entraînement Épée)', validators=[DataRequired()])
+    details = TextAreaField('Détails (ex: M17, M20...)', validators=[Optional()])
+    submit = SubmitField('Enregistrer')
+
+class TarifForm(FlaskForm):
+    nom = StringField('Intitulé (ex: Initiation, Location annuelle)', validators=[DataRequired()])
+    prix = IntegerField('Prix (€)', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[Optional()])
+    categorie = SelectField('Catégorie', choices=[
+        ('Adhesion', 'Adhésion'),
+        ('Materiel', 'Matériel')
+    ], validators=[DataRequired()])
+    submit = SubmitField('Enregistrer')
