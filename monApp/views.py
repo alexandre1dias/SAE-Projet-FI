@@ -8,6 +8,9 @@ from monApp.modelBD import *
 from flask import jsonify
 from functools import wraps
 from datetime import datetime
+import shutil
+import os
+from werkzeug.utils import secure_filename
 
 # Décorateur pour vérifier si l'utilisateur est un admin
 def admin_required(f):
@@ -696,8 +699,60 @@ def reunion_update(idReunion):
 # Affiche la page listant toutes les informations.
 @app.route("/informations/")
 def informations():
-    lesInformations = InformationBD.query.all()
-    return render_template("informations.html",title=TITLE+"- Informations",informations=lesInformations)
+    lesInformations = InformationBD.query.order_by(InformationBD.dateIN.desc(), InformationBD.heureIN.desc()).all()
+    return render_template("informations.html", title=TITLE+"- Informations", informations=lesInformations)
+
+@app.route("/admin/add_information/", methods=["GET", "POST"])
+@login_required
+@admin_required
+def add_information():
+    form = InformationForm()
+    if form.validate_on_submit():
+        now = datetime.now()
+        nouvelle_info = InformationBD(
+            titreIN=form.titre.data,
+            contenuIN=form.contenu.data,
+            dateIN=now.date(),
+            heureIN=now.strftime('%H:%M')
+        )
+        try:
+            db.session.add(nouvelle_info)
+            db.session.commit()
+            return redirect(url_for('informations'))
+        except Exception as e:
+            db.session.rollback()
+    return render_template("admin_form_information.html", title="Ajouter une information", form=form)
+
+@app.route("/admin/edit_information/<int:idI>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_information(idI):
+    info = InformationBD.query.get_or_404(idI)
+    form = InformationForm()
+    if request.method == 'GET':
+        form.titre.data = info.titreIN
+        form.contenu.data = info.contenuIN
+    if form.validate_on_submit():
+        info.titreIN = form.titre.data
+        info.contenuIN = form.contenu.data
+        try:
+            db.session.commit()
+            return redirect(url_for('informations'))
+        except Exception as e:
+            db.session.rollback()
+    return render_template("admin_form_information.html", title="Modifier une information", form=form)
+
+@app.route("/admin/delete_information/<int:idI>", methods=["POST"])
+@login_required
+@admin_required
+def delete_information(idI):
+    info = InformationBD.query.get_or_404(idI)
+    try:
+        db.session.delete(info)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+    return redirect(url_for('informations'))
 
 # Affiche la page listant tous les articles de presse.
 @app.route("/presse/")
@@ -705,6 +760,160 @@ def presse():
     lesArticles = PresseBD.query.all()
     return render_template("presse.html",title=TITLE+"- Presse",articles = lesArticles)
 
+@app.route("/admin/add_presse/", methods=["GET", "POST"])
+@login_required
+@admin_required
+def add_presse():
+    form = PresseForm()
+    if form.validate_on_submit():
+        now = datetime.now()
+        nouveau_presse = PresseBD(
+            titreP=form.titre.data,
+            contenuP=form.contenu.data,
+            lienP=form.lien.data,
+            dateP=now.date(),
+            heureP=now.strftime('%H:%M')
+        )
+        try:
+            db.session.add(nouveau_presse)
+            db.session.commit()
+            return redirect(url_for('presse'))
+        except Exception as e:
+            db.session.rollback()
+    return render_template("admin_form_presse.html", title="Ajouter un article de presse", form=form)
+
+@app.route("/admin/edit_presse/<int:idP>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_presse(idP):
+    article_presse = PresseBD.query.get_or_404(idP)
+    form = PresseForm()
+    if request.method == 'GET':
+        # Pré-remplissage du formulaire
+        form.titre.data = article_presse.titreP
+        form.contenu.data = article_presse.contenuP
+        form.lien.data = article_presse.lienP
+    if form.validate_on_submit():
+        article_presse.titreP = form.titre.data
+        article_presse.contenuP = form.contenu.data
+        article_presse.lienP = form.lien.data
+        try:
+            db.session.commit()
+            return redirect(url_for('presse'))
+        except Exception as e:
+            db.session.rollback()
+    return render_template("admin_form_presse.html", title="Modifier l'article de presse", form=form)
+
+@app.route("/admin/delete_presse/<int:idP>", methods=["POST"])
+@login_required
+@admin_required
+def delete_presse(idP):
+    article_presse = PresseBD.query.get_or_404(idP)
+    try:
+        db.session.delete(article_presse)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+    return redirect(url_for('presse'))
+
+@app.route("/articles/")
+def articles():
+    les_articles = ArticleBD.query.order_by(ArticleBD.date.desc()).all()
+    return render_template("articles.html", title=TITLE+"- Articles du Club", articles=les_articles)
+
+@app.route("/article/<int:idA>")
+def article_detail(idA):
+    article = ArticleBD.query.get_or_404(idA)
+    return render_template("article_detail.html", title=article.titre, article=article)
+
+@app.route("/admin/add_article/", methods=["GET", "POST"])
+@login_required
+@admin_required
+def add_article():
+    form = ArticleForm()
+    if form.validate_on_submit():
+        # Créer l'article en base pour avoir l'ID
+        nouveau_article = ArticleBD(
+            titre=form.titre.data,
+            contenu=form.contenu.data,
+            date=datetime.now().date()
+        )
+        db.session.add(nouveau_article)
+        db.session.commit()
+        # Gestion des images
+        if form.images.data:
+            # Création du chemin : static/images/articles/<ID_ARTICLE>
+            dossier_article = os.path.join(app.root_path, 'static/images/articles', str(nouveau_article.id))
+            # On crée le dossier s'il n'existe pas
+            os.makedirs(dossier_article, exist_ok=True)
+            for file in form.images.data:
+                if file.filename:
+                    filename = secure_filename(file.filename)
+                    # Sauvegarde dans le sous-dossier
+                    file.save(os.path.join(dossier_article, filename))
+                    nouvelle_image = ImageArticleBD(nom=filename, id_article=nouveau_article.id)
+                    db.session.add(nouvelle_image)
+            db.session.commit()
+        return redirect(url_for('articles'))
+    return render_template("admin_form_article.html", title="Rédiger un article", form=form)
+
+@app.route("/admin/edit_article/<int:idA>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_article(idA):
+    article = ArticleBD.query.get_or_404(idA)
+    form = ArticleForm(obj=article)
+    if form.validate_on_submit():
+        article.titre = form.titre.data
+        article.contenu = form.contenu.data
+        if form.images.data:
+            # Cible le dossier de l'article existant
+            dossier_article = os.path.join(app.root_path, 'static/images/articles', str(article.id))
+            os.makedirs(dossier_article, exist_ok=True)
+            
+            for file in form.images.data:
+                if file.filename:
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(dossier_article, filename))
+                    nouvelle_image = ImageArticleBD(nom=filename, id_article=article.id)
+                    db.session.add(nouvelle_image)
+        db.session.commit()
+        return redirect(url_for('articles'))
+    return render_template("admin_form_article.html", title="Modifier un article", form=form, article=article)
+
+@app.route("/admin/delete_article/<int:idA>", methods=["POST"])
+@login_required
+@admin_required
+def delete_article(idA):
+    article = ArticleBD.query.get_or_404(idA)
+    # Suppression du dossier complet de l'article (images incluses)
+    dossier_article = os.path.join(app.root_path, 'static/images/articles', str(article.id))
+    if os.path.exists(dossier_article):
+        # Supprime le dossier et tout ce qu'il contient
+        shutil.rmtree(dossier_article)
+    try:
+        db.session.delete(article)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+    return redirect(url_for('articles'))
+
+@app.route("/admin/delete_image_article/<int:idImg>", methods=["POST"])
+@login_required
+@admin_required
+def delete_image_article(idImg):
+    image = ImageArticleBD.query.get_or_404(idImg)
+    article_id = image.id_article
+    # On reconstruit le chemin avec l'ID de l'article
+    chemin_image = os.path.join(app.root_path, 'static/images/articles', str(article_id), image.nom)
+    try:
+        if os.path.exists(chemin_image):
+            os.remove(chemin_image)
+    except:
+        pass
+    db.session.delete(image)
+    db.session.commit()
+    return redirect(url_for('edit_article', idA=article_id))
 
 #============================================================#
 #====================   Pages A propos   ====================#

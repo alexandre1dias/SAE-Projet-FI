@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>Articles du Club</h1>
+            <p class="lead">Retrouvez les résumés de compétitions et la vie du club.</p>
+        </div>
+        
+        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+        <div>
+            <a href="{{ url_for('add_article') }}" class="btn btn-success">
+                + Nouvel Article
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for article in articles %}
+        <div class="col">
+            <div class="card h-100 shadow-sm hover-card">
+                {% if article.images %}
+                    <img src="{{ url_for('static', filename='images/articles/' ~ article.id ~ '/' ~ article.images[0].nom) }}" 
+                        class="card-img-top" 
+                        alt="{{ article.titre }}" 
+                        style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <img src="{{ url_for('static', filename='images/logo_app.png') }}" ... >
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h2 class="card-title h5 mb-0">{{ article.titre }}</h2>
+                    </div>
+                    <small class="text-muted mb-3">{{ article.date }}</small>
+                    
+                    <p class="card-text text-truncate-3 flex-grow-1">
+                        {{ article.contenu[:100] }}...
+                    </p>
+                    
+                    <a href="{{ url_for('article_detail', idA=article.id) }}" class="btn btn-primary mt-3 stretched-link">Lire l'article</a>
+                </div>
+                
+                {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+                <div class="card-footer bg-transparent border-top-0 d-flex justify-content-end gap-2 mb-2" style="position: relative; z-index: 2;">
+                    <a href="{{ url_for('edit_article', idA=article.id) }}" class="btn btn-warning btn-sm">Modifier</a>
+                    <form action="{{ url_for('delete_article', idA=article.id) }}" method="POST" onsubmit="return confirm('Supprimer cet article ?');">
+                        <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="col-12">
+            <p class="text-center">Aucun article pour le moment.</p>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
