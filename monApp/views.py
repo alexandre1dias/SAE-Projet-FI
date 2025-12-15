@@ -930,9 +930,16 @@ def profil_edit(idM):
 @app.route('/profil_edit/<int:idM>/desinscrit/', methods=["GET", "POST"])
 @login_required
 def desinscrit_profil(idM):
+    if session.get('user_type') != 'admin' and current_user.id != idM:
+        abort(403)
+
     membreDesinscrit = db.session.get(MembreBD, idM)
-    membreDesinscrit.activite = False
-    db.session.commit()
+    if membreDesinscrit:
+        membreDesinscrit.activite = False
+        db.session.commit()
+        if current_user.id == idM:
+            logout_user()
+            return redirect(url_for('index'))
     return redirect(url_for('gerer_profils'))
 
 # Réactive un profil.
