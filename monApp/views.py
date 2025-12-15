@@ -1291,6 +1291,7 @@ def inscription():
         )
     if unForm.validate_on_submit():
         mdp_clair = unForm.password.data
+        utilisateur_existant = MembreBD.query.filter_by(email=nouvelle_inscription.email).first()
         if not est_mot_de_passe_fort(mdp_clair):
             # On renvoie une erreur si le mot de passe est trop faible
             return render_template("inscription.html", 
@@ -1303,6 +1304,11 @@ def inscription():
                                    title=TITLE+"- Inscriptions", 
                                    form=unForm,
                                    erreur_nom ="le Nom et le Prénom doivent commencer par une majuscule.")
+        if utilisateur_existant:
+            return render_template("inscription.html",
+                                  title = TITLE+"- Inscriptions",
+                                  form = unForm,
+                                  erreur_email= "L'email que vous avez rentrez est deja utilisé")
         try:
             if current_user.is_authenticated and session.get('user_type') == 'admin':
                 nouveauMembre = MembreBD(
