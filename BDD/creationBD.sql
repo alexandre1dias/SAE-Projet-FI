@@ -45,7 +45,7 @@ create table MEMBRE(
     nomM varchar(41) not null,
     prenomM varchar(41) not null,
     emailM varchar(100) unique,
-    mdpM varchar(64) not null,
+    mdpM varchar(256) not null,
     date_inscription date DEFAULT CURRENT_DATE,
     sexeM varchar(5) not null,
     ddnM date not null,

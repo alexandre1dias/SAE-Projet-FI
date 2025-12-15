@@ -8,6 +8,7 @@ from monApp.modelBD import *
 from flask import jsonify
 from functools import wraps
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Décorateur pour vérifier si l'utilisateur est un admin
 def admin_required(f):
@@ -1065,13 +1066,13 @@ def changer_mdp():
     form = PasswordChangeForm()
     if form.validate_on_submit():
         # Vérifier si l'ancien mot de passe est correct
-        if current_user.mdp_hash != form.old_password.data:
+        if current_user.mdp_hash != generate_password_hash(form.old_password.data, method='pbkdf2:sha256'):
             return redirect(url_for('changer_mdp'))
         # Vérifier si les nouveaux mots de passe correspondent
         if form.new_password.data != form.confirm_new_password.data:
             return redirect(url_for('changer_mdp'))
         # Mettre à jour le mot de passe
-        current_user.mdp_hash = form.new_password.data
+        current_user.mdp_hash = generate_password_hash(form.new_password.data, method='pbkdf2:sha256')
         db.session.commit()
         return redirect(url_for('index'))
     return render_template("changer_mdp.html", form=form, title=TITLE+"- Changer mot de passe")
@@ -1103,7 +1104,7 @@ def login():
         
         # 4. Vérifier si le mot de passe est correct
         # La vérification du mot de passe est une comparaison directe
-        if utilisateur.mdp_hash != form.password.data:
+        if not check_password_hash(utilisateur.mdp_hash, form.password.data):
             return redirect(url_for('login', message = "mdpIncorrect"))
         
         # 5. Vérifier si le compte membre est actif
@@ -1116,7 +1117,8 @@ def login():
         session['user_type'] = 'admin' if est_admin else 'membre'
         # Redirection vers la page demandée ou l'accueil
         next_page = request.args.get('next')
-        return redirect(next_page) if next_page else redirect(url_for('index'))  
+        if check_password_hash(utilisateur.mdp_hash, form.password.data):
+            return redirect(next_page) if next_page else redirect(url_for('index'))  
     
     message = request.args.get('message')
     return render_template("login.html", title=TITLE + "- Connexion", form=form, message=message)
@@ -1132,7 +1134,7 @@ def inscription():
             prenom=unForm.prenom.data,
             ddn=unForm.date_naissance.data,
             sexe=unForm.sexe.data,
-            mdp_hash=unForm.password.data # Note: Le mot de passe devrait être haché ici
+            mdp_hash= generate_password_hash(unForm.password.data,method='pbkdf2:sha256')
         )
         try:
             if current_user.is_authenticated and session.get('user_type') == 'admin':
