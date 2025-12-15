@@ -779,7 +779,7 @@ def delete_information(idI):
 # Affiche la page listant tous les articles de presse.
 @app.route("/presse/")
 def presse():
-    lesArticles = PresseBD.query.order_by(PresseBD.date.desc()).all()
+    lesArticles = PresseBD.query.order_by(PresseBD.dateP.desc()).all()
     return render_template("presse.html",title=TITLE+"- Presse",articles = lesArticles)
 
 @app.route("/admin/add_presse/", methods=["GET", "POST"])
