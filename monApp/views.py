@@ -1,5 +1,5 @@
 from .app import app, db
-from flask import render_template, request, url_for, redirect, session, abort
+from flask import render_template, request, url_for, redirect, session, abort, flash
 from config import TITLE, AUJOURDHUI
 from flask_login import logout_user, login_user, login_required, current_user
 from .forms import *
@@ -11,6 +11,8 @@ from datetime import datetime
 import shutil
 import os
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
+import re
 
 # Décorateur pour vérifier si l'utilisateur est un admin
 def admin_required(f):
@@ -51,6 +53,26 @@ def comite_ou_admin_required(f):
             abort(405)  # Déclenche l'erreur "Accès Interdit" Comite
         return f(*args, **kwargs)
     return decorated_function
+
+#Vérificateur de mot de passe, vérifie si le mot de passe est complexe
+def est_mot_de_passe_fort(password):
+    # Vérifie la longueur (min 8 caractères)
+    if len(password) < 8:
+        return False
+    # Vérifie la présence d'au moins une minuscule
+    if not re.search(r"[a-z]", password):
+        return False
+    # Vérifie la présence d'au moins une majuscule
+    if not re.search(r"[A-Z]", password):
+        return False
+    # Vérifie la présence d'au moins un chiffre
+    if not re.search(r"[0-9]", password):
+        return False
+    # Vérifie la présence d'au moins un caractère spécial (!@#$%^&*)
+    if not re.search(r"[ !@#$%^&*(),.?\":{}|<>]", password):
+        return False
+    
+    return True
 
 
 #==========================================================#
@@ -1138,9 +1160,16 @@ def profil_edit(idM):
 @app.route('/profil_edit/<int:idM>/desinscrit/', methods=["GET", "POST"])
 @login_required
 def desinscrit_profil(idM):
+    if session.get('user_type') != 'admin' and current_user.id != idM:
+        abort(403)
+
     membreDesinscrit = db.session.get(MembreBD, idM)
-    membreDesinscrit.activite = False
-    db.session.commit()
+    if membreDesinscrit:
+        membreDesinscrit.activite = False
+        db.session.commit()
+        if current_user.id == idM:
+            logout_user()
+            return redirect(url_for('index'))
     return redirect(url_for('gerer_profils'))
 
 # Réactive un profil.
@@ -1392,14 +1421,21 @@ def changer_mdp():
     form = PasswordChangeForm()
     if form.validate_on_submit():
         # Vérifier si l'ancien mot de passe est correct
-        if current_user.mdp_hash != form.old_password.data:
+        if not check_password_hash(current_user.mdp_hash, form.old_password.data):
+            flash("L'ancien mot de passe est incorrect.", 'danger')
             return redirect(url_for('changer_mdp'))
         # Vérifier si les nouveaux mots de passe correspondent
         if form.new_password.data != form.confirm_new_password.data:
+            flash("Les nouveaux mots de passe ne correspondent pas.", 'danger')
             return redirect(url_for('changer_mdp'))
+        # Vérifier la complexité
+        if not est_mot_de_passe_fort(form.new_password.data):
+             flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
+             return redirect(url_for('changer_mdp'))
         # Mettre à jour le mot de passe
-        current_user.mdp_hash = form.new_password.data
+        current_user.mdp_hash = generate_password_hash(form.new_password.data, method='pbkdf2:sha256')
         db.session.commit()
+        flash("Votre mot de passe a été mis à jour avec succès.", 'success')
         return redirect(url_for('index'))
     return render_template("changer_mdp.html", form=form, title=TITLE+"- Changer mot de passe")
 
@@ -1430,7 +1466,7 @@ def login():
         
         # 4. Vérifier si le mot de passe est correct
         # La vérification du mot de passe est une comparaison directe
-        if utilisateur.mdp_hash != form.password.data:
+        if not check_password_hash(utilisateur.mdp_hash, form.password.data):
             return redirect(url_for('login', message = "mdpIncorrect"))
         
         # 5. Vérifier si le compte membre est actif
@@ -1443,7 +1479,8 @@ def login():
         session['user_type'] = 'admin' if est_admin else 'membre'
         # Redirection vers la page demandée ou l'accueil
         next_page = request.args.get('next')
-        return redirect(next_page) if next_page else redirect(url_for('index'))  
+        if check_password_hash(utilisateur.mdp_hash, form.password.data):
+            return redirect(next_page) if next_page else redirect(url_for('index'))  
     
     message = request.args.get('message')
     return render_template("login.html", title=TITLE + "- Connexion", form=form, message=message)
@@ -1459,8 +1496,22 @@ def inscription():
             prenom=unForm.prenom.data,
             ddn=unForm.date_naissance.data,
             sexe=unForm.sexe.data,
-            mdp_hash=unForm.password.data # Note: Le mot de passe devrait être haché ici
+            mdp_hash= generate_password_hash(unForm.password.data,method='pbkdf2:sha256')
         )
+    if unForm.validate_on_submit():
+        mdp_clair = unForm.password.data
+        if not est_mot_de_passe_fort(mdp_clair):
+            # On renvoie une erreur si le mot de passe est trop faible
+            return render_template("inscription.html", 
+                                   title=TITLE+"- Inscriptions", 
+                                   form=unForm, 
+                                   message_erreur="Le mot de passe doit contenir 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.")
+        if not nouvelle_inscription.nom[0].isupper() or not nouvelle_inscription.prenom[0].isupper():
+            #renvoie une erreur si le nom ou le prénom ne commence pas par une majuscule
+            return render_template("inscription.html", 
+                                   title=TITLE+"- Inscriptions", 
+                                   form=unForm,
+                                   erreur_nom ="le Nom et le Prénom doivent commencer par une majuscule.")
         try:
             if current_user.is_authenticated and session.get('user_type') == 'admin':
                 nouveauMembre = MembreBD(
