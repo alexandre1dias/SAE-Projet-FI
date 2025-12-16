@@ -1130,16 +1130,28 @@ def gerer_profils():
     return render_template("gerer_profils.html",
         title=TITLE + "- Gestion des Profils",pagination=pagination,filtre=filtre)
 
-# Désactive le compte d'un membre - Réservée aux administrateurs.
-@app.route ('/gerer_profils/desinscrire/<int:idM>', methods =("POST" ,))
+# Désactive le compte d'un membre.
+@app.route('/gerer_profils/desinscrire/<int:idM>', methods=["GET", "POST"])
 @login_required
-@admin_required
 def desinscrireMembre(idM):
+    # On récupère le membre ciblé
     membre = db.session.get(MembreBD, idM)
+    if not membre:
+        abort(404)
+    # Si ce n'est pas un admin, l'utilisateur ne peut cibler que lui-même.
+    if session.get('user_type') != 'admin' and current_user.id != idM:
+        abort(403)
+    # Désactivation
     membre.activite = False
     membre.statut = "Ancien Membre"
     db.session.commit()
-    return redirect(url_for('gerer_profils'))
+    # Redirection
+    if current_user.id == idM:
+        logout_user()
+        flash("Votre compte a été désactivé avec succès.", "success")
+        return redirect(url_for('index'))
+    else:
+        return redirect(url_for('gerer_profils'))
 
 # Réactive le compte d'un ancien membre - Réservée aux administrateurs.
 @app.route ('/gerer_anciens_profils/reinscrire/<int:idM>', methods =("POST" ,))
