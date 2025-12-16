@@ -14,6 +14,8 @@ import os
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
 
 # Décorateur pour vérifier si l'utilisateur est un admin
@@ -76,6 +78,22 @@ def est_mot_de_passe_fort(password):
     
     return True
 
+# fonction pour récupérer un utilisateur (Membre ou Admin) par email
+def get_user_by_email(email):
+    return MembreBD.query.filter_by(email=email).first() or AdminBD.query.filter_by(email=email).first()
+
+# fonction pour simuler l'envoi d'email
+def simuler_envoi_email(email, link):
+    print("\n" + "="*50)
+    print(f"SIMULATION D'ENVOI D'EMAIL À : {email}")
+    print(f"LIEN : {link}")
+    print("="*50 + "\n")
+
+# initialisation de Flask-Mail et du Serializer pour les tokens
+# variables de config MAIL_* sont définies dans app.config
+mail = Mail(app)
+# source : https://stackoverflow.com/questions/34043847/forcing-itsdangerous-urlsafetimedserializer-to-give-old-signature
+s = URLSafeTimedSerializer(app.config.get('SECRET_KEY', 'default-secret-key'))
 
 #==========================================================#
 #====================   Page Accueil   ====================#
@@ -1448,21 +1466,21 @@ def parametres_notifs():
 @app.route("/changer_mdp/", methods=['GET', 'POST'])
 @login_required
 def changer_mdp():
-    form = PasswordChangeForm()
+    form = MdpChangeForm()
     if form.validate_on_submit():
-        # Vérifier si l'ancien mot de passe est correct
+        # verifie ancien mot de passe 
         if not check_password_hash(current_user.mdp_hash, form.old_password.data):
             flash("L'ancien mot de passe est incorrect.", 'danger')
             return redirect(url_for('changer_mdp'))
-        # Vérifier si les nouveaux mots de passe correspondent
+        # verifie correspondance
         if form.new_password.data != form.confirm_new_password.data:
             flash("Les nouveaux mots de passe ne correspondent pas.", 'danger')
             return redirect(url_for('changer_mdp'))
-        # Vérifier la complexité
+        # verifie si mdp fort
         if not est_mot_de_passe_fort(form.new_password.data):
              flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
              return redirect(url_for('changer_mdp'))
-        # Mettre à jour le mot de passe
+        # maj le mdp
         current_user.mdp_hash = generate_password_hash(form.new_password.data, method='pbkdf2:sha256')
         db.session.commit()
         flash("Votre mot de passe a été mis à jour avec succès.", 'success')
@@ -1568,6 +1586,51 @@ def inscription():
         except Exception as e:
             db.session.rollback()
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
+
+@app.route("/mdp_oublier/", methods=["GET", "POST"])
+def mdp_oublier():
+    form = MdpOublieForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        user = get_user_by_email(email)
+        
+        if user:
+            token = s.dumps(email, salt='email-recover')
+            link = url_for('reset_with_token', token=token, _external=True)
+            
+            # Simulation d'envoi 
+            simuler_envoi_email(email, link)
+        
+        flash("Si cet email correspond à un compte, un lien de réinitialisation vous a été envoyé.", "info") 
+        return redirect(url_for('login'))
+    return render_template("mdp_oublier.html", title=TITLE + "- Mot de passe oublié", form=form)
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_with_token(token):
+    try:
+        # Cette ligne décode le token , récupère l’email qui y était stocké et vérifie que le token n’a pas été modifié / il a été généré avec le bon salt
+        email = s.loads(token, salt='email-recover', max_age=3600) # 1 heure d'expiration
+    except (SignatureExpired, Exception):
+        flash("Le lien de réinitialisation est invalide ou a expiré.", "danger")
+        return redirect(url_for('mdp_oublier'))
+    
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user = get_user_by_email(email)
+        if user:
+            if not est_mot_de_passe_fort(form.password.data):
+                flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
+                return render_template('reset_password.html', form=form, title="Réinitialisation mot de passe")
+            
+            user.mdp_hash = generate_password_hash(form.password.data, method='pbkdf2:sha256')
+            db.session.commit()
+            flash("Votre mot de passe a été mis à jour avec succès.", "success")
+            return redirect(url_for('login'))
+        else:
+            flash("Utilisateur introuvable.", "danger")
+            return redirect(url_for('login'))
+            
+    return render_template('reset_password.html', form=form, title="Réinitialisation mot de passe")
 
 # Déconnecte l'utilisateur.
 @app.route("/logout/")
