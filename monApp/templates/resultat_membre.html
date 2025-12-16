@@ -64,7 +64,7 @@
                                     <li><strong>Votre classement : {{ resultat.resultat }}</strong></li>
                                 </ul>
                                 <div class="text-center">
-                                    <a href="{{ url_for('competition_view', idCompetition=resultat.id_competition) }}" class="btn btn-outline-primary btn-custom">Consulter</a>
+                                    <a href="{{ url_for('competition_view', idCompetition=resultat.id_competition,origine ='resultat_membre') }}" class="btn btn-outline-primary btn-custom">Consulter</a>
                                 </div>
                             </div>
                         </div>
