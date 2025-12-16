@@ -186,6 +186,7 @@ class FiltreForm(FlaskForm):
     CHOIX_SEXE = [('homme', 'Homme'), ('femme', 'Femme')]
     CHOIX_NIVEAU = [('M9', 'M9'), ('M11', 'M11'), ('M13', 'M13'), ('M15', 'M15'), 
                     ('M17', 'M17'), ('M20', 'M20'), ('senior', 'Sénior'), ('veteran', 'Vétéran')]
+    CHOIX_FORMULAIRE = [('Question', 'Questions'), ('Demande', 'Demandes'), ('Signalement', 'Signalements')]
     
     sexe = SelectMultipleField(
         'Sexes',
@@ -202,8 +203,20 @@ class FiltreForm(FlaskForm):
         option_widget=widgets.CheckboxInput(),
         widget=widgets.ListWidget(prefix_label=False)
     )
+
+    type_formulaire = SelectMultipleField(
+        'Type',
+        choices=CHOIX_FORMULAIRE,
+        default=[c[0] for c in CHOIX_FORMULAIRE],
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
+
+
     recherche = StringField('Rechercher')
     submit = SubmitField('Envoyer')
+
+
     
 class HoraireForm(FlaskForm):
     jour = SelectField('Jour', choices=[

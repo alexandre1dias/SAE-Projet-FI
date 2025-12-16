@@ -1046,17 +1046,36 @@ def profil_view(idM):
 @login_required
 @admin_required
 def gerer_formulaires():
-    les_formulaires = FormulaireBD.query.order_by(FormulaireBD.date.desc()).filter(FormulaireBD.repondu == False).all()
-    les_formulaires.sort(key=lambda x: x.date, reverse=True) 
-    return render_template("gerer_formulaires.html", title=TITLE+"- Géstion des Formulaires", formulaires=les_formulaires)
+    filtre = FiltreForm(request.args if request.args else None)    
+    page = request.args.get('page', 1, type=int)
+    liste = db.session.query(FormulaireBD)\
+        .filter(FormulaireBD.repondu == False)\
+        .order_by(FormulaireBD.date.desc())
+
+    if filtre.type_formulaire.data: 
+        liste = liste.filter(FormulaireBD.type.in_(filtre.type_formulaire.data))
+    
+    pagination = liste.paginate(page=page, per_page=15, error_out=False)
+    return render_template("gerer_formulaires.html",
+        title=TITLE + "- Gestion des Formulaires",pagination=pagination,filtre=filtre)
 
 # Affiche les formulaires de contact déjà traités - Réservée aux administrateurs.
 @app.route("/gerer_anciens_formulaires/")
 @login_required
 @admin_required
 def gerer_anciens_formulaires():
-    les_formulaires = FormulaireBD.query.order_by(FormulaireBD.date.desc()).filter(FormulaireBD.repondu == True).all()
-    return render_template("gerer_anciens_formulaires.html", title=TITLE+"- Géstion des Anciens Formulaires", formulaires=les_formulaires)
+    filtre = FiltreForm(request.args if request.args else None)    
+    page = request.args.get('page', 1, type=int)
+    liste = db.session.query(FormulaireBD)\
+        .filter(FormulaireBD.repondu == True)\
+        .order_by(FormulaireBD.date.desc())
+
+    if filtre.type_formulaire.data: 
+        liste = liste.filter(FormulaireBD.type.in_(filtre.type_formulaire.data))
+    
+    pagination = liste.paginate(page=page, per_page=15, error_out=False)
+    return render_template("gerer_anciens_formulaires.html",
+        title=TITLE + "- Gestion des Anciens Formulaires",pagination=pagination,filtre=filtre)
 
 # Affiche le détail d'un formulaire de contact - Réservée aux administrateurs.
 @app.route("/formulaire_view/<int:idFormulaire>")
@@ -1091,23 +1110,13 @@ def repondre_formulaire(idFormulaire):
     leFormulaire.repondu = True
     db.session.commit()
     return redirect(url_for('gerer_formulaires'))
-
-# --- NOUVEAU : La fonction pour calculer le prochain ordre ---
-def calcule_ordre(colonne, triee, order):
-    """
-    Si on trie déjà cette colonne en ASC, le prochain clic sera DESC.
-    Sinon (autre colonne ou déjà DESC), le prochain clic sera ASC.
-    """
-    if triee == colonne and order == 'asc':
-        return 'desc'
-    return 'asc'
-    
+ 
 # Affiche la liste des membres actifs pour la gestion - Réservée aux administrateurs.
 @app.route("/gerer_profils/")
 @login_required
 @admin_required
 def gerer_profils():
-    filtre = FiltreForm(request.args) if request.args else FiltreForm()
+    filtre = FiltreForm(request.args if request.args else None)    
     page = request.args.get('page', 1, type=int)
     liste = db.session.query(MembreBD)\
         .filter(MembreBD.activite == True)\

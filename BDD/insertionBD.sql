@@ -283,7 +283,27 @@ INSERT INTO FORMULAIRE_CONTACT (typeFC, sujetFC, mailFC, descriptionFC, dateFC, 
 ('Demande', 'Inscription', 'marie.durand@email.com', 'Je souhaite avoir plus d\'informations sur l\'inscription.', '2023-02-15', 2, 1),
 ('Signalement', 'Matériel défectueux', 'jean.dupont@email.com', 'Le fil de corps n°12 est cassé au niveau de la prise.', '2025-10-28', 1, 1),
 ('Question', 'Stage de Février', 'lucas.petit@email.com', 'Le stage de février 2026 est-il ouvert aux M15 ?', '2025-11-06', 9, 1),
-('Demande', 'Photo de profil', 'visiteur.externe@email.com', 'Pouvez-vous supprimer ma photo de la galerie ?', '2025-11-01', NULL, 1);
+('Demande', 'Photo de profil', 'visiteur.externe@email.com', 'Pouvez-vous supprimer ma photo de la galerie ?', '2025-11-01', NULL, 1),
+('Question', 'Tarifs famille', 'famille.martin@email.com', 'Proposez-vous des réductions pour les familles nombreuses ?', '2025-09-15', NULL, 1),
+('Signalement', 'Vestiaire', 'paul.martin@email.com', 'La porte du vestiaire hommes ne ferme plus correctement.', '2025-10-02', 3, 1),
+('Demande', 'Facture', 'jean.dupont@email.com', 'Pourrais-je recevoir une facture pour mon adhésion ?', '2025-10-05', 1, 1),
+('Question', 'Compétition M13', 'leo.david@email.com', 'Est-ce que je peux participer à la compétition M15 le mois prochain ?', '2025-11-12', 16, 1),
+('Signalement', 'Fuite d\'eau', 'emma.bonnet@email.com', 'Il y a une fuite d\'eau dans les toilettes femmes.', '2025-11-14', 21, 1),
+('Demande', 'Stage Toussaint', 'parents.hugo@email.com', 'Reste-t-il des places pour le stage de la Toussaint ?', '2025-10-20', NULL, 1),
+('Question', 'Matériel', 'nouveau@email.com', 'Faut-il acheter son propre matériel dès la première année ?', '2025-09-05', NULL, 1),
+('Signalement', 'Lumière piste 3', 'louis.perrin@email.com', 'L\'éclairage au dessus de la piste 3 clignote.', '2025-11-10', 28, 1),
+('Demande', 'Attestation', 'manon.roux@email.com', 'J\'ai besoin d\'une attestation de pratique pour mon CE.', '2025-11-15', 15, 1),
+('Question', 'Bénévolat', 'benevole@email.com', 'Comment devenir bénévole pour la prochaine compétition ?', '2025-10-30', NULL, 1),
+('Demande', 'Remboursement', 'ancien@email.com', 'Je me suis blessé, est-il possible de se faire rembourser une partie de la cotisation ?', '2025-11-01', NULL, 1),
+('Signalement', 'Propreté', 'rose.barbier@email.com', 'Les douches n\'étaient pas très propres hier soir.', '2025-11-18', 25, 1),
+('Question', 'Horaires vacances', 'zoe.fournier@email.com', 'Y a-t-il entraînement pendant les vacances de Noël ?', '2025-12-10', 19, 1),
+('Demande', 'Partenariat', 'sponsor@entreprise.com', 'Nous souhaiterions sponsoriser votre club.', '2025-09-20', NULL, 1),
+('Question', 'Catégorie âge', 'parent.curieux@email.com', 'Mon fils a 7 ans, peut-il commencer l\'escrime ?', '2025-09-01', NULL, 1),
+('Signalement', 'Site web', 'geek@email.com', 'Il y a une faute d\'orthographe sur la page d\'accueil.', '2025-11-20', NULL, 1),
+('Demande', 'Essai', 'sportif@email.com', 'Est-il possible de faire une séance d\'essai gratuite ?', '2025-09-10', NULL, 1),
+('Question', 'Tenue', 'chloe.moreau@email.com', 'Quelle taille de veste dois-je commander ?', '2025-10-15', 10, 1),
+('Signalement', 'Parking', 'jules.girard@email.com', 'Le portail du parking est resté ouvert cette nuit.', '2025-11-22', 20, 1),
+('Demande', 'Inscription tardive', 'retardataire@email.com', 'Est-il encore possible de s\'inscrire en novembre ?', '2025-11-05', NULL, 1);
 
 
 -- Tables de liaison pour les formulaires (REPONDRE, REMPLIR) (existantes)
