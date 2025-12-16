@@ -280,7 +280,6 @@ INSERT INTO RESULTER (idResultat, idCompetition) VALUES
 -- Insertion des formulaires de contact (existants)
 INSERT INTO FORMULAIRE_CONTACT (typeFC, sujetFC, mailFC, descriptionFC, dateFC, idMembre, idAdmin) VALUES
 ('Question', 'Horaires', 'visiteur@email.com', 'Quels sont les horaires pour les débutants ?', '2024-04-10', NULL, 1),
-('Demande', 'Inscription', 'marie.durand@email.com', 'Je souhaite avoir plus d\'informations sur l\'inscription.', '2023-02-15', 2, 1),
 ('Signalement', 'Matériel défectueux', 'jean.dupont@email.com', 'Le fil de corps n°12 est cassé au niveau de la prise.', '2025-10-28', 1, 1),
 ('Question', 'Stage de Février', 'lucas.petit@email.com', 'Le stage de février 2026 est-il ouvert aux M15 ?', '2025-11-06', 9, 1),
 ('Demande', 'Photo de profil', 'visiteur.externe@email.com', 'Pouvez-vous supprimer ma photo de la galerie ?', '2025-11-01', NULL, 1),
@@ -288,7 +287,6 @@ INSERT INTO FORMULAIRE_CONTACT (typeFC, sujetFC, mailFC, descriptionFC, dateFC, 
 ('Signalement', 'Vestiaire', 'paul.martin@email.com', 'La porte du vestiaire hommes ne ferme plus correctement.', '2025-10-02', 3, 1),
 ('Demande', 'Facture', 'jean.dupont@email.com', 'Pourrais-je recevoir une facture pour mon adhésion ?', '2025-10-05', 1, 1),
 ('Question', 'Compétition M13', 'leo.david@email.com', 'Est-ce que je peux participer à la compétition M15 le mois prochain ?', '2025-11-12', 16, 1),
-('Signalement', 'Fuite d\'eau', 'emma.bonnet@email.com', 'Il y a une fuite d\'eau dans les toilettes femmes.', '2025-11-14', 21, 1),
 ('Demande', 'Stage Toussaint', 'parents.hugo@email.com', 'Reste-t-il des places pour le stage de la Toussaint ?', '2025-10-20', NULL, 1),
 ('Question', 'Matériel', 'nouveau@email.com', 'Faut-il acheter son propre matériel dès la première année ?', '2025-09-05', NULL, 1),
 ('Signalement', 'Lumière piste 3', 'louis.perrin@email.com', 'L\'éclairage au dessus de la piste 3 clignote.', '2025-11-10', 28, 1),
@@ -302,9 +300,7 @@ INSERT INTO FORMULAIRE_CONTACT (typeFC, sujetFC, mailFC, descriptionFC, dateFC, 
 ('Signalement', 'Site web', 'geek@email.com', 'Il y a une faute d\'orthographe sur la page d\'accueil.', '2025-11-20', NULL, 1),
 ('Demande', 'Essai', 'sportif@email.com', 'Est-il possible de faire une séance d\'essai gratuite ?', '2025-09-10', NULL, 1),
 ('Question', 'Tenue', 'chloe.moreau@email.com', 'Quelle taille de veste dois-je commander ?', '2025-10-15', 10, 1),
-('Signalement', 'Parking', 'jules.girard@email.com', 'Le portail du parking est resté ouvert cette nuit.', '2025-11-22', 20, 1),
-('Demande', 'Inscription tardive', 'retardataire@email.com', 'Est-il encore possible de s\'inscrire en novembre ?', '2025-11-05', NULL, 1);
-
+('Signalement', 'Parking', 'jules.girard@email.com', 'Le portail du parking est resté ouvert cette nuit.', '2025-11-22', 20, 1);
 
 -- Tables de liaison pour les formulaires (REPONDRE, REMPLIR) (existantes)
 INSERT INTO REPONDRE (idFormulaire, idAdmin) VALUES
@@ -324,13 +320,63 @@ INSERT INTO REMPLIR (idFormulaire, idMembre) VALUES
 INSERT INTO INSCRIPTION (mailInscr, nomI, prenomI, ddnI, mdpI, sexeI,dateInscription) VALUES
 ('nouveau.membre@email.com', 'Nouveau', 'Alice', '2000-01-01', 'mdpsecure', 'Femme', '2025-10-23'),
 ('sam.leroy@email.com', 'Leroy', 'Samuel', '1998-12-10', 'mdpSam1', 'Homme', '2025-11-05'),
-('emma.g@email.com', 'Garnier', 'Emma', '2011-02-05', 'mdpEmma2', 'Femme', '2025-11-07');
+('emma.g@email.com', 'Garnier', 'Emma', '2011-02-05', 'mdpEmma2', 'Femme', '2025-11-07'),
+('julie.faure@email.com', 'Faure', 'Julie', '2005-06-15', 'mdpJulie1', 'Femme', '2025-11-10'),
+('thomas.blanc@email.com', 'Blanc', 'Thomas', '2012-09-20', 'mdpThomas2', 'Homme', '2025-11-12'),
+('sophie.martin@email.com', 'Martin', 'Sophie', '1990-03-30', 'mdpSophie3', 'Femme', '2025-11-15'),
+('luc.simon@email.com', 'Simon', 'Luc', '2001-12-05', 'mdpLuc4', 'Homme', '2025-11-18'),
+('clara.michel@email.com', 'Michel', 'Clara', '2014-07-14', 'mdpClara5', 'Femme', '2025-11-20'),
+('lucas.m@email.com', 'Martin', 'Lucas', '2005-03-12', 'mdpLucas1', 'Homme', '2025-11-21'),
+('sophie.d@email.com', 'Dubois', 'Sophie', '1995-07-22', 'mdpSophie2', 'Femme', '2025-11-22'),
+('thomas.b@email.com', 'Bernard', 'Thomas', '2010-11-30', 'mdpThomas3', 'Homme', '2025-11-23'),
+('lea.p@email.com', 'Petit', 'Léa', '2000-09-05', 'mdpLea4', 'Femme', '2025-11-24'),
+('nathan.r@email.com', 'Robert', 'Nathan', '2012-01-15', 'mdpNathan5', 'Homme', '2025-11-25'),
+('manon.r@email.com', 'Richard', 'Manon', '2008-05-20', 'mdpManon6', 'Femme', '2025-11-26'),
+('leo.d@email.com', 'Durand', 'Léo', '2015-12-10', 'mdpLeo7', 'Homme', '2025-11-27'),
+('camille.v@email.com', 'Vidal', 'Camille', '1992-04-18', 'mdpCamille8', 'Femme', '2025-11-28'),
+('hugo.m@email.com', 'Morel', 'Hugo', '2003-08-25', 'mdpHugo9', 'Homme', '2025-11-29'),
+('chloe.l@email.com', 'Lambert', 'Chloé', '2014-02-14', 'mdpChloe10', 'Femme', '2025-11-30'),
+('antoine.r@email.com', 'Renard', 'Antoine', '2000-05-20', 'mdpAntoine11', 'Homme', '2025-12-01'),
+('sarah.b@email.com', 'Boucher', 'Sarah', '1998-11-15', 'mdpSarah12', 'Femme', '2025-12-02'),
+('maxime.l@email.com', 'Lefevre', 'Maxime', '2010-02-28', 'mdpMaxime13', 'Homme', '2025-12-03'),
+('elise.m@email.com', 'Mercier', 'Elise', '2013-07-10', 'mdpElise14', 'Femme', '2025-12-04'),
+('alexandre.d@email.com', 'Dumont', 'Alexandre', '1995-09-05', 'mdpAlex15', 'Homme', '2025-12-05'),
+('charlotte.g@email.com', 'Girard', 'Charlotte', '2005-12-12', 'mdpCharlotte16', 'Femme', '2025-12-06'),
+('nicolas.p@email.com', 'Payet', 'Nicolas', '1980-03-30', 'mdpNicolas17', 'Homme', '2025-12-07'),
+('audrey.f@email.com', 'Fontaine', 'Audrey', '1992-06-18', 'mdpAudrey18', 'Femme', '2025-12-08'),
+('benjamin.r@email.com', 'Robin', 'Benjamin', '2008-01-25', 'mdpBenjamin19', 'Homme', '2025-12-09'),
+('mathilde.s@email.com', 'Sanchez', 'Mathilde', '2011-08-14', 'mdpMathilde20', 'Femme', '2025-12-10');
 
 
 -- Insertion des modifications en attente (existante)
 INSERT INTO MODIFICATION (nomModif, prenomModif, emailModif, sexeModif, ddnModif, dateModif, idMembre) VALUES
 ('Durand', 'Marie', 'marie.durand45@email.com', 'Homme', '2008-10-10', '2025-10-20', 2),
-('Dupont', 'Jean', 'jean.dupont.pro@email.com', 'Homme', '1995-05-20', '2025-11-01', 1);
+('Dupont', 'Jean', 'jean.dupont.pro@email.com', 'Homme', '1995-05-20', '2025-11-01', 1),
+('Martin', 'Paul', 'paul.martin.new@email.com', 'Homme', '2015-03-25', '2025-11-05', 3),
+('Eche', 'Régis', 'regis.president@email.com', 'Homme', '1975-02-07', '2025-11-08', 4),
+('Petit', 'Lucas', 'lucas.petit@email.com', 'Homme', '2010-06-16', '2025-11-12', 9),
+('Robert-Deval', 'Tom', 'tom.robert@email.com', 'Homme', '1985-11-30', '2025-11-15', 12),
+('Girard', 'Jules', 'jules.girard.pro@email.com', 'Homme', '2004-05-10', '2025-11-20', 20),
+('Bonnet', 'Emma', 'emma.bonnet.new@email.com', 'Femme', '1999-02-18', '2025-11-21', 21),
+('Dubois', 'Gabriel', 'gabriel.dubois.pro@email.com', 'Homme', '1980-12-05', '2025-11-22', 22),
+('Leclerc', 'Louise', 'louise.leclerc.perso@email.com', 'Femme', '1975-09-08', '2025-11-23', 23),
+('Meyer', 'Adam', 'adam.meyer.parent@email.com', 'Homme', '2016-01-02', '2025-11-24', 24),
+('Barbier', 'Rose', 'rose.barbier.new@email.com', 'Femme', '2010-06-19', '2025-11-25', 25),
+('Brun', 'Raphaël', 'raphael.brun.etu@email.com', 'Homme', '2007-03-22', '2025-11-26', 26),
+('Guerin', 'Jade', 'jade.guerin.pro@email.com', 'Femme', '2006-10-14', '2025-11-27', 27),
+('Perrin', 'Louis', 'louis.perrin.new@email.com', 'Homme', '2002-04-01', '2025-11-28', 28),
+('Mercier', 'Ambre', 'ambre.mercier.art@email.com', 'Femme', '1995-07-07', '2025-11-29', 29),
+('Chevalier', 'Nathan', 'nathan.chevalier.parent@email.com', 'Homme', '2013-08-11', '2025-11-30', 30),
+('Lemoine', 'Anna', 'anna.lemoine.new@email.com', 'Femme', '2015-05-05', '2025-12-01', 31),
+('Benali', 'Mohamed', 'mohamed.benali.pro@email.com', 'Homme', '1990-11-30', '2025-12-02', 32),
+('Roy', 'Inès', 'ines.roy.perso@email.com', 'Femme', '1988-01-20', '2025-12-03', 33),
+('Dupont', 'Jean', 'jean.dupont.v2@email.com', 'Homme', '1995-05-20', '2025-12-04', 1),
+('Durand', 'Marie', 'marie.durand.v2@email.com', 'Femme', '2008-08-10', '2025-12-05', 2),
+('Martin', 'Paul', 'paul.martin.v2@email.com', 'Homme', '2015-03-25', '2025-12-06', 3),
+('Eche', 'Régis', 'regis.eche.v2@email.com', 'Homme', '1975-02-07', '2025-12-07', 4),
+('Marquet', 'Dominique', 'dom.mar.new@email.com', 'Homme', '1974-02-07', '2025-12-08', 5),
+('Deladeriere', 'Bernard', 'ber.del.new@email.com', 'Homme', '1976-02-07', '2025-12-09', 6),
+('Lhomme', 'Pascale', 'pas.lhm.new@email.com', 'Femme', '1978-02-07', '2025-12-10', 7);
 
 
 -- Insertion des notifications (existantes)
