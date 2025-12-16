@@ -51,7 +51,7 @@ def comite_ou_admin_required(f):
     def decorated_function(*args, **kwargs):
         # Liste des status du comite
         statuts_comite = [
-            'Président', 'Vice-président', 'Secrétaire Général', 
+            'Président', 'Vice-président', 'Secrétaire Général',
             'Trésorier Général', 'Membre du Comité'
         ]
         # Premiere condition: verifie si admin
@@ -84,7 +84,7 @@ def est_mot_de_passe_fort(password):
     # Vérifie la présence d'au moins un caractère spécial (!@#$%^&*)
     if not re.search(r"[ !@#$%^&*(),.?\":{}|<>]", password):
         return False
-    
+
     return True
 
 # fonction pour récupérer un utilisateur (Membre ou Admin) par email
@@ -129,12 +129,12 @@ def adresse():
 def horaires():
     les_horaires = HoraireBD.query.all()
     ordre_jours = {
-        'Lundi': 1, 
-        'Mardi': 2, 
-        'Mercredi': 3, 
-        'Jeudi': 4, 
-        'Vendredi': 5, 
-        'Samedi': 6, 
+        'Lundi': 1,
+        'Mardi': 2,
+        'Mercredi': 3,
+        'Jeudi': 4,
+        'Vendredi': 5,
+        'Samedi': 6,
         'Dimanche': 7
     }
     les_horaires.sort(key=lambda x: (ordre_jours.get(x.jour, 8), x.heure_debut))
@@ -263,11 +263,11 @@ def add_event():
         try:
             new_event = EvenementBD()
             db.session.add(new_event)
-            db.session.commit() 
-            
+            db.session.commit()
+
             event_id = new_event.id
             category = form.category.data
-            
+
             if category == 'Compétition':
                 new_specific_event = CompetitionBD(
                     id_event=event_id,
@@ -339,7 +339,7 @@ def add_event():
 def competitions():
     lesCompetitions = CompetitionBD.query.all()
     lesCompetitions.sort(key=lambda x: x.date_debut, reverse=True)
-    
+
     #events_a_venir = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateDebutRE', None) or getattr(e, 'dateDebutEV', None)) >= AUJOURDHUI]
     #events_passes = [e for e in evenements if (getattr(e, 'date_fin', None) or getattr(e, 'dateFinRE', None) or getattr(e, 'dateFinEV', None)) < AUJOURDHUI]
     return render_template("competitions.html", title=TITLE+"- Competitions", competitions=lesCompetitions)
@@ -353,7 +353,7 @@ def competition_view(idCompetition):
     est_eligible = False
     if current_user.is_authenticated and session.get('user_type') == 'membre':
         participation = ParticiperBD.query.filter_by(
-            id_membre=current_user.id, 
+            id_membre=current_user.id,
             id_event=uneCompetition.id_event
         ).first()
         deja_inscrit = participation is not None
@@ -454,7 +454,7 @@ def inscrire_membres_competition(idC):
     participations = ParticiperBD.query.filter_by(id_event=competition.id_event).all()
     participants_ids = {p.id_membre for p in participations}
     tous_les_non_participants = MembreBD.query.filter(MembreBD.id.notin_(participants_ids), MembreBD.activite == True).all()
-    surclassement_map = {'M9': 'M11', 'M11': 'M13', 'M13': 'M15', 'M15': 'M17','M17': 'M20', 'M20': 'Senior', 'Senior': 'Vétéran'}   
+    surclassement_map = {'M9': 'M11', 'M11': 'M13', 'M13': 'M15', 'M15': 'M17','M17': 'M20', 'M20': 'Senior', 'Senior': 'Vétéran'}
     niveaux_liste = [niveau.strip() for niveau in competition.niveaux.split(',')]
     non_participants_eligibles = []
     for non_participant in tous_les_non_participants:
@@ -500,7 +500,7 @@ def classer_membre(idCompetition, idMembre):
         db.session.add(nouveau_resultat)
     db.session.commit()
 
-    
+
     return redirect(url_for('competition_update', idCompetition=idCompetition))
 
 # Gère le téléversement du fichier PDF du classement pour une compétition
@@ -1139,7 +1139,7 @@ def edit_article(idA):
             # Cible le dossier de l'article existant
             dossier_article = os.path.join(app.root_path, 'static/images/articles', str(article.id))
             os.makedirs(dossier_article, exist_ok=True)
-            
+
             for file in form.images.data:
                 if file.filename:
                     filename = secure_filename(file.filename)
@@ -1195,7 +1195,7 @@ def about():
 # Affiche la page de l'historique du club.
 @app.route("/historique/")
 def historique():
-    return render_template("historique.html",title=TITLE+"- Historique") 
+    return render_template("historique.html",title=TITLE+"- Historique")
 
 # Affiche la page de présentation du comité directeur.
 @app.route("/comite_cercle/")
@@ -1275,7 +1275,7 @@ def profil_view(idM):
     if not session.get("user_type") == "admin":
         if current_user.id != idM:
             abort(410)
-    # origine corresponds à l'origine de l'utilisateur. 
+    # origine corresponds à l'origine de l'utilisateur.
     origine = request.args.get('origine', 'gerer_profils')
     id_competition = request.args.get('idCompetition', type=int)
     id_event_club = request.args.get('idEventClub', type=int)
@@ -1290,17 +1290,36 @@ def profil_view(idM):
 @login_required
 @admin_required
 def gerer_formulaires():
-    les_formulaires = FormulaireBD.query.order_by(FormulaireBD.date.desc()).filter(FormulaireBD.repondu == False).all()
-    les_formulaires.sort(key=lambda x: x.date, reverse=True) 
-    return render_template("gerer_formulaires.html", title=TITLE+"- Géstion des Formulaires", formulaires=les_formulaires)
+    filtre = FiltreForm(request.args if request.args else None)
+    page = request.args.get('page', 1, type=int)
+    liste = db.session.query(FormulaireBD)\
+        .filter(FormulaireBD.repondu == False)\
+        .order_by(FormulaireBD.date.desc())
+
+    if filtre.type_formulaire.data:
+        liste = liste.filter(FormulaireBD.type.in_(filtre.type_formulaire.data))
+
+    pagination = liste.paginate(page=page, per_page=15, error_out=False)
+    return render_template("gerer_formulaires.html",
+        title=TITLE + "- Gestion des Formulaires",pagination=pagination,filtre=filtre)
 
 # Affiche les formulaires de contact déjà traités - Réservée aux administrateurs.
 @app.route("/gerer_anciens_formulaires/")
 @login_required
 @admin_required
 def gerer_anciens_formulaires():
-    les_formulaires = FormulaireBD.query.order_by(FormulaireBD.date.desc()).filter(FormulaireBD.repondu == True).all()
-    return render_template("gerer_anciens_formulaires.html", title=TITLE+"- Géstion des Anciens Formulaires", formulaires=les_formulaires)
+    filtre = FiltreForm(request.args if request.args else None)
+    page = request.args.get('page', 1, type=int)
+    liste = db.session.query(FormulaireBD)\
+        .filter(FormulaireBD.repondu == True)\
+        .order_by(FormulaireBD.date.desc())
+
+    if filtre.type_formulaire.data:
+        liste = liste.filter(FormulaireBD.type.in_(filtre.type_formulaire.data))
+
+    pagination = liste.paginate(page=page, per_page=15, error_out=False)
+    return render_template("gerer_anciens_formulaires.html",
+        title=TITLE + "- Gestion des Anciens Formulaires",pagination=pagination,filtre=filtre)
 
 # Affiche le détail d'un formulaire de contact - Réservée aux administrateurs.
 @app.route("/formulaire_view/<int:idFormulaire>")
@@ -1327,7 +1346,7 @@ def formulaire_delete(idFormulaire):
 def repondre_formulaire(idFormulaire):
     reponse = request.form.get('reponse')
     leFormulaire = FormulaireBD.query.get_or_404(idFormulaire)
-    
+
     #Logique d'envoi d'email à ajouter ici
     # Par exemple : send_email(to=formulaire.email, subject=f"Re: {leFormulaire.sujet}", body=reponse)
     #une fois la réponse envoyée, on supprime le formulaire
@@ -1336,28 +1355,18 @@ def repondre_formulaire(idFormulaire):
     db.session.commit()
     return redirect(url_for('gerer_formulaires'))
 
-# --- NOUVEAU : La fonction pour calculer le prochain ordre ---
-def calcule_ordre(colonne, triee, order):
-    """
-    Si on trie déjà cette colonne en ASC, le prochain clic sera DESC.
-    Sinon (autre colonne ou déjà DESC), le prochain clic sera ASC.
-    """
-    if triee == colonne and order == 'asc':
-        return 'desc'
-    return 'asc'
-    
 # Affiche la liste des membres actifs pour la gestion - Réservée aux administrateurs.
 @app.route("/gerer_profils/")
 @login_required
 @admin_required
 def gerer_profils():
-    filtre = FiltreForm(request.args) if request.args else FiltreForm()
+    filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
     liste = db.session.query(MembreBD)\
         .filter(MembreBD.activite == True)\
         .order_by(MembreBD.date_inscription.desc())
 
-    if filtre.sexe.data: 
+    if filtre.sexe.data:
         liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
     if filtre.niveau.data:
         liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
@@ -1419,7 +1428,7 @@ def gerer_ancien_profils():
         .filter(MembreBD.activite == False)\
         .order_by(MembreBD.date_inscription.desc())
 
-    if filtre.sexe.data: 
+    if filtre.sexe.data:
         liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
     if filtre.niveau.data:
         liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
@@ -1466,17 +1475,26 @@ def profil_edit(idM):
             return redirect(url_for('profil_view', idM=unMembre.id, origine='profil'))
     return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
 
+
 # Affiche les demandes d'inscription et de modification de profil - Réservée aux administrateurs.
 @app.route("/gerer_inscriptions/")
 @login_required
 @admin_required
 def gerer_inscriptions():
-    lesInscriptions = db.session.query(InscriptionBD).all()
-    lesModifs = db.session.query(ModifBD).all()
-    lesRequetes = lesInscriptions + lesModifs
-    # Trie par date de la liste
-    lesRequetes.sort(key=lambda x: x.date, reverse=True)  
-    return render_template("gerer_inscriptions.html",title=TITLE+"- Géstion des Inscriptions", requetes=lesRequetes)
+    page = request.args.get('page', 1, type=int)
+    type_page = request.args.get('type',
+                                 'inscription') 
+    if type_page == 'modification':
+        lesRequetes = db.session.query(ModifBD).order_by(ModifBD.date.asc())
+    else:
+        type_page = 'inscription'
+        lesRequetes = db.session.query(InscriptionBD).order_by(
+            InscriptionBD.date.asc())
+    pagination = lesRequetes.paginate(page=page, per_page=7, error_out=False)
+    return render_template("gerer_inscriptions.html",
+                           title=TITLE + "- Gestion des Inscriptions",
+                           pagination=pagination,
+                           type_page=type_page)
 
 # Accepte une demande d'inscription et crée un nouveau membre - Réservée aux administrateurs.
 @app.route ('/accepter_inscription/<int:idI>', methods =("POST" ,))
@@ -1658,8 +1676,8 @@ def edit_horaire(idH):
 @app.route('/parametres/')
 def parametres():
     form = ParametresForm()
-    return render_template("parametres.html", 
-                         title=TITLE+"- Paramètres du Membre", 
+    return render_template("parametres.html",
+                         title=TITLE+"- Paramètres du Membre",
                          form=form)
 
 # Gère les paramètres de notification pour les membres et les administrateurs.
@@ -1753,7 +1771,7 @@ def login():
     # Si l'utilisateur est déjà connecté, on le redirige vers l'accueil
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    
+
     form = LoginForm()
     if form.validate_on_submit():
         # 1. Essayer de trouver un utilisateur (membre ou admin)
@@ -1765,15 +1783,15 @@ def login():
             utilisateur = AdminBD.query.filter_by(email=form.email.data).first()
             est_admin = True
 
-        # 3. Vérifier si un utilisateur a été trouvé 
-        if utilisateur is None: 
+        # 3. Vérifier si un utilisateur a été trouvé
+        if utilisateur is None:
             return redirect(url_for('login', message = "emailIncorrect"))
-        
+
         # 4. Vérifier si le mot de passe est correct
         # La vérification du mot de passe est une comparaison directe
         if not check_password_hash(utilisateur.mdp_hash, form.password.data):
             return redirect(url_for('login', message = "mdpIncorrect"))
-        
+
         # 5. Vérifier si le compte membre est actif
         if not est_admin and not utilisateur.activite:
             return redirect(url_for('login', message = "desincrit"))
@@ -1785,8 +1803,8 @@ def login():
         # Redirection vers la page demandée ou l'accueil
         next_page = request.args.get('next')
         if check_password_hash(utilisateur.mdp_hash, form.password.data):
-            return redirect(next_page) if next_page else redirect(url_for('index'))  
-    
+            return redirect(next_page) if next_page else redirect(url_for('index'))
+
     message = request.args.get('message')
     return render_template("login.html", title=TITLE + "- Connexion", form=form, message=message)
 
@@ -1800,14 +1818,14 @@ def inscription():
         demande_existante = InscriptionBD.query.filter_by(email=unForm.Login.data).first()
         if not est_mot_de_passe_fort(mdp_clair):
             # On renvoie une erreur si le mot de passe est trop faible
-            return render_template("inscription.html", 
-                                   title=TITLE+"- Inscriptions", 
-                                   form=unForm, 
+            return render_template("inscription.html",
+                                   title=TITLE+"- Inscriptions",
+                                   form=unForm,
                                    message_erreur="Le mot de passe doit contenir 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.")
         if not unForm.nom.data[0].isupper() or not unForm.prenom.data[0].isupper():
             #renvoie une erreur si le nom ou le prénom ne commence pas par une majuscule
-            return render_template("inscription.html", 
-                                   title=TITLE+"- Inscriptions", 
+            return render_template("inscription.html",
+                                   title=TITLE+"- Inscriptions",
                                    form=unForm,
                                    erreur_nom ="le Nom et le Prénom doivent commencer par une majuscule.")
         if utilisateur_existant or demande_existante:
@@ -1937,7 +1955,7 @@ def page_not_found(e):
 # Page d'erreur pour les erreurs internes du serveur (500).
 @app.errorhandler(500)
 def internal_server_error(e):
-    db.session.rollback() 
+    db.session.rollback()
     return render_template('gestion_erreur.html',
                            error_code=500,
                            error_title="Erreur interne du serveur",
