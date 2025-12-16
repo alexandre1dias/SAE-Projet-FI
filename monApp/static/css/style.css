@@ -296,8 +296,9 @@ section{
 }
 
 .explore-content h1{
-    font-size: 7vmin;
-    margin: 50px;
+    font-size: 6vmin;
+    margin: 0 0 20px 0;
+    text-align: center;
 }
 
 .explore-content p{
