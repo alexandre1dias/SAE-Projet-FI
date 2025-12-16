@@ -1539,30 +1539,22 @@ def login():
 def inscription():
     unForm = InscriptionForm()
     if unForm.validate_on_submit():
-        nouvelle_inscription = InscriptionBD(
-            email=unForm.Login.data,           
-            nom=unForm.nom.data,
-            prenom=unForm.prenom.data,
-            ddn=unForm.date_naissance.data,
-            sexe=unForm.sexe.data,
-            mdp_hash= generate_password_hash(unForm.password.data,method='pbkdf2:sha256')
-        )
-    if unForm.validate_on_submit():
         mdp_clair = unForm.password.data
-        utilisateur_existant = MembreBD.query.filter_by(email=nouvelle_inscription.email).first()
+        utilisateur_existant = MembreBD.query.filter_by(email=unForm.Login.data).first()
+        demande_existante = InscriptionBD.query.filter_by(email=unForm.Login.data).first()
         if not est_mot_de_passe_fort(mdp_clair):
             # On renvoie une erreur si le mot de passe est trop faible
             return render_template("inscription.html", 
                                    title=TITLE+"- Inscriptions", 
                                    form=unForm, 
                                    message_erreur="Le mot de passe doit contenir 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.")
-        if not nouvelle_inscription.nom[0].isupper() or not nouvelle_inscription.prenom[0].isupper():
+        if not unForm.nom.data[0].isupper() or not unForm.prenom.data[0].isupper():
             #renvoie une erreur si le nom ou le prénom ne commence pas par une majuscule
             return render_template("inscription.html", 
                                    title=TITLE+"- Inscriptions", 
                                    form=unForm,
                                    erreur_nom ="le Nom et le Prénom doivent commencer par une majuscule.")
-        if utilisateur_existant:
+        if utilisateur_existant or demande_existante:
             return render_template("inscription.html",
                                   title = TITLE+"- Inscriptions",
                                   form = unForm,
@@ -1570,12 +1562,12 @@ def inscription():
         try:
             if current_user.is_authenticated and session.get('user_type') == 'admin':
                 nouveauMembre = MembreBD(
-                    nom=nouvelle_inscription.nom,
-                    prenom=nouvelle_inscription.prenom,
-                    email=nouvelle_inscription.email,
-                    ddn=nouvelle_inscription.ddn,
-                    sexe=nouvelle_inscription.sexe,
-                    mdp_hash=nouvelle_inscription.mdp_hash
+                    nom=unForm.nom.data,
+                    prenom=unForm.prenom.data,
+                    email=unForm.Login.data,
+                    ddn=unForm.date_naissance.data,
+                    sexe=unForm.sexe.data,
+                    mdp_hash=generate_password_hash(unForm.password.data, method='pbkdf2:sha256')
                 )
                 db.session.add(nouveauMembre)
                 db.session.commit()
@@ -1600,11 +1592,26 @@ def inscription():
                 db.session.commit()
                 return redirect(url_for('gerer_profils'))
             else:
+                nouvelle_inscription = InscriptionBD(
+                    email=unForm.Login.data,           
+                    nom=unForm.nom.data,
+                    prenom=unForm.prenom.data,
+                    ddn=unForm.date_naissance.data,
+                    sexe=unForm.sexe.data,
+                    mdp_hash= generate_password_hash(unForm.password.data,method='pbkdf2:sha256'),
+                    date=datetime.now().date()
+                )
                 db.session.add(nouvelle_inscription)
                 db.session.commit()
                 return redirect(url_for('index'))
         except Exception as e:
             db.session.rollback()
+            print(f"ERREUR INSCRIPTION : {e}")
+            # Affiche l'erreur sur la page pour que l'utilisateur sache ce qui se passe
+            return render_template("inscription.html", 
+                                   title=TITLE+"- Inscriptions", 
+                                   form=unForm, 
+                                   message_erreur=f"Erreur technique : {str(e)}")
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
 
 # Déconnecte l'utilisateur.
