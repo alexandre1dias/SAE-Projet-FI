@@ -3,7 +3,6 @@ from flask import render_template, request, url_for, redirect, session, abort, f
 from config import TITLE, AUJOURDHUI
 from flask_login import logout_user, login_user, login_required, current_user
 from .forms import *
-from .connexionPythonSQL import *
 from monApp.modelBD import *
 from flask import jsonify
 from functools import wraps
@@ -22,7 +21,9 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or session.get('user_type') != 'admin':
+        # CORRECTION : On vérifie si l'objet current_user est une instance de la classe AdminBD
+        # Cela fonctionne même si la session 'user_type' est perdue
+        if not current_user.is_authenticated or not isinstance(current_user, AdminBD):
             abort(400)  # Déclenche l'erreur "Accès Interdit" Admin
         return f(*args, **kwargs)
     return decorated_function
@@ -31,7 +32,8 @@ def admin_required(f):
 def membre_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or session.get('user_type') != 'membre':
+        # CORRECTION : On vérifie l'instance MembreBD
+        if not current_user.is_authenticated or not isinstance(current_user, MembreBD):
             abort(401)  # Déclenche l'erreur "Accès Interdit" Membre
         return f(*args, **kwargs)
     return decorated_function
@@ -45,11 +47,10 @@ def comite_ou_admin_required(f):
             'Président', 'Vice-président', 'Secrétaire Général', 
             'Trésorier Général', 'Membre du Comité'
         ]
-        # Premiere condition: verifie si admin
-        is_admin = (session.get('user_type') == 'admin')
-        # Deuxieme condition: verifie si comite
+        # CORRECTION : Vérifications basées sur les objets
+        is_admin = isinstance(current_user, AdminBD)
         is_comite_membre = (
-            session.get('user_type') == 'membre' and
+            isinstance(current_user, MembreBD) and
             current_user.statut in statuts_comite
         )
         #Verification
@@ -623,6 +624,7 @@ def competition_delete(idCompetition):
 #====================   Pages Evenement du club   ====================#
 # Affiche la liste des événements du club.
 @app.route("/evenement_club/")
+@login_required
 def evenement_club():
     lesEventClubs = EventClubBD.query.all()
     ids_evenements_inscrits = set()
@@ -1075,11 +1077,6 @@ def delete_image_article(idImg):
 #============================================================#
 #====================   Pages A propos   ====================#
 #============================================================#
-# Affiche la page "À propos".
-@app.route("/about/")
-def about():
-    return render_template("about.html",title=TITLE+"- A propos")
-
 # Affiche la page de l'historique du club.
 @app.route("/historique/")
 def historique():
@@ -1241,10 +1238,7 @@ def calcule_ordre(colonne, triee, order):
 def gerer_profils():
     filtre = FiltreForm(request.args) if request.args else FiltreForm()
     page = request.args.get('page', 1, type=int)
-    liste = db.session.query(MembreBD)\
-        .filter(MembreBD.activite == True)\
-        .order_by(MembreBD.date_inscription.desc())
-
+    liste = MembreBD.query.filter(MembreBD.activite == True).order_by(MembreBD.date_inscription.desc())
     if filtre.sexe.data: 
         liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
     if filtre.niveau.data:
@@ -1258,6 +1252,7 @@ def gerer_profils():
                 MembreBD.email.ilike(terme)
             )
         )
+    # Maintenant .paginate() fonctionnera
     pagination = liste.paginate(page=page, per_page=15, error_out=False)
     return render_template("gerer_profils.html",
         title=TITLE + "- Gestion des Profils",pagination=pagination,filtre=filtre)
@@ -1303,10 +1298,7 @@ def reinscrireMembre(idM):
 def gerer_ancien_profils():
     filtre = FiltreForm(request.args) if request.args else FiltreForm()
     page = request.args.get('page', 1, type=int)
-    liste = db.session.query(MembreBD)\
-        .filter(MembreBD.activite == False)\
-        .order_by(MembreBD.date_inscription.desc())
-
+    liste = MembreBD.query.filter(MembreBD.activite == False).order_by(MembreBD.date_inscription.desc())
     if filtre.sexe.data: 
         liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
     if filtre.niveau.data:

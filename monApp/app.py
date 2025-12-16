@@ -28,9 +28,17 @@ def load_user(user_id):
     # Récupère le type d'utilisateur stocké dans la session
     user_type = session.get('user_type') 
     
+    # 1. Cas normal : on a le type dans la session
     if user_type == 'admin':
         return AdminBD.query.get(int(user_id))
     elif user_type == 'membre':
         return MembreBD.query.get(int(user_id))
     
-    return None # Si le type n'est pas défini ou inconnu
+    # 2. Cas de secours : Utile pour les tests ou si la session expire mal
+    # On cherche d'abord si c'est un admin
+    admin = AdminBD.query.get(int(user_id))
+    if admin:
+        return admin
+        
+    # Sinon on cherche si c'est un membre
+    return MembreBD.query.get(int(user_id))
