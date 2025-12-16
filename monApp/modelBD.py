@@ -23,6 +23,14 @@ class MembreBD(UserMixin, db.Model):
     niveau = db.Column(db.String(15))
     statut = db.Column(db.String(30), server_default='Membre')
     activite = db.Column(db.Boolean, server_default='1')
+    idParaNotif = db.Column('idParamNotifMembre', db.Integer, db.ForeignKey('PARAMETRE_NOTIF_MEMBRE.idParamNotifMembre'))
+    parametres_notif = db.relationship(
+        'ParametreNotifMembreBD', 
+        back_populates='membre', 
+        uselist=False, 
+        cascade="all, delete-orphan",
+        foreign_keys='ParametreNotifMembreBD.idMembre'
+    )
     
 
 
@@ -272,7 +280,6 @@ class PresseBD(UserMixin, db.Model):
     contenuP = db.Column(db.String(600))
     lienP = db.Column(db.String(255))
 
-
 class ParametreNotifAdminBD(UserMixin, db.Model):
     """
     Modèle SQLAlchemy pour la table PARAMETRE_NOTIF_ADMIN, compatible Flask-Login.
@@ -317,7 +324,11 @@ class ParametreNotifMembreBD(UserMixin, db.Model):
     modifProfilSite = db.Column(db.Boolean)
     modifProfilMail = db.Column(db.Boolean)
     idMembre = db.Column(db.Integer, db.ForeignKey('MEMBRE.idMembre'))
-    membre = db.relationship('MembreBD', backref=db.backref('parametres_notif_membre', uselist=False))
+    membre = db.relationship(
+        'MembreBD', 
+        back_populates='parametres_notif',
+        foreign_keys='[ParametreNotifMembreBD.idMembre]'
+    )
 
 class HoraireBD(db.Model):
     __tablename__ = 'HORAIRE'

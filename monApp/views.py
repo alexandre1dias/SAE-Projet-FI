@@ -1239,6 +1239,25 @@ def accepter_inscription(idI):
     db.session.add(nouveauMembre)
     db.session.delete(inscription)
     db.session.commit()
+    nouveauNotif=ParametreNotifMembreBD(
+        idMembre=nouveauMembre.id,
+        eventInscriptionSite=True,
+        evenementInscriptionMail=True,
+        eventNouveauSite=True,
+        eventNouveauMail=True,
+        eventAnnulationSite=True,
+        eventAnnulationMail=True,
+        resultatNouveauSite=True,
+        resultatNouveauMail=True,
+        reponseFormulaireSite=True,
+        reponseFormulaireMail=True,
+        modifProfilSite=True,
+        modifProfilMail=True
+    )
+    db.session.add(nouveauNotif)
+    db.session.commit()
+    nouveauMembre.idParaNotif = nouveauNotif.idParamNotifMembre
+    db.session.commit()
     return redirect(url_for('gerer_inscriptions'))
 
 # Accepte une demande de modification de profil - Réservée aux administrateurs.
@@ -1559,6 +1578,25 @@ def inscription():
                     mdp_hash=nouvelle_inscription.mdp_hash
                 )
                 db.session.add(nouveauMembre)
+                db.session.commit()
+                nouveauNotif=ParametreNotifMembreBD(
+                    idMembre=nouveauMembre.id,
+                    eventInscriptionSite=True,
+                    evenementInscriptionMail=True,
+                    eventNouveauSite=True,
+                    eventNouveauMail=True,
+                    eventAnnulationSite=True,
+                    eventAnnulationMail=True,
+                    resultatNouveauSite=True,
+                    resultatNouveauMail=True,
+                    reponseFormulaireSite=True,
+                    reponseFormulaireMail=True,
+                    modifProfilSite=True,
+                    modifProfilMail=True
+                )
+                db.session.add(nouveauNotif)
+                db.session.commit()
+                nouveauMembre.idParaNotif = nouveauNotif.idParamNotifMembre
                 db.session.commit()
                 return redirect(url_for('gerer_profils'))
             else:
