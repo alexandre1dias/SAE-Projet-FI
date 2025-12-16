@@ -288,8 +288,10 @@ def add_event():
             db.session.rollback()
     return render_template("add_event.html", title=TITLE + "- Ajouter un événement", form=form)
 
-
+#================================================================#
 #====================   Pages Competitions   ====================#
+#================================================================#
+
 # Affiche la liste de toutes les compétitions.
 @app.route("/competitions/")
 def competitions():
@@ -325,7 +327,11 @@ def competition_view(idCompetition):
                 est_eligible = True
     resultats = ResultatBD.query.filter_by(id_competition=idCompetition).all()
     resultats.sort(key=lambda x: x.resultat)
-    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",competition=uneCompetition,origine=origine,deja_inscrit=deja_inscrit,est_eligible=est_eligible, lesResultats = resultats)
+
+    # Vérifie si un classement PDF existe pour cette compétition
+    classement_pdf_path = os.path.join(app.root_path, 'static', 'classements', str(uneCompetition.id), 'classement.pdf')
+    classement_pdf_exists = os.path.exists(classement_pdf_path)
+    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",competition=uneCompetition,origine=origine,deja_inscrit=deja_inscrit,est_eligible=est_eligible, lesResultats = resultats, classement_pdf_exists=classement_pdf_exists)
 
 # Permet à un membre de s'inscrire à une compétition.
 @app.route("/inscrire/competition/<int:idCompetition>", methods=['GET'])
@@ -455,6 +461,33 @@ def classer_membre(idCompetition, idMembre):
     
     return redirect(url_for('competition_update', idCompetition=idCompetition))
 
+# Gère le téléversement du fichier PDF du classement pour une compétition
+@app.route("/competition/<int:idCompetition>/upload_classement", methods=['POST'])
+@login_required
+@admin_required
+def upload_classement_competition(idCompetition):
+    competition = CompetitionBD.query.get_or_404(idCompetition)
+    
+    if 'classement_pdf' not in request.files:
+        flash('Aucun fichier n\'a été envoyé.', 'danger')
+        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        
+    file = request.files['classement_pdf']
+    
+    if file.filename == '':
+        flash('Aucun fichier sélectionné.', 'danger')
+        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        
+    if file and file.filename.lower().endswith('.pdf'):
+        filename = "classement.pdf" # Nom de fichier fixe pour le retrouver facilement
+        dossier_classement = os.path.join(app.root_path, 'static', 'classements', str(competition.id))
+        os.makedirs(dossier_classement, exist_ok=True)
+        file.save(os.path.join(dossier_classement, filename))
+        flash('Le classement PDF a été téléversé avec succès.', 'success')
+    else:
+        flash('Type de fichier non autorisé. Veuillez téléverser un fichier PDF.', 'danger')
+    return redirect(url_for('competition_update', idCompetition=idCompetition))
+
 # Supprime la participation d'un membre à une compétition - Réservée aux administrateurs.
 @app.route("/competition/<int:idC>/delete/<int:idM>", methods=['POST'])
 @login_required
@@ -469,6 +502,72 @@ def delete_membre_competition(idC, idM):
         db.session.rollback()
     return redirect(url_for('competition_update', idCompetition=idC))
     
+# Ajoute une image à une compétition
+@app.route("/competition/<int:idCompetition>/add_image", methods=['POST'])
+@login_required
+@admin_required
+def add_image_competition(idCompetition):
+    competition = CompetitionBD.query.get_or_404(idCompetition)
+    
+    if 'image' not in request.files:
+        flash('Aucun fichier image n\'a été envoyé.', 'danger')
+        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        
+    file = request.files['image']
+    
+    if file.filename == '':
+        flash('Aucun fichier image sélectionné.', 'danger')
+        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        
+    if file:
+        filename = secure_filename(file.filename)
+        # Création d'un dossier unique pour chaque compétition pour éviter les conflits de noms
+        dossier_images = os.path.join(app.root_path, 'static', 'images', 'competitions', str(competition.id))
+        os.makedirs(dossier_images, exist_ok=True)
+        
+        file.save(os.path.join(dossier_images, filename))
+        
+        # L'URL stockée en BDD est relative au dossier 'static'
+        image_url = os.path.join('images', 'competitions', str(competition.id), filename).replace('\\', '/')
+        
+        alt_text = request.form.get('alt', filename)
+        prive = 'prive' in request.form
+        
+        try:
+            nouvelle_image = ImageAppBD(urlI=image_url, alt=alt_text, prive=prive)
+            competition.images_rc.append(nouvelle_image)
+            db.session.commit()
+            flash('Image ajoutée avec succès.', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erreur lors de l\'ajout de l\'image à la base de données.', 'danger')
+    
+    return redirect(url_for('competition_update', idCompetition=idCompetition))
+
+# Supprime une image d'une compétition
+@app.route("/competition/delete_image/<int:idImage>", methods=['POST'])
+@login_required
+@admin_required
+def delete_image_competition(idImage):
+    idCompetition = request.form.get('idCompetition')
+    if not idCompetition:
+        flash('ID de compétition manquant.', 'danger')
+        return redirect(request.referrer or url_for('index'))
+
+    competition = CompetitionBD.query.get_or_404(idCompetition)
+    image_a_retirer = ImageAppBD.query.get_or_404(idImage)
+
+    # On vérifie si l'image est bien dans la liste de la compétition
+    if image_a_retirer in competition.images_rc:
+        # On retire l'association
+        competition.images_rc.remove(image_a_retirer)
+        db.session.commit()
+        flash('L\'image a été retirée de la compétition.', 'success')
+    else:
+        flash('Cette image n\'était pas associée à cette compétition.', 'warning')
+
+    return redirect(url_for('competition_update', idCompetition=idCompetition))
+
 # Supprime une compétition et toutes ses participations - Réservée aux administrateurs.
 @app.route("/competition_delete/<int:idCompetition>", methods=['POST'])
 @login_required # Assure que seul un utilisateur connecté peut supprimer
