@@ -144,22 +144,22 @@ INSERT INTO EVENEMENT () VALUES
 
 -- Insertion des compétitions (existantes)
 INSERT INTO COMPETITION (nomCO, villeCO, adresseCO, dateDebutCO, heureDebutCO, dateFinCO, heureFinCO, typeArmeCO, sexeCO, typeCompete, descriptionCO, niveauCO, classementCO,passeeCO, idEvent) VALUES
-('Tournoi Régional', 'Orléans', '123 Rue du Sport', '2024-05-10', '09:00', '2024-05-11', '18:00', 'Épée', 'Mixte', 'Régional', 'Compétition ouverte à tous les niveaux régionaux.', 'Senior', 'En cours', 1,1),
+('Tournoi Régional', 'Orléans', '123 Rue du Sport', '2024-05-10', '09:00', '2024-05-11', '18:00', 'Épée', 'Homme', 'Régional', 'Compétition ouverte à tous les niveaux régionaux.', 'Senior', 'En cours', 1,1),
 ('Championnat M17', 'Tours', '456 Avenue de la Victoire', '2024-06-15', '08:30', '2024-06-15', '19:00', 'Fleuret', 'Femme', 'National', 'Championnat national pour la catégorie M17.', 'M17', NULL, 1,2),
 ('Championnat M17 Futur', 'Tours', '456 Avenue de la Victoire', '2026-06-15', '08:30', '2026-06-15', '19:00', 'Fleuret', 'Femme', 'National', 'Championnat national pour la catégorie M17.', 'M17', NULL, 0,6),
 ('Open de Blois', 'Blois', '1 Rue de la Halle', '2025-09-20', '09:00', '2025-09-21', '17:00', 'Sabre', 'Homme', 'National', 'Open national de sabre masculin.', 'Senior', NULL, 0, 7),
-('Circuit National M20', 'Paris', '2 Avenue de la Porte', '2025-10-11', '08:00', '2025-10-12', '18:00', 'Épée', 'Mixte', 'National', 'Étape du circuit national M20 épée.', 'M20', NULL, 0, 8),
+('Circuit National M20', 'Paris', '2 Avenue de la Porte', '2025-10-11', '08:00', '2025-10-12', '18:00', 'Épée', 'Femme', 'National', 'Étape du circuit national M20 épée.', 'M20', NULL, 0, 8),
 ('Tournoi des Ducs', 'Bourges', '3 Place Séraucourt', '2025-11-08', '10:00', '2025-11-08', '16:00', 'Fleuret', 'Femme', 'Régional', 'Tournoi amical fleuret féminin.', 'Senior', NULL, 0, 9),
-('Challenge de Noël M15', 'Orléans', '123 Rue du Sport', '2025-12-13', '09:30', '2025-12-13', '17:30', 'Sabre', 'Mixte', 'Régional', 'Compétition pour les jeunes sabreurs.', 'M15', NULL, 0, 10),
+('Challenge de Noël M15', 'Orléans', '123 Rue du Sport', '2025-12-13', '09:30', '2025-12-13', '17:30', 'Sabre', 'Homme', 'Régional', 'Compétition pour les jeunes sabreurs.', 'M15', NULL, 0, 10),
 ('Coupe de la Nouvelle Année', 'Tours', '456 Avenue de la Victoire', '2026-01-10', '09:00', '2026-01-11', '18:00', 'Épée', 'Homme', 'Régional', 'Première compétition de l''année.', 'Senior', NULL, 0, 11),
-('Tournoi de la Chandeleur', 'Vierzon', '4 Rue de la Paix', '2024-02-03', '09:00', '2024-02-04', '17:00', 'Fleuret', 'Mixte', 'Régional', 'Tournoi régional de début d''année.', 'M17', 'Terminé', 1, 12),
+('Tournoi de la Chandeleur', 'Vierzon', '4 Rue de la Paix', '2024-02-03', '09:00', '2024-02-04', '17:00', 'Fleuret', 'Femme', 'Régional', 'Tournoi régional de début d''année.', 'M17', 'Terminé', 1, 12),
 ('Grand Prix de Printemps', 'Chartres', '5 Boulevard de la Liberté', '2024-03-22', '08:30', '2024-03-23', '19:00', 'Sabre', 'Homme', 'National', 'Grand prix national de sabre.', 'Senior', 'Terminé', 1, 13),
 ('Critérium M13', 'Châteauroux', '6 Avenue du Stade', '2024-04-12', '10:00', '2024-04-12', '16:00', 'Épée', 'Femme', 'Départemental', 'Critérium pour les jeunes épéistes.', 'M13', 'Terminé', 1, 14),
-('Mémorial Jean Moulin', 'Montargis', '7 Rue de la Résistance', '2023-11-11', '09:00', '2023-11-11', '18:00', 'Toutes', 'Mixte', 'Régional', 'Tournoi commémoratif toutes armes.', 'Tous', 'Terminé', 1, 15),
+('Mémorial Jean Moulin', 'Montargis', '7 Rue de la Résistance', '2023-11-11', '09:00', '2023-11-11', '18:00', 'Épée', 'Homme', 'Régional', 'Tournoi commémoratif toutes armes.', 'M17,M20,Senior', 'Terminé', 1, 15),
 ('Tournoi d''Automne M20', 'Orléans', '123 Rue du Sport', '2025-09-27', '09:00', '2025-09-28', '18:00', 'Fleuret', 'Homme', 'Régional', 'Tournoi de début de saison M20 fleuret.', 'M20', NULL, 0, 27),
-('Challenge M13/M15', 'Blois', '1 Rue de la Halle', '2026-02-07', '10:00', '2026-02-07', '17:00', 'Sabre', 'Mixte', 'Départemental', 'Compétition amicale pour M13 et M15.', 'M13,M15', NULL, 0, 28),
+('Challenge M13/M15', 'Blois', '1 Rue de la Halle', '2026-02-07', '10:00', '2026-02-07', '17:00', 'Sabre', 'Femme', 'Départemental', 'Compétition amicale pour M13 et M15.', 'M13,M15', NULL, 0, 28),
 ('Coupe de Pâques Senior', 'Tours', '456 Avenue de la Victoire', '2026-04-04', '08:30', '2026-04-05', '19:00', 'Épée', 'Femme', 'Régional', 'Compétition épée dames senior.', 'Senior,Vétéran', NULL, 0, 29),
-('Circuit National Vétérans', 'Paris', '2 Avenue de la Porte', '2025-05-01', '09:00', '2025-05-01', '18:00', 'Toutes', 'Mixte', 'National', 'Étape nationale pour les vétérans.', 'Vétéran', 'Terminé', 1, 30);
+('Circuit National Vétérans', 'Paris', '2 Avenue de la Porte', '2025-05-01', '09:00', '2025-05-01', '18:00', 'Fleuret', 'Homme', 'National', 'Étape nationale pour les vétérans.', 'Vétéran', 'Terminé', 1, 30);
 
 
 -- Insertion des entraînements (existants)

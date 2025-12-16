@@ -337,12 +337,22 @@ def add_event():
 # Affiche la liste de toutes les compétitions.
 @app.route("/competitions/")
 def competitions():
-    lesCompetitions = CompetitionBD.query.all()
-    lesCompetitions.sort(key=lambda x: x.date_debut, reverse=True)
+    filtre = FiltreForm(request.args if request.args else None)
+    page = request.args.get('page', 1, type=int)
+    lesCompetitions = db.session.query(CompetitionBD)\
+        .order_by(CompetitionBD.date_debut.desc())
+        #.filter(CompetitionBD.repondu == False)\
+    if filtre.sexe.data:
+        lesCompetitions = lesCompetitions.filter(CompetitionBD.sexe.in_(filtre.sexe.data))
+    if filtre.niveau.data:
+        lesCompetitions = lesCompetitions.filter(or_(*(CompetitionBD.niveaux.like(f"%{n}%") for n in filtre.niveau.data)))
+    if filtre.armes.data:
+        lesCompetitions = lesCompetitions.filter(CompetitionBD.type_arme.in_(filtre.armes.data))
+    if filtre.type_competition.data:
+        lesCompetitions = lesCompetitions.filter(CompetitionBD.typeComp.in_(filtre.type_competition.data))
+    pagination = lesCompetitions.paginate(page=page, per_page=6, error_out=False)
+    return render_template("competitions.html", title=TITLE+"- Competitions", pagination=pagination,filtre = filtre )
 
-    #events_a_venir = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateDebutRE', None) or getattr(e, 'dateDebutEV', None)) >= AUJOURDHUI]
-    #events_passes = [e for e in evenements if (getattr(e, 'date_fin', None) or getattr(e, 'dateFinRE', None) or getattr(e, 'dateFinEV', None)) < AUJOURDHUI]
-    return render_template("competitions.html", title=TITLE+"- Competitions", competitions=lesCompetitions)
 
 # Affiche les détails d'une compétition spécifique.
 @app.route("/competitions/<int:idCompetition>/view")

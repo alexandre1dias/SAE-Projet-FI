@@ -196,11 +196,13 @@ class Parametres_updateForm(FlaskForm):
 
 
 class FiltreForm(FlaskForm):
-    CHOIX_SEXE = [('homme', 'Homme'), ('femme', 'Femme')]
+    CHOIX_SEXE = [('Homme', 'Homme'), ('Femme', 'Femme')]
     CHOIX_NIVEAU = [('M9', 'M9'), ('M11', 'M11'), ('M13', 'M13'), ('M15', 'M15'), 
-                    ('M17', 'M17'), ('M20', 'M20'), ('senior', 'Sénior'), ('veteran', 'Vétéran')]
+                    ('M17', 'M17'), ('M20', 'M20'), ('Senior', 'Senior'), ('Vétéran', 'Vétéran')]
     CHOIX_FORMULAIRE = [('Question', 'Questions'), ('Demande', 'Demandes'), ('Signalement', 'Signalements')]
-    
+    CHOIX_ARMES = [('Sabre', 'Sabre'), ('Fleuret', 'Fleuret'), ('Épée', 'Épée')]
+    CHOIX_TYPE_COMPETE = [('Régional', 'Régional'), ('National', 'National'), ('Départemental', 'Départemental')]
+
     sexe = SelectMultipleField(
         'Sexes',
         choices=CHOIX_SEXE,
@@ -225,10 +227,24 @@ class FiltreForm(FlaskForm):
         widget=widgets.ListWidget(prefix_label=False)
     )
 
+    armes = SelectMultipleField(
+        'Armes',
+        choices=CHOIX_ARMES,
+        default=[c[0] for c in CHOIX_ARMES],
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
+
+    type_competition = SelectMultipleField(
+        'Type Competition',
+        choices=CHOIX_TYPE_COMPETE,
+        default=[c[0] for c in CHOIX_TYPE_COMPETE],
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
 
     recherche = StringField('Rechercher')
     submit = SubmitField('Envoyer')
-
 
     
 class HoraireForm(FlaskForm):
