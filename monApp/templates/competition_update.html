@@ -2,8 +2,6 @@
 
 {% block head_extra %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/toggle_switch.css') }}">
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-   
 {% endblock %}
 
 {% block main %}
@@ -211,7 +209,7 @@
 
     <!-- Modale pour gérer les images -->
     <div class="modal fade" id="gererImagesModal" tabindex="-1" aria-labelledby="gererImagesModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="gererImagesModalLabel">Gérer les images de la compétition</h5>
