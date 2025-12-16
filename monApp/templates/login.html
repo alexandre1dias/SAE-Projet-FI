@@ -9,6 +9,13 @@
             
             {{ form.hidden_tag() }}
             <!-- Gestion des erreurs de connexion -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
             {%if message == "desincrit" %}
                 <div class="alert alert-danger" role="alert">Ce compte à été désinscrit, faite un demande via "Contact" pour plus d'information</div>
             {%endif%}
@@ -37,6 +44,7 @@
             </div>
         </form>
         <a href="{{ url_for('inscription') }}" class="btn-inscription">S'INSCRIRE</a>
+        <a href="{{ url_for('mdp_oublier') }}" class="mdp-link">Mot de passe oublié ?</a>
     </div>
 </div>
 {% endblock %}
