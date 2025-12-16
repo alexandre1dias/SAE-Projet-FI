@@ -350,7 +350,7 @@ INSERT INTO IMAGEAPP (urlI, prive, alt) VALUES
 ('/static/images/stage_paques.jpg', 0, 'Stage de Pâques 2024'),
 ('/static/images/podium_gp_printemps.jpg', 0, 'Podium GP Printemps'),
 ('/static/images/entrainement_jeunes.jpg', 0, 'Entraînement M13/M15'),
-('/static/images/logo_club.png', 0, 'Logo Cercle Escrime');
+('/static/images/logo_app.png', 0, 'Logo Cercle Escrime');
 
 
 -- Liaison des images aux compétitions et événements (existantes)
