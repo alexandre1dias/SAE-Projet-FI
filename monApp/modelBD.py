@@ -3,6 +3,16 @@ from flask_login import UserMixin
 from sqlalchemy.sql import func
 
 
+image_competition_association = db.Table('IMAGERC',
+    db.Column('idImage', db.Integer, db.ForeignKey('IMAGEAPP.idImage'), primary_key=True),
+    db.Column('idCompetition', db.Integer, db.ForeignKey('COMPETITION.idCompetition'), primary_key=True)
+)
+
+image_evenement_club_association = db.Table('IMAGERE',
+    db.Column('idImage', db.Integer, db.ForeignKey('IMAGEAPP.idImage'), primary_key=True),
+    db.Column('idEventClub', db.Integer, db.ForeignKey('EVENTCLUB.idEventClub'), primary_key=True)
+)
+
 class MembreBD(UserMixin, db.Model):
     """
     Modèle SQLAlchemy pour la table MEMBRE, compatible Flask-Login.
@@ -23,6 +33,14 @@ class MembreBD(UserMixin, db.Model):
     niveau = db.Column(db.String(15))
     statut = db.Column(db.String(30), server_default='Membre')
     activite = db.Column(db.Boolean, server_default='1')
+    idParaNotif = db.Column('idParamNotifMembre', db.Integer, db.ForeignKey('PARAMETRE_NOTIF_MEMBRE.idParamNotifMembre'))
+    parametres_notif = db.relationship(
+        'ParametreNotifMembreBD', 
+        back_populates='membre', 
+        uselist=False, 
+        cascade="all, delete-orphan",
+        foreign_keys='ParametreNotifMembreBD.idMembre'
+    )
     
 
 
@@ -83,6 +101,12 @@ class CompetitionBD(UserMixin, db.Model):
     id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
     evenement = db.relationship('EvenementBD', backref=db.backref('competitions', lazy=True))
     resultats = db.relationship('ResultatBD', backref='competition', lazy=True, cascade='all, delete-orphan')
+    images_rc = db.relationship(
+        'ImageAppBD',
+        secondary=image_competition_association,
+        lazy='subquery',
+        backref=db.backref('competitions_associees', lazy=True)
+    )
 
 class EntrainementBD(UserMixin, db.Model):
     """
@@ -228,6 +252,12 @@ class EventClubBD(UserMixin, db.Model):
     #Clé étrangère
     id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
     evenement = db.relationship('EvenementBD', backref=db.backref('eventclub', lazy=True))
+    images_re = db.relationship(
+        'ImageAppBD',
+        secondary=image_evenement_club_association,
+        lazy='subquery',
+        backref=db.backref('eventclubs_associes', lazy=True)
+    )
 
 class ResultatBD(db.Model):
     """
@@ -271,7 +301,6 @@ class PresseBD(UserMixin, db.Model):
     titreP = db.Column(db.String(50))
     contenuP = db.Column(db.String(600))
     lienP = db.Column(db.String(255))
-
 
 class ParametreNotifAdminBD(UserMixin, db.Model):
     """
@@ -317,7 +346,11 @@ class ParametreNotifMembreBD(UserMixin, db.Model):
     modifProfilSite = db.Column(db.Boolean)
     modifProfilMail = db.Column(db.Boolean)
     idMembre = db.Column(db.Integer, db.ForeignKey('MEMBRE.idMembre'))
-    membre = db.relationship('MembreBD', backref=db.backref('parametres_notif_membre', uselist=False))
+    membre = db.relationship(
+        'MembreBD', 
+        back_populates='parametres_notif',
+        foreign_keys='[ParametreNotifMembreBD.idMembre]'
+    )
 
 class HoraireBD(db.Model):
     __tablename__ = 'HORAIRE'
@@ -354,3 +387,12 @@ class ArticleBD(db.Model):
     contenu = db.Column('contenuA', db.Text)
     date = db.Column('dateA', db.Date)
     images = db.relationship('ImageArticleBD', backref='article', lazy=True, cascade="all, delete-orphan")
+
+
+class ImageAppBD(db.Model):
+    __tablename__ = 'IMAGEAPP'
+
+    idImage = db.Column(db.Integer, primary_key=True)
+    urlI = db.Column(db.String(255))
+    prive = db.Column(db.Boolean)
+    alt = db.Column(db.String(21))

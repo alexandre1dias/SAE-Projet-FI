@@ -112,7 +112,7 @@ create table INSCRIPTION(
     nomI varchar(41) not null,
     prenomI varchar(41) not null,
     ddnI date not null,
-    mdpI varchar(64) not null,
+    mdpI varchar(256) not null,
     sexeI varchar(5) not null,
     dateInscription date not null,
     PRIMARY KEY(idInscription)

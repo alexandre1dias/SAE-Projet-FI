@@ -14,6 +14,17 @@ import os
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+
+
+# Définir les extensions de fichiers autorisées
+ALLOWED_EXTENSIONS = {'webp','png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    """Vérifie si l'extension du fichier est autorisée."""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 # Décorateur pour vérifier si l'utilisateur est un admin
@@ -76,6 +87,22 @@ def est_mot_de_passe_fort(password):
 
     return True
 
+# fonction pour récupérer un utilisateur (Membre ou Admin) par email
+def get_user_by_email(email):
+    return MembreBD.query.filter_by(email=email).first() or AdminBD.query.filter_by(email=email).first()
+
+# fonction pour simuler l'envoi d'email
+def simuler_envoi_email(email, link):
+    print("\n" + "="*50)
+    print(f"SIMULATION D'ENVOI D'EMAIL À : {email}")
+    print(f"LIEN : {link}")
+    print("="*50 + "\n")
+
+# initialisation de Flask-Mail et du Serializer pour les tokens
+# variables de config MAIL_* sont définies dans app.config
+mail = Mail(app)
+# source : https://stackoverflow.com/questions/34043847/forcing-itsdangerous-urlsafetimedserializer-to-give-old-signature
+s = URLSafeTimedSerializer(app.config.get('SECRET_KEY', 'default-secret-key'))
 
 #==========================================================#
 #====================   Page Accueil   ====================#
@@ -164,7 +191,22 @@ def get_events():
                 'arme': event.type_arme
             }
         })
-    if current_user.is_authenticated and session.get('user_type') != 'membre':
+    voir_reunions = False
+    if current_user.is_authenticated:
+        # Si c'est un admin
+        if session.get('user_type') == 'admin':
+            voir_reunions = True
+        # Si c'est un membre, on vérifie s'il fait partie du comité
+        elif session.get('user_type') == 'membre':
+            statuts_comite = [
+                'Président', 'Vice-président', 'Vice-Président', 
+                'Secrétaire Général', 'Trésorier Général', 'Membre du Comité'
+            ]
+            if current_user.statut in statuts_comite:
+                voir_reunions = True
+
+    # Si l'utilisateur a les droits, on ajoute les réunions
+    if voir_reunions:
         for event in ReunionBD.query.all():
             all_events.append({
                 'id': f"reunion_{event.id}",
@@ -288,8 +330,10 @@ def add_event():
             db.session.rollback()
     return render_template("add_event.html", title=TITLE + "- Ajouter un événement", form=form)
 
-
+#================================================================#
 #====================   Pages Competitions   ====================#
+#================================================================#
+
 # Affiche la liste de toutes les compétitions.
 @app.route("/competitions/")
 def competitions():
@@ -325,7 +369,11 @@ def competition_view(idCompetition):
                 est_eligible = True
     resultats = ResultatBD.query.filter_by(id_competition=idCompetition).all()
     resultats.sort(key=lambda x: x.resultat)
-    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",competition=uneCompetition,origine=origine,deja_inscrit=deja_inscrit,est_eligible=est_eligible, lesResultats = resultats)
+
+    # Vérifie si un classement PDF existe pour cette compétition
+    classement_pdf_path = os.path.join(app.root_path, 'static', 'classements', str(uneCompetition.id), 'classement.pdf')
+    classement_pdf_exists = os.path.exists(classement_pdf_path)
+    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",competition=uneCompetition,origine=origine,deja_inscrit=deja_inscrit,est_eligible=est_eligible, lesResultats = resultats, classement_pdf_exists=classement_pdf_exists)
 
 # Permet à un membre de s'inscrire à une compétition.
 @app.route("/inscrire/competition/<int:idCompetition>", methods=['GET'])
@@ -455,6 +503,33 @@ def classer_membre(idCompetition, idMembre):
 
     return redirect(url_for('competition_update', idCompetition=idCompetition))
 
+# Gère le téléversement du fichier PDF du classement pour une compétition
+@app.route("/competition/<int:idCompetition>/upload_classement", methods=['POST'])
+@login_required
+@admin_required
+def upload_classement_competition(idCompetition):
+    competition = CompetitionBD.query.get_or_404(idCompetition)
+    
+    if 'classement_pdf' not in request.files:
+        flash('Aucun fichier n\'a été envoyé.', 'danger')
+        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        
+    file = request.files['classement_pdf']
+    
+    if file.filename == '':
+        flash('Aucun fichier sélectionné.', 'danger')
+        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        
+    if file and file.filename.lower().endswith('.pdf'):
+        filename = "classement.pdf" # Nom de fichier fixe pour le retrouver facilement
+        dossier_classement = os.path.join(app.root_path, 'static', 'classements', str(competition.id))
+        os.makedirs(dossier_classement, exist_ok=True)
+        file.save(os.path.join(dossier_classement, filename))
+        flash('Le classement PDF a été téléversé avec succès.', 'success')
+    else:
+        flash('Type de fichier non autorisé. Veuillez téléverser un fichier PDF.', 'danger')
+    return redirect(url_for('competition_update', idCompetition=idCompetition))
+
 # Supprime la participation d'un membre à une compétition - Réservée aux administrateurs.
 @app.route("/competition/<int:idC>/delete/<int:idM>", methods=['POST'])
 @login_required
@@ -468,6 +543,88 @@ def delete_membre_competition(idC, idM):
     except Exception as e:
         db.session.rollback()
     return redirect(url_for('competition_update', idCompetition=idC))
+    
+# Ajoute une image à une compétition
+@app.route("/competition/<int:idCompetition>/add_image", methods=['POST'])
+@login_required
+@admin_required
+def add_image_competition(idCompetition):
+    competition = CompetitionBD.query.get_or_404(idCompetition)
+    
+    if 'image' not in request.files:
+        flash('Aucun fichier image n\'a été envoyé.', 'danger')
+        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        
+    file = request.files['image']
+    
+    if file.filename == '':
+        flash('Aucun fichier image sélectionné.', 'danger')
+        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        
+    if file:
+        filename = secure_filename(file.filename)
+        # Création d'un dossier unique pour chaque compétition pour éviter les conflits de noms
+        dossier_images = os.path.join(app.root_path, 'static', 'images', 'competitions', str(competition.id))
+        os.makedirs(dossier_images, exist_ok=True)
+        
+        file.save(os.path.join(dossier_images, filename))
+        
+        # L'URL stockée en BDD est relative au dossier 'static'
+        image_url = os.path.join('images', 'competitions', str(competition.id), filename).replace('\\', '/')
+        
+        alt_text = request.form.get('alt', filename)
+        prive = 'prive' in request.form
+        
+        try:
+            nouvelle_image = ImageAppBD(urlI=image_url, alt=alt_text, prive=prive)
+            competition.images_rc.append(nouvelle_image)
+            db.session.add(nouvelle_image)
+            db.session.commit()
+            flash('Image ajoutée avec succès.', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erreur lors de l\'ajout de l\'image à la base de données.', 'danger')
+    
+    return redirect(url_for('competition_update', idCompetition=idCompetition))
+
+# Supprime une image d'une compétition
+@app.route("/competition/delete_image/<int:idImage>", methods=['POST'])
+@login_required
+@admin_required
+def delete_image_competition(idImage):
+    idCompetition = request.form.get('idCompetition')
+    if not idCompetition:
+        flash('ID de compétition manquant.', 'danger')
+        return redirect(request.referrer or url_for('index'))
+
+    competition = CompetitionBD.query.get_or_404(idCompetition)
+    image_a_retirer = ImageAppBD.query.get_or_404(idImage)
+
+    # On vérifie si l'image est bien dans la liste de la compétition
+    if image_a_retirer in competition.images_rc:
+        # On retire l'association
+        competition.images_rc.remove(image_a_retirer)
+
+        # Supprime le fichier physique
+        try:
+            image_path = os.path.join(app.static_folder, image_a_retirer.urlI)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+            # Optionnel : supprime le dossier s'il est vide
+            image_dir = os.path.dirname(image_path)
+            if not os.listdir(image_dir):
+                os.rmdir(image_dir)
+        except Exception as e:
+            flash(f"Erreur lors de la suppression du fichier : {e}", "danger")
+
+        # Supprime l'image de la base de données
+        db.session.delete(image_a_retirer)
+        db.session.commit()
+        flash('L\'image a été retirée de la compétition.', 'success')
+    else:
+        flash('Cette image n\'était pas associée à cette compétition.', 'warning')
+
+    return redirect(url_for('competition_update', idCompetition=idCompetition))
 
 # Supprime une compétition et toutes ses participations - Réservée aux administrateurs.
 @app.route("/competition_delete/<int:idCompetition>", methods=['POST'])
@@ -625,6 +782,93 @@ def desinscrire_club(idEventClub):
         db.session.commit()
     return redirect(url_for('club_view', idEventClub=idEventClub))
 
+@app.route('/club/add_image/<int:idEventClub>', methods=['POST'])
+@login_required
+@admin_required
+def add_image_club(idEventClub):
+    """Ajoute une image à un événement du club."""
+    event_club = EventClubBD.query.get_or_404(idEventClub)
+    
+    if 'image' not in request.files:
+        flash('Aucun fichier sélectionné.', 'danger')
+        return redirect(url_for('club_update', idEventClub=idEventClub))
+        
+    file = request.files['image']
+    alt_text = request.form.get('alt', 'Image pour l\'événement ' + event_club.NomEV)
+    is_prive = 'prive' in request.form
+
+    if file.filename == '':
+        flash('Aucun fichier image sélectionné.', 'warning')
+        return redirect(url_for('club_update', idEventClub=idEventClub))
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        # Crée un dossier spécifique pour l'événement s'il n'existe pas
+        upload_folder = os.path.join(app.static_folder, 'images', 'events_club', str(event_club.idEventClub))
+        os.makedirs(upload_folder, exist_ok=True)
+        
+        file_path = os.path.join(upload_folder, filename)
+        file.save(file_path)
+
+        # Chemin à stocker en BDD, relatif au dossier 'static'
+        db_url = os.path.join('images', 'events_club', str(event_club.idEventClub), filename).replace('\\', '/')
+
+        # Crée l'objet Image et l'associe à l'événement
+        try:
+            new_image = ImageAppBD(urlI=db_url, alt=alt_text, prive=is_prive)
+            event_club.images_re.append(new_image)
+            db.session.add(new_image)
+            db.session.commit()
+            flash('Image ajoutée avec succès !', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erreur lors de l\'ajout de l\'image : {e}', 'danger')
+    else:
+        flash('Type de fichier non autorisé.', 'danger')
+
+    return redirect(url_for('club_update', idEventClub=idEventClub))
+
+
+@app.route('/club/delete_image/<int:idImage>', methods=['POST'])
+@login_required
+@admin_required
+def delete_image_club(idImage):
+    """Supprime une image d'un événement du club."""
+    idEventClub = request.form.get('idEventClub')
+    if not idEventClub:
+        flash("ID de l'événement manquant.", "danger")
+        return redirect(url_for('index'))
+
+    image_to_delete = ImageAppBD.query.get_or_404(idImage)
+    event_club = EventClubBD.query.get_or_404(idEventClub)
+
+    if image_to_delete in event_club.images_re:
+        # Supprime l'association
+        event_club.images_re.remove(image_to_delete)
+
+        # Supprime le fichier physique
+        try:
+            image_path = os.path.join(app.static_folder, image_to_delete.urlI)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+            
+            # Optionnel : supprime le dossier s'il est vide
+            image_dir = os.path.dirname(image_path)
+            if not os.listdir(image_dir):
+                os.rmdir(image_dir)
+                
+        except Exception as e:
+            flash(f"Erreur lors de la suppression du fichier : {e}", "danger")
+
+        # Supprime l'image de la base de données
+        db.session.delete(image_to_delete)
+        db.session.commit()
+
+        flash("L'image a été retirée de l'événement.", "success")
+    else:
+        flash("Cette image n'était pas associée à cet événement.", "warning")
+        
+    return redirect(url_for('club_update', idEventClub=idEventClub))
 
 #====================   Pages Reunions   ====================#
 # Page affichant toutes les réunions - Réservée à Admin et Membre du Comité.
@@ -1139,16 +1383,28 @@ def gerer_profils():
     return render_template("gerer_profils.html",
         title=TITLE + "- Gestion des Profils",pagination=pagination,filtre=filtre)
 
-# Désactive le compte d'un membre - Réservée aux administrateurs.
-@app.route ('/gerer_profils/desinscrire/<int:idM>', methods =("POST" ,))
+# Désactive le compte d'un membre.
+@app.route('/gerer_profils/desinscrire/<int:idM>', methods=["GET", "POST"])
 @login_required
-@admin_required
 def desinscrireMembre(idM):
+    # On récupère le membre ciblé
     membre = db.session.get(MembreBD, idM)
+    if not membre:
+        abort(404)
+    # Si ce n'est pas un admin, l'utilisateur ne peut cibler que lui-même.
+    if session.get('user_type') != 'admin' and current_user.id != idM:
+        abort(403)
+    # Désactivation
     membre.activite = False
     membre.statut = "Ancien Membre"
     db.session.commit()
-    return redirect(url_for('gerer_profils'))
+    # Redirection
+    if current_user.id == idM:
+        logout_user()
+        flash("Votre compte a été désactivé avec succès.", "success")
+        return redirect(url_for('index'))
+    else:
+        return redirect(url_for('gerer_profils'))
 
 # Réactive le compte d'un ancien membre - Réservée aux administrateurs.
 @app.route ('/gerer_anciens_profils/reinscrire/<int:idM>', methods =("POST" ,))
@@ -1256,6 +1512,25 @@ def accepter_inscription(idI):
     )
     db.session.add(nouveauMembre)
     db.session.delete(inscription)
+    db.session.commit()
+    nouveauNotif=ParametreNotifMembreBD(
+        idMembre=nouveauMembre.id,
+        eventInscriptionSite=True,
+        evenementInscriptionMail=True,
+        eventNouveauSite=True,
+        eventNouveauMail=True,
+        eventAnnulationSite=True,
+        eventAnnulationMail=True,
+        resultatNouveauSite=True,
+        resultatNouveauMail=True,
+        reponseFormulaireSite=True,
+        reponseFormulaireMail=True,
+        modifProfilSite=True,
+        modifProfilMail=True
+    )
+    db.session.add(nouveauNotif)
+    db.session.commit()
+    nouveauMembre.idParaNotif = nouveauNotif.idParamNotifMembre
     db.session.commit()
     return redirect(url_for('gerer_inscriptions'))
 
@@ -1466,21 +1741,21 @@ def parametres_notifs():
 @app.route("/changer_mdp/", methods=['GET', 'POST'])
 @login_required
 def changer_mdp():
-    form = PasswordChangeForm()
+    form = MdpChangeForm()
     if form.validate_on_submit():
-        # Vérifier si l'ancien mot de passe est correct
+        # verifie ancien mot de passe 
         if not check_password_hash(current_user.mdp_hash, form.old_password.data):
             flash("L'ancien mot de passe est incorrect.", 'danger')
             return redirect(url_for('changer_mdp'))
-        # Vérifier si les nouveaux mots de passe correspondent
+        # verifie correspondance
         if form.new_password.data != form.confirm_new_password.data:
             flash("Les nouveaux mots de passe ne correspondent pas.", 'danger')
             return redirect(url_for('changer_mdp'))
-        # Vérifier la complexité
+        # verifie si mdp fort
         if not est_mot_de_passe_fort(form.new_password.data):
-            flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
-            return redirect(url_for('changer_mdp'))
-        # Mettre à jour le mot de passe
+             flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
+             return redirect(url_for('changer_mdp'))
+        # maj le mdp
         current_user.mdp_hash = generate_password_hash(form.new_password.data, method='pbkdf2:sha256')
         db.session.commit()
         flash("Votre mot de passe a été mis à jour avec succès.", 'success')
@@ -1538,30 +1813,22 @@ def login():
 def inscription():
     unForm = InscriptionForm()
     if unForm.validate_on_submit():
-        nouvelle_inscription = InscriptionBD(
-            email=unForm.Login.data,
-            nom=unForm.nom.data,
-            prenom=unForm.prenom.data,
-            ddn=unForm.date_naissance.data,
-            sexe=unForm.sexe.data,
-            mdp_hash= generate_password_hash(unForm.password.data,method='pbkdf2:sha256')
-        )
-    if unForm.validate_on_submit():
         mdp_clair = unForm.password.data
-        utilisateur_existant = MembreBD.query.filter_by(email=nouvelle_inscription.email).first()
+        utilisateur_existant = MembreBD.query.filter_by(email=unForm.Login.data).first()
+        demande_existante = InscriptionBD.query.filter_by(email=unForm.Login.data).first()
         if not est_mot_de_passe_fort(mdp_clair):
             # On renvoie une erreur si le mot de passe est trop faible
             return render_template("inscription.html",
                                    title=TITLE+"- Inscriptions",
                                    form=unForm,
                                    message_erreur="Le mot de passe doit contenir 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.")
-        if not nouvelle_inscription.nom[0].isupper() or not nouvelle_inscription.prenom[0].isupper():
+        if not unForm.nom.data[0].isupper() or not unForm.prenom.data[0].isupper():
             #renvoie une erreur si le nom ou le prénom ne commence pas par une majuscule
             return render_template("inscription.html",
                                    title=TITLE+"- Inscriptions",
                                    form=unForm,
                                    erreur_nom ="le Nom et le Prénom doivent commencer par une majuscule.")
-        if utilisateur_existant:
+        if utilisateur_existant or demande_existante:
             return render_template("inscription.html",
                                   title = TITLE+"- Inscriptions",
                                   form = unForm,
@@ -1569,23 +1836,102 @@ def inscription():
         try:
             if current_user.is_authenticated and session.get('user_type') == 'admin':
                 nouveauMembre = MembreBD(
-                    nom=nouvelle_inscription.nom,
-                    prenom=nouvelle_inscription.prenom,
-                    email=nouvelle_inscription.email,
-                    ddn=nouvelle_inscription.ddn,
-                    sexe=nouvelle_inscription.sexe,
-                    mdp_hash=nouvelle_inscription.mdp_hash
+                    nom=unForm.nom.data,
+                    prenom=unForm.prenom.data,
+                    email=unForm.Login.data,
+                    ddn=unForm.date_naissance.data,
+                    sexe=unForm.sexe.data,
+                    mdp_hash=generate_password_hash(unForm.password.data, method='pbkdf2:sha256')
                 )
                 db.session.add(nouveauMembre)
                 db.session.commit()
+                nouveauNotif=ParametreNotifMembreBD(
+                    idMembre=nouveauMembre.id,
+                    eventInscriptionSite=True,
+                    evenementInscriptionMail=True,
+                    eventNouveauSite=True,
+                    eventNouveauMail=True,
+                    eventAnnulationSite=True,
+                    eventAnnulationMail=True,
+                    resultatNouveauSite=True,
+                    resultatNouveauMail=True,
+                    reponseFormulaireSite=True,
+                    reponseFormulaireMail=True,
+                    modifProfilSite=True,
+                    modifProfilMail=True
+                )
+                db.session.add(nouveauNotif)
+                db.session.commit()
+                nouveauMembre.idParaNotif = nouveauNotif.idParamNotifMembre
+                db.session.commit()
                 return redirect(url_for('gerer_profils'))
             else:
+                nouvelle_inscription = InscriptionBD(
+                    email=unForm.Login.data,           
+                    nom=unForm.nom.data,
+                    prenom=unForm.prenom.data,
+                    ddn=unForm.date_naissance.data,
+                    sexe=unForm.sexe.data,
+                    mdp_hash= generate_password_hash(unForm.password.data,method='pbkdf2:sha256'),
+                    date=datetime.now().date()
+                )
                 db.session.add(nouvelle_inscription)
                 db.session.commit()
                 return redirect(url_for('index'))
         except Exception as e:
             db.session.rollback()
+            print(f"ERREUR INSCRIPTION : {e}")
+            # Affiche l'erreur sur la page pour que l'utilisateur sache ce qui se passe
+            return render_template("inscription.html", 
+                                   title=TITLE+"- Inscriptions", 
+                                   form=unForm, 
+                                   message_erreur=f"Erreur technique : {str(e)}")
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
+
+@app.route("/mdp_oublier/", methods=["GET", "POST"])
+def mdp_oublier():
+    form = MdpOublieForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        user = get_user_by_email(email)
+        
+        if user:
+            token = s.dumps(email, salt='email-recover')
+            link = url_for('reset_with_token', token=token, _external=True)
+            
+            # Simulation d'envoi 
+            simuler_envoi_email(email, link)
+        
+        flash("Si cet email correspond à un compte, un lien de réinitialisation vous a été envoyé.", "info") 
+        return redirect(url_for('login'))
+    return render_template("mdp_oublier.html", title=TITLE + "- Mot de passe oublié", form=form)
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_with_token(token):
+    try:
+        # Cette ligne décode le token , récupère l’email qui y était stocké et vérifie que le token n’a pas été modifié / il a été généré avec le bon salt
+        email = s.loads(token, salt='email-recover', max_age=3600) # 1 heure d'expiration
+    except (SignatureExpired, Exception):
+        flash("Le lien de réinitialisation est invalide ou a expiré.", "danger")
+        return redirect(url_for('mdp_oublier'))
+    
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user = get_user_by_email(email)
+        if user:
+            if not est_mot_de_passe_fort(form.password.data):
+                flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
+                return render_template('reset_password.html', form=form, title="Réinitialisation mot de passe")
+            
+            user.mdp_hash = generate_password_hash(form.password.data, method='pbkdf2:sha256')
+            db.session.commit()
+            flash("Votre mot de passe a été mis à jour avec succès.", "success")
+            return redirect(url_for('login'))
+        else:
+            flash("Utilisateur introuvable.", "danger")
+            return redirect(url_for('login'))
+            
+    return render_template('reset_password.html', form=form, title="Réinitialisation mot de passe")
 
 # Déconnecte l'utilisateur.
 @app.route("/logout/")

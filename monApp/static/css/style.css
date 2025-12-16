@@ -405,6 +405,29 @@ body {
     box-shadow: 0 5px 15px rgba(239, 83, 80, 0.3);
 }
 
+.mdp-link {
+    margin-top: 20px;
+    color: white !important;
+    display: block;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.mdp-oublierh2{
+    color: whitesmoke;
+}
+
+.mdpclassp {
+    margin-top: 10px;
+    color: whitesmoke;
+    text-align: center;
+}
+
+.mdpclassp2{
+    color: whitesmoke;
+}
+
+
 /*Page gerer profils*/
 .table-responsive {
     overflow-x: auto;

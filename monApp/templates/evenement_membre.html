@@ -126,13 +126,13 @@
                                     </ul>
                                     <div class="text-center d-flex justify-content-center gap-2">
                                         {% if event.__tablename__ == 'COMPETITION' %}
-                                            <a href="{{ url_for('competition_view', idCompetition=event.id) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                            <a href="{{ url_for('competition_view', idCompetition=event.id, origine='evenement_membre') }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
                                             <a href="#" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
                                         {% elif event.__tablename__ == 'REUNION' %}
                                             <a href="{{ url_for('reunion_view', idReunion=event.id) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
                                             <a href="{{ url_for('desinscrire_reunion', idReunion=event.id) }}" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
                                         {% elif event.__tablename__ == 'EVENTCLUB' %}
-                                            <a href="{{ url_for('club_view', idEventClub=event.idEventClub) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                            <a href="{{ url_for('club_view', idEventClub=event.idEventClub, origine='evenement_membre') }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
                                             <a href="{{ url_for('desinscrire_club', idEventClub=event.idEventClub) }}" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
                                         {% endif %}
                                     </div>
@@ -158,9 +158,9 @@
                                 </div>
                                 <div class="card-body p-4">
                                     <div class="text-center">
-                                        {% if event.__tablename__ == 'COMPETITION' %}<a href="{{ url_for('competition_view', idCompetition=event.id) }}" class="btn btn-outline-primary btn-custom">Consulter</a>{% endif %}
+                                        {% if event.__tablename__ == 'COMPETITION' %}<a href="{{ url_for('competition_view', idCompetition=event.id, origine='evenement_membre') }}" class="btn btn-outline-primary btn-custom">Consulter</a>{% endif %}
                                         {% if event.__tablename__ == 'REUNION' %}<a href="{{ url_for('reunion_view', idReunion=event.id) }}" class="btn btn-outline-primary btn-custom">Consulter</a>{% endif %}
-                                        {% if event.__tablename__ == 'EVENTCLUB' %}<a href="{{ url_for('club_view', idEventClub=event.idEventClub) }}" class="btn btn-outline-primary btn-custom">Consulter</a>{% endif %}
+                                        {% if event.__tablename__ == 'EVENTCLUB' %}<a href="{{ url_for('club_view', idEventClub=event.idEventClub, origine='evenement_membre') }}" class="btn btn-outline-primary btn-custom">Consulter</a>{% endif %}
                                     </div>
                                 </div>
                             </div>

@@ -10,12 +10,25 @@ class LoginForm(FlaskForm):
     password = PasswordField ('Mot de passe', validators=[DataRequired()])
     connecter = SubmitField('Se connecter')
 
-class PasswordChangeForm(FlaskForm):
+class MdpOublieForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Envoyer')
+
+class MdpChangeForm(FlaskForm):
     old_password = PasswordField ('Ancien mot de passe', validators=[DataRequired()])
     new_password = PasswordField ('Nouveau mot de passe', validators=[DataRequired()])
     confirm_new_password = PasswordField('Confirmer le nouveau mot de passe', validators=[DataRequired()])
     next = HiddenField()
     submit = SubmitField('Valider la modification')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Nouveau mot de passe', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirmer le nouveau mot de passe', validators=[DataRequired()])
+    submit = SubmitField('Réinitialiser le mot de passe')
+
+    def validate_confirm_password(self, confirm_password):
+        if self.password.data != confirm_password.data:
+            raise ValidationError('Les mots de passe ne correspondent pas.')
 
 class ModifForm(FlaskForm):
     nom = StringField ('nom' ,validators= [DataRequired()])
