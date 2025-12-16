@@ -162,21 +162,22 @@ def get_events():
                 'arme': event.type_arme
             }
         })
-    for event in ReunionBD.query.all():
-        all_events.append({
-            'id': f"reunion_{event.id}",
-            'title': event.nom,
-            'start': f"{event.dateDebutRE.isoformat()}T{event.heureDebutRE}",
-            'end': f"{event.dateFinRE.isoformat()}T{event.heureFinRE}" if event.dateFinRE and event.heureFinRE else None,
-            'color': '#ffc107',
-            'extendedProps': {
-                'url': url_for('reunion_view', idReunion=event.id, origine='calendrier'),
-                'type': 'Réunion',
-                'description': event.rapportRE,
-                'niveaux': event.niveauRE
-            }
-        })
     if current_user.is_authenticated and session.get('user_type') != 'membre':
+        for event in ReunionBD.query.all():
+            all_events.append({
+                'id': f"reunion_{event.id}",
+                'title': event.nom,
+                'start': f"{event.dateDebutRE.isoformat()}T{event.heureDebutRE}",
+                'end': f"{event.dateFinRE.isoformat()}T{event.heureFinRE}" if event.dateFinRE and event.heureFinRE else None,
+                'color': '#ffc107',
+                'extendedProps': {
+                    'url': url_for('reunion_view', idReunion=event.id, origine='calendrier'),
+                    'type': 'Réunion',
+                    'description': event.rapportRE,
+                    'niveaux': event.niveauRE
+                }
+            })
+    if current_user.is_authenticated:
         query_club = EventClubBD.query.filter(db.or_(EventClubBD.passeeEV == False, EventClubBD.passeeEV == None))
         for event in query_club.all():
             all_events.append({
