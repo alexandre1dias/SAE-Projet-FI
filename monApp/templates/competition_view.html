@@ -98,6 +98,10 @@
     {% elif origine == 'index' %}
         <a href="{{ url_for('index') }}" class="btn btn-secondary">Retour</a>
     
+    {% elif origine == 'evenement_membre' %}
+        <a href="{{ url_for('evenement_membre') }}" class="btn btn-secondary">Retour</a>
+    {% elif origine == 'resultat_membre' %}
+        <a href="{{ url_for('resultat_membre') }}" class="btn btn-secondary">Retour</a>
     {% else %}
         <a href="{{ url_for('competitions') }}" class="btn btn-secondary">Retour</a>
     {% endif %}

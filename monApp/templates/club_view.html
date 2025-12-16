@@ -68,9 +68,12 @@
     <div class="d-flex justify-content-center">
         {% if origine == 'calendrier' %}
             <a href="{{ url_for('calendrier') }}" class="btn btn-secondary me-2">Retour</a>
+        {% elif origine == 'evenement_membre'%}
+            <a href="{{ url_for('evenement_membre') }}" class="btn btn-secondary me-2">Retour</a>
         {% else %}
             <a href="{{ url_for('evenement_club') }}" class="btn btn-secondary me-2">Retour</a>
         {% endif %}
+        
         {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
             {% if not selectedEventClub.passeeEV %}
                 {% if deja_inscrit %}
