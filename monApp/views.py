@@ -182,7 +182,22 @@ def get_events():
                 'arme': event.type_arme
             }
         })
-    if current_user.is_authenticated and session.get('user_type') != 'membre':
+    voir_reunions = False
+    if current_user.is_authenticated:
+        # Si c'est un admin
+        if session.get('user_type') == 'admin':
+            voir_reunions = True
+        # Si c'est un membre, on vérifie s'il fait partie du comité
+        elif session.get('user_type') == 'membre':
+            statuts_comite = [
+                'Président', 'Vice-président', 'Vice-Président', 
+                'Secrétaire Général', 'Trésorier Général', 'Membre du Comité'
+            ]
+            if current_user.statut in statuts_comite:
+                voir_reunions = True
+
+    # Si l'utilisateur a les droits, on ajoute les réunions
+    if voir_reunions:
         for event in ReunionBD.query.all():
             all_events.append({
                 'id': f"reunion_{event.id}",
