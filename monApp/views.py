@@ -18,6 +18,15 @@ from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
 
+# Définir les extensions de fichiers autorisées
+ALLOWED_EXTENSIONS = {'webp','png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    """Vérifie si l'extension du fichier est autorisée."""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 # Décorateur pour vérifier si l'utilisateur est un admin
 def admin_required(f):
     @wraps(f)
@@ -554,6 +563,7 @@ def add_image_competition(idCompetition):
         try:
             nouvelle_image = ImageAppBD(urlI=image_url, alt=alt_text, prive=prive)
             competition.images_rc.append(nouvelle_image)
+            db.session.add(nouvelle_image)
             db.session.commit()
             flash('Image ajoutée avec succès.', 'success')
         except Exception as e:
@@ -579,6 +589,21 @@ def delete_image_competition(idImage):
     if image_a_retirer in competition.images_rc:
         # On retire l'association
         competition.images_rc.remove(image_a_retirer)
+
+        # Supprime le fichier physique
+        try:
+            image_path = os.path.join(app.static_folder, image_a_retirer.urlI)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+            # Optionnel : supprime le dossier s'il est vide
+            image_dir = os.path.dirname(image_path)
+            if not os.listdir(image_dir):
+                os.rmdir(image_dir)
+        except Exception as e:
+            flash(f"Erreur lors de la suppression du fichier : {e}", "danger")
+
+        # Supprime l'image de la base de données
+        db.session.delete(image_a_retirer)
         db.session.commit()
         flash('L\'image a été retirée de la compétition.', 'success')
     else:
@@ -742,6 +767,93 @@ def desinscrire_club(idEventClub):
         db.session.commit()
     return redirect(url_for('club_view', idEventClub=idEventClub))
 
+@app.route('/club/add_image/<int:idEventClub>', methods=['POST'])
+@login_required
+@admin_required
+def add_image_club(idEventClub):
+    """Ajoute une image à un événement du club."""
+    event_club = EventClubBD.query.get_or_404(idEventClub)
+    
+    if 'image' not in request.files:
+        flash('Aucun fichier sélectionné.', 'danger')
+        return redirect(url_for('club_update', idEventClub=idEventClub))
+        
+    file = request.files['image']
+    alt_text = request.form.get('alt', 'Image pour l\'événement ' + event_club.NomEV)
+    is_prive = 'prive' in request.form
+
+    if file.filename == '':
+        flash('Aucun fichier image sélectionné.', 'warning')
+        return redirect(url_for('club_update', idEventClub=idEventClub))
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        # Crée un dossier spécifique pour l'événement s'il n'existe pas
+        upload_folder = os.path.join(app.static_folder, 'images', 'events_club', str(event_club.idEventClub))
+        os.makedirs(upload_folder, exist_ok=True)
+        
+        file_path = os.path.join(upload_folder, filename)
+        file.save(file_path)
+
+        # Chemin à stocker en BDD, relatif au dossier 'static'
+        db_url = os.path.join('images', 'events_club', str(event_club.idEventClub), filename).replace('\\', '/')
+
+        # Crée l'objet Image et l'associe à l'événement
+        try:
+            new_image = ImageAppBD(urlI=db_url, alt=alt_text, prive=is_prive)
+            event_club.images_re.append(new_image)
+            db.session.add(new_image)
+            db.session.commit()
+            flash('Image ajoutée avec succès !', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erreur lors de l\'ajout de l\'image : {e}', 'danger')
+    else:
+        flash('Type de fichier non autorisé.', 'danger')
+
+    return redirect(url_for('club_update', idEventClub=idEventClub))
+
+
+@app.route('/club/delete_image/<int:idImage>', methods=['POST'])
+@login_required
+@admin_required
+def delete_image_club(idImage):
+    """Supprime une image d'un événement du club."""
+    idEventClub = request.form.get('idEventClub')
+    if not idEventClub:
+        flash("ID de l'événement manquant.", "danger")
+        return redirect(url_for('index'))
+
+    image_to_delete = ImageAppBD.query.get_or_404(idImage)
+    event_club = EventClubBD.query.get_or_404(idEventClub)
+
+    if image_to_delete in event_club.images_re:
+        # Supprime l'association
+        event_club.images_re.remove(image_to_delete)
+
+        # Supprime le fichier physique
+        try:
+            image_path = os.path.join(app.static_folder, image_to_delete.urlI)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+            
+            # Optionnel : supprime le dossier s'il est vide
+            image_dir = os.path.dirname(image_path)
+            if not os.listdir(image_dir):
+                os.rmdir(image_dir)
+                
+        except Exception as e:
+            flash(f"Erreur lors de la suppression du fichier : {e}", "danger")
+
+        # Supprime l'image de la base de données
+        db.session.delete(image_to_delete)
+        db.session.commit()
+
+        flash("L'image a été retirée de l'événement.", "success")
+    else:
+        flash("Cette image n'était pas associée à cet événement.", "warning")
+        
+    return redirect(url_for('club_update', idEventClub=idEventClub))
 
 #====================   Pages Reunions   ====================#
 # Page affichant toutes les réunions - Réservée à Admin et Membre du Comité.

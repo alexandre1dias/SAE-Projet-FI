@@ -8,6 +8,11 @@ image_competition_association = db.Table('IMAGERC',
     db.Column('idCompetition', db.Integer, db.ForeignKey('COMPETITION.idCompetition'), primary_key=True)
 )
 
+image_evenement_club_association = db.Table('IMAGERE',
+    db.Column('idImage', db.Integer, db.ForeignKey('IMAGEAPP.idImage'), primary_key=True),
+    db.Column('idEventClub', db.Integer, db.ForeignKey('EVENTCLUB.idEventClub'), primary_key=True)
+)
+
 class MembreBD(UserMixin, db.Model):
     """
     Modèle SQLAlchemy pour la table MEMBRE, compatible Flask-Login.
@@ -247,6 +252,12 @@ class EventClubBD(UserMixin, db.Model):
     #Clé étrangère
     id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
     evenement = db.relationship('EvenementBD', backref=db.backref('eventclub', lazy=True))
+    images_re = db.relationship(
+        'ImageAppBD',
+        secondary=image_evenement_club_association,
+        lazy='subquery',
+        backref=db.backref('eventclubs_associes', lazy=True)
+    )
 
 class ResultatBD(db.Model):
     """
