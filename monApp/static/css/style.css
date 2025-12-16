@@ -816,6 +816,18 @@ color: #fefefe;
 }
 
 /*le container des filtres*/
+.fixed-left {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 300px;  
+    padding: 10px;
+    overflow-y: auto; 
+    z-index: 1000; 
+}
+
+
 .filtres-container {
     background-color: white;
     padding: 20px;
