@@ -21,7 +21,7 @@ INSERT INTO MEMBRE (nomM, prenomM, emailM, mdpM, date_inscription, sexeM, ddnM, 
 ('Dominique', 'MARQUET', 'dom.mar@email.com', 'pbkdf2:sha256:1000000$vWV2QiPn3dN6hr4W$3dd808a8f7f2bec74b5ff34c44c0c777955e83bda1a8183a0153106e4665f9b0', '2006-01-01', 'Homme', '1974-02-07','Vice-Président', 1, NULL),-- mdp:mdp442
 ('Bernard', 'DELADERIERE', 'ber.del@email.com', 'pbkdf2:sha256:1000000$CQyHolHqSrk4qIAa$a5f22728417e72a3a9f7e79d3fe0cab81f167ab7a8fa80bd243ef8135911d6d8', '1999-01-01', 'Homme', '1976-02-07','Trésorier Général', 1, NULL),-- mdp:mdp5231
 ('Pascale', 'LHOMME', 'pas.lhm@email.com', 'pbkdf2:sha256:1000000$02eNZYjkYEzZK4zy$12b29b9fd98dfac13b9606b141587c117ee510e2cb02ac054be74ef40d2923ae', '2002-01-01', 'Femme', '1978-02-07','Secrétaire Générale', 1, NULL),-- mdp:mdp433
-('Christophe', 'LECHOPIER', 'chr.lec@email.com', 'pbkdf2:sha256:1000000$35JA6vIpcTUyLuh7$108c8dc3dc6880c01853dcb8d2cfb99830bbaf37fe830e20fbcf99f9109bd99b', '2005-01-01', 'Homme', '1969-02-07','Membre du Comité', 1, NULL),-- mdp:mdp541
+('Christophe', 'LECHOPIER', 'chr.lec@email.com', 'pbkdf2:sha256:1v
 ('Petit', 'Lucas', 'lucas.petit@email.com', 'pbkdf2:sha256:1000000$cBIfWWnFZa0AJLut$35374e4ffada5d72a3971137a11e066dca0406d5e9bfef951b390162a6ab77ab', '2024-09-05', 'Homme', '2010-06-15', 'Membre', 1, NULL),-- mdp:mdpL1
 ('Moreau', 'Chloé', 'chloe.moreau@email.com', 'pbkdf2:sha256:1000000$VUBF6WrY5IUcX9eY$7f43355adf3dae0bf457ea486e1184818baf2092b185ad5aaf29fab9985be68c', '2024-09-10', 'Femme', '2013-03-10', 'Membre', 1, NULL),-- mdp:mdpC2
 ('Garcia', 'Alice', 'alice.garcia@email.com', 'pbkdf2:sha256:1000000$XJSBBfHcblFzhkSU$dffbeb82aefc94cf5fe953bb0fc26fb92671b4d87c2b34df140d26f0a95dffaf', '2024-09-12', 'Femme', '2000-01-01', 'Membre', 1, NULL),-- mdp:mdpA3
@@ -144,22 +144,22 @@ INSERT INTO EVENEMENT () VALUES
 
 -- Insertion des compétitions (existantes)
 INSERT INTO COMPETITION (nomCO, villeCO, adresseCO, dateDebutCO, heureDebutCO, dateFinCO, heureFinCO, typeArmeCO, sexeCO, typeCompete, descriptionCO, niveauCO, classementCO,passeeCO, idEvent) VALUES
-('Tournoi Régional', 'Orléans', '123 Rue du Sport', '2024-05-10', '09:00', '2024-05-11', '18:00', 'Épée', 'Mixte', 'Régional', 'Compétition ouverte à tous les niveaux régionaux.', 'Senior', 'En cours', 1,1),
+('Tournoi Régional', 'Orléans', '123 Rue du Sport', '2024-05-10', '09:00', '2024-05-11', '18:00', 'Épée', 'Homme', 'Régional', 'Compétition ouverte à tous les niveaux régionaux.', 'Senior', 'En cours', 1,1),
 ('Championnat M17', 'Tours', '456 Avenue de la Victoire', '2024-06-15', '08:30', '2024-06-15', '19:00', 'Fleuret', 'Femme', 'National', 'Championnat national pour la catégorie M17.', 'M17', NULL, 1,2),
 ('Championnat M17 Futur', 'Tours', '456 Avenue de la Victoire', '2026-06-15', '08:30', '2026-06-15', '19:00', 'Fleuret', 'Femme', 'National', 'Championnat national pour la catégorie M17.', 'M17', NULL, 0,6),
 ('Open de Blois', 'Blois', '1 Rue de la Halle', '2025-09-20', '09:00', '2025-09-21', '17:00', 'Sabre', 'Homme', 'National', 'Open national de sabre masculin.', 'Senior', NULL, 0, 7),
-('Circuit National M20', 'Paris', '2 Avenue de la Porte', '2025-10-11', '08:00', '2025-10-12', '18:00', 'Épée', 'Mixte', 'National', 'Étape du circuit national M20 épée.', 'M20', NULL, 0, 8),
+('Circuit National M20', 'Paris', '2 Avenue de la Porte', '2025-10-11', '08:00', '2025-10-12', '18:00', 'Épée', 'Femme', 'National', 'Étape du circuit national M20 épée.', 'M20', NULL, 0, 8),
 ('Tournoi des Ducs', 'Bourges', '3 Place Séraucourt', '2025-11-08', '10:00', '2025-11-08', '16:00', 'Fleuret', 'Femme', 'Régional', 'Tournoi amical fleuret féminin.', 'Senior', NULL, 0, 9),
-('Challenge de Noël M15', 'Orléans', '123 Rue du Sport', '2025-12-13', '09:30', '2025-12-13', '17:30', 'Sabre', 'Mixte', 'Régional', 'Compétition pour les jeunes sabreurs.', 'M15', NULL, 0, 10),
+('Challenge de Noël M15', 'Orléans', '123 Rue du Sport', '2025-12-13', '09:30', '2025-12-13', '17:30', 'Sabre', 'Homme', 'Régional', 'Compétition pour les jeunes sabreurs.', 'M15', NULL, 0, 10),
 ('Coupe de la Nouvelle Année', 'Tours', '456 Avenue de la Victoire', '2026-01-10', '09:00', '2026-01-11', '18:00', 'Épée', 'Homme', 'Régional', 'Première compétition de l''année.', 'Senior', NULL, 0, 11),
-('Tournoi de la Chandeleur', 'Vierzon', '4 Rue de la Paix', '2024-02-03', '09:00', '2024-02-04', '17:00', 'Fleuret', 'Mixte', 'Régional', 'Tournoi régional de début d''année.', 'M17', 'Terminé', 1, 12),
+('Tournoi de la Chandeleur', 'Vierzon', '4 Rue de la Paix', '2024-02-03', '09:00', '2024-02-04', '17:00', 'Fleuret', 'Femme', 'Régional', 'Tournoi régional de début d''année.', 'M17', 'Terminé', 1, 12),
 ('Grand Prix de Printemps', 'Chartres', '5 Boulevard de la Liberté', '2024-03-22', '08:30', '2024-03-23', '19:00', 'Sabre', 'Homme', 'National', 'Grand prix national de sabre.', 'Senior', 'Terminé', 1, 13),
-('Critérium M13', 'Châteauroux', '6 Avenue du Stade', '2024-04-12', '10:00', '2024-04-12', '16:00', 'Épée', 'Femme', 'Départemental', 'Critérium pour les jeunes épéistes.', 'M13', 'Terminé', 1, 14),
-('Mémorial Jean Moulin', 'Montargis', '7 Rue de la Résistance', '2023-11-11', '09:00', '2023-11-11', '18:00', 'Toutes', 'Mixte', 'Régional', 'Tournoi commémoratif toutes armes.', 'Tous', 'Terminé', 1, 15),
+('Critérium M13', 'Châteauroux', '6 Avenue du Stade', '2024-04-12', '10:00', '2024-04-12', '16:00', 'Épée', 'Femme', 'Régional', 'Critérium pour les jeunes épéistes.', 'M13', 'Terminé', 1, 14),
+('Mémorial Jean Moulin', 'Montargis', '7 Rue de la Résistance', '2023-11-11', '09:00', '2023-11-11', '18:00', 'Épée', 'Homme', 'Régional', 'Tournoi commémoratif toutes armes.', 'M17,M20,Senior', 'Terminé', 1, 15),
 ('Tournoi d''Automne M20', 'Orléans', '123 Rue du Sport', '2025-09-27', '09:00', '2025-09-28', '18:00', 'Fleuret', 'Homme', 'Régional', 'Tournoi de début de saison M20 fleuret.', 'M20', NULL, 0, 27),
-('Challenge M13/M15', 'Blois', '1 Rue de la Halle', '2026-02-07', '10:00', '2026-02-07', '17:00', 'Sabre', 'Mixte', 'Départemental', 'Compétition amicale pour M13 et M15.', 'M13,M15', NULL, 0, 28),
+('Challenge M13/M15', 'Blois', '1 Rue de la Halle', '2026-02-07', '10:00', '2026-02-07', '17:00', 'Sabre', 'Femme', 'Régional', 'Compétition amicale pour M13 et M15.', 'M13,M15', NULL, 0, 28),
 ('Coupe de Pâques Senior', 'Tours', '456 Avenue de la Victoire', '2026-04-04', '08:30', '2026-04-05', '19:00', 'Épée', 'Femme', 'Régional', 'Compétition épée dames senior.', 'Senior,Vétéran', NULL, 0, 29),
-('Circuit National Vétérans', 'Paris', '2 Avenue de la Porte', '2025-05-01', '09:00', '2025-05-01', '18:00', 'Toutes', 'Mixte', 'National', 'Étape nationale pour les vétérans.', 'Vétéran', 'Terminé', 1, 30);
+('Circuit National Vétérans', 'Paris', '2 Avenue de la Porte', '2025-05-01', '09:00', '2025-05-01', '18:00', 'Fleuret', 'Homme', 'National', 'Étape nationale pour les vétérans.', 'Vétéran', 'Terminé', 1, 30);
 
 
 -- Insertion des entraînements (existants)
@@ -173,7 +173,16 @@ INSERT INTO ENTRAINEMENT (jourEN, villeEN, adresseEN, dateEN, heureDebutEN, heur
 INSERT INTO REUNION (nomRE, villeRE, adresseRE, dateDebutRE, heureDebutRE, dateFinRE, heureFinRE, nbParticipantsRE, typeReunionRE, rapportRE, niveauRE, idEvent) VALUES
 ('AG Annuelle', 'Blois', '5 rue de la salle', '2024-09-05', '19:00', '2024-09-05', '21:00', 10050, 'Assemblée', 'Rapport annuel des activités et finances.', 'Tous', 4),
 ('Réunion Comité Directeur', 'Orléans', 'Salle du Club', '2025-11-15', '20:00', '2025-11-15', '22:00', 8, 'Comité', 'Préparation budget 2026 et calendrier.', 'Comité', 33),
-('Réunion Bénévoles Fête du Club', 'Orléans', 'Salle du Club', '2024-06-20', '19:00', '2024-06-20', '20:00', 15, 'Organisation', 'Répartition des tâches pour la fête du 6 juillet.', 'Tous', 34);
+('Réunion Bénévoles Fête du Club', 'Orléans', 'Salle du Club', '2024-06-20', '19:00', '2024-06-20', '20:00', 15, 'Organisation', 'Répartition des tâches pour la fête du 6 juillet.', 'Tous', 34),
+('Réunion Entraîneurs', 'Orléans', 'Stade Omnisports', '2024-09-10', '18:30', '2024-09-10', '20:30', 12, 'Technique', 'Mise au point planning entraînements.', 'Coachs', 35),
+('Commission Sponsoring', 'Blois', '5 rue de la salle', '2025-01-20', '19:30', '2025-01-20', '21:30', 5, 'Finance', 'Recherche de nouveaux partenaires 2025.', 'Comité', 36),
+('Réunion Parents U15', 'Orléans', 'Salle du Club', '2024-09-15', '18:00', '2024-09-15', '19:30', 45, 'Information', 'Présentation de la saison et déplacements.', 'Tous', 37),
+('Bilan Mi-Saison', 'Orléans', 'Salle du Club', '2025-02-10', '20:00', '2025-02-10', '22:00', 10, 'Comité', 'Analyse des résultats sportifs intermédiaires.', 'Comité', 38),
+('Préparation Tournoi Printemps', 'Blois', 'Centre Sportif', '2025-03-05', '19:00', '2025-03-05', '20:30', 8, 'Organisation', 'Logistique et réservation des arbitres.', 'Bénévoles', 39),
+('Vœux du Président', 'Orléans', 'Salle des Fêtes', '2026-01-10', '19:00', '2026-01-10', '22:00', 120, 'Cérémonie', 'Présentation des vœux et galette des rois.', 'Tous', 40),
+('Point Budget Prévisionnel', 'Blois', '5 rue de la salle', '2026-02-15', '18:30', '2026-02-15', '20:30', 6, 'Finance', 'Ajustement du budget pour la fin de saison.', 'Comité', 41),
+('Réunion Fin de Saison', 'Orléans', 'Salle du Club', '2026-05-20', '19:30', '2026-05-20', '21:00', 30, 'Organisation', 'Organisation du barbecue de fin d''année.', 'Bénévoles', 42),
+('Assemblée Générale Extraordinaire', 'Orléans', 'Stade Omnisports', '2026-06-15', '20:00', '2026-06-15', '22:30', 90, 'Assemblée', 'Vote pour le changement de statuts du club.', 'Tous', 43);
 
 
 -- Insertion des événements de club (existants)
@@ -252,7 +261,7 @@ INSERT INTO RESULTAT (resultat, dateRE, typeArmeRE, typeCompeteRE, idCompetition
 (16, '2024-06-15', 'Fleuret', 'National', 2, 2),
 (5, '2024-02-04', 'Fleuret', 'Régional', 9, 2),
 (12, '2024-03-23', 'Sabre', 'National', 10, 1),
-(3, '2024-04-12', 'Épée', 'Départemental', 11, 2),
+(3, '2024-04-12', 'Épée', 'Régional', 11, 2),
 (22, '2025-05-01', 'Sabre', 'National', 16, 6),
 (8, '2025-05-01', 'Fleuret', 'National', 16, 7);
 

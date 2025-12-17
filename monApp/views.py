@@ -381,13 +381,36 @@ def add_event():
 
 # Affiche la liste de toutes les compétitions.
 @app.route("/competitions/")
-def competitions():
-    lesCompetitions = CompetitionBD.query.all()
-    lesCompetitions.sort(key=lambda x: x.date_debut, reverse=True)
+@app.route("/competitions/<string:etat>") 
+def competitions(etat="prochaine"): 
+    passee = (etat == "passees")
+    filtre = FiltreForm(request.args if request.args else None)
+    page = request.args.get('page', 1, type=int)
+    lesCompetitions = CompetitionBD.query
 
-    #events_a_venir = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateDebutRE', None) or getattr(e, 'dateDebutEV', None)) >= AUJOURDHUI]
-    #events_passes = [e for e in evenements if (getattr(e, 'date_fin', None) or getattr(e, 'dateFinRE', None) or getattr(e, 'dateFinEV', None)) < AUJOURDHUI]
-    return render_template("competitions.html", title=TITLE+"- Competitions", competitions=lesCompetitions)
+    filtre.tri.choices = [
+        ('date_desc', 'Plus récent'), 
+        ('date_asc', 'Plus ancien')
+    ]
+    
+    if filtre.tri.data == "date_asc":
+        lesCompetitions = lesCompetitions.order_by(CompetitionBD.date_debut.asc())
+    else:
+        lesCompetitions = lesCompetitions.order_by(CompetitionBD.date_debut.desc())
+
+    lesCompetitions = lesCompetitions.filter(CompetitionBD.passee == passee)     
+    
+    if filtre.sexe.data:
+        lesCompetitions = lesCompetitions.filter(CompetitionBD.sexe.in_(filtre.sexe.data))
+    if filtre.niveau.data:
+        lesCompetitions = lesCompetitions.filter(or_(*(CompetitionBD.niveaux.like(f"%{n}%") for n in filtre.niveau.data)))
+    if filtre.armes.data:
+        lesCompetitions = lesCompetitions.filter(CompetitionBD.type_arme.in_(filtre.armes.data))
+    if filtre.type_competition.data:
+        lesCompetitions = lesCompetitions.filter(CompetitionBD.typeComp.in_(filtre.type_competition.data))
+    pagination = lesCompetitions.paginate(page=page, per_page=6, error_out=False)
+    return render_template("competitions.html", title=TITLE+"- Competitions", pagination=pagination,filtre = filtre, passee=passee)
+
 
 # Affiche les détails d'une compétition spécifique.
 @app.route("/competitions/<int:idCompetition>/view")
@@ -693,14 +716,30 @@ def competition_delete(idCompetition):
 #====================   Pages Evenement du club   ====================#
 # Affiche la liste des événements du club.
 @app.route("/evenement_club/")
-@login_required
-def evenement_club():
-    lesEventClubs = EventClubBD.query.all()
-    ids_evenements_inscrits = set()
-    if current_user.is_authenticated and session.get('user_type') == 'membre':
-        participations = ParticiperBD.query.filter_by(id_membre=current_user.id).all()
-        ids_evenements_inscrits = {p.id_event for p in participations}
-    return render_template("evenement_club.html",title=TITLE+"- Evenements du Club",eventsclub=lesEventClubs, user_registered_event_ids=ids_evenements_inscrits)
+@app.route("/evenement_club/<string:etat>")
+def evenement_club(etat="prochaine"):
+    passee = (etat == "passees")
+    filtre = FiltreForm(request.args if request.args else None)
+    page = request.args.get('page', 1, type=int)
+    lesEvements = EventClubBD.query
+    filtre.tri.choices = [
+        ('date_desc', 'Plus récent'),
+        ('date_asc', 'Plus ancien')
+    ]
+
+    if filtre.tri.data == "date_asc":
+        lesEvements = lesEvements.order_by(EventClubBD.dateDebutEV.asc())
+    else:
+        lesEvements = lesEvements.order_by(EventClubBD.dateDebutEV.desc())
+
+    lesEvements = lesEvements.filter(EventClubBD.passeeEV == passee)
+    pagination = lesEvements.paginate(page=page, per_page=6, error_out=False)
+
+    return render_template("evenement_club.html",
+                           title=TITLE + "- Evenements du Club",
+                           pagination=pagination,
+                           filtre=filtre,
+                           passee=passee)
 
 # Affiche les détails d'un événement de club spécifique.
 @app.route("/evenement_club/<int:idEventClub>/club_view/")
@@ -923,9 +962,8 @@ def delete_image_club(idImage):
 @comite_ou_admin_required
 def reunion():
     reunions = ReunionBD.query.all()
-    aujourdhui = datetime.now().date()
-    prochaines_reunions = [r for r in reunions if r.dateDebutRE and r.dateDebutRE >= aujourdhui]
-    anciennes_reunions = [r for r in reunions if r.dateFinRE and r.dateFinRE < aujourdhui]
+    prochaines_reunions = [r for r in reunions if r.dateDebutRE and r.dateDebutRE >= AUJOURDHUI]
+    anciennes_reunions = [r for r in reunions if r.dateFinRE and r.dateFinRE < AUJOURDHUI]
     ids_evenements_inscrits = set()
     if current_user.is_authenticated and session.get('user_type') == 'membre':
         participations = ParticiperBD.query.filter_by(id_membre=current_user.id).all()
