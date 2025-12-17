@@ -3,7 +3,6 @@ from flask import render_template, request, url_for, redirect, session, abort, f
 from config import TITLE, AUJOURDHUI
 from flask_login import logout_user, login_user, login_required, current_user
 from .forms import *
-from .connexionPythonSQL import *
 from monApp.modelBD import *
 from flask import jsonify
 from functools import wraps
@@ -31,7 +30,8 @@ def allowed_file(filename):
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or session.get('user_type') != 'admin':
+        # On vérifie si l'objet current_user est une instance de la classe AdminBD
+        if not current_user.is_authenticated or not isinstance(current_user, AdminBD):
             abort(400)  # Déclenche l'erreur "Accès Interdit" Admin
         return f(*args, **kwargs)
     return decorated_function
@@ -40,7 +40,8 @@ def admin_required(f):
 def membre_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or session.get('user_type') != 'membre':
+        # On vérifie l'instance MembreBD
+        if not current_user.is_authenticated or not isinstance(current_user, MembreBD):
             abort(401)  # Déclenche l'erreur "Accès Interdit" Membre
         return f(*args, **kwargs)
     return decorated_function
@@ -54,16 +55,14 @@ def comite_ou_admin_required(f):
             'Président', 'Vice-président', 'Secrétaire Général',
             'Trésorier Général', 'Membre du Comité'
         ]
-        # Premiere condition: verifie si admin
-        is_admin = (session.get('user_type') == 'admin')
-        # Deuxieme condition: verifie si comite
+        # Vérifications basées sur les objets
+        is_admin = isinstance(current_user, AdminBD)
         is_comite_membre = (
-            session.get('user_type') == 'membre' and
+            isinstance(current_user, MembreBD) and
             current_user.statut in statuts_comite
         )
-        #Verification
         if not (current_user.is_authenticated and (is_admin or is_comite_membre)):
-            abort(405)  # Déclenche l'erreur "Accès Interdit" Comite
+            abort(405)  # Déclenche l'erreur "Accès Interdit"
         return f(*args, **kwargs)
     return decorated_function
 
@@ -237,11 +236,10 @@ def get_events():
         })
     voir_reunions = False
     if current_user.is_authenticated:
-        # Si c'est un admin
-        if session.get('user_type') == 'admin':
+        # On utilise isinstance pour être sûr du type d'objet
+        if isinstance(current_user, AdminBD):
             voir_reunions = True
-        # Si c'est un membre, on vérifie s'il fait partie du comité
-        elif session.get('user_type') == 'membre':
+        elif isinstance(current_user, MembreBD):
             statuts_comite = [
                 'Président', 'Vice-président', 'Vice-Président', 
                 'Secrétaire Général', 'Trésorier Général', 'Membre du Comité'
@@ -290,9 +288,11 @@ def get_events():
             'color': '#dc3545',
             'extendedProps': {
                 'type': 'Entraînement',
-                'description': f"Lieu: {event.ville}, Jour: {event.jour}",
+                'description': f"Jour: {event.jour}",
                 'niveaux': event.niveau,
-                'arme': event.type_arme
+                'arme': event.type_arme,
+                'ville': event.ville,
+                'adresse': event.adresse
             }
         })
     return jsonify(all_events)
@@ -339,7 +339,8 @@ def add_event():
                     heureFinRE=form.end_date.data.time().strftime('%H:%M'),
                     niveauRE=", ".join(form.level.data),
                     ville=form.ville.data,
-                    adresse=form.adresse.data
+                    adresse=form.adresse.data,
+                    typeReunionRE=form.type_reunion.data if form.type_reunion.data else "Générale"
                 )
             elif category == 'Evenement du club':
                 new_specific_event = EventClubBD(
@@ -692,6 +693,7 @@ def competition_delete(idCompetition):
 #====================   Pages Evenement du club   ====================#
 # Affiche la liste des événements du club.
 @app.route("/evenement_club/")
+@login_required
 def evenement_club():
     lesEventClubs = EventClubBD.query.all()
     ids_evenements_inscrits = set()
@@ -993,6 +995,7 @@ def reunion_update(idReunion):
     reunion = ReunionBD.query.get_or_404(idReunion)
     if request.method == 'POST':
         reunion.nom = request.form['nom']
+        reunion.typeReunionRE = request.form['type_reunion']
         reunion.ville = request.form['ville']
         reunion.adresse = request.form['adresse']
         reunion.rapportRE = request.form['description']
@@ -1231,11 +1234,6 @@ def delete_image_article(idImg):
 #============================================================#
 #====================   Pages A propos   ====================#
 #============================================================#
-# Affiche la page "À propos".
-@app.route("/about/")
-def about():
-    return render_template("about.html",title=TITLE+"- A propos")
-
 # Affiche la page de l'historique du club.
 @app.route("/historique/")
 def historique():
@@ -1406,11 +1404,9 @@ def repondre_formulaire(idFormulaire):
 def gerer_profils():
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
-    liste = db.session.query(MembreBD)\
+    liste = MembreBD.query\
         .filter(MembreBD.activite == True)\
         .order_by(MembreBD.date_inscription.desc())
-
-    if filtre.sexe.data:
         liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
     if filtre.niveau.data:
         liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
@@ -1423,6 +1419,7 @@ def gerer_profils():
                 MembreBD.email.ilike(terme)
             )
         )
+    # Maintenant .paginate() fonctionnera
     pagination = liste.paginate(page=page, per_page=15, error_out=False)
     return render_template("gerer_profils.html",
         title=TITLE + "- Gestion des Profils",pagination=pagination,filtre=filtre)
@@ -1468,11 +1465,10 @@ def reinscrireMembre(idM):
 def gerer_ancien_profils():
     filtre = FiltreForm(request.args) if request.args else FiltreForm()
     page = request.args.get('page', 1, type=int)
-    liste = db.session.query(MembreBD)\
+    liste = MembreBD.query\
         .filter(MembreBD.activite == False)\
         .order_by(MembreBD.date_inscription.desc())
 
-    if filtre.sexe.data:
         liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
     if filtre.niveau.data:
         liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))

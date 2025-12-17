@@ -44,7 +44,7 @@ class MembreBD(UserMixin, db.Model):
     niveau = db.Column(db.String(15))
     statut = db.Column(db.String(30), server_default='Membre')
     activite = db.Column(db.Boolean, server_default='1')
-    idParaNotif = db.Column('idParamNotifMembre', db.Integer, db.ForeignKey('PARAMETRE_NOTIF_MEMBRE.idParamNotifMembre'))
+    idParaNotif = db.Column('idParamNotifMembre', db.Integer, db.ForeignKey('PARAMETRE_NOTIF_MEMBRE.idParamNotifMembre', use_alter=True, name='fk_membre_param_notif'))
     parametres_notif = db.relationship(
         'ParametreNotifMembreBD', 
         back_populates='membre', 
