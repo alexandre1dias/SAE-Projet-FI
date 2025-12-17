@@ -1,11 +1,27 @@
 from .app import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+from datetime import datetime
 
 
 image_competition_association = db.Table('IMAGERC',
     db.Column('idImage', db.Integer, db.ForeignKey('IMAGEAPP.idImage'), primary_key=True),
     db.Column('idCompetition', db.Integer, db.ForeignKey('COMPETITION.idCompetition'), primary_key=True)
+)
+
+image_evenement_club_association = db.Table('IMAGERE',
+    db.Column('idImage', db.Integer, db.ForeignKey('IMAGEAPP.idImage'), primary_key=True),
+    db.Column('idEventClub', db.Integer, db.ForeignKey('EVENTCLUB.idEventClub'), primary_key=True)
+)
+
+recevoir_a = db.Table('RECEVOIRA',
+    db.Column('idNotifs', db.Integer, db.ForeignKey('NOTIFS.idNotifs'), primary_key=True),
+    db.Column('idAdmin', db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'), primary_key=True)
+)
+
+recevoir_m = db.Table('RECEVOIRM',
+    db.Column('idNotifs', db.Integer, db.ForeignKey('NOTIFS.idNotifs'), primary_key=True),
+    db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'), primary_key=True)
 )
 
 class MembreBD(UserMixin, db.Model):
@@ -247,6 +263,12 @@ class EventClubBD(UserMixin, db.Model):
     #Clé étrangère
     id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
     evenement = db.relationship('EvenementBD', backref=db.backref('eventclub', lazy=True))
+    images_re = db.relationship(
+        'ImageAppBD',
+        secondary=image_evenement_club_association,
+        lazy='subquery',
+        backref=db.backref('eventclubs_associes', lazy=True)
+    )
 
 class ResultatBD(db.Model):
     """
@@ -385,3 +407,15 @@ class ImageAppBD(db.Model):
     urlI = db.Column(db.String(255))
     prive = db.Column(db.Boolean)
     alt = db.Column(db.String(21))
+
+class NotifsBD(db.Model):
+    __tablename__ = 'NOTIFS'
+
+    idNotifs = db.Column(db.Integer, primary_key=True)
+    typeN = db.Column(db.String(19))
+    sourceN = db.Column(db.String(255))
+    lue = db.Column(db.Boolean)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    link = db.Column(db.String(255))
+    idAdmin = db.Column(db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'))
+    idMembre = db.Column(db.Integer, db.ForeignKey('MEMBRE.idMembre'))
