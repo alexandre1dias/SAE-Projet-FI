@@ -134,11 +134,11 @@ def test_pages_admin_protegees(client, app, db):
         url = url_for('gerer_formulaires')
     response = client.get(url)
     assert response.status_code == 200
-    assert "Géstion des Formulaires" in response.data.decode('utf-8')
+    assert "Gestion des Formulaires" in response.data.decode('utf-8')
 
     # C. Gestion des inscriptions
     with app.test_request_context():
         url = url_for('gerer_inscriptions')
     response = client.get(url)
     assert response.status_code == 200
-    assert "Géstion des Inscriptions" in response.data.decode('utf-8')
+    assert "Gestion des Inscriptions" in response.data.decode('utf-8')

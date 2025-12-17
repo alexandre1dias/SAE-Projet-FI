@@ -1372,7 +1372,7 @@ def profil_view(idM):
 def gerer_formulaires():
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
-    liste = db.session.query(FormulaireBD)\
+    liste = FormulaireBD.query\
         .filter(FormulaireBD.repondu == False)\
         .order_by(FormulaireBD.date.desc())
 
@@ -1445,7 +1445,7 @@ def gerer_profils():
     liste = MembreBD.query\
         .filter(MembreBD.activite == True)\
         .order_by(MembreBD.date_inscription.desc())
-        liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
+    liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
     if filtre.niveau.data:
         liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
     if filtre.recherche.data:
@@ -1507,7 +1507,7 @@ def gerer_ancien_profils():
         .filter(MembreBD.activite == False)\
         .order_by(MembreBD.date_inscription.desc())
 
-        liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
+    liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
     if filtre.niveau.data:
         liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
     if filtre.recherche.data:
@@ -1563,10 +1563,10 @@ def gerer_inscriptions():
     type_page = request.args.get('type',
                                  'inscription') 
     if type_page == 'modification':
-        lesRequetes = db.session.query(ModifBD).order_by(ModifBD.date.asc())
+        lesRequetes = ModifBD.query.order_by(ModifBD.date.asc())
     else:
         type_page = 'inscription'
-        lesRequetes = db.session.query(InscriptionBD).order_by(
+        lesRequetes = InscriptionBD.query.order_by(
             InscriptionBD.date.asc())
     pagination = lesRequetes.paginate(page=page, per_page=7, error_out=False)
     return render_template("gerer_inscriptions.html",
