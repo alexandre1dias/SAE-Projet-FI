@@ -110,7 +110,7 @@ class EventForm(FlaskForm):
     widget=widgets.ListWidget(prefix_label=False),
     option_widget=widgets.CheckboxInput()
     ) 
-    
+    type_reunion = StringField('Type de réunion', validators=[])
     sexe = SelectField('Sexe concerné', choices=[
         ('Homme', 'Homme'), ('Femme', 'Femme')
     ], validators=[]) 

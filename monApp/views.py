@@ -21,8 +21,7 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # CORRECTION : On vérifie si l'objet current_user est une instance de la classe AdminBD
-        # Cela fonctionne même si la session 'user_type' est perdue
+        # On vérifie si l'objet current_user est une instance de la classe AdminBD
         if not current_user.is_authenticated or not isinstance(current_user, AdminBD):
             abort(400)  # Déclenche l'erreur "Accès Interdit" Admin
         return f(*args, **kwargs)
@@ -32,7 +31,7 @@ def admin_required(f):
 def membre_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # CORRECTION : On vérifie l'instance MembreBD
+        # On vérifie l'instance MembreBD
         if not current_user.is_authenticated or not isinstance(current_user, MembreBD):
             abort(401)  # Déclenche l'erreur "Accès Interdit" Membre
         return f(*args, **kwargs)
@@ -47,15 +46,14 @@ def comite_ou_admin_required(f):
             'Président', 'Vice-président', 'Secrétaire Général', 
             'Trésorier Général', 'Membre du Comité'
         ]
-        # CORRECTION : Vérifications basées sur les objets
+        # Vérifications basées sur les objets
         is_admin = isinstance(current_user, AdminBD)
         is_comite_membre = (
             isinstance(current_user, MembreBD) and
             current_user.statut in statuts_comite
         )
-        #Verification
         if not (current_user.is_authenticated and (is_admin or is_comite_membre)):
-            abort(405)  # Déclenche l'erreur "Accès Interdit" Comite
+            abort(405)  # Déclenche l'erreur "Accès Interdit"
         return f(*args, **kwargs)
     return decorated_function
 
@@ -185,11 +183,10 @@ def get_events():
         })
     voir_reunions = False
     if current_user.is_authenticated:
-        # Si c'est un admin
-        if session.get('user_type') == 'admin':
+        # On utilise isinstance pour être sûr du type d'objet
+        if isinstance(current_user, AdminBD):
             voir_reunions = True
-        # Si c'est un membre, on vérifie s'il fait partie du comité
-        elif session.get('user_type') == 'membre':
+        elif isinstance(current_user, MembreBD):
             statuts_comite = [
                 'Président', 'Vice-président', 'Vice-Président', 
                 'Secrétaire Général', 'Trésorier Général', 'Membre du Comité'
@@ -238,9 +235,11 @@ def get_events():
             'color': '#dc3545',
             'extendedProps': {
                 'type': 'Entraînement',
-                'description': f"Lieu: {event.ville}, Jour: {event.jour}",
+                'description': f"Jour: {event.jour}",
                 'niveaux': event.niveau,
-                'arme': event.type_arme
+                'arme': event.type_arme,
+                'ville': event.ville,
+                'adresse': event.adresse
             }
         })
     return jsonify(all_events)
@@ -287,7 +286,8 @@ def add_event():
                     heureFinRE=form.end_date.data.time().strftime('%H:%M'),
                     niveauRE=", ".join(form.level.data),
                     ville=form.ville.data,
-                    adresse=form.adresse.data
+                    adresse=form.adresse.data,
+                    typeReunionRE=form.type_reunion.data if form.type_reunion.data else "Générale"
                 )
             elif category == 'Evenement du club':
                 new_specific_event = EventClubBD(
@@ -839,6 +839,7 @@ def reunion_update(idReunion):
     reunion = ReunionBD.query.get_or_404(idReunion)
     if request.method == 'POST':
         reunion.nom = request.form['nom']
+        reunion.typeReunionRE = request.form['type_reunion']
         reunion.ville = request.form['ville']
         reunion.adresse = request.form['adresse']
         reunion.rapportRE = request.form['description']
