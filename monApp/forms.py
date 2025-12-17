@@ -131,24 +131,24 @@ class EventForm(FlaskForm):
         ('M9', 'M9'), ('M11', 'M11'), ('M13', 'M13'), ('M15', 'M15'),
         ('M17', 'M17'), ('M20', 'M20'), ('Senior', 'Senior'), ('Veteran', 'Veteran')
     ], 
-    validators=[Optional()],
+    validators=[],
     widget=widgets.ListWidget(prefix_label=False),
     option_widget=widgets.CheckboxInput()
     ) 
-    
+    type_reunion = StringField('Type de réunion', validators=[])
     sexe = SelectField('Sexe concerné', choices=[
         ('Homme', 'Homme'), ('Femme', 'Femme')
-    ], validators=[Optional()]) 
+    ], validators=[]) 
     
     arme = SelectField('Arme concernée', choices=[
         ('Fleuret', 'Fleuret'), ('Épée', 'Épée'), ('Sabre', 'Sabre')
-    ], validators=[Optional()])
+    ], validators=[])
     
     type = SelectField('Type d\'événement', choices=[
         ('Regionale', 'Regionale'), ('National', 'National')
-    ], validators=[Optional()])
-    ville = StringField('Ville de l\'événement', validators=[DataRequired()])
-    adresse = StringField('Adresse de l\'événement', validators=[DataRequired()])
+    ], validators=[])
+    ville = StringField('Ville de l\'événement', validators=[])
+    adresse = StringField('Adresse de l\'événement', validators=[])
     description = TextAreaField('Description (optionnel)')
     submit = SubmitField('Ajouter l\'événement')
     
@@ -221,11 +221,13 @@ class Parametres_updateForm(FlaskForm):
 
 
 class FiltreForm(FlaskForm):
-    CHOIX_SEXE = [('homme', 'Homme'), ('femme', 'Femme')]
+    CHOIX_SEXE = [('Homme', 'Homme'), ('Femme', 'Femme')]
     CHOIX_NIVEAU = [('M9', 'M9'), ('M11', 'M11'), ('M13', 'M13'), ('M15', 'M15'), 
-                    ('M17', 'M17'), ('M20', 'M20'), ('senior', 'Sénior'), ('veteran', 'Vétéran')]
+                    ('M17', 'M17'), ('M20', 'M20'), ('Senior', 'Senior'), ('Vétéran', 'Vétéran')]
     CHOIX_FORMULAIRE = [('Question', 'Questions'), ('Demande', 'Demandes'), ('Signalement', 'Signalements')]
-    
+    CHOIX_ARMES = [('Sabre', 'Sabre'), ('Fleuret', 'Fleuret'), ('Épée', 'Épée')]
+    CHOIX_TYPE_COMPETE = [('Régional', 'Régional'), ('National', 'National')]
+
     sexe = SelectMultipleField(
         'Sexes',
         choices=CHOIX_SEXE,
@@ -250,10 +252,31 @@ class FiltreForm(FlaskForm):
         widget=widgets.ListWidget(prefix_label=False)
     )
 
+    armes = SelectMultipleField(
+        'Armes',
+        choices=CHOIX_ARMES,
+        default=[c[0] for c in CHOIX_ARMES],
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
+
+    type_competition = SelectMultipleField(
+        'Type Competition',
+        choices=CHOIX_TYPE_COMPETE,
+        default=[c[0] for c in CHOIX_TYPE_COMPETE],
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
 
     recherche = StringField('Rechercher')
     submit = SubmitField('Envoyer')
 
+    CHOIX_TRI = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien'), ('nom', 'Ordre alphabétique')]
+    tri = SelectField(
+        'Trier par',
+        choices=CHOIX_TRI,
+        default='date_desc'  
+    )
 
     
 class HoraireForm(FlaskForm):

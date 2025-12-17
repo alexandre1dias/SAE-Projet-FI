@@ -60,9 +60,11 @@ create table MEMBRE(
 
 create table NOTIFS(
     idNotifs integer AUTO_INCREMENT,
-    typeN varchar(19) not null,
+    typeN varchar(1255) not null,
     sourceN varchar(255) not null,
     lue boolean DEFAULT false,
+    timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    link VARCHAR(255),
     idMembre integer,
     idAdmin integer,
     PRIMARY KEY(idNotifs)
@@ -171,14 +173,14 @@ create table ENTRAINEMENT(
 create table REUNION(
     idReunion integer AUTO_INCREMENT,
     nomRE varchar(100) not null,
-    villeRE varchar(50) not null,
-    adresseRE varchar(50) not null,
+    villeRE varchar(50),
+    adresseRE varchar(50),
     datedebutRE date not null,
     heureDebutRE varchar(5) not null,
     dateFinRE date not null,
     heureFinRE varchar(5) not null,
     nbParticipantsRE integer,
-    typeReunionRE varchar(15) not null,
+    typeReunionRE varchar(64) not null,
     rapportRE varchar(200),
     niveauRE varchar(45),
     idEvent integer,

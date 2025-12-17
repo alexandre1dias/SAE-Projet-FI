@@ -3,7 +3,6 @@ from flask import render_template, request, url_for, redirect, session, abort, f
 from config import TITLE, AUJOURDHUI
 from flask_login import logout_user, login_user, login_required, current_user
 from .forms import *
-from .connexionPythonSQL import *
 from monApp.modelBD import *
 from flask import jsonify
 from functools import wraps
@@ -31,7 +30,8 @@ def allowed_file(filename):
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or session.get('user_type') != 'admin':
+        # On vérifie si l'objet current_user est une instance de la classe AdminBD
+        if not current_user.is_authenticated or not isinstance(current_user, AdminBD):
             abort(400)  # Déclenche l'erreur "Accès Interdit" Admin
         return f(*args, **kwargs)
     return decorated_function
@@ -40,7 +40,8 @@ def admin_required(f):
 def membre_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or session.get('user_type') != 'membre':
+        # On vérifie l'instance MembreBD
+        if not current_user.is_authenticated or not isinstance(current_user, MembreBD):
             abort(401)  # Déclenche l'erreur "Accès Interdit" Membre
         return f(*args, **kwargs)
     return decorated_function
@@ -54,16 +55,14 @@ def comite_ou_admin_required(f):
             'Président', 'Vice-président', 'Secrétaire Général',
             'Trésorier Général', 'Membre du Comité'
         ]
-        # Premiere condition: verifie si admin
-        is_admin = (session.get('user_type') == 'admin')
-        # Deuxieme condition: verifie si comite
+        # Vérifications basées sur les objets
+        is_admin = isinstance(current_user, AdminBD)
         is_comite_membre = (
-            session.get('user_type') == 'membre' and
+            isinstance(current_user, MembreBD) and
             current_user.statut in statuts_comite
         )
-        #Verification
         if not (current_user.is_authenticated and (is_admin or is_comite_membre)):
-            abort(405)  # Déclenche l'erreur "Accès Interdit" Comite
+            abort(405)  # Déclenche l'erreur "Accès Interdit"
         return f(*args, **kwargs)
     return decorated_function
 
@@ -103,6 +102,72 @@ def simuler_envoi_email(email, link):
 mail = Mail(app)
 # source : https://stackoverflow.com/questions/34043847/forcing-itsdangerous-urlsafetimedserializer-to-give-old-signature
 s = URLSafeTimedSerializer(app.config.get('SECRET_KEY', 'default-secret-key'))
+
+# Injecter les notifications dans tous les templates
+@app.context_processor
+def inject_notifications():
+    unread_count = 0
+    notifications_list = []
+    if current_user.is_authenticated:
+        user_type = session.get('user_type')
+        if user_type == 'membre':
+            query = NotifsBD.query.filter_by(idMembre=current_user.id)
+        elif user_type == 'admin':
+            query = NotifsBD.query.filter_by(idAdmin=current_user.id)
+        else:
+            query = None
+            
+        if query:
+            unread_count = query.filter_by(lue=False).count()
+            notifications_list = query.order_by(NotifsBD.timestamp.desc()).limit(10).all()
+            
+    return dict(unread_count=unread_count, notifications_list=notifications_list)
+
+# Route pour marquer une notification comme lue et rediriger vers son lien
+@app.route("/read_notification/<int:id_notif>")
+@login_required
+def read_notification(id_notif):
+    notif = NotifsBD.query.get_or_404(id_notif)
+    # Vérification que la notif appartient bien à l'utilisateur connecté
+    if session.get('user_type') == 'membre':
+        if notif.idMembre != current_user.id:
+            abort(403)
+    elif session.get('user_type') == 'admin':
+        if notif.idAdmin != current_user.id:
+            abort(403)
+    else:
+        abort(403)
+
+    notif.lue = True
+    db.session.commit()
+
+    if notif.link and notif.link != '#':
+        return redirect(notif.link)
+    return redirect(request.referrer or url_for('index'))
+
+# Route pour supprimer une notification
+@app.route("/delete_notification/<int:id_notif>", methods=['POST'])
+@login_required
+def delete_notification(id_notif):
+    notif = NotifsBD.query.get_or_404(id_notif)
+    # Vérification que la notif appartient bien à l'utilisateur connecté
+    if session.get('user_type') == 'membre':
+        if notif.idMembre != current_user.id:
+            abort(403)
+    elif session.get('user_type') == 'admin':
+        if notif.idAdmin != current_user.id:
+            abort(403)
+    else:
+        abort(403)
+
+    # Supprimer les dépendances dans les tables de liaison avant de supprimer la notification
+    # Cela évite l'erreur IntegrityError car la cascade n'est pas configurée en SQL
+    db.session.execute(recevoir_a.delete().where(recevoir_a.c.idNotifs == id_notif))
+    db.session.execute(recevoir_m.delete().where(recevoir_m.c.idNotifs == id_notif))
+
+    db.session.delete(notif)
+    db.session.commit()
+    return redirect(request.referrer or url_for('index'))
 
 #==========================================================#
 #====================   Page Accueil   ====================#
@@ -193,11 +258,10 @@ def get_events():
         })
     voir_reunions = False
     if current_user.is_authenticated:
-        # Si c'est un admin
-        if session.get('user_type') == 'admin':
+        # On utilise isinstance pour être sûr du type d'objet
+        if isinstance(current_user, AdminBD):
             voir_reunions = True
-        # Si c'est un membre, on vérifie s'il fait partie du comité
-        elif session.get('user_type') == 'membre':
+        elif isinstance(current_user, MembreBD):
             statuts_comite = [
                 'Président', 'Vice-président', 'Vice-Président', 
                 'Secrétaire Général', 'Trésorier Général', 'Membre du Comité'
@@ -246,9 +310,11 @@ def get_events():
             'color': '#dc3545',
             'extendedProps': {
                 'type': 'Entraînement',
-                'description': f"Lieu: {event.ville}, Jour: {event.jour}",
+                'description': f"Jour: {event.jour}",
                 'niveaux': event.niveau,
-                'arme': event.type_arme
+                'arme': event.type_arme,
+                'ville': event.ville,
+                'adresse': event.adresse
             }
         })
     return jsonify(all_events)
@@ -295,7 +361,8 @@ def add_event():
                     heureFinRE=form.end_date.data.time().strftime('%H:%M'),
                     niveauRE=", ".join(form.level.data),
                     ville=form.ville.data,
-                    adresse=form.adresse.data
+                    adresse=form.adresse.data,
+                    typeReunionRE=form.type_reunion.data if form.type_reunion.data else "Générale"
                 )
             elif category == 'Evenement du club':
                 new_specific_event = EventClubBD(
@@ -336,13 +403,36 @@ def add_event():
 
 # Affiche la liste de toutes les compétitions.
 @app.route("/competitions/")
-def competitions():
-    lesCompetitions = CompetitionBD.query.all()
-    lesCompetitions.sort(key=lambda x: x.date_debut, reverse=True)
+@app.route("/competitions/<string:etat>") 
+def competitions(etat="prochaine"): 
+    passee = (etat == "passees")
+    filtre = FiltreForm(request.args if request.args else None)
+    page = request.args.get('page', 1, type=int)
+    lesCompetitions = CompetitionBD.query
 
-    #events_a_venir = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateDebutRE', None) or getattr(e, 'dateDebutEV', None)) >= AUJOURDHUI]
-    #events_passes = [e for e in evenements if (getattr(e, 'date_fin', None) or getattr(e, 'dateFinRE', None) or getattr(e, 'dateFinEV', None)) < AUJOURDHUI]
-    return render_template("competitions.html", title=TITLE+"- Competitions", competitions=lesCompetitions)
+    filtre.tri.choices = [
+        ('date_desc', 'Plus récent'), 
+        ('date_asc', 'Plus ancien')
+    ]
+    
+    if filtre.tri.data == "date_asc":
+        lesCompetitions = lesCompetitions.order_by(CompetitionBD.date_debut.asc())
+    else:
+        lesCompetitions = lesCompetitions.order_by(CompetitionBD.date_debut.desc())
+
+    lesCompetitions = lesCompetitions.filter(CompetitionBD.passee == passee)     
+    
+    if filtre.sexe.data:
+        lesCompetitions = lesCompetitions.filter(CompetitionBD.sexe.in_(filtre.sexe.data))
+    if filtre.niveau.data:
+        lesCompetitions = lesCompetitions.filter(or_(*(CompetitionBD.niveaux.like(f"%{n}%") for n in filtre.niveau.data)))
+    if filtre.armes.data:
+        lesCompetitions = lesCompetitions.filter(CompetitionBD.type_arme.in_(filtre.armes.data))
+    if filtre.type_competition.data:
+        lesCompetitions = lesCompetitions.filter(CompetitionBD.typeComp.in_(filtre.type_competition.data))
+    pagination = lesCompetitions.paginate(page=page, per_page=6, error_out=False)
+    return render_template("competitions.html", title=TITLE+"- Competitions", pagination=pagination,filtre = filtre, passee=passee)
+
 
 # Affiche les détails d'une compétition spécifique.
 @app.route("/competitions/<int:idCompetition>/view")
@@ -648,13 +738,30 @@ def competition_delete(idCompetition):
 #====================   Pages Evenement du club   ====================#
 # Affiche la liste des événements du club.
 @app.route("/evenement_club/")
-def evenement_club():
-    lesEventClubs = EventClubBD.query.all()
-    ids_evenements_inscrits = set()
-    if current_user.is_authenticated and session.get('user_type') == 'membre':
-        participations = ParticiperBD.query.filter_by(id_membre=current_user.id).all()
-        ids_evenements_inscrits = {p.id_event for p in participations}
-    return render_template("evenement_club.html",title=TITLE+"- Evenements du Club",eventsclub=lesEventClubs, user_registered_event_ids=ids_evenements_inscrits)
+@app.route("/evenement_club/<string:etat>")
+def evenement_club(etat="prochaine"):
+    passee = (etat == "passees")
+    filtre = FiltreForm(request.args if request.args else None)
+    page = request.args.get('page', 1, type=int)
+    lesEvements = EventClubBD.query
+    filtre.tri.choices = [
+        ('date_desc', 'Plus récent'),
+        ('date_asc', 'Plus ancien')
+    ]
+
+    if filtre.tri.data == "date_asc":
+        lesEvements = lesEvements.order_by(EventClubBD.dateDebutEV.asc())
+    else:
+        lesEvements = lesEvements.order_by(EventClubBD.dateDebutEV.desc())
+
+    lesEvements = lesEvements.filter(EventClubBD.passeeEV == passee)
+    pagination = lesEvements.paginate(page=page, per_page=6, error_out=False)
+
+    return render_template("evenement_club.html",
+                           title=TITLE + "- Evenements du Club",
+                           pagination=pagination,
+                           filtre=filtre,
+                           passee=passee)
 
 # Affiche les détails d'un événement de club spécifique.
 @app.route("/evenement_club/<int:idEventClub>/club_view/")
@@ -877,9 +984,8 @@ def delete_image_club(idImage):
 @comite_ou_admin_required
 def reunion():
     reunions = ReunionBD.query.all()
-    aujourdhui = datetime.now().date()
-    prochaines_reunions = [r for r in reunions if r.dateDebutRE and r.dateDebutRE >= aujourdhui]
-    anciennes_reunions = [r for r in reunions if r.dateFinRE and r.dateFinRE < aujourdhui]
+    prochaines_reunions = [r for r in reunions if r.dateDebutRE and r.dateDebutRE >= AUJOURDHUI]
+    anciennes_reunions = [r for r in reunions if r.dateFinRE and r.dateFinRE < AUJOURDHUI]
     ids_evenements_inscrits = set()
     if current_user.is_authenticated and session.get('user_type') == 'membre':
         participations = ParticiperBD.query.filter_by(id_membre=current_user.id).all()
@@ -949,6 +1055,7 @@ def reunion_update(idReunion):
     reunion = ReunionBD.query.get_or_404(idReunion)
     if request.method == 'POST':
         reunion.nom = request.form['nom']
+        reunion.typeReunionRE = request.form['type_reunion']
         reunion.ville = request.form['ville']
         reunion.adresse = request.form['adresse']
         reunion.rapportRE = request.form['description']
@@ -1187,11 +1294,6 @@ def delete_image_article(idImg):
 #============================================================#
 #====================   Pages A propos   ====================#
 #============================================================#
-# Affiche la page "À propos".
-@app.route("/about/")
-def about():
-    return render_template("about.html",title=TITLE+"- A propos")
-
 # Affiche la page de l'historique du club.
 @app.route("/historique/")
 def historique():
@@ -1228,6 +1330,34 @@ def contact():
             )
             db.session.add(nouveau_message)
             db.session.commit()
+
+            # Création des notifications pour les administrateurs
+            admins = AdminBD.query.all()
+            type_f = form.type_form.data
+            
+            for admin in admins:
+                params = admin.parametres_notif_admin
+                if params:
+                    notify = False
+                    if type_f == 'Question' and params.formulaireQuestionSite:
+                        notify = True
+                    elif type_f == 'Demande' and params.formulaireDemandeSite:
+                        notify = True
+                    elif type_f == 'Signalement' and params.formulaireSignalementSite:
+                        notify = True
+                    
+                    if notify:
+                        notif = NotifsBD(
+                            typeN="Formulaire Contact",
+                            sourceN=f"{type_f} : {form.email.data}",
+                            lue=False,
+                            timestamp=datetime.now(),
+                            link=url_for('formulaire_view', idFormulaire=nouveau_message.id),
+                            idAdmin=admin.id
+                        )
+                        db.session.add(notif)
+            db.session.commit()
+
             return redirect(url_for('contact'))
         except Exception as e:
             db.session.rollback()
@@ -1292,7 +1422,7 @@ def profil_view(idM):
 def gerer_formulaires():
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
-    liste = db.session.query(FormulaireBD)\
+    liste = FormulaireBD.query\
         .filter(FormulaireBD.repondu == False)\
         .order_by(FormulaireBD.date.desc())
 
@@ -1362,12 +1492,10 @@ def repondre_formulaire(idFormulaire):
 def gerer_profils():
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
-    liste = db.session.query(MembreBD)\
+    liste = MembreBD.query\
         .filter(MembreBD.activite == True)\
         .order_by(MembreBD.date_inscription.desc())
-
-    if filtre.sexe.data:
-        liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
+    liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
     if filtre.niveau.data:
         liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
     if filtre.recherche.data:
@@ -1379,6 +1507,7 @@ def gerer_profils():
                 MembreBD.email.ilike(terme)
             )
         )
+    # Maintenant .paginate() fonctionnera
     pagination = liste.paginate(page=page, per_page=15, error_out=False)
     return render_template("gerer_profils.html",
         title=TITLE + "- Gestion des Profils",pagination=pagination,filtre=filtre)
@@ -1424,12 +1553,11 @@ def reinscrireMembre(idM):
 def gerer_ancien_profils():
     filtre = FiltreForm(request.args) if request.args else FiltreForm()
     page = request.args.get('page', 1, type=int)
-    liste = db.session.query(MembreBD)\
+    liste = MembreBD.query\
         .filter(MembreBD.activite == False)\
         .order_by(MembreBD.date_inscription.desc())
 
-    if filtre.sexe.data:
-        liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
+    liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
     if filtre.niveau.data:
         liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
     if filtre.recherche.data:
@@ -1473,9 +1601,29 @@ def profil_edit(idM):
             uneModif.date = datetime.now()
             uneModif.justification = unForm.justification.data
             db.session.commit()
+        # Création des notifications pour les administrateurs
+            admins = AdminBD.query.all()
+            
+            for admin in admins:
+                params = admin.parametres_notif_admin
+                if params:
+                    notify = False
+                    if params.demandeModifSite:
+                        notify = True
+                    
+                    if notify:
+                        notif = NotifsBD(
+                            typeN="Demande Modification",
+                            sourceN=f"Modification : {unForm.email.data}",
+                            lue=False,
+                            timestamp=datetime.now(),
+                            link=url_for('gerer_inscriptions', type='modification'),
+                            idAdmin=admin.id
+                        )
+                        db.session.add(notif)
+            db.session.commit()    
             return redirect(url_for('profil_view', idM=unMembre.id, origine='profil'))
     return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
-
 
 # Affiche les demandes d'inscription et de modification de profil - Réservée aux administrateurs.
 @app.route("/gerer_inscriptions/")
@@ -1486,10 +1634,10 @@ def gerer_inscriptions():
     type_page = request.args.get('type',
                                  'inscription') 
     if type_page == 'modification':
-        lesRequetes = db.session.query(ModifBD).order_by(ModifBD.date.asc())
+        lesRequetes = ModifBD.query.order_by(ModifBD.date.asc())
     else:
         type_page = 'inscription'
-        lesRequetes = db.session.query(InscriptionBD).order_by(
+        lesRequetes = InscriptionBD.query.order_by(
             InscriptionBD.date.asc())
     pagination = lesRequetes.paginate(page=page, per_page=7, error_out=False)
     return render_template("gerer_inscriptions.html",
@@ -1882,6 +2030,29 @@ def inscription():
                 )
                 db.session.add(nouvelle_inscription)
                 db.session.commit()
+
+                # Création des notifications pour les administrateurs
+                admins = AdminBD.query.all()
+                
+                for admin in admins:
+                    params = admin.parametres_notif_admin
+                    if params:
+                        notify = False
+                        if params.demandeInscriptionSite:
+                            notify = True
+                        
+                        if notify:
+                            notif = NotifsBD(
+                                typeN="Demande Inscription",
+                                sourceN=f"Inscription : {unForm.Login.data}",
+                                lue=False,
+                                timestamp=datetime.now(),
+                                link=url_for('gerer_inscriptions', type='inscription'),
+                                idAdmin=admin.id
+                            )
+                            db.session.add(notif)
+                db.session.commit()    
+
                 return redirect(url_for('index'))
         except Exception as e:
             db.session.rollback()

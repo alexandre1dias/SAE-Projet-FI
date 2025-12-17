@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_event.css') }}">
+{% endblock %}
 {% block main %}
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -90,6 +92,11 @@
                     {% endif %}
                 </div>
                 
+                <div class="mb-3" id="reunion-type-field" style="display: none;">
+                    {{ form.type_reunion.label(class="form-label") }}
+                    {{ form.type_reunion(class="form-control", placeholder="Ex: Assemblée Générale") }}
+                </div>
+
                 <div class="mb-3" id="ville-field-container" style="display: none;">
                     {{ form.ville.label(class="form-label") }}
                     {{ form.ville(class="form-control" + (" is-invalid" if form.ville.errors else "")) }}
@@ -127,6 +134,7 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // 1. On récupère tous les éléments
     const categorySelect = document.getElementById('category_select');
     const levelContainer = document.getElementById('level-field-container');
     const armeContainer = document.getElementById('arme-field-container');
@@ -134,14 +142,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const typeContainer = document.getElementById('type-field-container');
     const villeContainer = document.getElementById('ville-field-container');
     const adresseContainer = document.getElementById('adresse-field-container');
+    const reunionTypeContainer = document.getElementById('reunion-type-field'); 
     function updateFormFields() {
         const selectedCategory = categorySelect.value;
+        // 2. On cache TOUT par défaut pour repartir de zéro
         levelContainer.style.display = 'none';
         armeContainer.style.display = 'none';
         sexeContainer.style.display = 'none';
         typeContainer.style.display = 'none';
         villeContainer.style.display = 'none';
         adresseContainer.style.display = 'none';
+        reunionTypeContainer.style.display = 'none';
+        // 3. On affiche seulement ce qui est nécessaire selon la catégorie
         switch (selectedCategory) {
             case 'Compétition':
                 levelContainer.style.display = 'block';
@@ -151,24 +163,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 villeContainer.style.display = 'block';
                 adresseContainer.style.display = 'block';
                 break;
+
             case 'Entraînement':
                 levelContainer.style.display = 'block';
                 armeContainer.style.display = 'block';
                 villeContainer.style.display = 'block';
                 adresseContainer.style.display = 'block';
                 break;
+
             case 'Evenement du club':
                 levelContainer.style.display = 'block';
                 villeContainer.style.display = 'block';
                 adresseContainer.style.display = 'block';
                 break;
+
             case 'Réunion':
                 villeContainer.style.display = 'block';
                 adresseContainer.style.display = 'block';
+                reunionTypeContainer.style.display = 'block';
                 break;
         }
     }
     categorySelect.addEventListener('change', updateFormFields);
+    // 4. On lance la fonction au chargement de la page
     updateFormFields();
 });
 </script>
