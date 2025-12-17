@@ -44,6 +44,7 @@ class MembreBD(UserMixin, db.Model):
     niveau = db.Column(db.String(15))
     statut = db.Column(db.String(30), server_default='Membre')
     activite = db.Column(db.Boolean, server_default='1')
+    numTel = db.Column(db.String(20))
     idParaNotif = db.Column('idParamNotifMembre', db.Integer, db.ForeignKey('PARAMETRE_NOTIF_MEMBRE.idParamNotifMembre', use_alter=True, name='fk_membre_param_notif'))
     parametres_notif = db.relationship(
         'ParametreNotifMembreBD', 
@@ -162,6 +163,7 @@ class InscriptionBD(UserMixin, db.Model):
     nom = db.Column('nomI', db.String(41))
     prenom = db.Column('prenomI', db.String(41))
     ddn = db.Column('ddnI', db.Date)
+    numTel = db.Column('numTelI', db.String(20))
     mdp_hash = db.Column('mdpI', db.String(128), nullable=False)
     sexe = db.Column('sexeI', db.String(5))
     date = db.Column('dateInscription', db.Date)
@@ -180,6 +182,7 @@ class ModifBD(UserMixin, db.Model):
     email = db.Column('emailModif', db.String(100), unique=True, nullable=False)
     sexe = db.Column('sexeModif', db.String(5))
     ddn = db.Column('ddnModif', db.Date)
+    numTel = db.Column('numTelModif', db.String(20))
     date = db.Column('dateModif', db.Date)
     justification = db.Column('justificationModif', db.String(200))
     membre = db.relationship('MembreBD', backref=db.backref('modifications', lazy='dynamic'))
