@@ -2,40 +2,42 @@
 {% block head_extra %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
 {% endblock %}
-{%block main%}
-<div class="container py-5">
-    <h2 class="text-center mb-5">Listes des prochaines réunions</h2>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for reunion in prochaines_reunions %}
-        <div class="col">
-            <div class="card pricing-card h-100">
-                <div class="card-header pricing-header basic-header p-4">
-                    <h3 class="card-title text-center mb-0">{{ reunion.nom }}</h3>
-                </div>
-                <div class="card-body p-4">
-                    <ul class="feature-list text-center mb-4">
-                        <li>
-                            <h3>{{ reunion.dateDebutRE.strftime('%d/%m') }} {{ reunion.heureDebutRE }} <br> {{
-                                reunion.dateFinRE.strftime('%d/%m') }} {{ reunion.heureFinRE }}</h3>
-                        </li>
-                        <li>
-                            <h3>{{ reunion.ville }}</h3>
-                        </li>
-                        <li>
-                            <h3>{{ reunion.adresse }}</h3>
-                        </li>
-                    </ul>
-                    <div class="text-center">
-                        {% if current_user.is_authenticated %}
-
-                        {% if session.get('user_type') == 'membre' %}
-                        {% if reunion.idEvent in user_registered_event_ids %}
-                        <a href="{{ url_for('desinscrire_reunion', idReunion=reunion.id) }}"
-                            class="btn btn-outline-danger btn-custom">Se désinscrire</a>
-
-                        {% else %}
-                        <a href="{{ url_for('inscrire_reunion', idReunion=reunion.id) }}"
-                            class="btn btn-outline-primary btn-custom">S'inscrire</a>
+    {%block main%}
+        <div class="container py-5">
+            <h2 class="text-center mb-5">Listes des prochaines réunions</h2>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for reunion in prochaines_reunions %}
+                <div class="col">
+                    <div class="card pricing-card h-100">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0">{{ reunion.nom }}</h3>
+                        </div>
+                        <div class="card-body p-4">
+                                <ul class="feature-list text-center mb-4">
+                                    <li>
+                                        <h3 class="fw-bold text-primary">{{ reunion.typeReunionRE }}</h3>
+                                    </li>
+                                    <li>
+                                        <h3>{{ reunion.dateDebutRE.strftime('%d/%m') }} {{ reunion.heureDebutRE }} <br> {{ reunion.dateFinRE.strftime('%d/%m') }} {{ reunion.heureFinRE }}</h3>
+                                    </li>
+                                    <li>
+                                        <h3>{{ reunion.ville }}</h3>  
+                                    </li>
+                                    <li>
+                                        <h3>{{ reunion.adresse }}</h3>  
+                                    </li>
+                                </ul>
+                            <div class="text-center">
+                                {% if current_user.is_authenticated %}
+                                    
+                                    {% if session.get('user_type') == 'membre' %}
+                                        {% if reunion.idEvent in user_registered_event_ids %}
+                                            <a href="{{ url_for('desinscrire_reunion', idReunion=reunion.id) }}" class="btn btn-outline-danger btn-custom">Se désinscrire</a>
+                                        
+                                        {% else %}
+                                            <a href="{{ url_for('inscrire_reunion', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">S'inscrire</a>
+                                        
+                                        {% endif %}
 
                         {% endif %}
 

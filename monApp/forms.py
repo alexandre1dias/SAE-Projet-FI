@@ -106,24 +106,24 @@ class EventForm(FlaskForm):
         ('M9', 'M9'), ('M11', 'M11'), ('M13', 'M13'), ('M15', 'M15'),
         ('M17', 'M17'), ('M20', 'M20'), ('Senior', 'Senior'), ('Veteran', 'Veteran')
     ], 
-    validators=[Optional()],
+    validators=[],
     widget=widgets.ListWidget(prefix_label=False),
     option_widget=widgets.CheckboxInput()
     ) 
-    
+    type_reunion = StringField('Type de réunion', validators=[])
     sexe = SelectField('Sexe concerné', choices=[
         ('Homme', 'Homme'), ('Femme', 'Femme')
-    ], validators=[Optional()]) 
+    ], validators=[]) 
     
     arme = SelectField('Arme concernée', choices=[
         ('Fleuret', 'Fleuret'), ('Épée', 'Épée'), ('Sabre', 'Sabre')
-    ], validators=[Optional()])
+    ], validators=[])
     
     type = SelectField('Type d\'événement', choices=[
         ('Regionale', 'Regionale'), ('National', 'National')
-    ], validators=[Optional()])
-    ville = StringField('Ville de l\'événement', validators=[DataRequired()])
-    adresse = StringField('Adresse de l\'événement', validators=[DataRequired()])
+    ], validators=[])
+    ville = StringField('Ville de l\'événement', validators=[])
+    adresse = StringField('Adresse de l\'événement', validators=[])
     description = TextAreaField('Description (optionnel)')
     submit = SubmitField('Ajouter l\'événement')
     

@@ -124,6 +124,40 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="eventModalLabel">Détails de l'événement</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4 id="modalTitle" class="text-primary mb-4 text-center"></h4>
+                
+                <div class="fs-6"> <p class="mb-2"><strong>Type :</strong> <span id="modalType"></span></p>
+                    <p class="mb-2"><strong>Début :</strong> <span id="modalStart"></span></p>
+                    <p class="mb-2"><strong>Fin :</strong> <span id="modalEnd"></span></p>
+                    
+                    <div id="lineNiveau">
+                        <p class="mb-2"><strong>Niveaux :</strong> <span id="modalNiveaux"></span></p>
+                    </div>
+                    
+                    <div id="lineArme">
+                        <p class="mb-2"><strong>Arme :</strong> <span id="modalArme"></span></p>
+                    </div>
+
+                    <hr> <p class="mb-2"><strong>Ville :</strong> <span id="modalVille"></span></p>
+                    <p class="mb-2"><strong>Adresse :</strong> <span id="modalAdresse"></span></p>
+                    
+                    <hr> <p class="mb-2"><strong>Infos :</strong> <span id="modalDescription" class="text-muted"></span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -131,6 +165,10 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
+        
+        // Initialisation de la modale Bootstrap
+        var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'fr',
@@ -150,24 +188,45 @@
             },
             events: '/api/events',
             eventClick: function(info) {
+                // 1. Si l'événement a une URL (Compétition, Réunion...), on redirige
                 if (info.event.extendedProps.url) {
                     window.location.href = info.event.extendedProps.url;
                 }
+                // 2. Sinon (Entraînement), on ouvre la modale
                 else {
                     let event = info.event;
                     let props = event.extendedProps;
-                    let startDate = event.start ? event.start.toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' }) : 'Non spécifié';
-                    let endDate = event.end ? event.end.toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' }) : 'Non spécifié';
-                    let description = props.description || 'Aucune description';
-                    let category = props.type || 'Non classé';
-                    let levels = props.niveaux || 'Non spécifié';
-                    let alertMessage = `Événement: ${event.title}\n` +
-                                       `Type: ${category}\n` +
-                                       `Début: ${startDate}\n` +
-                                       `Fin: ${endDate}\n` +
-                                       `Niveaux: ${levels}\n` +
-                                       `Description: ${description}`;
-                    alert(alertMessage);
+                    // Remplissage des champs de base
+                    document.getElementById('eventModalLabel').innerText = props.type || 'Détails';
+                    document.getElementById('modalTitle').innerText = event.title;
+                    document.getElementById('modalType').innerText = props.type || 'Non spécifié';
+                    document.getElementById('modalVille').innerText = props.ville || 'Non spécifié';
+                    document.getElementById('modalAdresse').innerText = props.adresse || 'Non spécifié';
+                    document.getElementById('modalDescription').innerText = props.description || 'Aucune description';
+                    // Formatage des dates
+                    let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                    document.getElementById('modalStart').innerText = event.start ? event.start.toLocaleDateString('fr-FR', options) : '';
+                    document.getElementById('modalEnd').innerText = event.end ? event.end.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) : '';
+                    // Gestion de l'affichage conditionnel (Niveaux)
+                    let elemNiveau = document.getElementById('lineNiveau');
+                    let spanNiveau = document.getElementById('modalNiveaux');
+                    if (props.niveaux) {
+                        spanNiveau.innerText = props.niveaux;
+                        elemNiveau.style.display = 'block';
+                    } else {
+                        elemNiveau.style.display = 'none';
+                    }
+                    // Gestion de l'affichage conditionnel (Armes)
+                    let elemArme = document.getElementById('lineArme');
+                    let spanArme = document.getElementById('modalArme');
+                    if (props.arme) {
+                        spanArme.innerText = props.arme;
+                        elemArme.style.display = 'block';
+                    } else {
+                        elemArme.style.display = 'none';
+                    }
+
+                    eventModal.show();
                 }
             }
         });
