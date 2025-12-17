@@ -201,7 +201,7 @@ class FiltreForm(FlaskForm):
                     ('M17', 'M17'), ('M20', 'M20'), ('Senior', 'Senior'), ('Vétéran', 'Vétéran')]
     CHOIX_FORMULAIRE = [('Question', 'Questions'), ('Demande', 'Demandes'), ('Signalement', 'Signalements')]
     CHOIX_ARMES = [('Sabre', 'Sabre'), ('Fleuret', 'Fleuret'), ('Épée', 'Épée')]
-    CHOIX_TYPE_COMPETE = [('Régional', 'Régional'), ('National', 'National'), ('Départemental', 'Départemental')]
+    CHOIX_TYPE_COMPETE = [('Régional', 'Régional'), ('National', 'National')]
 
     sexe = SelectMultipleField(
         'Sexes',
@@ -245,6 +245,13 @@ class FiltreForm(FlaskForm):
 
     recherche = StringField('Rechercher')
     submit = SubmitField('Envoyer')
+
+    CHOIX_TRI = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien'), ('nom', 'Ordre alphabétique')]
+    tri = SelectField(
+        'Trier par',
+        choices=CHOIX_TRI,
+        default='date_desc'  
+    )
 
     
 class HoraireForm(FlaskForm):

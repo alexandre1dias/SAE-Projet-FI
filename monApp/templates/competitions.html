@@ -5,7 +5,11 @@
 {%block main%}
     <!-- Section des compétitions à venir (pleine largeur) -->
     <div class="container py-5">
-        <h2 class="text-center mb-5">Listes des prochaines compétitions</h2>
+        {% if passee %}
+            <h2 class="text-center mb-5">Listes des compétitions passées</h2>
+        {% else %}
+            <h2 class="text-center mb-5">Listes des prochaines compétitions</h2>
+        {% endif %}
         <div class="row row-cols-1 row-cols-md-3 g-4">
             {% for uneCompetition in pagination %}
                 <div class="col">
@@ -69,12 +73,24 @@
             <div>
                 <h5 class="filtres-titre">Action</h5>
                 <div class="d-grid gap-2">
-                    <a href="{{ url_for('competitions') }}" class="btn btn-secondary">Voir les compétitions passées</a>
+                    {% if passee %}
+                        <a href="{{ url_for('competitions', etat='avenir') }}" class="btn btn-secondary">
+                            Voir les compétitions prochaines
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('competitions', etat='passees') }}" class="btn btn-secondary">
+                            Voir les compétitions passées
+                        </a>
+                    {% endif %}
                 </div>
             </div>
             <br>
             <h5 class="filtres-titre">Filtres</h5>
             <form action="{{ url_for('competitions') }}" method="GET">
+                <h6> {{ filtre.tri.label }}</h6>
+                <div class="form-group">
+                    {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle") }} 
+                </div>
                 <h6>{{ filtre.sexe.label }}</h6>
                 {% for subfield in filtre.sexe %}
                     <div class="form-check">
