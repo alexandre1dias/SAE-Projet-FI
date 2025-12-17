@@ -383,3 +383,87 @@ def test_securite_membre_vers_admin(client, app, db):
     
     # L'article doit toujours être là
     assert PresseBD.query.get(presse.idPresse) is not None
+
+def test_access_control_admin_pages(client, app):
+    """
+    SCÉNARIO : Un utilisateur non connecté essaie d'accéder aux pages admin.
+    RÉSULTAT ATTENDU : Redirection vers le login (302).
+    """
+    app.config['LOGIN_DISABLED'] = False
+    client.get('/logout/')
+
+    # Liste des routes Admin
+    routes_admin = [
+        '/gerer_profils/',
+        '/gerer_formulaires/',
+        '/admin/add_article/',
+        '/admin/gestion_tarifs/'
+    ]
+
+    for route in routes_admin:
+        response = client.get(route)
+        # Doit rediriger vers login (Code 302)
+        assert response.status_code == 302
+        assert "/login" in response.location
+
+def test_access_control_membre_pages(client, app):
+    """
+    SCÉNARIO : Un utilisateur non connecté essaie d'accéder aux pages membre.
+    """
+    app.config['LOGIN_DISABLED'] = False
+    client.get('/logout/')
+
+    response = client.get('/resultat_membre/')
+    assert response.status_code == 302
+    assert "/login" in response.location
+
+def test_password_change_security(client, app, db):
+    """
+    FAILLE TESTÉE : Mauvaise validation de l'ancien mot de passe.
+    SCÉNARIO : Un membre essaie de changer son mot de passe en donnant un mauvais 'ancien mot de passe'.
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+    app.config['LOGIN_DISABLED'] = False
+    
+    user = MembreBD(email='pwd@test.fr', mdp_hash=generate_password_hash('VraiMotDePasse123!'))
+    db.session.add(user)
+    db.session.commit()
+    
+    client.post('/login/', data={'email': 'pwd@test.fr', 'password': 'VraiMotDePasse123!'})
+
+    # Tentative de changement avec MAUVAIS ancien mdp
+    response = client.post('/changer_mdp/', data={
+        'old_password': 'MauvaisPassword',
+        'new_password': 'NewPassword123!',
+        'confirm_new_password': 'NewPassword123!'
+    }, follow_redirects=True)
+
+    # Vérifications
+    assert b"ancien mot de passe est incorrect" in response.data
+    
+    # On vérifie que le hash en base n'a PAS changé
+    user_db = db.session.get(MembreBD, user.id)
+    from werkzeug.security import check_password_hash
+    assert check_password_hash(user_db.mdp_hash, 'VraiMotDePasse123!') is True
+
+def test_inscription_password_strength(client, app, db):
+    """
+    FAILLE TESTÉE : Politique de mot de passe faible.
+    SCÉNARIO : Inscription avec un mot de passe trop simple (ex: "123").
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+    
+    response = client.post('/inscription/', data={
+        'Login': 'weak@test.fr',
+        'nom': 'Faible',
+        'prenom': 'User',
+        'date_naissance': '2000-01-01',
+        'sexe': 'Homme',
+        'password': '123',
+        'confirm_password': '123'
+    }, follow_redirects=True)
+
+    # Doit échouer et afficher le message d'erreur
+    # On cherche un mot clé du message d'erreur défini dans views.py
+    assert b"mot de passe doit contenir" in response.data
+    assert InscriptionBD.query.filter_by(email='weak@test.fr').first() is None
