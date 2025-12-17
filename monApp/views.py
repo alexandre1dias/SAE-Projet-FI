@@ -124,6 +124,28 @@ def inject_notifications():
             
     return dict(unread_count=unread_count, notifications_list=notifications_list)
 
+# Route pour marquer une notification comme lue et rediriger vers son lien
+@app.route("/read_notification/<int:id_notif>")
+@login_required
+def read_notification(id_notif):
+    notif = NotifsBD.query.get_or_404(id_notif)
+    # Vérification que la notif appartient bien à l'utilisateur connecté
+    if session.get('user_type') == 'membre':
+        if notif.idMembre != current_user.id:
+            abort(403)
+    elif session.get('user_type') == 'admin':
+        if notif.idAdmin != current_user.id:
+            abort(403)
+    else:
+        abort(403)
+
+    notif.lue = True
+    db.session.commit()
+
+    if notif.link and notif.link != '#':
+        return redirect(notif.link)
+    return redirect(request.referrer or url_for('index'))
+
 # Route pour supprimer une notification
 @app.route("/delete_notification/<int:id_notif>", methods=['POST'])
 @login_required
@@ -1272,6 +1294,34 @@ def contact():
             )
             db.session.add(nouveau_message)
             db.session.commit()
+
+            # Création des notifications pour les administrateurs
+            admins = AdminBD.query.all()
+            type_f = form.type_form.data
+            
+            for admin in admins:
+                params = admin.parametres_notif_admin
+                if params:
+                    notify = False
+                    if type_f == 'Question' and params.formulaireQuestionSite:
+                        notify = True
+                    elif type_f == 'Demande' and params.formulaireDemandeSite:
+                        notify = True
+                    elif type_f == 'Signalement' and params.formulaireSignalementSite:
+                        notify = True
+                    
+                    if notify:
+                        notif = NotifsBD(
+                            typeN="Formulaire Contact",
+                            sourceN=f"{type_f} : {form.email.data}",
+                            lue=False,
+                            timestamp=datetime.now(),
+                            link=url_for('formulaire_view', idFormulaire=nouveau_message.id),
+                            idAdmin=admin.id
+                        )
+                        db.session.add(notif)
+            db.session.commit()
+
             return redirect(url_for('contact'))
         except Exception as e:
             db.session.rollback()
@@ -1516,9 +1566,29 @@ def profil_edit(idM):
             uneModif.date = datetime.now()
             uneModif.justification = unForm.justification.data
             db.session.commit()
+        # Création des notifications pour les administrateurs
+            admins = AdminBD.query.all()
+            
+            for admin in admins:
+                params = admin.parametres_notif_admin
+                if params:
+                    notify = False
+                    if params.demandeModifSite:
+                        notify = True
+                    
+                    if notify:
+                        notif = NotifsBD(
+                            typeN="Demande Modification",
+                            sourceN=f"Modification : {unForm.email.data}",
+                            lue=False,
+                            timestamp=datetime.now(),
+                            link=url_for('gerer_inscriptions', type='modification'),
+                            idAdmin=admin.id
+                        )
+                        db.session.add(notif)
+            db.session.commit()    
             return redirect(url_for('profil_view', idM=unMembre.id, origine='profil'))
     return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
-
 
 # Affiche les demandes d'inscription et de modification de profil - Réservée aux administrateurs.
 @app.route("/gerer_inscriptions/")
@@ -1921,6 +1991,29 @@ def inscription():
                 )
                 db.session.add(nouvelle_inscription)
                 db.session.commit()
+
+                # Création des notifications pour les administrateurs
+                admins = AdminBD.query.all()
+                
+                for admin in admins:
+                    params = admin.parametres_notif_admin
+                    if params:
+                        notify = False
+                        if params.demandeInscriptionSite:
+                            notify = True
+                        
+                        if notify:
+                            notif = NotifsBD(
+                                typeN="Demande Inscription",
+                                sourceN=f"Inscription : {unForm.Login.data}",
+                                lue=False,
+                                timestamp=datetime.now(),
+                                link=url_for('gerer_inscriptions', type='inscription'),
+                                idAdmin=admin.id
+                            )
+                            db.session.add(notif)
+                db.session.commit()    
+
                 return redirect(url_for('index'))
         except Exception as e:
             db.session.rollback()

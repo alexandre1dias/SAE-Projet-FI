@@ -412,7 +412,7 @@ class NotifsBD(db.Model):
     __tablename__ = 'NOTIFS'
 
     idNotifs = db.Column(db.Integer, primary_key=True)
-    typeN = db.Column(db.String(19))
+    typeN = db.Column(db.String(1255))
     sourceN = db.Column(db.String(255))
     lue = db.Column(db.Boolean)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

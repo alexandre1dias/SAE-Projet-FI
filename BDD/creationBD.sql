@@ -59,7 +59,7 @@ create table MEMBRE(
 
 create table NOTIFS(
     idNotifs integer AUTO_INCREMENT,
-    typeN varchar(19) not null,
+    typeN varchar(1255) not null,
     sourceN varchar(255) not null,
     lue boolean DEFAULT false,
     timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
