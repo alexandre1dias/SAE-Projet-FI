@@ -281,8 +281,7 @@ def get_events():
                 'extendedProps': {
                     'url': url_for('reunion_view', idReunion=event.id, origine='calendrier'),
                     'type': 'Réunion',
-                    'description': event.rapportRE,
-                    'niveaux': event.niveauRE
+                    'description': event.rapportRE
                 }
             })
     if current_user.is_authenticated:
@@ -359,11 +358,17 @@ def add_event():
                     heureDebutRE=form.start_date.data.time().strftime('%H:%M'),
                     dateFinRE=form.end_date.data.date(),
                     heureFinRE=form.end_date.data.time().strftime('%H:%M'),
-                    niveauRE=", ".join(form.level.data),
                     ville=form.ville.data,
                     adresse=form.adresse.data,
                     typeReunionRE=form.type_reunion.data if form.type_reunion.data else "Générale"
                 )
+
+                # Inscription automatique des membres du comité
+                statuts_comite = ['Président', 'Vice-président', 'Vice-Président', 'Secrétaire Général', 'Trésorier Général', 'Membre du Comité']
+                membres_comite = MembreBD.query.filter(MembreBD.statut.in_(statuts_comite)).all()
+                for membre in membres_comite:
+                    participation = ParticiperBD(id_membre=membre.id, id_event=event_id)
+                    db.session.add(participation)
             elif category == 'Evenement du club':
                 new_specific_event = EventClubBD(
                     id_event=event_id,

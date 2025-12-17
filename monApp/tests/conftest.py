@@ -2,10 +2,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from monApp.app import app as flask_app
-from monApp.app import db as _db
-from monApp.modelBD import *
-
+# On les retire pour laisser le temps à la couverture de démarrer.
 
 # ===============================================================
 # 1. Configuration Application
@@ -15,15 +12,13 @@ def app():
     """
     Configure l'application Flask pour le mode TEST.
     """
+    from monApp.app import app as flask_app
+    
     flask_app.config.update({
-        "TESTING":
-        True,
-        "WTF_CSRF_ENABLED":
-        False,
-        "SQLALCHEMY_DATABASE_URI":
-        "sqlite:///:memory:",
-        "SECRET_KEY":
-        "cle_secrete_temporaire_pour_les_tests"
+        "TESTING": True,
+        "WTF_CSRF_ENABLED": False,
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+        "SECRET_KEY": "cle_secrete_temporaire_pour_les_tests"
     })
 
     with flask_app.app_context():
@@ -38,16 +33,18 @@ def db(app):
     """
     Crée une base SQLite isolée et REMPLACE la session globale de l'app.
     """
+    from monApp.app import db as _db
+    # On importe les modèles pour s'assurer qu'ils sont connus de SQLAlchemy avant create_all
+    import monApp.modelBD 
+
     # A. Création du moteur SQLite manuel
     engine = create_engine('sqlite:///:memory:')
     connection = engine.connect()
 
     # B. Création des tables sur ce moteur SQLite
-    # Le @compiles plus haut empêche le crash sur LONGTEXT
     _db.metadata.create_all(bind=engine)
 
     # C. "HACK" : On crée une nouvelle factory de session liée à SQLite
-    # et on remplace celle de l'application par celle-ci.
     session_factory = sessionmaker(bind=connection)
     new_db_session = scoped_session(session_factory)
 
@@ -63,7 +60,7 @@ def db(app):
     connection.close()
     engine.dispose()
 
-    # On remet la session originale pour ne pas casser d'autres tests potentiels
+    # On remet la session originale
     _db.session = old_session
 
 
