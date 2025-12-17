@@ -123,7 +123,7 @@
                                         {% if notifications_list %}
                                             {% for notif in notifications_list %}
                                         <li class="position-relative border-bottom">
-                                            <a class="dropdown-item d-flex align-items-center justify-content-between pe-5" href="{{ notif.link if notif.link else '#' }}">
+                                            <a class="dropdown-item d-flex align-items-center justify-content-between pe-5" href="{{ url_for('read_notification', id_notif=notif.idNotifs) }}">
                                                 {% if not notif.lue %}
                                                 <span class="p-1 bg-primary border border-light rounded-circle" title="Non lue"></span>
                                                 {% endif %}
