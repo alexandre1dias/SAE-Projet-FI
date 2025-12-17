@@ -21,7 +21,7 @@ INSERT INTO MEMBRE (nomM, prenomM, emailM, mdpM, date_inscription, sexeM, ddnM, 
 ('Dominique', 'MARQUET', 'dom.mar@email.com', 'pbkdf2:sha256:1000000$vWV2QiPn3dN6hr4W$3dd808a8f7f2bec74b5ff34c44c0c777955e83bda1a8183a0153106e4665f9b0', '2006-01-01', 'Homme', '1974-02-07','Vice-Président', 1, NULL),-- mdp:mdp442
 ('Bernard', 'DELADERIERE', 'ber.del@email.com', 'pbkdf2:sha256:1000000$CQyHolHqSrk4qIAa$a5f22728417e72a3a9f7e79d3fe0cab81f167ab7a8fa80bd243ef8135911d6d8', '1999-01-01', 'Homme', '1976-02-07','Trésorier Général', 1, NULL),-- mdp:mdp5231
 ('Pascale', 'LHOMME', 'pas.lhm@email.com', 'pbkdf2:sha256:1000000$02eNZYjkYEzZK4zy$12b29b9fd98dfac13b9606b141587c117ee510e2cb02ac054be74ef40d2923ae', '2002-01-01', 'Femme', '1978-02-07','Secrétaire Générale', 1, NULL),-- mdp:mdp433
-('Christophe', 'LECHOPIER', 'chr.lec@email.com', 'pbkdf2:sha256:1v
+('Christophe', 'LECHOPIER', 'chr.lec@email.com', 'pbkdf2:sha256:1000000$35JA6vIpcTUyLuh7$108c8dc3dc6880c01853dcb8d2cfb99830bbaf37fe830e20fbcf99f9109bd99b', '2005-01-01', 'Homme', '1969-02-07','Membre du Comité', 1, NULL),-- mdp:mdp541
 ('Petit', 'Lucas', 'lucas.petit@email.com', 'pbkdf2:sha256:1000000$cBIfWWnFZa0AJLut$35374e4ffada5d72a3971137a11e066dca0406d5e9bfef951b390162a6ab77ab', '2024-09-05', 'Homme', '2010-06-15', 'Membre', 1, NULL),-- mdp:mdpL1
 ('Moreau', 'Chloé', 'chloe.moreau@email.com', 'pbkdf2:sha256:1000000$VUBF6WrY5IUcX9eY$7f43355adf3dae0bf457ea486e1184818baf2092b185ad5aaf29fab9985be68c', '2024-09-10', 'Femme', '2013-03-10', 'Membre', 1, NULL),-- mdp:mdpC2
 ('Garcia', 'Alice', 'alice.garcia@email.com', 'pbkdf2:sha256:1000000$XJSBBfHcblFzhkSU$dffbeb82aefc94cf5fe953bb0fc26fb92671b4d87c2b34df140d26f0a95dffaf', '2024-09-12', 'Femme', '2000-01-01', 'Membre', 1, NULL),-- mdp:mdpA3
@@ -87,6 +87,7 @@ INSERT INTO PARAMETRE_NOTIF_MEMBRE (eventInscriptionSite, evenementInscriptionMa
 (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 31),
 (1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 32),
 (1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 33);
+
 
 
 -- Mise à jour des membres pour lier leurs paramètres de notification (existants 1-3)
@@ -388,14 +389,15 @@ INSERT INTO MODIFICATION (nomModif, prenomModif, emailModif, sexeModif, ddnModif
 ('Lhomme', 'Pascale', 'pas.lhm.new@email.com', 'Femme', '1978-02-07', '2025-12-10', 7);
 
 
+
 -- Insertion des notifications (existantes)
-INSERT INTO NOTIFS (typeN, sourceN, lue, timestamp, link, idMembre, idAdmin) VALUES
-('Demande Inscription', 'Formulaire', 0, '2025-11-20 10:00:00', '/gerer_inscriptions/', NULL, 1),
-('Nouveau Résultat', 'Compétition', 0, '2025-11-21 14:30:00', '/resultat_membre/', 1, NULL),
-('Nouveau Résultat', 'Compétition', 1, '2025-11-21 14:35:00', '/resultat_membre/', 2, NULL),
-('Evenement', 'Nouvel événement : Arbre de Noël 2025', 0, '2025-12-01 09:00:00', '/evenement_club/', 1, NULL),
-('Evenement', 'Nouvel événement : Arbre de Noël 2025', 1, '2025-12-01 09:00:00', '/evenement_club/', 2, NULL),
-('Admin', 'Maintenance du site prévue le 10/11', 0, '2025-11-09 18:00:00', NULL, 1, 1);
+INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, idAdmin) VALUES
+('Demande Inscription', 'Formulaire', 0, NULL, 1),
+('Nouveau Résultat', 'Compétition', 0, 1, NULL),
+('Nouveau Résultat', 'Compétition', 1, 2, NULL),
+('Evenement', 'Nouvel événement : Arbre de Noël 2025', 0, 1, NULL),
+('Evenement', 'Nouvel événement : Arbre de Noël 2025', 1, 2, NULL),
+('Admin', 'Maintenance du site prévue le 10/11', 0, 1, 1);
 
 
 -- Tables de liaison pour les notifications (RECEVOIRA, RECEVOIRM) (existantes)
