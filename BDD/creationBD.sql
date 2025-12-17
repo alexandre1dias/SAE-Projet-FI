@@ -62,6 +62,8 @@ create table NOTIFS(
     typeN varchar(19) not null,
     sourceN varchar(255) not null,
     lue boolean DEFAULT false,
+    timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    link VARCHAR(255),
     idMembre integer,
     idAdmin integer,
     PRIMARY KEY(idNotifs)
