@@ -1018,10 +1018,6 @@ def reunion_delete(idReunion):
 def inscrire_reunion(idReunion):
     reunion_objet = ReunionBD.query.get_or_404(idReunion)
     id_evenement_a_inscrire = reunion_objet.idEvent
-    deja_inscrit = ParticiperBD.query.filter_by(
-        id_membre=current_user.id,
-        id_event=id_evenement_a_inscrire
-    ).first()
     try:
         nouvelle_participation = ParticiperBD(id_membre=current_user.id,
                                                 id_event=id_evenement_a_inscrire)
@@ -1029,6 +1025,7 @@ def inscrire_reunion(idReunion):
         db.session.commit()
     except Exception as e:
         db.session.rollback()
+        
     return redirect(url_for('reunion'))
 
 # Vue de désinscription d'une réunion - Réservée aux membres du comité et aux admins.
