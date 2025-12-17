@@ -1469,6 +1469,7 @@ def profil_edit(idM):
             uneModif.email = unForm.email.data
             uneModif.sexe = unForm.sexe.data
             uneModif.ddn = unForm.ddn.data
+            uneModif.numTel = unForm.numTel.data
             uneModif.date = datetime.now()
             uneModif.justification = unForm.justification.data
             db.session.commit()
@@ -1508,6 +1509,7 @@ def accepter_inscription(idI):
         email=inscription.email,
         ddn=inscription.ddn,
         sexe=inscription.sexe,
+        numTel=inscription.numTel,
         mdp_hash=inscription.mdp_hash
     )
     db.session.add(nouveauMembre)
@@ -1547,6 +1549,7 @@ def accepter_modifications(idModif):
         membre_a_modifier.email = modifications.email
         membre_a_modifier.ddn = modifications.ddn
         membre_a_modifier.sexe = modifications.sexe
+        membre_a_modifier.numTel = modifications.numTel
         db.session.delete(modifications)
         db.session.commit()
     return redirect(url_for('gerer_inscriptions'))
@@ -1841,6 +1844,7 @@ def inscription():
                     email=unForm.Login.data,
                     ddn=unForm.date_naissance.data,
                     sexe=unForm.sexe.data,
+                    numTel=unForm.numTel.data,
                     mdp_hash=generate_password_hash(unForm.password.data, method='pbkdf2:sha256')
                 )
                 db.session.add(nouveauMembre)
@@ -1872,6 +1876,7 @@ def inscription():
                     prenom=unForm.prenom.data,
                     ddn=unForm.date_naissance.data,
                     sexe=unForm.sexe.data,
+                    numTel=unForm.numTel.data,
                     mdp_hash= generate_password_hash(unForm.password.data,method='pbkdf2:sha256'),
                     date=datetime.now().date()
                 )

@@ -54,6 +54,7 @@ create table MEMBRE(
     statut varchar(30) DEFAULT "Membre",
     activite boolean DEFAULT True,
     idParamNotifMembre integer,
+    numTel varchar(20),
     PRIMARY KEY(idMembre)
 );
 
@@ -115,6 +116,7 @@ create table INSCRIPTION(
     mdpI varchar(256) not null,
     sexeI varchar(5) not null,
     dateInscription date not null,
+    numTelI varchar(20),
     PRIMARY KEY(idInscription)
 );
 
@@ -126,6 +128,7 @@ create table MODIFICATION(
     emailModif varchar(100),
     sexeModif varchar(5),
     ddnModif date,
+    numTelModif varchar(20),
     dateModif date,
     justificationModif varchar(500),
     idMembre integer,
