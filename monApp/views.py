@@ -392,9 +392,7 @@ def add_event():
             db.session.commit()
             return redirect(url_for('calendrier'))
         except Exception as e:
-            print(f"ERREUR SQL/CODE : {e}")  # AJOUT POUR DEBUG
-    else:
-        print(f"ERREUR FORMULAIRE : {form.errors}")
+            db.session.rollback()
     return render_template("add_event.html", title=TITLE + "- Ajouter un événement", form=form)
 
 #================================================================#
