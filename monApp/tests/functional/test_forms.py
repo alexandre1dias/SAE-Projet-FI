@@ -224,7 +224,7 @@ def test_contact_form(app, db):
 def test_filtre_form(app):
     """Test FiltreForm."""
     with app.test_request_context():
-        form = FiltreForm(formdata=MultiDict({'sexe': ['homme']}))
+        form = FiltreForm(formdata=MultiDict({'sexe': ['Homme']}))
         assert form.validate() is True
 
 def test_horaire_form(app, db):

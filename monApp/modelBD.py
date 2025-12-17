@@ -70,7 +70,6 @@ class ReunionBD(UserMixin, db.Model):
     nbParticipantsRE = db.Column(db.Integer)
     typeReunionRE = db.Column(db.String(15))
     rapportRE = db.Column(db.String(200))
-    niveauRE = db.Column(db.String(15)) 
     idEvent = db.Column(db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
     evenement = db.relationship('EvenementBD', backref=db.backref('reunions', lazy=True))
 

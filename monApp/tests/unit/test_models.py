@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from monApp.modelBD import *
 
 # ==============================================================================
@@ -313,3 +313,116 @@ def test_image_app(app, db):
     db.session.commit()
     
     assert ImageAppBD.query.filter_by(alt='Logo').first() is not None
+
+# ==============================================================================
+# 7. TEST NOTIFICATION
+# ==============================================================================
+
+def test_notification(app, db):
+    """Test NOTIFICATION."""
+    # Création d'un timestamp propre avec datetime
+    ts = datetime(2025, 11, 20, 10, 0, 0)
+    
+    notif = NotifsBD(
+        typeN='modification',
+        sourceN='Test Source',
+        lue=False,
+        timestamp=ts,
+        link='http://test.com/modif/1'
+    )
+    db.session.add(notif)
+    db.session.commit()
+
+    saved_notif = NotifsBD.query.first()
+    assert saved_notif is not None
+    assert saved_notif.typeN == 'modification'
+    assert saved_notif.lue is False
+    assert saved_notif.timestamp == ts
+
+# ==============================================================================
+# 8. TEST RELATIONS MANY-TO-MANY (IMAGES)
+# ==============================================================================
+
+def test_relation_image_competition(app, db):
+    """Test Many-to-Many entre COMPETITION et IMAGEAPP."""
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.flush()
+
+    comp = CompetitionBD(id_event=evt.id, nom="Compétition Photo")
+    img_comp = ImageAppBD(urlI="test_comp.jpg", alt="Test")
+    
+    # Ajout via la relation
+    comp.images_rc.append(img_comp)
+    db.session.add(comp)
+    db.session.add(img_comp)
+    db.session.commit()
+
+    assert len(comp.images_rc) == 1
+    assert comp.images_rc[0].urlI == "test_comp.jpg"
+
+def test_relation_image_event_club(app, db):
+    """Test Many-to-Many entre EVENTCLUB et IMAGEAPP."""
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.flush()
+
+    club = EventClubBD(id_event=evt.id, NomEV="Club Photo")
+    img_club = ImageAppBD(urlI="test_club.jpg", alt="TestClub")
+    
+    # Ajout via la relation
+    club.images_re.append(img_club)
+    db.session.add(club)
+    db.session.add(img_club)
+    db.session.commit()
+
+    assert len(club.images_re) == 1
+    assert club.images_re[0].urlI == "test_club.jpg"
+
+# ==============================================================================
+# 9. TEST TABLES ASSOCIATION & NOTIFICATIONS AVANCÉES
+# ==============================================================================
+
+def test_tables_liaison_notification(app, db):
+    """
+    Test technique pour valider l'existence des tables 'recevoir_a' et 'recevoir_m'.
+    Ces tables n'ont pas de relation directe mappée dans NotifsBD, on teste donc 
+    l'insertion brute pour garantir la couverture du code SQLAlchmey.
+    """
+    notif = NotifsBD(typeN="Test Liaison", timestamp=datetime.now(), lue=False)
+    admin = AdminBD(email="admin_liaison@test.fr", mdp_hash="pass")
+    membre = MembreBD(email="membre_liaison@test.fr", mdp_hash="pass")
+    
+    db.session.add_all([notif, admin, membre])
+    db.session.commit()
+
+    # Insertion directe dans les tables de liaison définies dans modelBD.py
+    ins_a = recevoir_a.insert().values(idNotifs=notif.idNotifs, idAdmin=admin.id)
+    ins_m = recevoir_m.insert().values(idNotifs=notif.idNotifs, idMembre=membre.id)
+    
+    db.session.execute(ins_a)
+    db.session.execute(ins_m)
+    db.session.commit()
+
+    # Si aucune erreur n'est levée, les tables existent et sont fonctionnelles.
+    assert True
+
+def test_notification_fk_users(app, db):
+    """Test des clés étrangères idAdmin et idMembre dans NOTIFS."""
+    admin = AdminBD(email="admin_fk@test.fr", mdp_hash="pass")
+    membre = MembreBD(email="membre_fk@test.fr", mdp_hash="pass")
+    db.session.add_all([admin, membre])
+    db.session.flush()
+
+    notif_complete = NotifsBD(
+        typeN="Info FK", 
+        timestamp=datetime.now(),
+        lue=True, 
+        idAdmin=admin.id,
+        idMembre=membre.id
+    )
+    db.session.add(notif_complete)
+    db.session.commit()
+    
+    assert notif_complete.idAdmin == admin.id
+    assert notif_complete.idMembre == membre.id
