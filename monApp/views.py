@@ -362,6 +362,13 @@ def add_event():
                     adresse=form.adresse.data,
                     typeReunionRE=form.type_reunion.data if form.type_reunion.data else "Générale"
                 )
+
+                # Inscription automatique des membres du comité
+                statuts_comite = ['Président', 'Vice-président', 'Vice-Président', 'Secrétaire Général', 'Trésorier Général', 'Membre du Comité']
+                membres_comite = MembreBD.query.filter(MembreBD.statut.in_(statuts_comite)).all()
+                for membre in membres_comite:
+                    participation = ParticiperBD(id_membre=membre.id, id_event=event_id)
+                    db.session.add(participation)
             elif category == 'Evenement du club':
                 new_specific_event = EventClubBD(
                     id_event=event_id,
