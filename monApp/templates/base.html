@@ -117,15 +117,15 @@
                                             <span class="visually-hidden">notifications non lues</span>
                                         </span>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end notifs-scroll" aria-labelledby="notificationDropdown" style="width: 1390%; max-height: 1500%; overflow-y: auto;">
+                                    <ul class="dropdown-menu dropdown-menu-end notifs-scroll" aria-labelledby="notificationDropdown" style="width: 900%; max-height: 1100%; overflow-y: auto;">
                                         <li><h6 class="dropdown-header">Notifications</h6></li>
                                         
                                         {% if notifications_list %}
                                             {% for notif in notifications_list %}
                                         <li class="position-relative border-bottom">
-                                            <a class="dropdown-item d-flex align-items-center justify-content-between pe-5" href="{{ url_for('read_notification', id_notif=notif.idNotifs) }}">
+                                            <a class="dropdown-item d-flex align-items-center pe-5" href="{{ url_for('read_notification', id_notif=notif.idNotifs) }}">
                                                 {% if not notif.lue %}
-                                                <span class="p-1 bg-primary border border-light rounded-circle" title="Non lue"></span>
+                                                <span class="p-1 bg-primary border border-light rounded-circle me-2" title="Non lue"></span>
                                                 {% endif %}
                                                 <div>
                                                     <p class="mb-0 {{ 'notif-new' if not notif.lue else '' }}">{{ notif.typeN }} : {{ notif.sourceN }}</p>
