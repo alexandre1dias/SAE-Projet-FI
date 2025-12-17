@@ -4,6 +4,7 @@ from wtforms import StringField, HiddenField, PasswordField, SubmitField, Intege
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 from datetime import date
 from flask_wtf.file import FileField, FileAllowed
+import phonenumbers
 
 class LoginForm(FlaskForm):
     email = StringField ('Email' ,validators= [DataRequired(), Email()])
@@ -39,6 +40,7 @@ class ModifForm(FlaskForm):
         ('Femme', 'Femme')
     ], validators=[DataRequired()])
     email = StringField ('Email' ,validators= [DataRequired(), Email()])
+    numTel = StringField('Numéro de téléphone (optionnel)', validators=[Optional()])
     statut = SelectField('Statut', choices=[
         ('Membre', 'Membre'),
         ('Membre du comité', 'Membre du comité'),
@@ -48,6 +50,17 @@ class ModifForm(FlaskForm):
         ('Président', 'Président')
     ], validators=[DataRequired()]) 
     justification = TextAreaField('Justification de la demande (optionnel)', validators=[Optional()])
+
+    def validate_numTel(self, field):
+        if field.data:
+            try:
+                phone = phonenumbers.parse(field.data, "FR")
+                if not phonenumbers.is_valid_number(phone):
+                    raise ValidationError('Numéro de téléphone invalide.')
+                # conversion au format INTERNATIONAL pour stockage String (ex: +33 6 12 34 56 78)
+                field.data = phonenumbers.format_number(phone, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+            except phonenumbers.NumberParseException:
+                raise ValidationError('Numéro de téléphone invalide.')
 
 class InscriptionForm(FlaskForm):
     # cette fonction permet de vérifier que l'utilisateur a au moins 8 ans
@@ -76,10 +89,22 @@ class InscriptionForm(FlaskForm):
     prenom = StringField ('prenom' ,validators= [DataRequired()])
     date_naissance = DateField ('date de naissance' , format='%Y-%m-%d', validators=[DataRequired(), validate_age])
     sexe = SelectField ('sexe' , choices=[('Homme', 'Homme'), ('Femme', 'Femme')], validators=[DataRequired()])
+    numTel = StringField('Numéro de téléphone (optionnel)', validators=[Optional()])
     password = PasswordField ('Mot de passe', validators=[DataRequired()])
     confirm_password = PasswordField ('Confirmer mot de passe', validators=[DataRequired()])
     next = HiddenField()
     inscription = SubmitField()
+
+    def validate_numTel(self, field):
+        if field.data:
+            try:
+                phone = phonenumbers.parse(field.data, "FR")
+                if not phonenumbers.is_valid_number(phone):
+                    raise ValidationError('Numéro de téléphone invalide.')
+                # conversion au format INTERNATIONAL pour stockage String (ex: +33 6 12 34 56 78)
+                field.data = phonenumbers.format_number(phone, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+            except phonenumbers.NumberParseException:
+                raise ValidationError('Numéro de téléphone invalide.')
 
 class ContactForm(FlaskForm):
     type_form = RadioField('Type de formulaire', choices=[
