@@ -104,6 +104,50 @@ mail = Mail(app)
 # source : https://stackoverflow.com/questions/34043847/forcing-itsdangerous-urlsafetimedserializer-to-give-old-signature
 s = URLSafeTimedSerializer(app.config.get('SECRET_KEY', 'default-secret-key'))
 
+# Injecter les notifications dans tous les templates
+@app.context_processor
+def inject_notifications():
+    unread_count = 0
+    notifications_list = []
+    if current_user.is_authenticated:
+        user_type = session.get('user_type')
+        if user_type == 'membre':
+            query = NotifsBD.query.filter_by(idMembre=current_user.id)
+        elif user_type == 'admin':
+            query = NotifsBD.query.filter_by(idAdmin=current_user.id)
+        else:
+            query = None
+            
+        if query:
+            unread_count = query.filter_by(lue=False).count()
+            notifications_list = query.order_by(NotifsBD.timestamp.desc()).limit(10).all()
+            
+    return dict(unread_count=unread_count, notifications_list=notifications_list)
+
+# Route pour supprimer une notification
+@app.route("/delete_notification/<int:id_notif>", methods=['POST'])
+@login_required
+def delete_notification(id_notif):
+    notif = NotifsBD.query.get_or_404(id_notif)
+    # Vérification que la notif appartient bien à l'utilisateur connecté
+    if session.get('user_type') == 'membre':
+        if notif.idMembre != current_user.id:
+            abort(403)
+    elif session.get('user_type') == 'admin':
+        if notif.idAdmin != current_user.id:
+            abort(403)
+    else:
+        abort(403)
+
+    # Supprimer les dépendances dans les tables de liaison avant de supprimer la notification
+    # Cela évite l'erreur IntegrityError car la cascade n'est pas configurée en SQL
+    db.session.execute(recevoir_a.delete().where(recevoir_a.c.idNotifs == id_notif))
+    db.session.execute(recevoir_m.delete().where(recevoir_m.c.idNotifs == id_notif))
+
+    db.session.delete(notif)
+    db.session.commit()
+    return redirect(request.referrer or url_for('index'))
+
 #==========================================================#
 #====================   Page Accueil   ====================#
 #==========================================================#

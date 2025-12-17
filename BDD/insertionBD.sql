@@ -380,13 +380,13 @@ INSERT INTO MODIFICATION (nomModif, prenomModif, emailModif, sexeModif, ddnModif
 
 
 -- Insertion des notifications (existantes)
-INSERT INTO NOTIFS (typeN, sourceN, lue, idMembre, idAdmin) VALUES
-('Demande Inscription', 'Formulaire', 0, NULL, 1),
-('Nouveau Résultat', 'Compétition', 0, 1, NULL),
-('Nouveau Résultat', 'Compétition', 1, 2, NULL),
-('Evenement', 'Nouvel événement : Arbre de Noël 2025', 0, 1, NULL),
-('Evenement', 'Nouvel événement : Arbre de Noël 2025', 1, 2, NULL),
-('Admin', 'Maintenance du site prévue le 10/11', 0, 1, 1);
+INSERT INTO NOTIFS (typeN, sourceN, lue, timestamp, link, idMembre, idAdmin) VALUES
+('Demande Inscription', 'Formulaire', 0, '2025-11-20 10:00:00', '/gerer_inscriptions/', NULL, 1),
+('Nouveau Résultat', 'Compétition', 0, '2025-11-21 14:30:00', '/resultat_membre/', 1, NULL),
+('Nouveau Résultat', 'Compétition', 1, '2025-11-21 14:35:00', '/resultat_membre/', 2, NULL),
+('Evenement', 'Nouvel événement : Arbre de Noël 2025', 0, '2025-12-01 09:00:00', '/evenement_club/', 1, NULL),
+('Evenement', 'Nouvel événement : Arbre de Noël 2025', 1, '2025-12-01 09:00:00', '/evenement_club/', 2, NULL),
+('Admin', 'Maintenance du site prévue le 10/11', 0, '2025-11-09 18:00:00', NULL, 1, 1);
 
 
 -- Tables de liaison pour les notifications (RECEVOIRA, RECEVOIRM) (existantes)
