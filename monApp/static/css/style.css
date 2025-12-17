@@ -484,6 +484,7 @@ body {
     text-align: center; /* Pour centrer le texte */
     text-decoration: none; /* Pour enlever le soulignement du lien */
 }
+
 .btn-inscription:hover {
     background: #000000;
     color: white;
@@ -760,6 +761,13 @@ body.dark-mode {
     color: #fefefe;
 }
 
+
+body.dark-mode .list-group-item {
+    background-color: #1c1c1e;
+    color: #fefefe;
+    border-color: #555;
+}
+
 body.dark-mode nav {
     background-color: #8b1f1f !important;
 }
@@ -773,7 +781,7 @@ body.dark-mode nav .nav-link.active {
     font-weight: bold;
 }
 
-body.dark-mode h1,h2,h3,h4 {
+body.dark-mode h1,h2,h3,h4,h5,h6 {
     color: whitesmoke;
 }
 
@@ -808,6 +816,26 @@ body.dark-mode .form-control {
     background-color: #3a3a3c;
     color: #fefefe;
     border-color: #555;
+}
+
+body.dark-mode .btn-inscription {
+    background-color: #3a3a3c;
+    color: #fefefe;
+}
+
+body.dark-mode .card-body,
+body.dark-mode .card-title,
+body.dark-mode .card-text { 
+    color: #fefefe;
+}
+
+body.dark-mode .text-muted {
+    color: #aaa !important;
+}
+
+body.dark-mode .btn-connecter {
+    background-color: #3a3a3c;
+    color: #fefefe;
 }
 
 body.dark-mode img {
@@ -940,9 +968,16 @@ body.dark-mode .form-check-label {
     color: #fefefe;
 }
 
+body.dark-mode .filtres-titre {
+    color: #fefefe;
+    border-bottom-color: #555;
+}
+
 body.dark-mode .fc {
     color: #fefefe;
 }
+
+body.dark-mode h3
 
 body.dark-mode .fc-theme-standard td,
 body.dark-mode .fc-theme-standard th {
@@ -1091,6 +1126,11 @@ body.dark-mode .form-check-label {
     color: #fefefe;
 }
 
+body.dark-mode .filtres-titre {
+    color: #fefefe;
+    border-bottom-color: #555;
+}
+
 body.dark-mode .fc {
     color: #fefefe;
 }
@@ -1132,6 +1172,20 @@ body.dark-mode .fc-daygrid-day {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+body.dark-mode .filtres-box {
+    background-color: #2c2c2e;
+    color: #fefefe;
+}
+
+body.dark-mode .filtres-box h5 {
+    color: #fefefe;
+    border-bottom-color: #555;
+}
+
+body.dark-mode .filtres-box .form-check-label {
+    color: #fefefe;
 }
 
 .filtres-box h5 {
