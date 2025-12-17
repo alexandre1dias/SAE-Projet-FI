@@ -171,19 +171,19 @@ INSERT INTO ENTRAINEMENT (jourEN, villeEN, adresseEN, dateEN, heureDebutEN, heur
 
 
 -- Insertion des réunions (existante)
-INSERT INTO REUNION (nomRE, villeRE, adresseRE, dateDebutRE, heureDebutRE, dateFinRE, heureFinRE, nbParticipantsRE, typeReunionRE, rapportRE, niveauRE, idEvent) VALUES
-('AG Annuelle', 'Blois', '5 rue de la salle', '2024-09-05', '19:00', '2024-09-05', '21:00', 10050, 'Assemblée', 'Rapport annuel des activités et finances.', 'Tous', 4),
-('Réunion Comité Directeur', 'Orléans', 'Salle du Club', '2025-11-15', '20:00', '2025-11-15', '22:00', 8, 'Comité', 'Préparation budget 2026 et calendrier.', 'Comité', 33),
-('Réunion Bénévoles Fête du Club', 'Orléans', 'Salle du Club', '2024-06-20', '19:00', '2024-06-20', '20:00', 15, 'Organisation', 'Répartition des tâches pour la fête du 6 juillet.', 'Tous', 34),
-('Réunion Entraîneurs', 'Orléans', 'Stade Omnisports', '2024-09-10', '18:30', '2024-09-10', '20:30', 12, 'Technique', 'Mise au point planning entraînements.', 'Coachs', 35),
-('Commission Sponsoring', 'Blois', '5 rue de la salle', '2025-01-20', '19:30', '2025-01-20', '21:30', 5, 'Finance', 'Recherche de nouveaux partenaires 2025.', 'Comité', 36),
-('Réunion Parents U15', 'Orléans', 'Salle du Club', '2024-09-15', '18:00', '2024-09-15', '19:30', 45, 'Information', 'Présentation de la saison et déplacements.', 'Tous', 37),
-('Bilan Mi-Saison', 'Orléans', 'Salle du Club', '2025-02-10', '20:00', '2025-02-10', '22:00', 10, 'Comité', 'Analyse des résultats sportifs intermédiaires.', 'Comité', 38),
-('Préparation Tournoi Printemps', 'Blois', 'Centre Sportif', '2025-03-05', '19:00', '2025-03-05', '20:30', 8, 'Organisation', 'Logistique et réservation des arbitres.', 'Bénévoles', 39),
-('Vœux du Président', 'Orléans', 'Salle des Fêtes', '2026-01-10', '19:00', '2026-01-10', '22:00', 120, 'Cérémonie', 'Présentation des vœux et galette des rois.', 'Tous', 40),
-('Point Budget Prévisionnel', 'Blois', '5 rue de la salle', '2026-02-15', '18:30', '2026-02-15', '20:30', 6, 'Finance', 'Ajustement du budget pour la fin de saison.', 'Comité', 41),
-('Réunion Fin de Saison', 'Orléans', 'Salle du Club', '2026-05-20', '19:30', '2026-05-20', '21:00', 30, 'Organisation', 'Organisation du barbecue de fin d''année.', 'Bénévoles', 42),
-('Assemblée Générale Extraordinaire', 'Orléans', 'Stade Omnisports', '2026-06-15', '20:00', '2026-06-15', '22:30', 90, 'Assemblée', 'Vote pour le changement de statuts du club.', 'Tous', 43);
+INSERT INTO REUNION (nomRE, villeRE, adresseRE, dateDebutRE, heureDebutRE, dateFinRE, heureFinRE, nbParticipantsRE, typeReunionRE, rapportRE, idEvent) VALUES
+('AG Annuelle', 'Blois', '5 rue de la salle', '2024-09-05', '19:00', '2024-09-05', '21:00', 10050, 'Assemblée', 'Rapport annuel des activités et finances.', 4),
+('Réunion Comité Directeur', 'Orléans', 'Salle du Club', '2025-11-15', '20:00', '2025-11-15', '22:00', 8, 'Comité', 'Préparation budget 2026 et calendrier.', 33),
+('Réunion Bénévoles Fête du Club', 'Orléans', 'Salle du Club', '2024-06-20', '19:00', '2024-06-20', '20:00', 15, 'Organisation', 'Répartition des tâches pour la fête du 6 juillet.', 34),
+('Réunion Entraîneurs', 'Orléans', 'Stade Omnisports', '2024-09-10', '18:30', '2024-09-10', '20:30', 12, 'Technique', 'Mise au point planning entraînements.', 35),
+('Commission Sponsoring', 'Blois', '5 rue de la salle', '2025-01-20', '19:30', '2025-01-20', '21:30', 5, 'Finance', 'Recherche de nouveaux partenaires 2025.', 36),
+('Réunion Parents U15', 'Orléans', 'Salle du Club', '2024-09-15', '18:00', '2024-09-15', '19:30', 45, 'Information', 'Présentation de la saison et déplacements.', 37),
+('Bilan Mi-Saison', 'Orléans', 'Salle du Club', '2025-02-10', '20:00', '2025-02-10', '22:00', 10, 'Comité', 'Analyse des résultats sportifs intermédiaires.', 38),
+('Préparation Tournoi Printemps', 'Blois', 'Centre Sportif', '2025-03-05', '19:00', '2025-03-05', '20:30', 8, 'Organisation', 'Logistique et réservation des arbitres.', 39),
+('Vœux du Président', 'Orléans', 'Salle des Fêtes', '2026-01-10', '19:00', '2026-01-10', '22:00', 120, 'Cérémonie', 'Présentation des vœux et galette des rois.', 40),
+('Point Budget Prévisionnel', 'Blois', '5 rue de la salle', '2026-02-15', '18:30', '2026-02-15', '20:30', 6, 'Finance', 'Ajustement du budget pour la fin de saison.', 41),
+('Réunion Fin de Saison', 'Orléans', 'Salle du Club', '2026-05-20', '19:30', '2026-05-20', '21:00', 30, 'Organisation', 'Organisation du barbecue de fin d''année.', 42),
+('Assemblée Générale Extraordinaire', 'Orléans', 'Stade Omnisports', '2026-06-15', '20:00', '2026-06-15', '22:30', 90, 'Assemblée', 'Vote pour le changement de statuts du club.', 43);
 
 
 -- Insertion des événements de club (existants)

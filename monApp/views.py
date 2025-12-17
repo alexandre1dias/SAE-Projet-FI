@@ -281,8 +281,7 @@ def get_events():
                 'extendedProps': {
                     'url': url_for('reunion_view', idReunion=event.id, origine='calendrier'),
                     'type': 'Réunion',
-                    'description': event.rapportRE,
-                    'niveaux': event.niveauRE
+                    'description': event.rapportRE
                 }
             })
     if current_user.is_authenticated:
@@ -359,7 +358,6 @@ def add_event():
                     heureDebutRE=form.start_date.data.time().strftime('%H:%M'),
                     dateFinRE=form.end_date.data.date(),
                     heureFinRE=form.end_date.data.time().strftime('%H:%M'),
-                    niveauRE=", ".join(form.level.data),
                     ville=form.ville.data,
                     adresse=form.adresse.data,
                     typeReunionRE=form.type_reunion.data if form.type_reunion.data else "Générale"
@@ -394,7 +392,9 @@ def add_event():
             db.session.commit()
             return redirect(url_for('calendrier'))
         except Exception as e:
-            db.session.rollback()
+            print(f"ERREUR SQL/CODE : {e}")  # AJOUT POUR DEBUG
+    else:
+        print(f"ERREUR FORMULAIRE : {form.errors}")
     return render_template("add_event.html", title=TITLE + "- Ajouter un événement", form=form)
 
 #================================================================#

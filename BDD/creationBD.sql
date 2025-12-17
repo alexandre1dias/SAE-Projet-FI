@@ -179,7 +179,6 @@ create table REUNION(
     nbParticipantsRE integer,
     typeReunionRE varchar(64) not null,
     rapportRE varchar(200),
-    niveauRE varchar(45),
     idEvent integer,
     PRIMARY KEY(idReunion)
 
