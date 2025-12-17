@@ -804,6 +804,19 @@ body.dark-mode .dropdown-item:focus {
     color: #fefefe;
 }
 
+body.dark-mode .modal-content {
+    background-color: #2c2c2e;
+    color: #fefefe;
+}
+
+body.dark-mode .modal-header {
+    border-bottom-color: #555;
+}
+
+body.dark-mode .modal-footer {
+    border-top-color: #555;
+}
+
 body.dark-mode .parametres-container,
 body.dark-mode .contact-container,
 body.dark-mode .card {
