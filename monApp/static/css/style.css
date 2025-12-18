@@ -992,16 +992,6 @@ body.dark-mode .fc-daygrid-day {
     background-color: #2c2c2e;
 }
 
-/* Proportions des colonnes */
-@media (min-width: 992px) {
-    .col-lg-3 {
-        max-width: 23%;
-    }
-    
-    .col-lg-9 {
-        max-width: 77%;
-    }
-}
 /* CSS Calendrier */
 
 .calendrier-section {
@@ -1148,16 +1138,6 @@ body.dark-mode .fc-daygrid-day {
     background-color: #2c2c2e;
 }
 
-/* Proportions des colonnes */
-@media (min-width: 992px) {
-    .col-lg-3 {
-        max-width: 23%;
-    }
-    
-    .col-lg-9 {
-        max-width: 77%;
-    }
-}
 
 /* Rendre les filtres "sticky" sur les écrans de taille moyenne et plus */
 @media (min-width: 768px) { /* Applique à partir de la taille "md" de Bootstrap */
@@ -1216,8 +1196,10 @@ body.dark-mode .filtres-box .form-check-label {
 /* Container des cartes */
 .competitions-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
+    justify-content: center;
+    width: 100%;
 }
 
 /* Ou si vous utilisez déjà Bootstrap row/col */
@@ -1253,12 +1235,11 @@ body.dark-mode .filtres-box .form-check-label {
 
 /* Permet à la section de s'étendre sur toute la largeur */
 .competitions-section {
-    width: 80vw;
-    position: relative;
-    left: 55%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
+    width: 100%;
+    position: static !important;
+    margin: 0 !important;
+    left: auto !important;
+    display: block !important;
 }
 
 /* pour les bordures dans l'acceuil */ 
