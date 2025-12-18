@@ -1205,12 +1205,17 @@ def add_presse():
             dateP=now.date(),
             heureP=now.strftime('%H:%M')
         )
-        try:
-            db.session.add(nouveau_presse)
+        db.session.add(nouveau_presse)
+        db.session.commit()
+        if form.image.data:
+            file = form.image.data
+            filename = secure_filename(file.filename)
+            dossier_presse = os.path.join(app.root_path, 'static', 'images', 'presse', str(nouveau_presse.idPresse))
+            os.makedirs(dossier_presse, exist_ok=True)
+            file.save(os.path.join(dossier_presse, filename))
+            nouveau_presse.imageP = filename
             db.session.commit()
-            return redirect(url_for('presse'))
-        except Exception as e:
-            db.session.rollback()
+        return redirect(url_for('presse'))
     return render_template("admin_form_presse.html", title="Ajouter un article de presse", form=form)
 
 @app.route("/admin/edit_presse/<int:idP>", methods=["GET", "POST"])
@@ -1220,7 +1225,6 @@ def edit_presse(idP):
     article_presse = PresseBD.query.get_or_404(idP)
     form = PresseForm()
     if request.method == 'GET':
-        # Pré-remplissage du formulaire
         form.titre.data = article_presse.titreP
         form.contenu.data = article_presse.contenuP
         form.lien.data = article_presse.lienP
@@ -1228,11 +1232,19 @@ def edit_presse(idP):
         article_presse.titreP = form.titre.data
         article_presse.contenuP = form.contenu.data
         article_presse.lienP = form.lien.data
-        try:
-            db.session.commit()
-            return redirect(url_for('presse'))
-        except Exception as e:
-            db.session.rollback()
+        if form.image.data:
+            file = form.image.data
+            filename = secure_filename(file.filename)
+            dossier_presse = os.path.join(app.root_path, 'static', 'images', 'presse', str(article_presse.idPresse))
+            os.makedirs(dossier_presse, exist_ok=True)
+            if article_presse.imageP:
+                ancien_chemin = os.path.join(dossier_presse, article_presse.imageP)
+                if os.path.exists(ancien_chemin):
+                    os.remove(ancien_chemin)
+            file.save(os.path.join(dossier_presse, filename))
+            article_presse.imageP = filename
+        db.session.commit()
+        return redirect(url_for('presse'))
     return render_template("admin_form_presse.html", title="Modifier l'article de presse", form=form)
 
 @app.route("/admin/delete_presse/<int:idP>", methods=["POST"])
@@ -1240,6 +1252,9 @@ def edit_presse(idP):
 @admin_required
 def delete_presse(idP):
     article_presse = PresseBD.query.get_or_404(idP)
+    dossier_presse = os.path.join(app.root_path, 'static', 'images', 'presse', str(article_presse.idPresse))
+    if os.path.exists(dossier_presse):
+        shutil.rmtree(dossier_presse)
     try:
         db.session.delete(article_presse)
         db.session.commit()

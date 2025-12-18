@@ -319,7 +319,7 @@ class ArticleForm(FlaskForm):
     titre = StringField('Titre de l\'article', validators=[DataRequired()])
     contenu = TextAreaField('Contenu complet', validators=[DataRequired()], render_kw={"rows": 10})
     images = MultipleFileField('Ajouter des photos', validators=[
-        FileAllowed(['jpg', 'png', 'jpeg'], 'Images seulement !')
+        FileAllowed(['jpg', 'png', 'jpeg', 'webp'], 'Images seulement !')
     ])
     submit = SubmitField('Publier l\'article')
 
@@ -327,4 +327,7 @@ class PresseForm(FlaskForm):
     titre = StringField('Titre de l\'article', validators=[DataRequired()])
     contenu = TextAreaField('Description / Contenu', validators=[DataRequired()], render_kw={"rows": 5})
     lien = StringField('Lien vers la source (URL)', validators=[DataRequired()])
+    image = FileField('Image de l\'article', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg', 'webp'], 'Images seulement !')
+    ])
     submit = SubmitField('Publier')

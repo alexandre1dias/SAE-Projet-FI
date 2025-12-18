@@ -8,8 +8,13 @@
             
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <form method="POST">
+                    <form method="POST" enctype="multipart/form-data">
                         {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.image.label(class="form-label") }}
+                            {{ form.image(class="form-control") }}
+                        </div>
 
                         <div class="mb-3">
                             {{ form.titre.label(class="form-label fw-bold") }}
