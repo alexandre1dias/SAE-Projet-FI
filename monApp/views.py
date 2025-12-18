@@ -234,88 +234,119 @@ def escrime_feminin():
 # Affiche le calendrier interactif des événements.
 @app.route("/calendrier/")
 def calendrier():
-    return render_template("calendrier.html", title=TITLE+"- Calendrier")
+    filtre = FiltreForm(request.args if request.args else None)
+    return render_template("calendrier.html", title=TITLE+"- Calendrier", filtre=filtre)
 
 # API pour fournir les données des événements au calendrier FullCalendar.
 @app.route('/api/events')
 def get_events():
-    all_events = []
-    query_comp = CompetitionBD.query.filter(db.or_(CompetitionBD.passee == False, CompetitionBD.passee == None))
-    for event in query_comp.all():
-        all_events.append({
-            'id': f"comp_{event.id}",
-            'title': event.nom,
-            'start': f"{event.date_debut.isoformat()}T{event.heure_debut}",
-            'end': f"{event.date_fin.isoformat()}T{event.heure_fin}",
-            'color': '#007bff',
-            'extendedProps': {
-                'url': url_for('competition_view', idCompetition=event.id, origine='calendrier'),
-                'type': 'Compétition',
-                'description': event.description,
-                'niveaux': event.niveaux,
-                'arme': event.type_arme
-            }
-        })
-    voir_reunions = False
-    if current_user.is_authenticated:
-        # On utilise isinstance pour être sûr du type d'objet
-        if isinstance(current_user, AdminBD):
-            voir_reunions = True
-        elif isinstance(current_user, MembreBD):
-            statuts_comite = [
-                'Président', 'Vice-président', 'Vice-Président',
-                'Secrétaire Général', 'Trésorier Général', 'Membre du Comité'
-            ]
-            if current_user.statut in statuts_comite:
-                voir_reunions = True
+    sexes = request.args.getlist('sexe')
+    niveaux = request.args.getlist('niveau')
+    armes = request.args.getlist('armes')
+    type_competition = request.args.getlist('type_competition')
+    types_event = request.args.getlist('type_event')
 
-    # Si l'utilisateur a les droits, on ajoute les réunions
-    if voir_reunions:
-        for event in ReunionBD.query.all():
+    
+
+    all_events = []
+
+    #Compétitions
+    if not types_event or 'Compétition' in types_event:
+        query_comp = CompetitionBD.query
+
+        if armes:
+            query_comp = query_comp.filter(CompetitionBD.type_arme.in_(armes))
+        if sexes:
+            query_comp = query_comp.filter(CompetitionBD.sexe.in_(sexes))
+        if type_competition:
+            query_comp = query_comp.filter(CompetitionBD.typeComp.in_(type_competition))
+        if niveaux:
+            query_comp = query_comp.filter(CompetitionBD.niveaux.in_(niveaux))
+        
+        for event in query_comp.all():
             all_events.append({
-                'id': f"reunion_{event.id}",
+                'id': f"comp_{event.id}",
                 'title': event.nom,
-                'start': f"{event.dateDebutRE.isoformat()}T{event.heureDebutRE}",
-                'end': f"{event.dateFinRE.isoformat()}T{event.heureFinRE}" if event.dateFinRE and event.heureFinRE else None,
-                'color': '#ffc107',
+                'start': f"{event.date_debut.isoformat()}T{event.heure_debut}",
+                'end': f"{event.date_fin.isoformat()}T{event.heure_fin}",
+                'color': '#007bff',
                 'extendedProps': {
-                    'url': url_for('reunion_view', idReunion=event.id, origine='calendrier'),
-                    'type': 'Réunion',
-                    'description': event.rapportRE
+                    'url': url_for('competition_view', idCompetition=event.id, origine='calendrier'),
+                    'type': 'Compétition',
+                    'description': event.description,
+                    'niveaux': event.niveaux,
+                    'arme': event.type_arme
                 }
             })
-    if current_user.is_authenticated:
-        query_club = EventClubBD.query.filter(db.or_(EventClubBD.passeeEV == False, EventClubBD.passeeEV == None))
-        for event in query_club.all():
+    
+    #Reunion
+    if not types_event or 'Réunion' in types_event:
+        voir_reunions = False
+        if current_user.is_authenticated:
+            # On utilise isinstance pour être sûr du type d'objet
+            if isinstance(current_user, AdminBD):
+                voir_reunions = True
+            elif isinstance(current_user, MembreBD):
+                statuts_comite = [
+                    'Président', 'Vice-président', 'Vice-Président',
+                    'Secrétaire Général', 'Trésorier Général', 'Membre du Comité'
+                ]
+                if current_user.statut in statuts_comite:
+                    voir_reunions = True
+
+        # Si l'utilisateur a les droits, on ajoute les réunions
+        if voir_reunions:
+            for event in ReunionBD.query.all():
+                all_events.append({
+                    'id': f"reunion_{event.id}",
+                    'title': event.nom,
+                    'start': f"{event.dateDebutRE.isoformat()}T{event.heureDebutRE}",
+                    'end': f"{event.dateFinRE.isoformat()}T{event.heureFinRE}" if event.dateFinRE and event.heureFinRE else None,
+                    'color': '#ffc107',
+                    'extendedProps': {
+                        'url': url_for('reunion_view', idReunion=event.id, origine='calendrier'),
+                        'type': 'Réunion',
+                        'description': event.rapportRE
+                    }
+                })
+
+    #Event Club
+    if not types_event or 'Évènement du club' in types_event:
+        if current_user.is_authenticated:
+            query_club = EventClubBD.query
+            for event in query_club.all():
+                all_events.append({
+                    'id': f"club_{event.idEventClub}",
+                    'title': event.NomEV,
+                    'start': f"{event.dateDebutEV.isoformat()}T{event.heureDebutEV}",
+                    'end': f"{event.dateFinEV.isoformat()}T{event.heureFinEV}",
+                    'color': '#28a745',
+                    'extendedProps': {
+                        'url': url_for('club_view', idEventClub=event.idEventClub, origine='calendrier'),
+                        'type': 'Événement du Club',
+                        'description': event.descriptionEV,
+                        'niveaux': event.niveauxEV
+                    }
+                })
+
+    #Entrainement
+    if not types_event or 'Entrainement' in types_event:
+        for event in EntrainementBD.query.all():
             all_events.append({
-                'id': f"club_{event.idEventClub}",
-                'title': event.NomEV,
-                'start': f"{event.dateDebutEV.isoformat()}T{event.heureDebutEV}",
-                'end': f"{event.dateFinEV.isoformat()}T{event.heureFinEV}",
-                'color': '#28a745',
+                'id': f"entrainement_{event.id}",
+                'title': f"Entraînement {event.niveau} {event.type_arme}",
+                'start': f"{event.date.isoformat()}T{event.heure_debut}",
+                'end': f"{event.date.isoformat()}T{event.heure_fin}",
+                'color': '#dc3545',
                 'extendedProps': {
-                    'url': url_for('club_view', idEventClub=event.idEventClub, origine='calendrier'),
-                    'type': 'Événement du Club',
-                    'description': event.descriptionEV,
-                    'niveaux': event.niveauxEV
+                    'type': 'Entraînement',
+                    'description': f"Jour: {event.jour}",
+                    'niveaux': event.niveau,
+                    'arme': event.type_arme,
+                    'ville': event.ville,
+                    'adresse': event.adresse
                 }
             })
-    for event in EntrainementBD.query.all():
-        all_events.append({
-            'id': f"entrainement_{event.id}",
-            'title': f"Entraînement {event.niveau} {event.type_arme}",
-            'start': f"{event.date.isoformat()}T{event.heure_debut}",
-            'end': f"{event.date.isoformat()}T{event.heure_fin}",
-            'color': '#dc3545',
-            'extendedProps': {
-                'type': 'Entraînement',
-                'description': f"Jour: {event.jour}",
-                'niveaux': event.niveau,
-                'arme': event.type_arme,
-                'ville': event.ville,
-                'adresse': event.adresse
-            }
-        })
     return jsonify(all_events)
 
 # Page pour ajouter un nouvel événement - Réservée aux administrateurs.
@@ -1769,11 +1800,11 @@ def gerer_inscriptions():
     type_page = request.args.get('type',
                                  'inscription')
     if type_page == 'modification':
-        lesRequetes = ModifBD.query.order_by(ModifBD.date.asc())
+        lesRequetes = ModifBD.query.order_by(ModifBD.date.desc())
     else:
         type_page = 'inscription'
         lesRequetes = InscriptionBD.query.order_by(
-            InscriptionBD.date.asc())
+            InscriptionBD.date.desc())
     pagination = lesRequetes.paginate(page=page, per_page=7, error_out=False)
     return render_template("gerer_inscriptions.html",
                            title=TITLE + "- Gestion des Inscriptions",

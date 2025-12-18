@@ -227,6 +227,8 @@ class FiltreForm(FlaskForm):
     CHOIX_FORMULAIRE = [('Question', 'Questions'), ('Demande', 'Demandes'), ('Signalement', 'Signalements')]
     CHOIX_ARMES = [('Sabre', 'Sabre'), ('Fleuret', 'Fleuret'), ('Épée', 'Épée')]
     CHOIX_TYPE_COMPETE = [('Régional', 'Régional'), ('National', 'National')]
+    CHOIX_TYPE_EVENT = [('Compétition', 'Compétition'), ('Réunion', 'Réunion'),('Évènement du club', 'Évènement du club'), ('Entraînement', 'Entraînement')]
+
 
     sexe = SelectMultipleField(
         'Sexes',
@@ -268,10 +270,18 @@ class FiltreForm(FlaskForm):
         widget=widgets.ListWidget(prefix_label=False)
     )
 
+    type_event = SelectMultipleField(
+        'Type Evenement',
+        choices=CHOIX_TYPE_EVENT,
+        default=[c[0] for c in CHOIX_TYPE_EVENT],
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
+
     recherche = StringField('Rechercher')
     submit = SubmitField('Envoyer')
 
-    CHOIX_TRI = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien'), ('nom', 'Ordre alphabétique')]
+    CHOIX_TRI = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien')]
     tri = SelectField(
         'Trier par',
         choices=CHOIX_TRI,
