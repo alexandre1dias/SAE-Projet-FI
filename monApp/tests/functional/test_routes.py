@@ -3,9 +3,12 @@ from flask import url_for
 from werkzeug.security import generate_password_hash
 from datetime import date, datetime
 from monApp.modelBD import *
+from monApp.forms import ModifForm
+from wtforms import DateField
+from wtforms.validators import DataRequired
 
 # ==============================================================================
-# HELPER (Fonction utilitaire)
+# Fonction utilitaire
 # ==============================================================================
 def setup_admin(client, db):
     """
@@ -106,6 +109,11 @@ def test_pages_membres_protegees(client, app, db):
         content = response.data.decode('utf-8')
         assert "Profil de" in content or "Profil Membre" in content
 
+        # D. Evènement du club
+        response = client.get(url_for('evenement_club'))
+        assert response.status_code == 200
+        assert "Liste des prochains évènements du cercle" in response.data.decode('utf-8')
+
 # ==============================================================================
 # 3. PAGES ADMIN (Accès basique)
 # ==============================================================================
@@ -120,25 +128,27 @@ def test_pages_admin_protegees(client, app, db):
         response = client.get(url_for('gerer_profils'))
         assert response.status_code == 200
         assert "Gestion des Profils" in response.data.decode('utf-8')
-
         # B. Formulaires
         response = client.get(url_for('gerer_formulaires'))
         assert response.status_code == 200
-        content = response.data.decode('utf-8')
-        assert "Gestion des Formulaires" in content or "Géstion des Formulaires" in content
+        assert "Gestion des Formulaires" in response.data.decode('utf-8')
 
         # C. Inscriptions
         response = client.get(url_for('gerer_inscriptions'))
         assert response.status_code == 200
-        content = response.data.decode('utf-8')
-        assert "Gestion des Inscriptions" in content or "Géstion des Inscriptions" in content
+        assert "Gestion des Inscriptions" in response.data.decode('utf-8')
+
+        # D. Réunion
+        response = client.get(url_for('reunion'))
+        assert response.status_code == 200
+        assert "Listes des prochaines réunions" in response.data.decode('utf-8')
 
 # ==============================================================================
 # 4. SCENARIOS ACTIONS ADMIN
 # ==============================================================================
 
 def test_scenario_presse_admin(client, app, db):
-    """Test CRUD Presse : Ajout -> Vérif -> Suppression."""
+    """Test CRUD Presse : Ajout -> Modif -> Suppression."""
     app.config['WTF_CSRF_ENABLED'] = False
     setup_admin(client, db)
     # NETTOYAGE
@@ -154,18 +164,30 @@ def test_scenario_presse_admin(client, app, db):
     
     assert response.status_code == 200
     
-    # 2. VÉRIFICATION BDD
+    # Vérification
     article = PresseBD.query.filter_by(titreP='Victoire Régionale').first()
     assert article is not None
     assert article.contenuP == 'Le club a gagné !'
 
-    # 3. SUPPRESSION
+    # 3. MODIFICATION
+    article = PresseBD.query.filter_by(titreP='Victoire Régionale').first()
+    client.post(f'/admin/edit_presse/{article.idPresse}', data={
+        'titre': 'Victoire Régionale',
+        'contenu': 'Le club a perdu !',
+        'lien': 'http://journal.fr'
+    }, follow_redirects=True)
+    article = PresseBD.query.get(article.idPresse)
+
+    # Vérification modification
+    assert article.contenuP == 'Le club a perdu !'
+
+    # 4. SUPPRESSION
     client.post(f'/admin/delete_presse/{article.idPresse}', follow_redirects=True)
     
     # Vérification suppression
     assert PresseBD.query.filter_by(titreP='Victoire Régionale').first() is None
 
-def test_crud_informations(client, app, db):
+def test_scenario_informations_admin(client, app, db):
     """Test CRUD Information : Ajout -> Modif -> Suppression."""
     app.config['WTF_CSRF_ENABLED'] = False
     setup_admin(client, db)
@@ -192,6 +214,49 @@ def test_crud_informations(client, app, db):
     # 3. SUPPRESSION
     client.post(f'/admin/delete_information/{info.idInformation}', follow_redirects=True)
     assert db.session.get(InformationBD, info.idInformation) is None
+
+def test_scenario_article_admin(client, app, db):
+    """Test CRUD Information : Ajout -> Modif -> Suppression."""
+    app.config['WTF_CSRF_ENABLED'] = False
+    setup_admin(client, db)
+
+    # 1. AJOUT
+    client.post('/admin/add_article/', data={
+        'titre': 'JOBLIFE',
+        'contenu': 'Soutenez JOBLIFE'
+    }, follow_redirects=True)
+    
+    art = ArticleBD.query.filter_by(titre='JOBLIFE').first()
+    assert art is not None
+    assert art.contenu == 'Soutenez JOBLIFE'
+
+    # 2. MODIFICATION
+    client.post(f'/admin/edit_article/{art.id}', data={
+        'titre': 'FUCK KC et M8',
+        'contenu': 'Ne soutenez pas ces sionniste'
+    }, follow_redirects=True)
+    
+    updated_art = db.session.get(ArticleBD, art.id)
+    assert updated_art.titre == 'FUCK KC et M8'
+
+    # 3. TEST SUPPRESSION IMAGE
+    # A. On simule l'existence d'une image en l'ajoutant directement en BDD
+    img = ImageArticleBD(nom="fake_image.jpg", id_article=art.id)
+    db.session.add(img)
+    db.session.commit()
+    id_img = img.id
+
+    assert ImageArticleBD.query.get(id_img) is not None
+
+    # B. Appel de la route de suppression
+    client.post(f'/admin/delete_image_article/{id_img}', follow_redirects=True)
+
+    # C. Vérification que l'image n'est plus en base
+    assert ImageArticleBD.query.get(id_img) is None
+
+    # 4. SUPPRESSION
+    client.post(f'/admin/delete_article/{art.id}', follow_redirects=True)
+    assert db.session.get(ArticleBD, art.id) is None
 
 def test_crud_tarifs(client, app, db):
     """Test CRUD Tarifs : Ajout -> Modif -> Suppression."""
@@ -284,25 +349,34 @@ def test_add_event_complex(client, app, db):
 
 
 def test_gestion_inscriptions(client, app, db):
-    """Test flux Inscription : Création demande -> Acceptation -> Création Membre."""
+    """
+    Test complet de la gestion des inscriptions :
+    1. Acceptation d'une demande -> Création Membre.
+    2. Refus d'une demande -> Suppression demande sans création Membre.
+    """
     app.config['WTF_CSRF_ENABLED'] = False
     setup_admin(client, db)
 
-    # 1. Créer une demande d'inscription
-    inscr = InscriptionBD(
+    # ======================================================
+    # SCÉNARIO 1 : ACCEPTATION
+    # ======================================================
+    # 1. Créer une demande d'inscription valide
+    inscr_ok = InscriptionBD(
         email='new_member@test.fr', nom='Test', prenom='User', 
         ddn=date(2000,1,1), mdp_hash='pass', sexe='Homme', date=date.today()
     )
-    db.session.add(inscr)
+    db.session.add(inscr_ok)
     db.session.commit()
+    id_ok = inscr_ok.id
 
-    # 2. Accepter l'inscription via la route admin
-    client.post(f'/accepter_inscription/{inscr.id}', follow_redirects=True)
+    # 2. Accepter l'inscription
+    client.post(f'/accepter_inscription/{id_ok}', follow_redirects=True)
     
     # 3. Vérifications
-    assert db.session.get(InscriptionBD, inscr.id) is None
+    # La demande d'inscription doit avoir disparu
+    assert db.session.get(InscriptionBD, id_ok) is None
     
-    # Le membre doit être créé
+    # Le membre doit avoir été créé
     membre = MembreBD.query.filter_by(email='new_member@test.fr').first()
     assert membre is not None
     
@@ -310,6 +384,125 @@ def test_gestion_inscriptions(client, app, db):
     assert membre.idParaNotif is not None
     param = ParametreNotifMembreBD.query.get(membre.idParaNotif)
     assert param.eventNouveauMail is True
+
+    # ======================================================
+    # SCÉNARIO 2 : REFUS
+    # ======================================================
+    # 1. Créer une deuxième demande
+    inscr_refus = InscriptionBD(
+        email='refused@test.fr', nom='Refus', prenom='Guy', 
+        ddn=date(1999,1,1), mdp_hash='pass', sexe='Homme', date=date.today()
+    )
+    db.session.add(inscr_refus)
+    db.session.commit()
+    id_refus = inscr_refus.id
+
+    # 2. Refuser l'inscription
+    client.post(f'/refuser_inscription/{id_refus}', data={
+        'justification': 'Dossier incomplet ou incohérent'
+    }, follow_redirects=True)
+
+    # 3. Vérifications
+    # La demande d'inscription doit avoir disparu
+    assert db.session.get(InscriptionBD, id_refus) is None
+    
+    # Le membre ne doit pas avoir été créé
+    membre_refus = MembreBD.query.filter_by(email='refused@test.fr').first()
+    assert membre_refus is None
+
+def test_gestion_modifications(client, app, db):
+    """
+    Test complet du cycle de vie d'une modification de profil.
+    UTILISE UN MONKEY-PATCH pour contourner la stricticité de SQLite sur les dates.
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+    
+    # SQLite refuse les Strings dans une colonne Date. MySQL l'accepte.
+    # Comme on ne peut pas toucher au code source, on modifie la classe Form temporairement juste pour ce test.
+    original_field = ModifForm.ddn
+    ModifForm.ddn = DateField('date de naissance', format='%Y-%m-%d', validators=[DataRequired()])
+    
+    try:
+        # Setup : Création Admin et Membre
+        admin = setup_admin(client, db)
+        
+        membre = MembreBD(
+            email='membre@modif.fr', mdp_hash=generate_password_hash('pass'),
+            nom='Original', prenom='User', sexe='Homme', ddn=date(1990, 1, 1),
+            activite=True
+        )
+        db.session.add(membre)
+        db.session.commit()
+        id_membre = membre.id
+
+        # ======================================================
+        # SCÉNARIO A : DEMANDE ET ACCEPTATION
+        # ======================================================
+        
+        # 1. Le Membre se connecte et fait une demande
+        client.get('/logout/')
+        client.post('/login/', data={'email': 'membre@modif.fr', 'password': 'pass'})
+        
+        data_modif = {
+            'submit_action': 'membre_request',
+            'nom': 'NouveauNom',          
+            'prenom': 'User',             
+            'email': 'membre@modif.fr',
+            'sexe': 'Homme',
+            'ddn': '1990-01-01',
+            'statut': 'Membre',
+            'justification': 'Mariage'
+        }
+        client.post(f'/profil_edit/{id_membre}', data=data_modif, follow_redirects=True)
+        
+        # Vérification
+        modif = ModifBD.query.filter_by(id_membre=id_membre).first()
+        assert modif is not None
+        assert modif.nom == 'NouveauNom'
+
+        # 2. L'Admin se connecte et accepte
+        client.get('/logout/')
+        client.post('/login/', data={'email': 'superadmin@test.fr', 'password': 'pass'})
+        
+        client.post(f'/accepter_modifications/{modif.id}', follow_redirects=True)
+        
+        # 3. Vérifications
+        assert db.session.get(ModifBD, modif.id) is None
+        updated_membre = db.session.get(MembreBD, id_membre)
+        assert updated_membre.nom == 'NouveauNom'
+
+        # ======================================================
+        # SCÉNARIO B : DEMANDE ET REFUS
+        # ======================================================
+        
+        # 1. Le Membre refait une demande
+        client.get('/logout/')
+        client.post('/login/', data={'email': 'membre@modif.fr', 'password': 'pass'})
+        
+        data_modif['nom'] = 'NouveauNom' 
+        data_modif['prenom'] = 'RefusePrenom' 
+        client.post(f'/profil_edit/{id_membre}', data=data_modif, follow_redirects=True)
+        
+        modif_refus = ModifBD.query.filter_by(id_membre=id_membre).first()
+        assert modif_refus is not None
+        id_modif_refus = modif_refus.id
+
+        # 2. L'Admin refuse
+        client.get('/logout/')
+        client.post('/login/', data={'email': 'superadmin@test.fr', 'password': 'pass'})
+        
+        client.post(f'/refuser_modification/{id_modif_refus}', data={
+            'justification': 'Pas valide'
+        }, follow_redirects=True)
+        
+        # 3. Vérifications
+        assert db.session.get(ModifBD, id_modif_refus) is None
+        final_membre = db.session.get(MembreBD, id_membre)
+        assert final_membre.prenom == 'User'
+
+    finally:
+        # On remet le formulaire comme avant pour ne pas casser d'autres tests
+        ModifForm.ddn = original_field
 
 def test_contact_form_submission(client, app, db):
     """Test flux Contact : Soumission -> Notification Admin."""

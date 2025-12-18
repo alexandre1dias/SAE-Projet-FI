@@ -744,6 +744,7 @@ def competition_delete(idCompetition):
 # Affiche la liste des événements du club.
 @app.route("/evenement_club/")
 @app.route("/evenement_club/<string:etat>")
+@login_required
 def evenement_club(etat="prochaine"):
     passee = (etat == "passees")
     filtre = FiltreForm(request.args if request.args else None)
