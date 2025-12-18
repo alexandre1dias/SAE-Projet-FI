@@ -290,6 +290,7 @@ create table PRESSE(
     titreP varchar(50) not null,
     contenuP varchar(600),
     lienP varchar(255) not null,
+    imageP VARCHAR(255),
     PRIMARY KEY(idPresse)
 );
 

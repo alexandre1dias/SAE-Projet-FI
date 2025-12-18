@@ -317,6 +317,7 @@ class PresseBD(UserMixin, db.Model):
     titreP = db.Column(db.String(50))
     contenuP = db.Column(db.String(600))
     lienP = db.Column(db.String(255))
+    imageP = db.Column(db.String(255))
 
 class ParametreNotifAdminBD(UserMixin, db.Model):
     """
