@@ -874,17 +874,6 @@ background-color: #1c1c1e !important;
 color: #fefefe;
 }
 
-/* CSS Calendrier */
-
-.calendrier-section {
-    padding: 40px 20px;
-}
-
-.calendrier-section h1 {
-    color: #b82828;
-    margin-bottom: 40px;
-}
-
 /*le container des filtres*/
 .fixed-left {
     position: fixed; 
@@ -896,7 +885,6 @@ color: #fefefe;
     overflow-y: auto; 
     z-index: 1000; 
 }
-
 
 .filtres-container {
     background-color: white;
@@ -935,9 +923,12 @@ color: #fefefe;
 /*le container du calendrier */
 .calendrier-wrapper {
     background-color: white;
-    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+/*Titre page calendrier*/
+#calendrier-titre{
+    color: #b82828;
 }
 
 /* pour le mode clair par défaut du calendirer lorsque le mode sombre est désactivé */

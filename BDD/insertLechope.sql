@@ -42,17 +42,17 @@ INSERT INTO COMPETITION (nomCO, villeCO, adresseCO, dateDebutCO, heureDebutCO, d
 -- ============================================================
 -- 5. INSERTION DES RÉUNIONS (ID 57-66)
 -- ============================================================
-INSERT INTO REUNION (nomRE, villeRE, adresseRE, dateDebutRE, heureDebutRE, dateFinRE, heureFinRE, nbParticipantsRE, typeReunionRE, rapportRE, niveauRE, idEvent) VALUES
-('Comité Directeur - Rentrée', 'Orléans', 'Salle du Club', '2025-09-05', '19:00', '2025-09-05', '21:00', 12, 'Comité', 'Validé', 'Comité', 57),
-('Commission Finances', 'Orléans', 'Bureau Trésorier', '2025-10-12', '18:30', '2025-10-12', '20:30', 5, 'Commission', 'En cours', 'Comité', 58),
-('Réunion Prépa Tournoi', 'Orléans', 'Salle d''armes', '2025-11-02', '20:00', '2025-11-02', '22:00', 20, 'Organisation', 'Fait', 'Bénévoles', 59),
-('AG Ordinaire 2025', 'Orléans', 'Salle Polyvalente', '2025-12-15', '10:00', '2025-12-15', '12:00', 50, 'Assemblée', 'Validé', 'Tous', 60),
-('Comité Directeur - Hiver', 'Orléans', 'Salle du Club', '2026-01-10', '19:00', '2026-01-10', '21:00', 12, 'Comité', NULL, 'Comité', 61),
-('Réunion Mairie', 'Orléans', 'Hôtel de Ville', '2026-02-20', '14:00', '2026-02-20', '15:30', 4, 'Externe', NULL, 'Bureau', 62),
-('Commission Partenariats', 'Orléans', 'Visio', '2026-03-15', '18:00', '2026-03-15', '19:30', 6, 'Commission', NULL, 'Comité', 63),
-('Comité Directeur - Printemps', 'Orléans', 'Salle du Club', '2026-04-10', '19:30', '2026-04-10', '21:30', 12, 'Comité', NULL, 'Comité', 64),
-('Orga Fête du Club 2026', 'Orléans', 'Club House', '2026-05-25', '20:00', '2026-05-25', '22:00', 15, 'Organisation', NULL, 'Bénévoles', 65),
-('AG Élective', 'Orléans', 'Gymnase', '2026-06-28', '10:00', '2026-06-28', '13:00', 60, 'Assemblée', NULL, 'Tous', 66);
+INSERT INTO REUNION (nomRE, villeRE, adresseRE, dateDebutRE, heureDebutRE, dateFinRE, heureFinRE, nbParticipantsRE, typeReunionRE, rapportRE, idEvent) VALUES
+('Comité Directeur - Rentrée', 'Orléans', 'Salle du Club', '2025-09-05', '19:00', '2025-09-05', '21:00', 12, 'Comité', 'Validé', 57),
+('Commission Finances', 'Orléans', 'Bureau Trésorier', '2025-10-12', '18:30', '2025-10-12', '20:30', 5, 'Commission', 'En cours', 58),
+('Réunion Prépa Tournoi', 'Orléans', 'Salle d''armes', '2025-11-02', '20:00', '2025-11-02', '22:00', 20, 'Organisation', 'Fait', 59),
+('AG Ordinaire 2025', 'Orléans', 'Salle Polyvalente', '2025-12-15', '10:00', '2025-12-15', '12:00', 50, 'Assemblée', 'Validé', 60),
+('Comité Directeur - Hiver', 'Orléans', 'Salle du Club', '2026-01-10', '19:00', '2026-01-10', '21:00', 12, 'Comité', NULL, 61),
+('Réunion Mairie', 'Orléans', 'Hôtel de Ville', '2026-02-20', '14:00', '2026-02-20', '15:30', 4, 'Externe', 'Bureau', 62),
+('Commission Partenariats', 'Orléans', 'Visio', '2026-03-15', '18:00', '2026-03-15', '19:30', 6, 'Commission', NULL, 63),
+('Comité Directeur - Printemps', 'Orléans', 'Salle du Club', '2026-04-10', '19:30', '2026-04-10', '21:30', 12, 'Comité', NULL, 64),
+('Orga Fête du Club 2026', 'Orléans', 'Club House', '2026-05-25', '20:00', '2026-05-25', '22:00', 15, 'Organisation', NULL, 65),
+('AG Élective', 'Orléans', 'Gymnase', '2026-06-28', '10:00', '2026-06-28', '13:00', 60, 'Assemblée', NULL, 66);
 
 -- ============================================================
 -- 6. INSERTION DES EVENTCLUB (ID 67-76)

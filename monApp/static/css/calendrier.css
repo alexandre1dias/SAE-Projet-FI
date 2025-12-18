@@ -1,0 +1,20 @@
+.custom-check-competition .form-check-input:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.custom-check-reunion .form-check-input:checked {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.custom-check-evenement-du-club .form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.custom-check-entrainement .form-check-input:checked {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
