@@ -246,7 +246,7 @@ def get_events():
     type_competition = request.args.getlist('type_competition')
     types_event = request.args.getlist('type_event')
 
-    
+
 
     all_events = []
 
@@ -262,7 +262,7 @@ def get_events():
             query_comp = query_comp.filter(CompetitionBD.typeComp.in_(type_competition))
         if niveaux:
             query_comp = query_comp.filter(CompetitionBD.niveaux.in_(niveaux))
-        
+
         for event in query_comp.all():
             all_events.append({
                 'id': f"comp_{event.id}",
@@ -278,7 +278,7 @@ def get_events():
                     'arme': event.type_arme
                 }
             })
-    
+
     #Reunion
     if not types_event or 'Réunion' in types_event:
         voir_reunions = False
@@ -1130,8 +1130,33 @@ def reunion_update(idReunion):
 # Affiche la page listant toutes les informations.
 @app.route("/informations/")
 def informations():
-    lesInformations = InformationBD.query.order_by(InformationBD.dateIN.desc(), InformationBD.heureIN.desc()).all()
-    return render_template("informations.html", title=TITLE+"- Informations", informations=lesInformations)
+    filtre = FiltreForm(request.args)
+    annee_selectionnee = filtre.annee_scolaire.data
+    les_infos = InformationBD.query
+    if filtre.recherche.data:
+        les_infos = les_infos.filter(InformationBD.titreIN.ilike(f"%{filtre.recherche.data}%"))
+
+    if annee_selectionnee:
+        try:
+            an_debut = int(annee_selectionnee)
+            debut_saison = date(an_debut, 8, 1)
+            fin_saison = date(an_debut + 1, 7, 31)
+            les_infos = les_infos.filter(InformationBD.dateIN >= debut_saison, 
+                                 InformationBD.dateIN <= fin_saison)
+        except (ValueError, TypeError):
+            pass
+    if filtre.tri.data == 'date_asc':
+        les_infos = les_infos.order_by(InformationBD.dateIN.asc(), InformationBD.heureIN.asc())
+    else:
+        les_infos = les_infos.order_by(InformationBD.dateIN.desc(), InformationBD.heureIN.desc())
+
+    page = request.args.get('page', 1, type=int)
+    pagination = les_infos.paginate(page=page, per_page=6, error_out=False)
+
+    return render_template("informations.html", 
+                           title=TITLE + " - Informations",
+                           pagination=pagination, 
+                           filtre=filtre)
 
 @app.route("/admin/add_information/", methods=["GET", "POST"])
 @login_required
@@ -1461,13 +1486,13 @@ def resultat_membre():
 def evenement_membre():
     # 1. Instanciation du formulaire comme dans votre exemple
     filtre = FiltreForm(request.args if request.args else None)
-    
+
     # 2. Paramètres de base
     page = request.args.get('page', 1, type=int)
     type_page = request.args.get('type', 'competitions')
     etat = request.args.get('etat', 'avenir')
     today = date.today()
-    
+
     query = None
 
     # =========================================================
@@ -1487,10 +1512,10 @@ def evenement_membre():
 
         if filtre.armes.data:
             query = query.filter(CompetitionBD.type_arme.in_(filtre.armes.data))
-            
+
         if filtre.type_competition.data:
             query = query.filter(CompetitionBD.typeComp.in_(filtre.type_competition.data))
-            
+
         if filtre.recherche.data:
             terme = f"%{filtre.recherche.data}%"
             query = query.filter(
@@ -1551,7 +1576,7 @@ def evenement_membre():
             query = query.order_by(EventClubBD.dateDebutEV.asc())
         else:
             query = query.order_by(EventClubBD.dateDebutEV.desc())
-            
+
     else:
         # Fallback
         return redirect(url_for('evenement_membre', type='competitions'))
@@ -1559,7 +1584,7 @@ def evenement_membre():
     # Pagination finale
     pagination = query.paginate(page=page, per_page=6, error_out=False)
 
-    return render_template("evenement_membre.html", 
+    return render_template("evenement_membre.html",
                            title=TITLE + "- Vos Évènements",
                            pagination=pagination,
                            type_page=type_page,
