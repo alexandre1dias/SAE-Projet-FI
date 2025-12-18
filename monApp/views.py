@@ -116,11 +116,11 @@ def inject_notifications():
             query = NotifsBD.query.filter_by(idAdmin=current_user.id)
         else:
             query = None
-            
+
         if query:
             unread_count = query.filter_by(lue=False).count()
             notifications_list = query.order_by(NotifsBD.timestamp.desc()).limit(10).all()
-            
+
     return dict(unread_count=unread_count, notifications_list=notifications_list)
 
 # Route pour marquer une notification comme lue et rediriger vers son lien
@@ -263,7 +263,7 @@ def get_events():
             voir_reunions = True
         elif isinstance(current_user, MembreBD):
             statuts_comite = [
-                'Président', 'Vice-président', 'Vice-Président', 
+                'Président', 'Vice-président', 'Vice-Président',
                 'Secrétaire Général', 'Trésorier Général', 'Membre du Comité'
             ]
             if current_user.statut in statuts_comite:
@@ -408,25 +408,25 @@ def add_event():
 
 # Affiche la liste de toutes les compétitions.
 @app.route("/competitions/")
-@app.route("/competitions/<string:etat>") 
-def competitions(etat="prochaine"): 
+@app.route("/competitions/<string:etat>")
+def competitions(etat="prochaine"):
     passee = (etat == "passees")
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
     lesCompetitions = CompetitionBD.query
 
     filtre.tri.choices = [
-        ('date_desc', 'Plus récent'), 
+        ('date_desc', 'Plus récent'),
         ('date_asc', 'Plus ancien')
     ]
-    
+
     if filtre.tri.data == "date_asc":
         lesCompetitions = lesCompetitions.order_by(CompetitionBD.date_debut.asc())
     else:
         lesCompetitions = lesCompetitions.order_by(CompetitionBD.date_debut.desc())
 
-    lesCompetitions = lesCompetitions.filter(CompetitionBD.passee == passee)     
-    
+    lesCompetitions = lesCompetitions.filter(CompetitionBD.passee == passee)
+
     if filtre.sexe.data:
         lesCompetitions = lesCompetitions.filter(CompetitionBD.sexe.in_(filtre.sexe.data))
     if filtre.niveau.data:
@@ -604,17 +604,17 @@ def classer_membre(idCompetition, idMembre):
 @admin_required
 def upload_classement_competition(idCompetition):
     competition = CompetitionBD.query.get_or_404(idCompetition)
-    
+
     if 'classement_pdf' not in request.files:
         flash('Aucun fichier n\'a été envoyé.', 'danger')
         return redirect(url_for('competition_update', idCompetition=idCompetition))
-        
+
     file = request.files['classement_pdf']
-    
+
     if file.filename == '':
         flash('Aucun fichier sélectionné.', 'danger')
         return redirect(url_for('competition_update', idCompetition=idCompetition))
-        
+
     if file and file.filename.lower().endswith('.pdf'):
         filename = "classement.pdf" # Nom de fichier fixe pour le retrouver facilement
         dossier_classement = os.path.join(app.root_path, 'static', 'classements', str(competition.id))
@@ -638,38 +638,38 @@ def delete_membre_competition(idC, idM):
     except Exception as e:
         db.session.rollback()
     return redirect(url_for('competition_update', idCompetition=idC))
-    
+
 # Ajoute une image à une compétition
 @app.route("/competition/<int:idCompetition>/add_image", methods=['POST'])
 @login_required
 @admin_required
 def add_image_competition(idCompetition):
     competition = CompetitionBD.query.get_or_404(idCompetition)
-    
+
     if 'image' not in request.files:
         flash('Aucun fichier image n\'a été envoyé.', 'danger')
         return redirect(url_for('competition_update', idCompetition=idCompetition))
-        
+
     file = request.files['image']
-    
+
     if file.filename == '':
         flash('Aucun fichier image sélectionné.', 'danger')
         return redirect(url_for('competition_update', idCompetition=idCompetition))
-        
+
     if file:
         filename = secure_filename(file.filename)
         # Création d'un dossier unique pour chaque compétition pour éviter les conflits de noms
         dossier_images = os.path.join(app.root_path, 'static', 'images', 'competitions', str(competition.id))
         os.makedirs(dossier_images, exist_ok=True)
-        
+
         file.save(os.path.join(dossier_images, filename))
-        
+
         # L'URL stockée en BDD est relative au dossier 'static'
         image_url = os.path.join('images', 'competitions', str(competition.id), filename).replace('\\', '/')
-        
+
         alt_text = request.form.get('alt', filename)
         prive = 'prive' in request.form
-        
+
         try:
             nouvelle_image = ImageAppBD(urlI=image_url, alt=alt_text, prive=prive)
             competition.images_rc.append(nouvelle_image)
@@ -679,7 +679,7 @@ def add_image_competition(idCompetition):
         except Exception as e:
             db.session.rollback()
             flash(f'Erreur lors de l\'ajout de l\'image à la base de données.', 'danger')
-    
+
     return redirect(url_for('competition_update', idCompetition=idCompetition))
 
 # Supprime une image d'une compétition
@@ -900,11 +900,11 @@ def desinscrire_club(idEventClub):
 def add_image_club(idEventClub):
     """Ajoute une image à un événement du club."""
     event_club = EventClubBD.query.get_or_404(idEventClub)
-    
+
     if 'image' not in request.files:
         flash('Aucun fichier sélectionné.', 'danger')
         return redirect(url_for('club_update', idEventClub=idEventClub))
-        
+
     file = request.files['image']
     alt_text = request.form.get('alt', 'Image pour l\'événement ' + event_club.NomEV)
     is_prive = 'prive' in request.form
@@ -918,7 +918,7 @@ def add_image_club(idEventClub):
         # Crée un dossier spécifique pour l'événement s'il n'existe pas
         upload_folder = os.path.join(app.static_folder, 'images', 'events_club', str(event_club.idEventClub))
         os.makedirs(upload_folder, exist_ok=True)
-        
+
         file_path = os.path.join(upload_folder, filename)
         file.save(file_path)
 
@@ -963,12 +963,12 @@ def delete_image_club(idImage):
             image_path = os.path.join(app.static_folder, image_to_delete.urlI)
             if os.path.exists(image_path):
                 os.remove(image_path)
-            
+
             # Optionnel : supprime le dossier s'il est vide
             image_dir = os.path.dirname(image_path)
             if not os.listdir(image_dir):
                 os.rmdir(image_dir)
-                
+
         except Exception as e:
             flash(f"Erreur lors de la suppression du fichier : {e}", "danger")
 
@@ -979,23 +979,43 @@ def delete_image_club(idImage):
         flash("L'image a été retirée de l'événement.", "success")
     else:
         flash("Cette image n'était pas associée à cet événement.", "warning")
-        
+
     return redirect(url_for('club_update', idEventClub=idEventClub))
 
 #====================   Pages Reunions   ====================#
 # Page affichant toutes les réunions - Réservée à Admin et Membre du Comité.
 @app.route("/reunion/")
+@app.route("/reunion/<string:etat>")
 @login_required
 @comite_ou_admin_required
-def reunion():
-    reunions = ReunionBD.query.all()
-    prochaines_reunions = [r for r in reunions if r.dateDebutRE and r.dateDebutRE >= AUJOURDHUI]
-    anciennes_reunions = [r for r in reunions if r.dateFinRE and r.dateFinRE < AUJOURDHUI]
+def reunion(etat="prochaine"):
+    passee = (etat == "passees")
+    filtre = FiltreForm(request.args if request.args else None)
+    page = request.args.get('page', 1, type=int)
+    filtre.tri.choices = [('date_desc', 'Plus récent'),
+                          ('date_asc', 'Plus ancien')]
+    lesReunions = ReunionBD.query
+    if passee:
+        lesReunions = lesReunions.filter(ReunionBD.dateFinRE < AUJOURDHUI)
+    else:
+        lesReunions = lesReunions.filter(ReunionBD.dateDebutRE >= AUJOURDHUI)
+    if filtre.tri.data == "date_asc":
+        lesReunions = lesReunions.order_by(ReunionBD.dateDebutRE.asc())
+    else:
+        lesReunions = lesReunions.order_by(ReunionBD.dateDebutRE.desc())
+    pagination = lesReunions.paginate(page=page, per_page=6, error_out=False)
     ids_evenements_inscrits = set()
     if current_user.is_authenticated and session.get('user_type') == 'membre':
-        participations = ParticiperBD.query.filter_by(id_membre=current_user.id).all()
+        participations = ParticiperBD.query.filter_by(
+            id_membre=current_user.id).all()
         ids_evenements_inscrits = {p.id_event for p in participations}
-    return render_template("reunion.html", title=TITLE + "- Réunion", prochaines_reunions=prochaines_reunions, anciennes_reunions=anciennes_reunions,user_registered_event_ids = ids_evenements_inscrits)
+
+    return render_template("reunion.html",
+                           title=TITLE + "- Réunions",
+                           pagination=pagination,
+                           filtre=filtre,
+                           passee=passee,
+                           user_registered_event_ids=ids_evenements_inscrits)
 
 # Page de consultation d'une réunion - Réservée à Admin et Membres du Comité.
 @app.route("/reunion/consultation/<int:idReunion>")
@@ -1030,7 +1050,7 @@ def inscrire_reunion(idReunion):
         db.session.commit()
     except Exception as e:
         db.session.rollback()
-        
+
     return redirect(url_for('reunion'))
 
 # Vue de désinscription d'une réunion - Réservée aux membres du comité et aux admins.
@@ -1336,7 +1356,7 @@ def contact():
             # Création des notifications pour les administrateurs
             admins = AdminBD.query.all()
             type_f = form.type_form.data
-            
+
             for admin in admins:
                 params = admin.parametres_notif_admin
                 if params:
@@ -1347,7 +1367,7 @@ def contact():
                         notify = True
                     elif type_f == 'Signalement' and params.formulaireSignalementSite:
                         notify = True
-                    
+
                     if notify:
                         notif = NotifsBD(
                             typeN="Formulaire Contact",
@@ -1374,32 +1394,144 @@ def contact():
 @login_required
 @membre_required
 def resultat_membre():
-    les_resultats = ResultatBD.query.filter_by(id_membre=current_user.id).all()
-    return render_template("resultat_membre.html", title=TITLE+"- Résultat du Membre", resultats=les_resultats)
+    filtre = FiltreForm(request.args if request.args else None)
+    page = request.args.get('page', 1, type=int)
+    filtre.tri.choices = [('date_desc', 'Plus récent'),
+                          ('date_asc', 'Plus ancien')]
+    lesCompete = ResultatBD.query.join(CompetitionBD).filter(
+        ResultatBD.id_membre == current_user.id)
+    if filtre.armes.data:
+        lesCompete = lesCompete.filter(
+            CompetitionBD.type_arme.in_(filtre.armes.data))
+
+    if filtre.type_competition.data:
+        lesCompete = lesCompete.filter(
+            CompetitionBD.typeComp.in_(filtre.type_competition.data))
+    if filtre.tri.data == "date_asc":
+        lesCompete = lesCompete.order_by(CompetitionBD.date_debut.asc())
+    elif filtre.tri.data == "classement":
+        lesCompete = lesCompete.order_by(ResultatBD.resultat.asc())
+    else:
+        lesCompete = lesCompete.order_by(CompetitionBD.date_debut.desc())
+
+    pagination = lesCompete.paginate(page=page, per_page=6, error_out=False)
+    return render_template("resultat_membre.html",
+                           title=TITLE + "- Résultat du Membre",
+                           resultats=pagination.items,
+                           pagination=pagination,
+                           filtre=filtre)
 
 # Affiche les événements auxquels le membre connecté est inscrit.
 @app.route("/evenement_membre/")
 @login_required
 @membre_required
 def evenement_membre():
-    participations = ParticiperBD.query.filter_by(id_membre=current_user.id).all()
-    ids_evenements = [p.id_event for p in participations]
+    # 1. Instanciation du formulaire comme dans votre exemple
+    filtre = FiltreForm(request.args if request.args else None)
+    
+    # 2. Paramètres de base
+    page = request.args.get('page', 1, type=int)
+    type_page = request.args.get('type', 'competitions')
+    etat = request.args.get('etat', 'avenir')
+    today = date.today()
+    
+    query = None
 
-    evenements = []
-    if ids_evenements:
-        les_competitions = CompetitionBD.query.filter(CompetitionBD.id_event.in_(ids_evenements)).all()
-        les_reunions = ReunionBD.query.filter(ReunionBD.idEvent.in_(ids_evenements)).all()
-        les_evenements_club = EventClubBD.query.filter(EventClubBD.id_event.in_(ids_evenements)).all()
-        evenements.extend(les_competitions)
-        evenements.extend(les_reunions)
-        evenements.extend(les_evenements_club)
+    # =========================================================
+    # BLOC 1 : COMPÉTITIONS
+    # =========================================================
+    if type_page == 'competitions':
+        # Requete de base
+        query = CompetitionBD.query.join(
+            ParticiperBD, CompetitionBD.id_event == ParticiperBD.id_event
+        ).filter(ParticiperBD.id_membre == current_user.id)
 
-    events_a_venir = [e for e in evenements if (getattr(e, 'date_debut', None) or getattr(e, 'dateDebutRE', None) or getattr(e, 'dateDebutEV', None)) >= AUJOURDHUI]
-    events_passes = [e for e in evenements if (getattr(e, 'date_fin', None) or getattr(e, 'dateFinRE', None) or getattr(e, 'dateFinEV', None)) < AUJOURDHUI]
+        # Filtre État (Passé/Avenir) - Hors formulaire
+        if etat == 'passees':
+            query = query.filter(CompetitionBD.date_debut < today)
+        else:
+            query = query.filter(CompetitionBD.date_debut >= today)
 
+        if filtre.armes.data:
+            query = query.filter(CompetitionBD.type_arme.in_(filtre.armes.data))
+            
+        if filtre.type_competition.data:
+            query = query.filter(CompetitionBD.typeComp.in_(filtre.type_competition.data))
+            
+        if filtre.recherche.data:
+            terme = f"%{filtre.recherche.data}%"
+            query = query.filter(
+                or_(
+                    CompetitionBD.nom.ilike(terme),
+                    CompetitionBD.ville.ilike(terme)
+                )
+            )
 
-    return render_template("evenement_membre.html", title=TITLE+"- Vos Évènements",
-                           events_a_venir=events_a_venir, events_passes=events_passes)
+        # Tri
+        if filtre.tri.data == 'date_asc':
+            query = query.order_by(CompetitionBD.date_debut.asc())
+        elif filtre.tri.data == 'nom':
+            query = query.order_by(CompetitionBD.nom.asc())
+        else:
+            query = query.order_by(CompetitionBD.date_debut.desc())
+
+    # =========================================================
+    # BLOC 2 : RÉUNIONS
+    # =========================================================
+    elif type_page == 'reunions':
+        query = ReunionBD.query.join(
+            ParticiperBD, ReunionBD.idEvent == ParticiperBD.id_event
+        ).filter(ParticiperBD.id_membre == current_user.id)
+
+        if etat == 'passees':
+            query = query.filter(ReunionBD.dateDebutRE < today)
+        else:
+            query = query.filter(ReunionBD.dateDebutRE >= today)
+
+        if filtre.recherche.data:
+            terme = f"%{filtre.recherche.data}%"
+            query = query.filter(ReunionBD.nom.ilike(terme))
+
+        if filtre.tri.data == 'date_asc':
+            query = query.order_by(ReunionBD.dateDebutRE.asc())
+        else:
+            query = query.order_by(ReunionBD.dateDebutRE.desc())
+
+    # =========================================================
+    # BLOC 3 : ÉVÉNEMENTS CLUB
+    # =========================================================
+    elif type_page == 'event_club':
+        query = EventClubBD.query.join(
+            ParticiperBD, EventClubBD.id_event == ParticiperBD.id_event
+        ).filter(ParticiperBD.id_membre == current_user.id)
+
+        if etat == 'passees':
+            query = query.filter(EventClubBD.dateDebutEV < today)
+        else:
+            query = query.filter(EventClubBD.dateDebutEV >= today)
+
+        if filtre.recherche.data:
+            terme = f"%{filtre.recherche.data}%"
+            query = query.filter(EventClubBD.NomEV.ilike(terme))
+
+        if filtre.tri.data == 'date_asc':
+            query = query.order_by(EventClubBD.dateDebutEV.asc())
+        else:
+            query = query.order_by(EventClubBD.dateDebutEV.desc())
+            
+    else:
+        # Fallback
+        return redirect(url_for('evenement_membre', type='competitions'))
+
+    # Pagination finale
+    pagination = query.paginate(page=page, per_page=6, error_out=False)
+
+    return render_template("evenement_membre.html", 
+                           title=TITLE + "- Vos Évènements",
+                           pagination=pagination,
+                           type_page=type_page,
+                           etat=etat,
+                           filtre=filtre)
 
 # Affiche le profil public d'un membre.
 @app.route("/profil_view/<int:idM>")
@@ -1603,16 +1735,16 @@ def profil_edit(idM):
             uneModif.date = datetime.now()
             uneModif.justification = unForm.justification.data
             db.session.commit()
-        # Création des notifications pour les administrateurs
+            # Création des notifications pour les administrateurs
             admins = AdminBD.query.all()
-            
+
             for admin in admins:
                 params = admin.parametres_notif_admin
                 if params:
                     notify = False
                     if params.demandeModifSite:
                         notify = True
-                    
+
                     if notify:
                         notif = NotifsBD(
                             typeN="Demande Modification",
@@ -1623,7 +1755,7 @@ def profil_edit(idM):
                             idAdmin=admin.id
                         )
                         db.session.add(notif)
-            db.session.commit()    
+            db.session.commit()
             return redirect(url_for('profil_view', idM=unMembre.id, origine='profil'))
     return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
 
@@ -1634,7 +1766,7 @@ def profil_edit(idM):
 def gerer_inscriptions():
     page = request.args.get('page', 1, type=int)
     type_page = request.args.get('type',
-                                 'inscription') 
+                                 'inscription')
     if type_page == 'modification':
         lesRequetes = ModifBD.query.order_by(ModifBD.date.asc())
     else:
@@ -1896,7 +2028,7 @@ def parametres_notifs():
 def changer_mdp():
     form = MdpChangeForm()
     if form.validate_on_submit():
-        # verifie ancien mot de passe 
+        # verifie ancien mot de passe
         if not check_password_hash(current_user.mdp_hash, form.old_password.data):
             flash("L'ancien mot de passe est incorrect.", 'danger')
             return redirect(url_for('changer_mdp'))
@@ -1906,8 +2038,8 @@ def changer_mdp():
             return redirect(url_for('changer_mdp'))
         # verifie si mdp fort
         if not est_mot_de_passe_fort(form.new_password.data):
-             flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
-             return redirect(url_for('changer_mdp'))
+            flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
+            return redirect(url_for('changer_mdp'))
         # maj le mdp
         current_user.mdp_hash = generate_password_hash(form.new_password.data, method='pbkdf2:sha256')
         db.session.commit()
@@ -2021,7 +2153,7 @@ def inscription():
                 return redirect(url_for('gerer_profils'))
             else:
                 nouvelle_inscription = InscriptionBD(
-                    email=unForm.Login.data,           
+                    email=unForm.Login.data,
                     nom=unForm.nom.data,
                     prenom=unForm.prenom.data,
                     ddn=unForm.date_naissance.data,
@@ -2035,14 +2167,14 @@ def inscription():
 
                 # Création des notifications pour les administrateurs
                 admins = AdminBD.query.all()
-                
+
                 for admin in admins:
                     params = admin.parametres_notif_admin
                     if params:
                         notify = False
                         if params.demandeInscriptionSite:
                             notify = True
-                        
+
                         if notify:
                             notif = NotifsBD(
                                 typeN="Demande Inscription",
@@ -2053,16 +2185,16 @@ def inscription():
                                 idAdmin=admin.id
                             )
                             db.session.add(notif)
-                db.session.commit()    
+                db.session.commit()
 
                 return redirect(url_for('index'))
         except Exception as e:
             db.session.rollback()
             print(f"ERREUR INSCRIPTION : {e}")
             # Affiche l'erreur sur la page pour que l'utilisateur sache ce qui se passe
-            return render_template("inscription.html", 
-                                   title=TITLE+"- Inscriptions", 
-                                   form=unForm, 
+            return render_template("inscription.html",
+                                   title=TITLE+"- Inscriptions",
+                                   form=unForm,
                                    message_erreur=f"Erreur technique : {str(e)}")
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
 
@@ -2072,15 +2204,15 @@ def mdp_oublier():
     if form.validate_on_submit():
         email = form.email.data
         user = get_user_by_email(email)
-        
+
         if user:
             token = s.dumps(email, salt='email-recover')
             link = url_for('reset_with_token', token=token, _external=True)
-            
-            # Simulation d'envoi 
+
+            # Simulation d'envoi
             simuler_envoi_email(email, link)
-        
-        flash("Si cet email correspond à un compte, un lien de réinitialisation vous a été envoyé.", "info") 
+
+        flash("Si cet email correspond à un compte, un lien de réinitialisation vous a été envoyé.", "info")
         return redirect(url_for('login'))
     return render_template("mdp_oublier.html", title=TITLE + "- Mot de passe oublié", form=form)
 
@@ -2092,7 +2224,7 @@ def reset_with_token(token):
     except (SignatureExpired, Exception):
         flash("Le lien de réinitialisation est invalide ou a expiré.", "danger")
         return redirect(url_for('mdp_oublier'))
-    
+
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user = get_user_by_email(email)
@@ -2100,7 +2232,7 @@ def reset_with_token(token):
             if not est_mot_de_passe_fort(form.password.data):
                 flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
                 return render_template('reset_password.html', form=form, title="Réinitialisation mot de passe")
-            
+
             user.mdp_hash = generate_password_hash(form.password.data, method='pbkdf2:sha256')
             db.session.commit()
             flash("Votre mot de passe a été mis à jour avec succès.", "success")
@@ -2108,7 +2240,7 @@ def reset_with_token(token):
         else:
             flash("Utilisateur introuvable.", "danger")
             return redirect(url_for('login'))
-            
+
     return render_template('reset_password.html', form=form, title="Réinitialisation mot de passe")
 
 # Déconnecte l'utilisateur.
