@@ -2107,12 +2107,6 @@ def inscription():
                                    title=TITLE+"- Inscriptions",
                                    form=unForm,
                                    message_erreur="Le mot de passe doit contenir 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.")
-        if not unForm.nom.data[0].isupper() or not unForm.prenom.data[0].isupper():
-            #renvoie une erreur si le nom ou le prénom ne commence pas par une majuscule
-            return render_template("inscription.html",
-                                   title=TITLE+"- Inscriptions",
-                                   form=unForm,
-                                   erreur_nom ="le Nom et le Prénom doivent commencer par une majuscule.")
         if utilisateur_existant or demande_existante:
             return render_template("inscription.html",
                                   title = TITLE+"- Inscriptions",
@@ -2121,8 +2115,8 @@ def inscription():
         try:
             if current_user.is_authenticated and session.get('user_type') == 'admin':
                 nouveauMembre = MembreBD(
-                    nom=unForm.nom.data,
-                    prenom=unForm.prenom.data,
+                    nom=unForm.nom.data.capitalize(),
+                    prenom=unForm.prenom.data.capitalize(),
                     email=unForm.Login.data,
                     ddn=unForm.date_naissance.data,
                     sexe=unForm.sexe.data,
@@ -2154,8 +2148,8 @@ def inscription():
             else:
                 nouvelle_inscription = InscriptionBD(
                     email=unForm.Login.data,
-                    nom=unForm.nom.data,
-                    prenom=unForm.prenom.data,
+                    nom=unForm.nom.data.capitalize(),
+                    prenom=unForm.prenom.data.capitalize(),
                     ddn=unForm.date_naissance.data,
                     sexe=unForm.sexe.data,
                     numTel=unForm.numTel.data,
