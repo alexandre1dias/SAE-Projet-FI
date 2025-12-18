@@ -802,6 +802,7 @@ def evenement_club(etat="prochaine"):
 
 # Affiche les détails d'un événement de club spécifique.
 @app.route("/evenement_club/<int:idEventClub>/club_view/")
+@login_required
 def club_view(idEventClub):
     unEventClub = EventClubBD.query.get(idEventClub)
     origine = request.args.get('origine', 'default')

@@ -56,6 +56,47 @@ def test_pages_publiques_avec_url_for(client, app, page, text):
     assert response.status_code == 200
     assert text in response.data.decode('utf-8')
 
+def test_page_publique_competition_view(client, app, db):
+    """
+    Test de la page de consultation d'une compétition.
+    Nécessite de créer une compétition en BDD avant d'appeler l'URL.
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+
+    # 1. Création d'une compétition
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+
+    comp = CompetitionBD(
+        id_event=evt.id,
+        nom="Grande Compétition Test",
+        ville="Lyon",
+        adresse="Gymnase du Centre",
+        date_debut=date.today(),
+        heure_debut="09:00",
+        date_fin=date.today(),
+        heure_fin="18:00",
+        type_arme="Sabre",
+        sexe="F",
+        typeComp="National",
+        niveaux="M20",
+        passee=False
+    )
+    db.session.add(comp)
+    db.session.commit()
+
+    # 2. Appel de la route avec l'ID dynamique
+    with app.test_request_context():
+        url = url_for('competition_view', idCompetition=comp.id)
+    
+    response = client.get(url)
+
+    # 3. vérification
+    assert response.status_code == 200
+    assert "Grande Compétition Test" in response.data.decode('utf-8')
+    assert "Lyon" in response.data.decode('utf-8')
+
 # ==============================================================================
 # 2. PAGES MEMBRES
 # ==============================================================================
@@ -115,7 +156,7 @@ def test_pages_membres_protegees(client, app, db):
         assert "Liste des prochains évènements du cercle" in response.data.decode('utf-8')
 
 # ==============================================================================
-# 3. PAGES ADMIN (Accès basique)
+# 3. PAGES ADMIN
 # ==============================================================================
 def test_pages_admin_protegees(client, app, db):
     """Test de l'accès aux pages réservées aux administrateurs."""
@@ -142,6 +183,135 @@ def test_pages_admin_protegees(client, app, db):
         response = client.get(url_for('reunion'))
         assert response.status_code == 200
         assert "Listes des prochaines réunions" in response.data.decode('utf-8')
+
+def test_page_protegee_reunion_view(client, app, db):
+    """
+    Test de la consultation d'une réunion.
+    Route : /reunion/consultation/<id>
+    Nécessite d'être connecté en Admin.
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+    
+    # 1. AUTHENTIFICATION
+    setup_admin(client, db)
+
+    # 2. SETUP DONNÉES
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+
+    reunion = ReunionBD(
+        idEvent=evt.id,
+        nom="Réunion Mensuelle",
+        typeReunionRE="Générale",
+        ville="Salle de réunion",
+        adresse="12 rue du pont",
+        dateDebutRE=date.today(),
+        heureDebutRE="10:00",
+        dateFinRE=date.today(),
+        heureFinRE="12:00",
+        nbParticipantsRE=10,
+        rapportRE="Rien à signaler"
+    )
+    db.session.add(reunion)
+    db.session.commit()
+
+    # 3. EXECUTION
+    with app.test_request_context():
+        url = url_for('reunion_view', idReunion=reunion.id)
+    
+    response = client.get(url)
+
+    # 4. VERIFICATION
+    assert response.status_code == 200
+    assert "Réunion Mensuelle" in response.data.decode('utf-8')
+    assert "Rien à signaler" in response.data.decode('utf-8')
+
+def test_page_reunion_view_acces_refuse(client, app, db):
+    """
+    Test inverse : Vérifie qu'un visiteur non connecté est redirigé (ou bloqué).
+    """
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+    reunion = ReunionBD(idEvent=evt.id, nom="Secret", dateDebutRE=date.today(), 
+                        heureDebutRE="10:00", dateFinRE=date.today(), heureFinRE="11:00", typeReunionRE="AG")
+    db.session.add(reunion)
+    db.session.commit()
+
+    client.get('/logout/') 
+    
+    response = client.get(f'/reunion/consultation/{reunion.id}')
+    
+    assert response.status_code == 302 
+    assert "/login" in response.location
+
+def test_page_protegee_club_view(client, app, db):
+    """
+    Test de la consultation d'un événement club.
+    Route : /evenement_club/<id>/club_view/
+    Nécessite d'être CONNECTÉ (Membre ou Admin).
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+
+    # 1. SETUP DONNÉES
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+
+    club = EventClubBD(
+        id_event=evt.id,
+        NomEV="Soirée Barbecue",
+        villeEV="Orléans",
+        adresseEV="Club House",
+        dateDebutEV=date.today(),
+        heureDebutEV="19:00",
+        dateFinEV=date.today(),
+        heureFinEV="23:00",
+        descriptionEV="Venez nombreux",
+        niveauxEV="Tous",
+        passeeEV=False
+    )
+    db.session.add(club)
+    
+    # 2. SETUP UTILISATEUR
+    membre = MembreBD(
+        email='membre@test.fr', 
+        mdp_hash=generate_password_hash('pass'),
+        nom='Test', prenom='User', activite=True
+    )
+    db.session.add(membre)
+    db.session.commit()
+
+    # 3. CONNEXION
+    client.post('/login/', data={'email': 'membre@test.fr', 'password': 'pass'})
+
+    # 4. EXECUTION
+    with app.test_request_context():
+        url = url_for('club_view', idEventClub=club.idEventClub)
+    
+    response = client.get(url)
+
+    # 5. VERIFICATION
+    assert response.status_code == 200
+    assert "Soirée Barbecue" in response.data.decode('utf-8')
+
+def test_club_view_acces_refuse_anonyme(client, app, db):
+    """Vérifie qu'un visiteur non connecté est redirigé vers le login."""
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+    club = EventClubBD(id_event=evt.id, NomEV="Privé", dateDebutEV=date.today(), 
+                       heureDebutEV="10:00", dateFinEV=date.today(), heureFinEV="12:00", 
+                       descriptionEV="Test", niveauxEV="Tous", villeEV="Paris", adresseEV="Ici")
+    db.session.add(club)
+    db.session.commit()
+
+    client.get('/logout/')
+    response = client.get(f'/evenement_club/{club.idEventClub}/club_view/')
+    
+    assert response.status_code == 302
+    assert "/login" in response.location
 
 # ==============================================================================
 # 4. SCENARIOS ACTIONS ADMIN
