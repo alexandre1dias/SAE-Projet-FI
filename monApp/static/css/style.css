@@ -981,6 +981,11 @@ body.dark-mode .fc {
     color: #fefefe;
 }
 
+body.dark-mode .contact-info-box{
+    background-color: #312f2f;
+    color: #fefefe87;
+}
+
 body.dark-mode h3
 
 body.dark-mode .fc-theme-standard td,
