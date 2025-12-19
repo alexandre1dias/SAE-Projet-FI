@@ -1,175 +1,199 @@
-{%extends "base.html"%}
-    {% block head_extra %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
-    {% endblock %}
-    {%block main%}
-    <div class="container-fluid py-5">
-        <h2 class="text-center mb-5">Vos Évènements</h2>
-        <div class="row">
-            <aside class="col-lg-2 col-md-3 mb-4">
-                <div class="filtres-box">
-                    <h5>Filtrer par</h5>
-                    
-                    <div class="filtre-categorie">
-                        <h6>Type d'événement</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-competition" checked>
-                            <label class="form-check-label" for="type-competition">Compétition</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-reunion" checked>
-                            <label class="form-check-label" for="type-reunion">Réunion</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-eventclub" checked>
-                            <label class="form-check-label" for="type-eventclub">Évènement du club</label>
-                        </div>
-                    </div>
+{% extends "base.html" %}
 
-                    <div class="filtre-categorie">
-                        <h6>Type d'arme</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-sabre" checked>
-                            <label class="form-check-label" for="type-sabre">Sabre</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-fleuret" checked>
-                            <label class="form-check-label" for="type-fleuret">Fleuret</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-epee" checked>
-                            <label class="form-check-label" for="type-epee">Épée</label>
-                        </div>
-                    </div>
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
+{% endblock %}
 
-                    <div class="filtre-categorie">
-                        <h6>Niveau</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-M9" checked>
-                            <label class="form-check-label" for="type-M9">M9</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-M11" checked>
-                            <label class="form-check-label" for="type-M11">M11</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-M13" checked>
-                            <label class="form-check-label" for="type-M13">M13</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-M15" checked>
-                            <label class="form-check-label" for="type-M15">M15</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-M17" checked>
-                            <label class="form-check-label" for="type-M17">M17</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-M20" checked>
-                            <label class="form-check-label" for="type-M20">M20</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-senior" checked>
-                            <label class="form-check-label" for="type-senior">Sénior</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="type-veteran" checked>
-                            <label class="form-check-label" for="type-veteran">Vétéran</label>
-                        </div>
-                    </div>
+{% block main %}
+<div class="container-fluid py-5">
+    <div class="header-container mb-4 text-center justify-content-center">
+        <h2>Vos Évènements</h2>
+    </div>
+    
+    <ul class="nav nav-tabs mb-4 justify-content-center">
+        <li class="nav-item">
+            <a class="nav-link {% if type_page == 'competitions' %}active{% endif %}" 
+               href="{{ url_for('evenement_membre', type='competitions', etat=etat, recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}">
+               Compétitions
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if type_page == 'reunions' %}active{% endif %}" 
+               href="{{ url_for('evenement_membre', type='reunions', etat=etat, recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}">
+               Réunions
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if type_page == 'event_club' %}active{% endif %}" 
+               href="{{ url_for('evenement_membre', type='event_club', etat=etat, recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}">
+               Évènements Club
+            </a>
+        </li>
+    </ul>
 
-                    <div class="filtre-categorie">
-                        <h6>Trier par</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="tri" id="dateRecente" checked>
-                            <label class="form-check-label" for="dateRecente">Date (plus récent)</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="tri" id="dateAncienne">
-                            <label class="form-check-label" for="dateAncienne">Date (plus ancien)</label>
-                        </div>
-                    </div>
-                </div>
-            </aside>
+    <div class="row">
+            <h4 class="mb-4">
+                {% if etat == 'passees' %}Historique : {% else %}Prochains évènements : {% endif %}
+            </h4>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
+                {% for event in pagination.items %}
+                    <div class="col">
+                        <div class="card pricing-card h-100 border-primary shadow-sm">
+                            
+                            <div class="card-header pricing-header basic-header p-4 bg-light">
+                                <h3 class="card-title text-center mb-0 h5">
+                                    {% if type_page == 'competitions' %}
+                                        {{ event.nom }}
+                                    {% elif type_page == 'reunions' %}
+                                        {{ event.nom }}
+                                    {% elif type_page == 'event_club' %}
+                                        {{ event.NomEV }}
+                                    {% endif %}
+                                </h3>
+                            </div>
 
-            <div class="col-lg-10 col-md-9">
-                <h3 class="mb-4">Évènements à venir</h3>
-                <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
-                    {% for event in events_a_venir %}
-                        <div class="col">
-                            <div class="card pricing-card h-100">
-                                <div class="card-header pricing-header basic-header p-4">
-                                    <h3 class="card-title text-center mb-0">
-                                        {% if event.__tablename__ == 'COMPETITION' %}{{ event.nom }}{% endif %}
-                                        {% if event.__tablename__ == 'REUNION' %}{{ event.nom }}{% endif %}
-                                        {% if event.__tablename__ == 'EVENTCLUB' %}{{ event.NomEV }}{% endif %}
-                                    </h3>
-                                </div>
-                                <div class="card-body p-4">
-                                    <h4 class="card-title text-center mb-4 h5">
-                                        {% if event.__tablename__ == 'COMPETITION' %}{{ event.niveaux }}{% endif %}
-                                        {% if event.__tablename__ == 'REUNION' %}{{ event.niveauRE }}{% endif %}
-                                        {% if event.__tablename__ == 'EVENTCLUB' %}{{ event.niveauxEV }}{% endif %}
-                                    </h4>
-                                    <ul class="feature-list text-center mb-4">
-                                        {% if event.__tablename__ == 'COMPETITION' %}
-                                            <li>{{ event.date_debut.strftime('%d/%m/%Y') }} - {{ event.date_fin.strftime('%d/%m/%Y') }}</li>
-                                            <li>{{ event.type_arme }}</li>
-                                            <li>{{ event.typeComp }}</li>
-                                        {% elif event.__tablename__ == 'REUNION' %}
-                                            <li>{{ event.dateDebutRE.strftime('%d/%m/%Y') }}</li>
-                                            <li>{{ event.typeReunionRE }}</li>
-                                        {% elif event.__tablename__ == 'EVENTCLUB' %}
-                                            <li>{{ event.dateDebutEV.strftime('%d/%m/%Y') }} - {{ event.dateFinEV.strftime('%d/%m/%Y') }}</li>
-                                            <li>Évènement de club</li>
+                            <div class="card-body p-4 d-flex flex-column">
+                                <h4 class="card-title text-center mb-3 h6 text-muted">
+                                    {% if type_page == 'competitions' %}
+                                        {{ event.niveaux }}
+                                    {% elif type_page == 'reunions' %}
+                                        {{ event.niveauRE }}
+                                    {% elif type_page == 'event_club' %}
+                                        {{ event.niveauxEV }}
+                                    {% endif %}
+                                </h4>
+
+                                <ul class="feature-list text-center mb-4 list-unstyled flex-grow-1">
+                                    {% if type_page == 'competitions' %}
+                                        <li class="mb-2 fs-5"><strong>{{ event.date_debut.strftime('%d/%m/%Y') }}</strong></li>
+                                        <li><i class="fas fa-fist-raised me-2"></i>{{ event.type_arme }}</li>
+                                        <li><i class="fas fa-map-marker-alt me-2"></i>{{ event.ville }}</li>
+                                    
+                                    {% elif type_page == 'reunions' %}
+                                        <li class="mb-2 fs-5"><strong>{{ event.dateDebutRE.strftime('%d/%m/%Y') }}</strong></li>
+                                        <li><i class="far fa-clock me-2"></i>{{ event.heureDebutRE }} - {{ event.heureFinRE }}</li>
+                                        <li><i class="fas fa-map-marker-alt me-2"></i>{{ event.ville }}</li>
+                                    
+                                    {% elif type_page == 'event_club' %}
+                                        <li class="mb-2 fs-5"><strong>{{ event.dateDebutEV.strftime('%d/%m/%Y') }}</strong></li>
+                                        <li><i class="far fa-clock me-2"></i>{{ event.heureDebutEV }}</li>
+                                        <li><i class="fas fa-map-marker-alt me-2"></i>{{ event.villeEV }}</li>
+                                    {% endif %}
+                                </ul>
+
+                                <div class="text-center d-flex justify-content-center gap-2 mt-auto">
+                                    {% if type_page == 'competitions' %}
+                                        <a href="{{ url_for('competition_view', idCompetition=event.id, origine='evenement_membre') }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                        {% if etat == 'avenir' %}
+                                        <a href="{{ url_for('desinscrire_competition', idCompetition=event.id) }}" 
+                                           class="btn btn-sm btn-outline-danger btn-custom"
+                                           onclick="return confirm('Êtes-vous sûr de vouloir vous désinscrire ?');">Désinscrire</a>
                                         {% endif %}
-                                    </ul>
-                                    <div class="text-center d-flex justify-content-center gap-2">
-                                        {% if event.__tablename__ == 'COMPETITION' %}
-                                            <a href="{{ url_for('competition_view', idCompetition=event.id) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
-                                            <a href="#" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
-                                        {% elif event.__tablename__ == 'REUNION' %}
-                                            <a href="{{ url_for('reunion_view', idReunion=event.id) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
-                                            <a href="{{ url_for('desinscrire_reunion', idReunion=event.id) }}" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
-                                        {% elif event.__tablename__ == 'EVENTCLUB' %}
-                                            <a href="{{ url_for('club_view', idEventClub=event.idEventClub) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
-                                            <a href="{{ url_for('desinscrire_club', idEventClub=event.idEventClub) }}" class="btn btn-sm btn-outline-danger btn-custom">Désinscrire</a>
+                                    
+                                    {% elif type_page == 'reunions' %}
+                                        <a href="{{ url_for('reunion_view', idReunion=event.id) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                        {% if etat == 'avenir' %}
+                                        <a href="{{ url_for('desinscrire_reunion', idReunion=event.id) }}" 
+                                           class="btn btn-sm btn-outline-danger btn-custom"
+                                           onclick="return confirm('Êtes-vous sûr de vouloir vous désinscrire ?');">Désinscrire</a>
                                         {% endif %}
-                                    </div>
+                                    
+                                    {% elif type_page == 'event_club' %}
+                                        <a href="{{ url_for('club_view', idEventClub=event.idEventClub, origine='evenement_membre') }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                        {% if etat == 'avenir' %}
+                                        <a href="{{ url_for('desinscrire_club', idEventClub=event.idEventClub) }}" 
+                                           class="btn btn-sm btn-outline-danger btn-custom"
+                                           onclick="return confirm('Êtes-vous sûr de vouloir vous désinscrire ?');">Désinscrire</a>
+                                        {% endif %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
-                    {% else %}
-                        <p>Vous n'êtes inscrit à aucun événement à venir.</p>
-                    {% endfor %}
-                </div>
-
-                <h3 class="mb-4">Évènements passés</h3>
-                <div class="row row-cols-1 row-cols-md-3 g-4">
-                    {% for event in events_passes %}
-                        <div class="col">
-                            <div class="card pricing-card h-100">
-                                <div class="card-header pricing-header basic-header p-4">
-                                    <h3 class="card-title text-center mb-0">
-                                        {% if event.__tablename__ == 'COMPETITION' %}{{ event.nom }}{% endif %}
-                                        {% if event.__tablename__ == 'REUNION' %}{{ event.nom }}{% endif %}
-                                        {% if event.__tablename__ == 'EVENTCLUB' %}{{ event.NomEV }}{% endif %}
-                                    </h3>
-                                </div>
-                                <div class="card-body p-4">
-                                    <div class="text-center">
-                                        {% if event.__tablename__ == 'COMPETITION' %}<a href="{{ url_for('competition_view', idCompetition=event.id) }}" class="btn btn-outline-primary btn-custom">Consulter</a>{% endif %}
-                                        {% if event.__tablename__ == 'REUNION' %}<a href="{{ url_for('reunion_view', idReunion=event.id) }}" class="btn btn-outline-primary btn-custom">Consulter</a>{% endif %}
-                                        {% if event.__tablename__ == 'EVENTCLUB' %}<a href="{{ url_for('club_view', idEventClub=event.idEventClub) }}" class="btn btn-outline-primary btn-custom">Consulter</a>{% endif %}
-                                    </div>
-                                </div>
-                            </div>
+                    </div>
+                {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-info text-center py-4">
+                            <i class="fas fa-info-circle fa-2x mb-3"></i><br>
+                            Aucun évènement trouvé.
                         </div>
-                    {% else %}
-                        <p>Vous n'avez participé à aucun événement pour le moment.</p>
-                    {% endfor %}
-                </div>
+                    </div>
+                {% endfor %}
             </div>
+
+            {% if pagination.pages > 1 %}
+            <div class="d-flex justify-content-center mt-4">
+                <ul class="pagination">
+                    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('evenement_membre', page=pagination.prev_num, type=type_page, etat=etat, sexe=filtre.sexe.data, armes=filtre.armes.data, tri=filtre.tri.data, niveau=filtre.niveau.data, type_competition=filtre.type_competition.data, recherche=filtre.recherche.data) }}">Précédent</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Page {{ pagination.page }} sur {{ pagination.pages }}</span>
+                    </li>
+                    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('evenement_membre', page=pagination.next_num, type=type_page, etat=etat, sexe=filtre.sexe.data, armes=filtre.armes.data, tri=filtre.tri.data, niveau=filtre.niveau.data, type_competition=filtre.type_competition.data, recherche=filtre.recherche.data) }}">Suivant</a>
+                    </li>
+                </ul>
+            </div>
+            {% endif %}
+
         </div>
     </div>
-    {%endblock%}
+    
+    <aside class="fixed-left">
+        <div class="filtres-box">
+            <div>
+                <h5 class="filtres-titre">Action</h5>
+                <div class="d-grid gap-2">
+                    {% if etat == 'passees' %}
+                        <a href="{{ url_for('evenement_membre', type=type_page, etat='avenir', recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}" class="btn btn-outline-success">
+                            <i class="fas fa-calendar-alt me-2"></i>Voir À venir
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('evenement_membre', type=type_page, etat='passees', recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-history me-2"></i>Voir l'historique
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <br>
+            
+            <h5 class="filtres-titre">Filtres</h5>
+            <form action="{{ url_for('evenement_membre') }}" method="GET">
+                <input type="hidden" name="type" value="{{ type_page }}">
+                <input type="hidden" name="etat" value="{{ etat }}">
+
+                <div class="mb-3">
+                    {{ filtre.recherche(class="form-control", placeholder="Nom ou ville...") }}
+                </div>
+
+                <h6>{{ filtre.tri.label }}</h6>
+                <div class="form-group d-grid gap-2">
+                    {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle") }} 
+                </div>
+
+                {% if type_page == 'competitions' %}
+                    <h6>{{ filtre.armes.label }}</h6>
+                    {% for subfield in filtre.armes %}
+                        <div class="form-check">
+                            {{ subfield(class="form-check-input") }}
+                            {{ subfield.label(class="form-check-label") }}
+                        </div>
+                    {% endfor %}
+                    <h6>{{ filtre.type_competition.label }}</h6>
+                    {% for subfield in filtre.type_competition %}
+                        <div class="form-check">
+                            {{ subfield(class="form-check-input") }}
+                            {{ subfield.label(class="form-check-label") }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="d-grid gap-2 mt-4">
+                    {{ filtre.submit(class="btn btn-primary", value="Appliquer") }}
+                </div>
+            </form>
+        </div>
+    </aside>
+</div>
+{% endblock %}

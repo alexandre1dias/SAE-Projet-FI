@@ -1,129 +1,108 @@
 {%extends "base.html"%}
-
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendrier.css') }}">
+{% endblock %}
 {% block main %}
-<section class="calendrier-section">
-    <div class="container-fluid py-5">
-        <h1 class="text-center mb-5">Calendrier des Évènements</h1>
-        
-        <div class="row">  <div class="col-lg-2 col-md-3 mb-4">
-                <h5 class="filtres-titre">Filtres</h5>
-                    
-                    <div class="filtre-categorie">
-                        <h6>Type d'événement</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="competition" checked>
-                            <label class="form-check-label" for="competition">Compétition</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="reunion" checked>
-                            <label class="form-check-label" for="reunion">Réunion</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="eventclub" checked>
-                            <label class="form-check-label" for="eventclub">Évènement du club</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="entrainement" checked>
-                            <label class="form-check-label" for="entrainement">Entraînement</label>
-                        </div>
-                    </div>
+<h1 class="text-center mb-5" id="calendrier-titre">Calendrier des Évènements</h1>
+<aside class="fixed-left">
+<div class="filtres-box">
+    {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+    <div>
+        <h5 class="filtres-titre">Action</h5>
+        <a href="{{ url_for('add_event') }}" class="btn btn-primary w-100">
+            Ajouter un événement
+        </a>
+    </div>
+    {% endif%}
+    <br>
+    <h5 class="filtres-titre">Filtres</h5>
+    <form action="{{ url_for('calendrier') }}" method="GET">
 
-                   
-                    <div class="filtre-categorie">
-                        <h6>Type de compétition</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="regional" checked>
-                            <label class="form-check-label" for="regional">Régional</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="national" checked>
-                            <label class="form-check-label" for="national">National</label>
-                        </div>
-                    </div>
-
-                    
-                    <div class="filtre-categorie">
-                        <h6>Type d'arme</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="epee" checked>
-                            <label class="form-check-label" for="epee">Épée</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="fleuret" checked>
-                            <label class="form-check-label" for="fleuret">Fleuret</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="sabre" checked>
-                            <label class="form-check-label" for="sabre">Sabre</label>
-                        </div>
-                    </div>
-
-                    
-                    <div class="filtre-categorie">
-                        <h6>Genre</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="homme" checked>
-                            <label class="form-check-label" for="homme">Homme</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="femme" checked>
-                            <label class="form-check-label" for="femme">Femme</label>
-                        </div>
-                    </div>
-
-                    
-                    <div class="filtre-categorie">
-                        <h6>Niveau</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="M9" checked>
-                            <label class="form-check-label" for="M9">M9</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="M11" checked>
-                            <label class="form-check-label" for="M11">M11</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="M13" checked>
-                            <label class="form-check-label" for="M13">M13</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="M15" checked>
-                            <label class="form-check-label" for="M15">M15</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="M17" checked>
-                            <label class="form-check-label" for="M17">M17</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="M20" checked>
-                            <label class="form-check-label" for="M20">M20</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="senior" checked>
-                            <label class="form-check-label" for="senior">Sénior</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="veteran" checked>
-                            <label class="form-check-label" for="veteran">Vétéran</label>
-                        </div>
-                    </div>
-
-                    {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
-                    <div class="mt-4">
-                        <a href="{{ url_for('add_event') }}" class="btn btn-primary w-100">
-                            Ajouter un événement
-                        </a>
-                    </div>
-                    {% endif %}
+        <h6>{{ filtre.type_event.label }}</h6>
+        {% for subfield in filtre.type_event %}
+            <div class="form-check custom-check-{{ subfield.data | replace(' ', '-') 
+            | replace('é', 'e') | replace('è', 'e') | replace('É', 'e') | replace('î', 'i') | lower }}">
+                {{ subfield(class="form-check-input") }}
+                {{ subfield.label(class="form-check-label") }}
             </div>
+        {% endfor %}
 
-            
-            <div class="col-lg-10 col-md-9"> <div class="calendrier-wrapper">
-                    <div id='calendar'></div>
+        <h6>{{ filtre.type_competition.label }}</h6>
+        {% for subfield in filtre.type_competition %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+
+        <h6>{{ filtre.armes.label }}</h6>
+        {% for subfield in filtre.armes %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+
+        <h6>{{ filtre.sexe.label }}</h6>
+        {% for subfield in filtre.sexe %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+
+        <h6>{{ filtre.niveau.label }}</h6>
+        {% for subfield in filtre.niveau %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+        {{ filtre.submit(class="btn btn-primary", value="Appliquer les filtres") }}
+    </form>
+</div>
+</aside>
+<!--Ligne pour l'affichage du calendrier-->
+    <div class="calendrier-wrapper" id='calendar'></div>
+
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="eventModalLabel">Détails de l'événement</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4 id="modalTitle" class="text-primary mb-4 text-center"></h4>
+                
+                <div class="fs-6"> <p class="mb-2"><strong>Type :</strong> <span id="modalType"></span></p>
+                    <p class="mb-2"><strong>Début :</strong> <span id="modalStart"></span></p>
+                    <p class="mb-2"><strong>Fin :</strong> <span id="modalEnd"></span></p>
+                    
+                    <div id="lineNiveau">
+                        <p class="mb-2"><strong>Niveaux :</strong> <span id="modalNiveaux"></span></p>
+                    </div>
+                    
+                    <div id="lineArme">
+                        <p class="mb-2"><strong>Arme :</strong> <span id="modalArme"></span></p>
+                    </div>
+
+                    <hr> <p class="mb-2"><strong>Ville :</strong> <span id="modalVille"></span></p>
+                    <p class="mb-2"><strong>Adresse :</strong> <span id="modalAdresse"></span></p>
+                    
+                    <hr> <p class="mb-2"><strong>Infos :</strong> <span id="modalDescription" class="text-muted"></span></p>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -131,11 +110,16 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
+        
+        // Initialisation de la modale Bootstrap
+        var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'fr',
             firstDay: 1,
             height: 700,
+            fixedWeekCount: false,
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
@@ -148,26 +132,63 @@
                 day: 'Jour',
                 list: 'Liste'
             },
-            events: '/api/events',
+            
+            events: function(info, successCallback, failureCallback) {
+                const urlParams = new URLSearchParams(window.location.search);
+                let apiUrl = '/api/events?' + urlParams.toString();
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        successCallback(data);
+                    })
+                    .catch(error => {
+                        console.error("Erreur lors de la récupération des événements:", error);
+                        failureCallback(error);
+                    });
+            },
             eventClick: function(info) {
+                // Si l'événement a une URL (Compétition, Réunion...), on redirige
                 if (info.event.extendedProps.url) {
                     window.location.href = info.event.extendedProps.url;
                 }
+
+                // Sinon (Entraînement), on ouvre la modale
                 else {
                     let event = info.event;
                     let props = event.extendedProps;
-                    let startDate = event.start ? event.start.toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' }) : 'Non spécifié';
-                    let endDate = event.end ? event.end.toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' }) : 'Non spécifié';
-                    let description = props.description || 'Aucune description';
-                    let category = props.type || 'Non classé';
-                    let levels = props.niveaux || 'Non spécifié';
-                    let alertMessage = `Événement: ${event.title}\n` +
-                                       `Type: ${category}\n` +
-                                       `Début: ${startDate}\n` +
-                                       `Fin: ${endDate}\n` +
-                                       `Niveaux: ${levels}\n` +
-                                       `Description: ${description}`;
-                    alert(alertMessage);
+                    
+                    document.getElementById('eventModalLabel').innerText = props.type || 'Détails';
+                    document.getElementById('modalTitle').innerText = event.title;
+                    document.getElementById('modalType').innerText = props.type || 'Non spécifié';
+                    document.getElementById('modalVille').innerText = props.ville || 'Non spécifié';
+                    document.getElementById('modalAdresse').innerText = props.adresse || 'Non spécifié';
+                    document.getElementById('modalDescription').innerText = props.description || 'Aucune description';
+                    
+                    let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                    document.getElementById('modalStart').innerText = event.start ? event.start.toLocaleDateString('fr-FR', options) : '';
+                    document.getElementById('modalEnd').innerText = event.end ? event.end.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) : '';
+                    
+                    // Niveaux
+                    let elemNiveau = document.getElementById('lineNiveau');
+                    let spanNiveau = document.getElementById('modalNiveaux');
+                    if (props.niveaux) {
+                        spanNiveau.innerText = props.niveaux;
+                        elemNiveau.style.display = 'block';
+                    } else {
+                        elemNiveau.style.display = 'none';
+                    }
+                    
+                    // Armes
+                    let elemArme = document.getElementById('lineArme');
+                    let spanArme = document.getElementById('modalArme');
+                    if (props.arme) {
+                        spanArme.innerText = props.arme;
+                        elemArme.style.display = 'block';
+                    } else {
+                        elemArme.style.display = 'none';
+                    }
+
+                    eventModal.show();
                 }
             }
         });

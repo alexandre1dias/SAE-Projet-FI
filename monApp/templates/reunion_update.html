@@ -5,7 +5,10 @@
         <label for="nom" class="form-label">Nom de la réunion</label>
         <input type="text" class="form-control form-control-lg" id="nom" name="nom" value="{{ reunion.nom }}" required>
     </h1>
-    
+    <div class="mb-4">
+        <label for="type_reunion" class="form-label">Type de réunion</label>
+        <input type="text" class="form-control" id="type_reunion" name="type_reunion" value="{{ reunion.typeReunionRE }}" placeholder="Ex: Générale, Comité..." required>
+    </div>
     <div class="row">
         <div class="col-lg-3 col-md-6 mb-4">
             <div class="card h-100 shadow-sm">

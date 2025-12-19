@@ -1,20 +1,37 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField, widgets
+from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField, widgets, MultipleFileField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 from datetime import date
+from flask_wtf.file import FileField, FileAllowed
+import phonenumbers
+from config import AUJOURDHUI, LISTE_ANNEE
+
 
 class LoginForm(FlaskForm):
     email = StringField ('Email' ,validators= [DataRequired(), Email()])
     password = PasswordField ('Mot de passe', validators=[DataRequired()])
     connecter = SubmitField('Se connecter')
 
-class PasswordChangeForm(FlaskForm):
+class MdpOublieForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Envoyer')
+
+class MdpChangeForm(FlaskForm):
     old_password = PasswordField ('Ancien mot de passe', validators=[DataRequired()])
     new_password = PasswordField ('Nouveau mot de passe', validators=[DataRequired()])
     confirm_new_password = PasswordField('Confirmer le nouveau mot de passe', validators=[DataRequired()])
     next = HiddenField()
     submit = SubmitField('Valider la modification')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Nouveau mot de passe', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirmer le nouveau mot de passe', validators=[DataRequired()])
+    submit = SubmitField('Réinitialiser le mot de passe')
+
+    def validate_confirm_password(self, confirm_password):
+        if self.password.data != confirm_password.data:
+            raise ValidationError('Les mots de passe ne correspondent pas.')
 
 class ModifForm(FlaskForm):
     nom = StringField ('nom' ,validators= [DataRequired()])
@@ -25,6 +42,8 @@ class ModifForm(FlaskForm):
         ('Femme', 'Femme')
     ], validators=[DataRequired()])
     email = StringField ('Email' ,validators= [DataRequired(), Email()])
+    numTel = StringField('Numéro de téléphone (optionnel)', validators=[Optional()])
+    numLicense = StringField('numéro de License',validators=[Optional()])
     statut = SelectField('Statut', choices=[
         ('Membre', 'Membre'),
         ('Membre du comité', 'Membre du comité'),
@@ -34,6 +53,17 @@ class ModifForm(FlaskForm):
         ('Président', 'Président')
     ], validators=[DataRequired()]) 
     justification = TextAreaField('Justification de la demande (optionnel)', validators=[Optional()])
+
+    def validate_numTel(self, field):
+        if field.data:
+            try:
+                phone = phonenumbers.parse(field.data, "FR")
+                if not phonenumbers.is_valid_number(phone):
+                    raise ValidationError('Numéro de téléphone invalide.')
+                # conversion au format INTERNATIONAL pour stockage String (ex: +33 6 12 34 56 78)
+                field.data = phonenumbers.format_number(phone, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+            except phonenumbers.NumberParseException:
+                raise ValidationError('Numéro de téléphone invalide.')
 
 class InscriptionForm(FlaskForm):
     # cette fonction permet de vérifier que l'utilisateur a au moins 8 ans
@@ -62,10 +92,22 @@ class InscriptionForm(FlaskForm):
     prenom = StringField ('prenom' ,validators= [DataRequired()])
     date_naissance = DateField ('date de naissance' , format='%Y-%m-%d', validators=[DataRequired(), validate_age])
     sexe = SelectField ('sexe' , choices=[('Homme', 'Homme'), ('Femme', 'Femme')], validators=[DataRequired()])
+    numTel = StringField('Numéro de téléphone (optionnel)', validators=[Optional()])
     password = PasswordField ('Mot de passe', validators=[DataRequired()])
     confirm_password = PasswordField ('Confirmer mot de passe', validators=[DataRequired()])
     next = HiddenField()
     inscription = SubmitField()
+
+    def validate_numTel(self, field):
+        if field.data:
+            try:
+                phone = phonenumbers.parse(field.data, "FR")
+                if not phonenumbers.is_valid_number(phone):
+                    raise ValidationError('Numéro de téléphone invalide.')
+                # conversion au format INTERNATIONAL pour stockage String (ex: +33 6 12 34 56 78)
+                field.data = phonenumbers.format_number(phone, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+            except phonenumbers.NumberParseException:
+                raise ValidationError('Numéro de téléphone invalide.')
 
 class ContactForm(FlaskForm):
     type_form = RadioField('Type de formulaire', choices=[
@@ -92,24 +134,24 @@ class EventForm(FlaskForm):
         ('M9', 'M9'), ('M11', 'M11'), ('M13', 'M13'), ('M15', 'M15'),
         ('M17', 'M17'), ('M20', 'M20'), ('Senior', 'Senior'), ('Veteran', 'Veteran')
     ], 
-    validators=[Optional()],
+    validators=[],
     widget=widgets.ListWidget(prefix_label=False),
     option_widget=widgets.CheckboxInput()
     ) 
-    
+    type_reunion = StringField('Type de réunion', validators=[])
     sexe = SelectField('Sexe concerné', choices=[
         ('Homme', 'Homme'), ('Femme', 'Femme')
-    ], validators=[Optional()]) 
+    ], validators=[]) 
     
     arme = SelectField('Arme concernée', choices=[
         ('Fleuret', 'Fleuret'), ('Épée', 'Épée'), ('Sabre', 'Sabre')
-    ], validators=[Optional()])
+    ], validators=[])
     
     type = SelectField('Type d\'événement', choices=[
         ('Regionale', 'Regionale'), ('National', 'National')
-    ], validators=[Optional()])
-    ville = StringField('Ville de l\'événement', validators=[DataRequired()])
-    adresse = StringField('Adresse de l\'événement', validators=[DataRequired()])
+    ], validators=[])
+    ville = StringField('Ville de l\'événement', validators=[])
+    adresse = StringField('Adresse de l\'événement', validators=[])
     description = TextAreaField('Description (optionnel)')
     submit = SubmitField('Ajouter l\'événement')
     
@@ -179,3 +221,144 @@ class Parametres_updateForm(FlaskForm):
     email = StringField('Email', validators=[Optional(), Email()])
     password = PasswordField('Nouveau mot de passe', validators=[Optional()])
     submit = SubmitField('Envoyer la requête')
+
+
+class FiltreForm(FlaskForm):
+    CHOIX_SEXE = [('Homme', 'Homme'), ('Femme', 'Femme')]
+    CHOIX_NIVEAU = [('M9', 'M9'), ('M11', 'M11'), ('M13', 'M13'), ('M15', 'M15'), 
+                    ('M17', 'M17'), ('M20', 'M20'), ('Senior', 'Senior'), ('Vétéran', 'Vétéran')]
+    CHOIX_FORMULAIRE = [('Question', 'Questions'), ('Demande', 'Demandes'), ('Signalement', 'Signalements')]
+    CHOIX_ARMES = [('Sabre', 'Sabre'), ('Fleuret', 'Fleuret'), ('Épée', 'Épée')]
+    CHOIX_TYPE_COMPETE = [('Régional', 'Régional'), ('National', 'National')]
+    CHOIX_TYPE_EVENT = [('Compétition', 'Compétition'), ('Réunion', 'Réunion'),('Évènement du club', 'Évènement du club'), ('Entraînement', 'Entraînement')]
+
+
+    sexe = SelectMultipleField(
+        'Sexes',
+        choices=CHOIX_SEXE,
+        default=[c[0] for c in CHOIX_SEXE], 
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
+    
+    niveau = SelectMultipleField(
+        'Niveaux',
+        choices=CHOIX_NIVEAU,
+        default=[c[0] for c in CHOIX_NIVEAU],
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
+
+    type_formulaire = SelectMultipleField(
+        'Type',
+        choices=CHOIX_FORMULAIRE,
+        default=[c[0] for c in CHOIX_FORMULAIRE],
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
+
+    armes = SelectMultipleField(
+        'Armes',
+        choices=CHOIX_ARMES,
+        default=[c[0] for c in CHOIX_ARMES],
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
+
+    type_competition = SelectMultipleField(
+        'Type Competition',
+        choices=CHOIX_TYPE_COMPETE,
+        default=[c[0] for c in CHOIX_TYPE_COMPETE],
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
+
+    type_event = SelectMultipleField(
+        'Type Evenement',
+        choices=CHOIX_TYPE_EVENT,
+        default=[c[0] for c in CHOIX_TYPE_EVENT],
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
+
+    recherche = StringField('Rechercher')
+    submit = SubmitField('Envoyer')
+
+    CHOIX_TRI = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien'), ('resultat', 'Resultat'),
+                 ('nom_asc', 'Nom A-Z'), ('nom_desc', 'Nom Z-A'), ('prenom_asc', 'Prenom A-Z'), ('prenom_desc', 'Prenom Z-A'),
+                ('age_asc', 'Plus agé'), ('age_desc', 'Plus jeune')]
+    tri = SelectField(
+        'Trier par',
+        choices=CHOIX_TRI,
+        default='date_desc'  
+    )
+
+
+    annee_scolaire = SelectField('Années', choices=[])
+
+    def __init__(self, *args, **kwargs):
+        super(FiltreForm, self).__init__(*args, **kwargs)
+        annee_courante = AUJOURDHUI.year
+        mois_courant = AUJOURDHUI.month
+
+        if mois_courant >= 8:
+            annee_courante = str(annee_courante) + "-" + str(annee_courante + 1)
+        else:
+            annee_courante = str(annee_courante - 1) + "-" + str(annee_courante)
+        if not annee_courante in LISTE_ANNEE:
+            LISTE_ANNEE.append(annee_courante)
+        choix_final = []
+        for annee_str in LISTE_ANNEE:
+            annee_debut = annee_str.split('-')[0]
+            choix_final.append((annee_debut, annee_str))
+        choix_final.reverse()
+        self.annee_scolaire.choices = choix_final
+        if not self.annee_scolaire.data and choix_final:
+            self.annee_scolaire.data = choix_final[0][0] 
+  
+        
+        
+
+    
+class HoraireForm(FlaskForm):
+    jour = SelectField('Jour', choices=[
+        ('Lundi', 'Lundi'), ('Mardi', 'Mardi'), ('Mercredi', 'Mercredi'),
+        ('Jeudi', 'Jeudi'), ('Vendredi', 'Vendredi'), ('Samedi', 'Samedi'), ('Dimanche', 'Dimanche')
+    ], validators=[DataRequired()])
+    heure_debut = StringField('Heure de début (ex: 19h00)', validators=[DataRequired()])
+    heure_fin = StringField('Heure de fin (ex: 21h15)', validators=[DataRequired()])
+    activite = StringField('Activité (ex: Entraînement Épée)', validators=[DataRequired()])
+    details = TextAreaField('Détails (ex: M17, M20...)', validators=[Optional()])
+    submit = SubmitField('Enregistrer')
+
+class TarifForm(FlaskForm):
+    nom = StringField('Intitulé (ex: Initiation, Location annuelle)', validators=[DataRequired()])
+    prix = IntegerField('Prix (€)', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[Optional()])
+    categorie = SelectField('Catégorie', choices=[
+        ('Adhesion', 'Adhésion'),
+        ('Materiel', 'Matériel')
+    ], validators=[DataRequired()])
+    submit = SubmitField('Enregistrer')
+
+class InformationForm(FlaskForm):
+    titre = StringField('Titre', validators=[DataRequired()])
+    contenu = TextAreaField('Contenu', validators=[DataRequired()])
+    submit = SubmitField('Publier')
+
+class ArticleForm(FlaskForm):
+    titre = StringField('Titre de l\'article', validators=[DataRequired()])
+    contenu = TextAreaField('Contenu complet', validators=[DataRequired()], render_kw={"rows": 10})
+    images = MultipleFileField('Ajouter des photos', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg', 'webp'], 'Images seulement !')
+    ])
+    submit = SubmitField('Publier l\'article')
+
+class PresseForm(FlaskForm):
+    titre = StringField('Titre de l\'article', validators=[DataRequired()])
+    contenu = TextAreaField('Description / Contenu', validators=[DataRequired()], render_kw={"rows": 5})
+    lien = StringField('Lien vers la source (URL)', validators=[DataRequired()])
+    image = FileField('Image de l\'article', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg', 'webp'], 'Images seulement !')
+    ])
+    submit = SubmitField('Publier')

@@ -24,6 +24,11 @@
     filter: brightness(0);
 }
 
+#param.active img {
+    filter: brightness(0);
+}
+
+
 /*Pour les notifications*/
 .notifs-scroll {
   max-height: 400px; 
@@ -58,6 +63,12 @@ nav{
 nav .nav-link {
   color: white; /* Remplacez par le code couleur de votre choix */
   font-size: larger;
+}
+
+nav .nav-link.active {
+    color: #000000 !important;
+    font-weight: bold;
+
 }
 
 .navbar-brand img {
@@ -290,8 +301,9 @@ section{
 }
 
 .explore-content h1{
-    font-size: 7vmin;
-    margin: 50px;
+    font-size: 6vmin;
+    margin: 0 0 20px 0;
+    text-align: center;
 }
 
 .explore-content p{
@@ -399,6 +411,29 @@ body {
     box-shadow: 0 5px 15px rgba(239, 83, 80, 0.3);
 }
 
+.mdp-link {
+    margin-top: 20px;
+    color: white !important;
+    display: block;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.mdp-oublierh2{
+    color: whitesmoke;
+}
+
+.mdpclassp {
+    margin-top: 10px;
+    color: whitesmoke;
+    text-align: center;
+}
+
+.mdpclassp2{
+    color: whitesmoke;
+}
+
+
 /*Page gerer profils*/
 .table-responsive {
     overflow-x: auto;
@@ -449,6 +484,7 @@ body {
     text-align: center; /* Pour centrer le texte */
     text-decoration: none; /* Pour enlever le soulignement du lien */
 }
+
 .btn-inscription:hover {
     background: #000000;
     color: white;
@@ -725,6 +761,13 @@ body.dark-mode {
     color: #fefefe;
 }
 
+
+body.dark-mode .list-group-item {
+    background-color: #1c1c1e;
+    color: #fefefe;
+    border-color: #555;
+}
+
 body.dark-mode nav {
     background-color: #8b1f1f !important;
 }
@@ -733,7 +776,12 @@ body.dark-mode a {
     color: whitesmoke;
 }
 
-body.dark-mode h1,h2,h3,h4 {
+body.dark-mode nav .nav-link.active {
+    color: #ffc107 !important;
+    font-weight: bold;
+}
+
+body.dark-mode h1,h2,h3,h4,h5,h6 {
     color: whitesmoke;
 }
 
@@ -756,6 +804,19 @@ body.dark-mode .dropdown-item:focus {
     color: #fefefe;
 }
 
+body.dark-mode .modal-content {
+    background-color: #2c2c2e;
+    color: #fefefe;
+}
+
+body.dark-mode .modal-header {
+    border-bottom-color: #555;
+}
+
+body.dark-mode .modal-footer {
+    border-top-color: #555;
+}
+
 body.dark-mode .parametres-container,
 body.dark-mode .contact-container,
 body.dark-mode .card {
@@ -768,6 +829,26 @@ body.dark-mode .form-control {
     background-color: #3a3a3c;
     color: #fefefe;
     border-color: #555;
+}
+
+body.dark-mode .btn-inscription {
+    background-color: #3a3a3c;
+    color: #fefefe;
+}
+
+body.dark-mode .card-body,
+body.dark-mode .card-title,
+body.dark-mode .card-text { 
+    color: #fefefe;
+}
+
+body.dark-mode .text-muted {
+    color: #aaa !important;
+}
+
+body.dark-mode .btn-connecter {
+    background-color: #3a3a3c;
+    color: #fefefe;
 }
 
 body.dark-mode img {
@@ -793,18 +874,18 @@ background-color: #1c1c1e !important;
 color: #fefefe;
 }
 
-/* CSS Calendrier */
-
-.calendrier-section {
-    padding: 40px 20px;
-}
-
-.calendrier-section h1 {
-    color: #b82828;
-    margin-bottom: 40px;
-}
-
 /*le container des filtres*/
+.fixed-left {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 300px;  
+    padding: 10px;
+    overflow-y: auto; 
+    z-index: 1000; 
+}
+
 .filtres-container {
     background-color: white;
     padding: 20px;
@@ -842,9 +923,12 @@ color: #fefefe;
 /*le container du calendrier */
 .calendrier-wrapper {
     background-color: white;
-    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+/*Titre page calendrier*/
+#calendrier-titre{
+    color: #b82828;
 }
 
 /* pour le mode clair par défaut du calendirer lorsque le mode sombre est désactivé */
@@ -888,9 +972,21 @@ body.dark-mode .form-check-label {
     color: #fefefe;
 }
 
+body.dark-mode .filtres-titre {
+    color: #fefefe;
+    border-bottom-color: #555;
+}
+
 body.dark-mode .fc {
     color: #fefefe;
 }
+
+body.dark-mode .contact-info-box{
+    background-color: #312f2f;
+    color: #fefefe87;
+}
+
+body.dark-mode h3
 
 body.dark-mode .fc-theme-standard td,
 body.dark-mode .fc-theme-standard th {
@@ -901,16 +997,6 @@ body.dark-mode .fc-daygrid-day {
     background-color: #2c2c2e;
 }
 
-/* Proportions des colonnes */
-@media (min-width: 992px) {
-    .col-lg-3 {
-        max-width: 23%;
-    }
-    
-    .col-lg-9 {
-        max-width: 77%;
-    }
-}
 /* CSS Calendrier */
 
 .calendrier-section {
@@ -1039,6 +1125,11 @@ body.dark-mode .form-check-label {
     color: #fefefe;
 }
 
+body.dark-mode .filtres-titre {
+    color: #fefefe;
+    border-bottom-color: #555;
+}
+
 body.dark-mode .fc {
     color: #fefefe;
 }
@@ -1052,16 +1143,6 @@ body.dark-mode .fc-daygrid-day {
     background-color: #2c2c2e;
 }
 
-/* Proportions des colonnes */
-@media (min-width: 992px) {
-    .col-lg-3 {
-        max-width: 23%;
-    }
-    
-    .col-lg-9 {
-        max-width: 77%;
-    }
-}
 
 /* Rendre les filtres "sticky" sur les écrans de taille moyenne et plus */
 @media (min-width: 768px) { /* Applique à partir de la taille "md" de Bootstrap */
@@ -1080,6 +1161,20 @@ body.dark-mode .fc-daygrid-day {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+body.dark-mode .filtres-box {
+    background-color: #2c2c2e;
+    color: #fefefe;
+}
+
+body.dark-mode .filtres-box h5 {
+    color: #fefefe;
+    border-bottom-color: #555;
+}
+
+body.dark-mode .filtres-box .form-check-label {
+    color: #fefefe;
 }
 
 .filtres-box h5 {
@@ -1106,8 +1201,10 @@ body.dark-mode .fc-daygrid-day {
 /* Container des cartes */
 .competitions-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
+    justify-content: center;
+    width: 100%;
 }
 
 /* Ou si vous utilisez déjà Bootstrap row/col */
@@ -1143,12 +1240,11 @@ body.dark-mode .fc-daygrid-day {
 
 /* Permet à la section de s'étendre sur toute la largeur */
 .competitions-section {
-    width: 80vw;
-    position: relative;
-    left: 55%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
+    width: 100%;
+    position: static !important;
+    margin: 0 !important;
+    left: auto !important;
+    display: block !important;
 }
 
 /* pour les bordures dans l'acceuil */ 
@@ -1236,4 +1332,107 @@ header {
 
 body.homepage #main {
     margin-top: 79px !important;
+}
+
+/* page FFEscrime  */
+
+.ffe-page-wrapper {
+    padding: 60px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.ffe-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.ffe-logo {
+    width: 150px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.ffe-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #b82828; /* Ton rouge thématique */
+    margin-bottom: 15px;
+}
+
+.ffe-description {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.ffe-cards-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+}
+
+.ffe-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 40px 30px;
+    width: 350px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    border: 1px solid #eee;
+}
+
+.ffe-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgb(80, 13, 13);
+}
+
+.ffe-card-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.ffe-card-text {
+    color: #777;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    flex-grow: 1;
+}
+
+.ffe-btn {
+    padding: 12px 25px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: opacity 0.3s;
+    color: #ffffff !important;
+}
+
+.ffe-btn-primary { background-color: #0056b3; }
+.ffe-btn-success { background-color: #28a745; }
+.ffe-btn-secondary { background-color: #6c757d; }
+
+.ffe-footer-text {
+    text-align: center;
+    margin-top: 50px;
+    color: #999;
+}
+
+/* Adaptations pour le Mode Sombre */
+body.dark-mode .ffe-card {
+    background-color: #2c2c2e;
+    border-color: #1a1a1a;
+}
+
+body.dark-mode .ffe-card-title, 
+body.dark-mode .ffe-description {
+    color: #ffffff;
+}
+
+body.dark-mode .ffe-card-text {
+    color: #bbb;
 }

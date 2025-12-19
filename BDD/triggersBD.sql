@@ -164,3 +164,59 @@ BEGIN
 END;
 //
 DELIMITER ;
+
+DELIMITER //
+-- Trigger pour vérifier si les rôles de président et vice-president sont unique lors de l'INSERTION d'un nouveau membre
+CREATE OR REPLACE TRIGGER verif_role_unique_insert
+BEFORE INSERT ON MEMBRE
+FOR EACH ROW
+BEGIN
+    DECLARE president_cpt INT;
+    DECLARE vice_president_cpt INT;
+
+    -- Vérifier si on essaie d'insérer un Président
+    IF NEW.statut = 'Président' THEN
+        SELECT COUNT(*) INTO president_cpt FROM MEMBRE WHERE statut = 'Président';
+        IF president_cpt > 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Un président est déjà désigné. Impossible d''en ajouter un second.';
+        END IF;
+    END IF;
+
+    -- Vérifier si on essaie d'insérer un Vice-Président
+    IF NEW.statut = 'Vice-Président' THEN
+        SELECT COUNT(*) INTO vice_president_cpt FROM MEMBRE WHERE statut = 'Vice-Président';
+        IF vice_president_cpt > 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Un vice-président est déjà désigné. Impossible d''en ajouter un second.';
+        END IF;
+    END IF;
+END;
+//
+DELIMITER ;
+
+DELIMITER //
+-- Trigger pour vérifier si les rôles de président et vice-president sont unique lors de l'UPDATE d'un membre
+CREATE OR REPLACE TRIGGER verif_role_unique_update
+BEFORE UPDATE ON MEMBRE
+FOR EACH ROW
+BEGIN
+    DECLARE president_cpt INT;
+    DECLARE vice_president_cpt INT;
+
+    -- On vérifie uniquement si le statut est MODIFIÉ pour devenir 'Président'
+    IF NEW.statut = 'Président' AND NEW.statut != OLD.statut THEN -- on vérifie la modification du statut
+        SELECT COUNT(*) INTO president_cpt FROM MEMBRE WHERE statut = 'Président';
+        IF president_cpt > 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Un président est déjà désigné. Impossible de nommer un second président.';
+        END IF;
+    END IF;
+
+    -- On vérifie uniquement si le statut est MODIFIÉ pour devenir 'Vice-Président'
+    IF NEW.statut = 'Vice-Président' AND NEW.statut != OLD.statut THEN -- on vérifie la modification du statut
+        SELECT COUNT(*) INTO vice_president_cpt FROM MEMBRE WHERE statut = 'Vice-Président';
+        IF vice_president_cpt > 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Un vice-président est déjà désigné. Impossible de nommer un second vice-président.';
+        END IF;
+    END IF;
+END;
+//
+DELIMITER ;

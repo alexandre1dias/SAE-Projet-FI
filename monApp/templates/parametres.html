@@ -30,6 +30,12 @@
             <h4>Paramètres de confidentialités</h4>
             <a href="/changer_mdp/"><button type="button" class="btn-notif">Changer le mot de passe</button></a>  
         </li>
+        {% if session.get('user_type') == 'membre' %}
+        <li class="list-group-item">
+            <h4>Paramètre du compte </h4>
+            <a href="{{ url_for('desinscrireMembre', idM=current_user.id) }}" onclick="return confirm('Êtes-vous sûr de vouloir vous désinscrire ?');"><button type="button" class="btn-notif">Se desinscrire du club</button></a>  
+        </li>
+        {% endif %}
         {%endif%}
     </ul>
 
@@ -39,4 +45,3 @@
 
     
 {% endblock %}
-

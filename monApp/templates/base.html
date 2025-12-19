@@ -19,8 +19,8 @@
                 <a class="navbar-brand" href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='images/Logo.png') }}"/></a>
                     <div class="collapse navbar-collapse" id="mainNavbar">
                         <ul class="navbar-nav me-auto mb-2 mb-md-0">
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Accueil</a></li>
-                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" 
+                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Accueil</a></li>
+                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle {% if request.endpoint in ['adresse', 'horaires', 'adhesions', 'materiel'] %}active{% endif %}" href="#" 
                             id="auteursDropdown" role="button" data-bs-toggle="dropdown" 
                             aria-expanded="false">Renseignements</a>
                               <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
@@ -39,9 +39,9 @@
                                 </li>
                               </ul>
                         </li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('escrime_feminin') }}">L'escrime feminin</a></li>
+                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'escrime_feminin' %}active{% endif %}" href="{{ url_for('escrime_feminin') }}">L'escrime feminin</a></li>
                         
-                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" 
+                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle {% if request.endpoint in ['calendrier', 'competitions', 'evenement_club', 'reunion', 'competition_view', 'club_view', 'reunion_view'] %}active{% endif %}" href="#" 
                             id="auteursDropdown" role="button" data-bs-toggle="dropdown" 
                             aria-expanded="false">Évènement</a>
                               <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
@@ -56,31 +56,33 @@
 
                               </ul>
                         </li>
-                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" 
+                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle {% if request.endpoint in ['informations', 'presse', 'articles', 'ffescrime'] %}active{% endif %}" href="#" 
                             id="auteursDropdown" role="button" data-bs-toggle="dropdown" 
                             aria-expanded="false">Actualités</a>
-                              <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
+                            <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
                                 <li><a class="dropdown-item" href="{{ url_for('informations') }}">Informations</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('articles') }}">Articles du Club</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('presse') }}">Presse</a></li>
-                              </ul>
+                                <li><a class ="dropdown-item" href="{{ url_for('ffescrime') }}">FFEscrime</a></li>
+                            </ul>
                         </li>
                         
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="auteursDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">A propos</a>
+                            <a class="nav-link dropdown-toggle {% if request.endpoint in ['historique', 'comite_cercle'] %}active{% endif %}" href="#" id="auteursDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">A propos</a>
                             <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
                                 <li><a class="dropdown-item" href="{{ url_for('historique') }}">Historique</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('comite_cercle')}}">Comite directeur du cercle</a></li>
                             </ul>
                         </li>
 
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}" href="{{ url_for('contact') }}">Contact</a></li>
 
                         {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
                             <!-- Liens pour les utilisateurs connectés -->
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Profil</a>
+                                <a class="nav-link dropdown-toggle {% if request.endpoint in ['resultat_membre', 'evenement_membre', 'profil_view'] %}active{% endif %}" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Profil</a>
                                 <ul class="dropdown-menu" aria-labelledby="profilDropdown">
                                     <li><a class="dropdown-item" href="{{ url_for('resultat_membre') }}">Vos résultat</a></li>
                                     <li><a class="dropdown-item" href="{{ url_for('evenement_membre') }}">Vos évènements</a></li>
@@ -91,11 +93,15 @@
                         {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
                             <!-- Menu de l'admin - Visible uniquement par un compte admin -->
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Menu Admin</a>
+                                <a class="nav-link dropdown-toggle {% if request.endpoint in ['gerer_formulaires', 'gerer_profils', 'gerer_inscriptions', 'gestion_tarifs', 'gestion_horaires', 'profil_view', 'profil_edit', 'formulaire_view', 'edit_tarif', 'edit_horaire', 'gerer_ancien_profils', 'gerer_anciens_formulaires'] %}active{% endif %}" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Menu Admin</a>
                                 <ul class="dropdown-menu" aria-labelledby="profilDropdown">
                                     <li><a class="dropdown-item" href="{{ url_for('gerer_formulaires') }}">Gérer Formulaires</a></li>
                                     <li><a class="dropdown-item" href="{{ url_for('gerer_profils') }}">Gérer Profils</a></li>
                                     <li><a class="dropdown-item" href="{{ url_for('gerer_inscriptions') }}">Gérer Inscriptions/Modification</a></li>
+                                    
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('gestion_tarifs') }}">Gérer Tarifs & Matériel</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('gestion_horaires') }}">Gérer Horaires</a></li>
                                 </ul> 
                             </li>
                         {% endif %}
@@ -105,36 +111,41 @@
                                 <div class="dropdown">
                                     <button class="btn position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                         <img src="{{ url_for('static', filename='images/cloche.png') }}" alt="Notifications" style="height: 30px;"/>
+                                        {% if unread_count > 0 %}
                                         <span class="position-absolute badge rounded-pill bg-danger">
-                                            1
+                                                {{ unread_count }}
+                                        {% endif %}
                                             <span class="visually-hidden">notifications non lues</span>
                                         </span>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end notifs-scroll" aria-labelledby="notificationDropdown" style="width: 360px;">
+                                    <ul class="dropdown-menu dropdown-menu-end notifs-scroll" aria-labelledby="notificationDropdown" style="width: 900%; max-height: 1100%; overflow-y: auto;">
                                         <li><h6 class="dropdown-header">Notifications</h6></li>
-                                        <li>
-                                            <a class="dropdown-item d-flex align-items-center justify-content-between" href="#">
-                                                <span class="p-1 bg-primary border border-light rounded-circle"></span>
+                                        
+                                        {% if notifications_list %}
+                                            {% for notif in notifications_list %}
+                                        <li class="position-relative border-bottom">
+                                            <a class="dropdown-item d-flex align-items-center pe-5" href="{{ url_for('read_notification', id_notif=notif.idNotifs) }}">
+                                                {% if not notif.lue %}
+                                                <span class="p-1 bg-primary border border-light rounded-circle me-2" title="Non lue"></span>
+                                                {% endif %}
                                                 <div>
-                                                    <p class="mb-0 notif-new">Demande d'inscription: Jean</p>
-                                                    <small class="text-muted">il y a 5 minutes</small>
+                                                    <p class="mb-0 {{ 'notif-new' if not notif.lue else '' }}">{{ notif.typeN }} : {{ notif.sourceN }}</p>
+                                                    <small class="text-muted">{{ notif.timestamp.strftime('%d/%m/%Y %H:%M') }}</small>
                                                 </div>
-                                                <button class="btn notification-delete" type="button" aria-label="Supprimer la notification">
-                                                    <img src="{{ url_for('static', filename='images/supprimer.png') }}" alt="Supprimer notifications"/>
-                                                </button>
                                             </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item d-flex align-items-center justify-content-between" href="#">
-                                                <div>
-                                                    <p class="mb-0">Demande formulaire: Visiteur</p>
-                                                    <small class="text-muted">il y a 1 heure</small>
-                                                </div>
-                                                <button class="btn notification-delete" type="button" aria-label="Supprimer la notification">
-                                                    <img src="{{ url_for('static', filename='images/supprimer.png') }}" alt="Supprimer notifications"/>
+                                            <form action="{{ url_for('delete_notification', id_notif=notif.idNotifs) }}" method="POST" class="position-absolute top-50 end-0 translate-middle-y me-2">
+                                                {% if csrf_token %}
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                                {% endif %}
+                                                <button type="submit" class="btn btn-sm text-danger border-0 p-1" title="Supprimer" style="z-index: 10;">
+                                                    <span style="font-size: 1.2rem;">&times;</span>
                                                 </button>
-                                            </a>
+                                            </form>
                                         </li>
+                                            {% endfor %}
+                                        {% else %}
+                                            <li><p class="dropdown-item text-center text-muted">Aucune notification</p></li>
+                                        {% endif %}
                                         <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item text-center" href="{{ url_for('parametres_notifs') }}">Paramètre de notification</a></li>
                                     </ul>
@@ -143,7 +154,7 @@
                             {% endif %}
                             <!-- Paramètres -->
                             <li class="nav-item">
-                                <a class="btn position-relative" id="param" href="{{ url_for('parametres') }}">
+                                <a class="btn position-relative {% if request.endpoint in ['parametres', 'parametres_notifs', 'changer_mdp'] %}active{% endif %}" id="param" href="{{ url_for('parametres') }}">
                                     <img src="{{ url_for('static', filename='images/parametres.png') }}" alt="Parametres" style="height: 30px;"/>
                                 </a>
                             </li>
@@ -154,7 +165,7 @@
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Se déconnecter</a></li>
                         {% else %}
                             <!-- Login -->
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Se connecter</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'login' %}active{% endif %}" href="{{ url_for('login') }}">Se connecter</a></li>
                         {% endif %}
                     </ul>
                     </div>

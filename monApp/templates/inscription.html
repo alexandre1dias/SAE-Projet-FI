@@ -87,6 +87,20 @@
             </div>
 
             <div class="form-group">
+                {{ form.numTel(
+                    class="form-input" + (" is-invalid" if form.prenom.errors else ""), 
+                    placeholder="Rentrer votre numéro de téléphone (optionnel)"
+                ) }}
+                {% if form.numTel.errors %}
+                    <div class="invalid-feedback d-block text-white">
+                        {% for error in form.numTel.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
                 {{ form.password(
                     class="form-input" + (" is-invalid" if form.password.errors else ""), 
                     placeholder="Rentrer votre mot de passe"
@@ -152,4 +166,13 @@
         </div>
     </div>
 </div>
+{% if message_erreur %}
+    <div class="alert alert-danger">{{ message_erreur }}</div>
+{% endif %}
+{% if erreur_nom %}
+    <div class="alert alert-danger">{{ erreur_nom }}</div>
+{% endif %}
+{% if erreur_email %}
+    <div class="alert alert-danger">{{ erreur_email }}</div>
+{% endif %}
 {% endblock %}

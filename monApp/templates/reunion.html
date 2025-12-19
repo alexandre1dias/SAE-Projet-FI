@@ -1,92 +1,112 @@
-{%extends "base.html"%}
+{% extends "base.html" %}
 {% block head_extra %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
 {% endblock %}
-    {%block main%}
-        <div class="container py-5">
+
+{% block main %}
+    <div class="container py-5">
+        {% if passee %}
+            <h2 class="text-center mb-5">Listes des anciennes réunions</h2>
+        {% else %}
             <h2 class="text-center mb-5">Listes des prochaines réunions</h2>
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                {% for reunion in prochaines_reunions %}
+        {% endif %}
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for reunion in pagination.items %}
                 <div class="col">
                     <div class="card pricing-card h-100">
                         <div class="card-header pricing-header basic-header p-4">
                             <h3 class="card-title text-center mb-0">{{ reunion.nom }}</h3>
                         </div>
-                        <div class="card-body p-4">
-                                <ul class="feature-list text-center mb-4">
-                                    <li>
-                                        <h3>{{ reunion.dateDebutRE.strftime('%d/%m') }} {{ reunion.heureDebutRE }} <br> {{ reunion.dateFinRE.strftime('%d/%m') }} {{ reunion.heureFinRE }}</h3>
-                                    </li>
-                                    <li>
-                                        <h3>{{ reunion.ville }}</h3>  
-                                    </li>
-                                    <li>
-                                        <h3>{{ reunion.adresse }}</h3>  
-                                    </li>
-                                </ul>
-                            <div class="text-center">
-                                {% if current_user.is_authenticated %}
-                                    
-                                    {% if session.get('user_type') == 'membre' %}
-                                        {% if reunion.idEvent in user_registered_event_ids %}
-                                            <a href="{{ url_for('desinscrire_reunion', idReunion=reunion.id) }}" class="btn btn-outline-danger btn-custom">Se désinscrire</a>
-                                        
-                                        {% else %}
-                                            <a href="{{ url_for('inscrire_reunion', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">S'inscrire</a>
-                                        
+                        <div class="card-body p-4 d-flex flex-column">
+                            <ul class="feature-list text-center mb-4">
+                                <li>
+                                    <h3>
+                                        {{ reunion.dateDebutRE.strftime('%d/%m') }} {{ reunion.heureDebutRE }} <br> 
+                                        {{ reunion.dateFinRE.strftime('%d/%m') }} {{ reunion.heureFinRE }}
+                                    </h3>
+                                </li>
+                                <li><h3>{{ reunion.ville }}</h3></li>
+                                <li><h3>{{ reunion.adresse }}</h3></li>
+                            </ul>
+                            
+                            <div class="text-center mt-auto">
+                                {% if passee %}
+                                    <a href="{{ url_for('reunion_view', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">Consulter rapport</a>
+                                {% else %}
+                                    {% if current_user.is_authenticated %}
+                                        {% if session.get('user_type') == 'membre' %}
+                                            {% if reunion.idEvent in user_registered_event_ids %}
+                                                <a href="{{ url_for('desinscrire_reunion', idReunion=reunion.id) }}" class="btn btn-outline-danger btn-custom">Se désinscrire</a>
+                                            {% else %}
+                                                <a href="{{ url_for('inscrire_reunion', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">S'inscrire</a>
+                                            {% endif %}
+                                        {% elif session.get('user_type') == 'admin' %}
+                                            <a href="{{ url_for('reunion_update', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">Modifier</a>
                                         {% endif %}
-
-                                    {% elif session.get('user_type') == 'admin' %}
-                                        <a href="{{ url_for('reunion_update', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">Modifier</a>
                                     {% endif %}
-
                                 {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-            </div>
+            {% endfor %}
         </div>
+    </div>
 
-        <div class="container py-5">
-            <h2 class="text-center mb-5">Listes des anciennes réunions</h2>
-            <!--Filtres ordre-->
-            <div class="dropdown">
-                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">Filtrer par</button>
-                    <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-                        <li><a class="dropdown-item" href="#">Date (Plus récent)</a></li>
-                        <li><a class="dropdown-item" href="#">Date (Plus ancien)</a></li>
-                    </ul>
-            </div>
-            <!--Fin Filtres ordre-->
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                <!--Cartes-->
-                {% for reunion in anciennes_reunions %}
-                <div class="col">
-                    <div class="card pricing-card h-100">
-                        <div class="card-header pricing-header basic-header p-4">
-                            <h3 class="card-title text-center mb-0">{{ reunion.nom }}</h3>
-                        </div>
-                        <div class="card-body p-4">
-                                <ul class="feature-list text-center mb-4">
-                                    <li>
-                                        <h3>{{ reunion.dateDebutRE.strftime('%d/%m') }} {{ reunion.heureDebutRE }} <br> {{ reunion.dateFinRE.strftime('%d/%m') }} {{ reunion.heureFinRE }}</h3>
-                                    </li>
-                                    <li>
-                                        <h3>{{ reunion.ville }}</h3>  
-                                    </li>
-                                    <li>
-                                        <h3>{{ reunion.adresse }}</h3>  
-                                    </li>
-                                </ul>
-                            <div class="text-center">
-                                <a href="{{ url_for('reunion_view', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">consulter rapport</a>
-                            </div>
-                        </div>
-                    </div>
+    {% if pagination.items %}
+    <div class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('reunion', 
+                    etat='passees' if passee else 'prochaine',
+                    page=pagination.prev_num, 
+                    tri=filtre.tri.data) if pagination.has_prev else '#' }}">
+                    &laquo; Avant
+                </a>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">
+                    Page {{ pagination.page }} sur {{ pagination.pages }}
+                </span>
+            </li>
+            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('reunion', 
+                    etat='passees' if passee else 'prochaine',
+                    page=pagination.next_num, 
+                    tri=filtre.tri.data) if pagination.has_next else '#' }}">
+                    Après &raquo;
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+
+    <aside class="fixed-left">
+        <div class="filtres-box">
+            <div>
+                <h5 class="filtres-titre">Action</h5>
+                <div class="d-grid gap-2">
+                    {% if passee %}
+                        <a href="{{ url_for('reunion', etat='prochaine') }}" class="btn btn-secondary">
+                            Voir les prochaines réunions
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('reunion', etat='passees') }}" class="btn btn-secondary">
+                            Voir les anciennes réunions
+                        </a>
+                    {% endif %}
                 </div>
-                {% endfor %}
             </div>
+            <br>
+            <h5 class="filtres-titre">Filtres</h5>
+            <form action="{{ url_for('reunion', etat='passees' if passee else 'prochaine') }}" method="GET">
+                <h6>{{ filtre.tri.label }}</h6>
+                <div class="form-group mb-3">
+                    {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle w-100") }} 
+                </div>
+                {{ filtre.submit(class="btn btn-primary w-100", value="Appliquer") }}
+            </form>
         </div>
-    {%endblock%}
+    </aside>
+{% endblock %}

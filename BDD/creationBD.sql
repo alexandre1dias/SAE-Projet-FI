@@ -1,43 +1,18 @@
 CREATE TABLE ADMINISTRATEUR(
     idAdmin integer AUTO_INCREMENT,
     emailA varchar(41) unique,
-    mdpA varchar(64) not null,
-    idParamNotifAdmin integer,
+    mdpA varchar(256) not null,
+    formulaireDemandeSite boolean DEFAULT true not null,
+    formulaireDemandeMail boolean DEFAULT true not null,
+    formulaireQuestionSite boolean DEFAULT true not null,
+    formulaireQuestionMail boolean DEFAULT true not null,
+    formulaireSignalementSite boolean DEFAULT true not null,
+    formulaireSignalementMail boolean DEFAULT true not null,
+    demandeModifSite boolean DEFAULT true not null,
+    demandeModifMail boolean DEFAULT true not null,
+    demandeInscriptionSite boolean DEFAULT true not null,
+    demandeInscriptionMail boolean DEFAULT true not null,
     PRIMARY KEY(idAdmin)
-);
-
-create table PARAMETRE_NOTIF_ADMIN(
-    idParamNotifAdmin integer AUTO_INCREMENT,
-    formulaireDemandeSite boolean not null,
-    formulaireDemandeMail boolean not null,
-    formulaireQuestionSite boolean not null,
-    formulaireQuestionMail boolean not null,
-    formulaireSignalementSite boolean not null,
-    formulaireSignalementMail boolean not null,
-    demandeModifSite boolean not null,
-    demandeModifMail boolean not null,
-    demandeInscriptionSite boolean not null,
-    demandeInscriptionMail boolean not null,
-    idAdmin integer,
-    PRIMARY KEY(idParamNotifAdmin)
-);
-
-create table PARAMETRE_NOTIF_MEMBRE(
-    idParamNotifMembre integer AUTO_INCREMENT,
-    eventInscriptionSite boolean not null,
-    evenementInscriptionMail boolean not null,
-    eventNouveauSite boolean not null,
-    eventNouveauMail boolean not null,
-    eventAnnulationSite boolean not null,
-    eventAnnulationMail boolean not null,
-    resultatNouveauSite boolean not null,
-    resultatNouveauMail boolean not null,
-    reponseFormulaireSite boolean not null,
-    reponseFormulaireMail boolean not null,
-    modifProfilSite boolean not null,
-    modifProfilMail boolean not null,
-    idMembre integer,
-    PRIMARY KEY(idParamNotifMembre)
 );
     
 create table MEMBRE(
@@ -45,7 +20,7 @@ create table MEMBRE(
     nomM varchar(41) not null,
     prenomM varchar(41) not null,
     emailM varchar(100) unique,
-    mdpM varchar(64) not null,
+    mdpM varchar(256) not null,
     date_inscription date DEFAULT CURRENT_DATE,
     sexeM varchar(5) not null,
     ddnM date not null,
@@ -53,15 +28,30 @@ create table MEMBRE(
     niveau varchar(15) not null,
     statut varchar(30) DEFAULT "Membre",
     activite boolean DEFAULT True,
-    idParamNotifMembre integer,
+    numTel varchar(20),
+    numLicense varchar(67) default null,
+    eventInscriptionSite boolean DEFAULT true not null,
+    evenementInscriptionMail boolean DEFAULT true not null,
+    eventNouveauSite boolean DEFAULT true not null,
+    eventNouveauMail boolean DEFAULT true not null,
+    eventAnnulationSite boolean DEFAULT true not null,
+    eventAnnulationMail boolean DEFAULT true not null,
+    resultatNouveauSite boolean DEFAULT true not null,
+    resultatNouveauMail boolean DEFAULT true not null,
+    reponseFormulaireSite boolean DEFAULT true not null,
+    reponseFormulaireMail boolean DEFAULT true not null,
+    modifProfilSite boolean DEFAULT true not null,
+    modifProfilMail boolean DEFAULT true not null,
     PRIMARY KEY(idMembre)
 );
 
 create table NOTIFS(
     idNotifs integer AUTO_INCREMENT,
-    typeN varchar(19) not null,
+    typeN varchar(1255) not null,
     sourceN varchar(255) not null,
     lue boolean DEFAULT false,
+    timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    link VARCHAR(255),
     idMembre integer,
     idAdmin integer,
     PRIMARY KEY(idNotifs)
@@ -112,9 +102,10 @@ create table INSCRIPTION(
     nomI varchar(41) not null,
     prenomI varchar(41) not null,
     ddnI date not null,
-    mdpI varchar(64) not null,
+    mdpI varchar(256) not null,
     sexeI varchar(5) not null,
     dateInscription date not null,
+    numTelI varchar(20),
     PRIMARY KEY(idInscription)
 );
 
@@ -126,7 +117,9 @@ create table MODIFICATION(
     emailModif varchar(100),
     sexeModif varchar(5),
     ddnModif date,
+    numTelModif varchar(20),
     dateModif date,
+    numLicense varchar(67) DEFAULT NULL,
     justificationModif varchar(500),
     idMembre integer,
     PRIMARY KEY(idModif)
@@ -168,16 +161,15 @@ create table ENTRAINEMENT(
 create table REUNION(
     idReunion integer AUTO_INCREMENT,
     nomRE varchar(100) not null,
-    villeRE varchar(50) not null,
-    adresseRE varchar(50) not null,
+    villeRE varchar(50),
+    adresseRE varchar(50),
     datedebutRE date not null,
     heureDebutRE varchar(5) not null,
     dateFinRE date not null,
     heureFinRE varchar(5) not null,
     nbParticipantsRE integer,
-    typeReunionRE varchar(15) not null,
+    typeReunionRE varchar(64) not null,
     rapportRE varchar(200),
-    niveauRE varchar(45),
     idEvent integer,
     PRIMARY KEY(idReunion)
 
@@ -286,26 +278,49 @@ create table PRESSE(
     titreP varchar(50) not null,
     contenuP varchar(600),
     lienP varchar(255) not null,
+    imageP VARCHAR(255),
     PRIMARY KEY(idPresse)
 );
 
-create table IMAGERP(
-    idImage integer,
-    idPresse integer,
-    PRIMARY KEY(idImage, idPresse)
+CREATE TABLE HORAIRE (
+    idHoraire integer AUTO_INCREMENT,
+    jour varchar(10) not null,
+    heureDebut varchar(5) not null,
+    heureFin varchar(5) not null,
+    activite varchar(100) not null,
+    details varchar(255),
+    PRIMARY KEY(idHoraire)
 );
+
+CREATE TABLE TARIF (
+    idTarif integer AUTO_INCREMENT,
+    nom varchar(50) not null,
+    prix integer not null,
+    description varchar(255),
+    categorie varchar(20) not null,
+    PRIMARY KEY(idTarif)
+);
+
+CREATE TABLE ARTICLE (
+    idArticle integer AUTO_INCREMENT,
+    titreA varchar(100) not null,
+    contenuA text,
+    dateA date not null,
+    imgA varchar(255),
+    PRIMARY KEY(idArticle)
+);
+
+CREATE TABLE IMAGEARTICLE (
+    idImageArticle integer AUTO_INCREMENT,
+    nomI varchar(255) not null,
+    idArticle integer not null,
+    PRIMARY KEY(idImageArticle)
+);
+
 
 -- Ajout des contraintes de clé étrangère
 
 ALTER TABLE MODIFICATION ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
-
-ALTER TABLE ADMINISTRATEUR ADD FOREIGN KEY (idParamNotifAdmin) REFERENCES PARAMETRE_NOTIF_ADMIN(idParamNotifAdmin);
-
-ALTER TABLE PARAMETRE_NOTIF_ADMIN ADD FOREIGN KEY (idAdmin) REFERENCES ADMINISTRATEUR(idAdmin);
-
-ALTER TABLE PARAMETRE_NOTIF_MEMBRE ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
-
-ALTER TABLE MEMBRE ADD FOREIGN KEY (idParamNotifMembre) REFERENCES PARAMETRE_NOTIF_MEMBRE(idParamNotifMembre);
 
 ALTER TABLE NOTIFS ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
 ALTER TABLE NOTIFS ADD FOREIGN KEY (idAdmin) REFERENCES ADMINISTRATEUR(idAdmin);
@@ -354,5 +369,4 @@ ALTER TABLE IMAGERE ADD FOREIGN KEY (idEventClub) REFERENCES EVENTCLUB(idEventCl
 ALTER TABLE IMAGERIN ADD FOREIGN KEY (idImage) REFERENCES IMAGEAPP(idImage);
 ALTER TABLE IMAGERIN ADD FOREIGN KEY (idInformation) REFERENCES INFORMATION(idInformation);
 
-ALTER TABLE IMAGERP ADD FOREIGN KEY (idImage) REFERENCES IMAGEAPP(idImage);
-ALTER TABLE IMAGERP ADD FOREIGN KEY (idPresse) REFERENCES PRESSE(idPresse);
+ALTER TABLE IMAGEARTICLE ADD FOREIGN KEY (idArticle) REFERENCES ARTICLE(idArticle);
