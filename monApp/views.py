@@ -1600,9 +1600,9 @@ def evenement_membre():
                 ParticiperBD.id_membre == current_user.id)
 
         if etat == 'passees':
-            query = query.filter(ReunionBD.dateDebutRE < today)
+            query = query.filter(ReunionBD.dateDebutRE < AUJOURDHUI)
         else:
-            query = query.filter(ReunionBD.dateDebutRE >= today)
+            query = query.filter(ReunionBD.dateDebutRE >= AUJOURDHUI)
 
         if filtre.recherche.data:
             terme = f"%{filtre.recherche.data}%"
@@ -1618,9 +1618,9 @@ def evenement_membre():
             EventClubBD.id_event == ParticiperBD.id_event).filter(
                 ParticiperBD.id_membre == current_user.id)
         if etat == 'passees':
-            query = query.filter(EventClubBD.dateDebutEV < today)
+            query = query.filter(EventClubBD.dateDebutEV < AUJOURDHUI)
         else:
-            query = query.filter(EventClubBD.dateDebutEV >= today)
+            query = query.filter(EventClubBD.dateDebutEV >= AUJOURDHUI)
 
         if filtre.recherche.data:
             terme = f"%{filtre.recherche.data}%"
@@ -1661,36 +1661,27 @@ def profil_view(idM):
 @login_required
 @admin_required
 def gerer_formulaires():
+    mode = request.args.get('mode', 'attente')
+    repondu = (mode == 'repondus')
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
-    liste = FormulaireBD.query\
-        .filter(FormulaireBD.repondu == False)\
-        .order_by(FormulaireBD.date.desc())
-
+    filtre.tri.choices = [('date_desc', 'Plus récent'),
+                          ('date_asc', 'Plus ancien')]
+    
+    liste = FormulaireBD.query.filter(FormulaireBD.repondu == repondu)
     if filtre.type_formulaire.data:
         liste = liste.filter(FormulaireBD.type.in_(filtre.type_formulaire.data))
-
+    if filtre.tri.data == 'date_asc':
+        liste = liste.order_by(FormulaireBD.date.asc())
+    else:
+        liste = liste.order_by(FormulaireBD.date.desc())
+    
     pagination = liste.paginate(page=page, per_page=15, error_out=False)
     return render_template("gerer_formulaires.html",
-        title=TITLE + "- Gestion des Formulaires",pagination=pagination,filtre=filtre)
-
-# Affiche les formulaires de contact déjà traités - Réservée aux administrateurs.
-@app.route("/gerer_anciens_formulaires/")
-@login_required
-@admin_required
-def gerer_anciens_formulaires():
-    filtre = FiltreForm(request.args if request.args else None)
-    page = request.args.get('page', 1, type=int)
-    liste = db.session.query(FormulaireBD)\
-        .filter(FormulaireBD.repondu == True)\
-        .order_by(FormulaireBD.date.desc())
-
-    if filtre.type_formulaire.data:
-        liste = liste.filter(FormulaireBD.type.in_(filtre.type_formulaire.data))
-
-    pagination = liste.paginate(page=page, per_page=15, error_out=False)
-    return render_template("gerer_anciens_formulaires.html",
-        title=TITLE + "- Gestion des Anciens Formulaires",pagination=pagination,filtre=filtre)
+        title=TITLE + " - Gestion Formulaires",
+        pagination=pagination,
+        filtre=filtre,
+        mode=mode)
 
 # Affiche le détail d'un formulaire de contact - Réservée aux administrateurs.
 @app.route("/formulaire_view/<int:idFormulaire>")
@@ -1708,7 +1699,7 @@ def formulaire_delete(idFormulaire):
     formulaire = FormulaireBD.query.get_or_404(idFormulaire)
     db.session.delete(formulaire)
     db.session.commit()
-    return redirect(url_for('gerer_anciens_formulaires'))
+    return redirect(url_for('gerer_formulaires'))
 
 # Permet de répondre à un formulaire et de le marquer comme traité - Réservée aux administrateurs.
 @app.route("/repondre_formulaire/<int:idFormulaire>", methods=['POST'])
@@ -1731,14 +1722,16 @@ def repondre_formulaire(idFormulaire):
 @login_required
 @admin_required
 def gerer_profils():
+    mode = request.args.get('mode', 'actifs')
+    ancien = (mode == 'anciens')
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
-    liste = MembreBD.query\
-        .filter(MembreBD.activite == True)\
-        .order_by(MembreBD.date_inscription.desc())
+    filtre.tri.choices = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien'),
+                ('nom_asc', 'Nom A-Z'), ('nom_desc', 'Nom Z-A'), ('prenom_asc', 'Prenom A-Z'), 
+                ('prenom_desc', 'Prenom Z-A'),('age_asc', 'Plus agé'), ('age_desc', 'Plus jeune')]
+    liste = MembreBD.query.filter(MembreBD.activite == (not ancien))
     liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
-    if filtre.niveau.data:
-        liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
+    liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
     if filtre.recherche.data:
         terme = f"%{filtre.recherche.data}%"
         liste = liste.filter(
@@ -1748,9 +1741,30 @@ def gerer_profils():
                 MembreBD.email.ilike(terme)
             )
         )
+    if filtre.tri.data == 'date_asc':
+        liste = liste.order_by(MembreBD.date_inscription.asc())
+    elif filtre.tri.data == 'nom_desc':
+        liste = liste.order_by(MembreBD.nom.desc())
+    elif filtre.tri.data == 'nom_asc':
+        liste = liste.order_by(MembreBD.nom.asc())
+    elif filtre.tri.data == 'prenom_desc':
+        liste = liste.order_by(MembreBD.prenom.desc())
+    elif filtre.tri.data == 'prenom_asc':
+        liste = liste.order_by(MembreBD.prenom.asc())
+    elif filtre.tri.data == 'age_desc':
+        liste = liste.order_by(MembreBD.ddn.desc())
+    elif filtre.tri.data == 'age_asc':
+        liste = liste.order_by(MembreBD.ddn.asc())
+    else:
+        liste = liste.order_by(MembreBD.date_inscription.desc())
+
     pagination = liste.paginate(page=page, per_page=15, error_out=False)
     return render_template("gerer_profils.html",
-        title=TITLE + "- Gestion des Profils",pagination=pagination,filtre=filtre)
+        title=TITLE + " - Gestion des Profils",
+        pagination=pagination,
+        filtre=filtre,
+        mode=mode)
+
 
 # Désactive le compte d'un membre.
 @app.route('/gerer_profils/desinscrire/<int:idM>', methods=["GET", "POST"])
@@ -1784,34 +1798,7 @@ def reinscrireMembre(idM):
     membre.activite = True
     membre.statut = "Membre"
     db.session.commit()
-    return redirect(url_for('gerer_ancien_profils'))
-
-# Affiche la liste des membres inactifs - Réservée aux administrateurs.
-@app.route("/gerer_profils/ancien/")
-@login_required
-@admin_required
-def gerer_ancien_profils():
-    filtre = FiltreForm(request.args) if request.args else FiltreForm()
-    page = request.args.get('page', 1, type=int)
-    liste = MembreBD.query\
-        .filter(MembreBD.activite == False)\
-        .order_by(MembreBD.date_inscription.desc())
-
-    liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
-    if filtre.niveau.data:
-        liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
-    if filtre.recherche.data:
-        terme = f"%{filtre.recherche.data}%"
-        liste = liste.filter(
-            or_(
-                MembreBD.nom.ilike(terme),
-                MembreBD.prenom.ilike(terme),
-                MembreBD.email.ilike(terme)
-            )
-        )
-    pagination = liste.paginate(page=page, per_page=15, error_out=False)
-    return render_template("gerer_ancien_profils.html",
-        title=TITLE + "- Gestion des Anciens Profils",pagination=pagination,filtre=filtre)
+    return redirect(url_for('gerer_profils'))
 
 # Page de modification d'un profil, accessible par le membre lui-même ou un admin.
 @app.route("/profil_edit/<int:idM>", methods=["GET", "POST"])
