@@ -7,18 +7,10 @@
             <h1>Articles du Club</h1>
             <p class="lead">Retrouvez les résumés de compétitions et la vie du club.</p>
         </div>
-        
-        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
-        <div>
-            <a href="{{ url_for('add_article') }}" class="btn btn-success">
-                + Nouvel Article
-            </a>
-        </div>
-        {% endif %}
     </div>
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-    {% for article in articles %}
+    {% for article in pagination.items %}
         <div class="col">
             <div class="card h-100 shadow-sm hover-card">
                 {% if article.images %}
@@ -52,9 +44,76 @@
         </div>
     {% else %}
         <div class="col-12">
-            <p class="text-center">Aucun article pour le moment.</p>
+            <p class="text-center">Aucun article trouvé pour cette recherche.</p>
         </div>
     {% endfor %}
     </div>
 </div>
+
+<aside class="fixed-left">
+    <div class="filtres-box">
+        <br>
+        <div>
+            {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}           
+            <h5 class="filtres-titre">Action</h5>
+            <div class="d-grid gap-2">
+                <a href="{{ url_for('add_article') }}" class="btn btn-success">
+                    Nouvel Article
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        <br>
+        <form action="{{ url_for('articles') }}" method="GET">
+            <h5 class="filtres-titre">Années</h5>
+            <div class="form-group d-grid gap-2">
+                {{ filtre.annee_scolaire(class="btn btn-outline-primary dropdown-toggle", onchange="this.form.submit()") }} 
+            </div>
+            
+            <h5 class="filtres-titre">Filtres</h5>
+            <div class="search-container">
+                {{ filtre.recherche(class="form-control search-input", placeholder="Rechercher...") }}
+            </div>
+            
+            <h6>{{ filtre.tri.label }}</h6>
+            <div class="form-group d-grid gap-2">
+                {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle", onchange="this.form.submit()") }} 
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-sm mt-2">Appliquer</button>
+            </div>
+        </form>
+    </div>
+</aside>
+
+{% if pagination.items %}
+    <div class="d-flex justify-content-center mt-4">
+    <ul class="pagination">
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('articles', 
+                page=pagination.prev_num, 
+                recherche=filtre.recherche.data,
+                tri=filtre.tri.data,
+                annee_scolaire=filtre.annee_scolaire.data) if pagination.has_prev else '#' }}">
+                &laquo; Avant
+            </a>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">
+                Page {{ pagination.page }} sur {{ pagination.pages }}
+            </span>
+        </li>
+        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('articles', 
+                page=pagination.next_num, 
+                recherche=filtre.recherche.data,
+                tri=filtre.tri.data,
+                annee_scolaire=filtre.annee_scolaire.data) if pagination.has_next else '#' }}">
+                Après &raquo;
+            </a>
+        </li>
+    </ul>
+    </div>
+{% endif %}
+
 {% endblock %}

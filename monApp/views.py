@@ -1141,7 +1141,7 @@ def informations():
             an_debut = int(annee_selectionnee)
             debut_saison = date(an_debut, 8, 1)
             fin_saison = date(an_debut + 1, 7, 31)
-            les_infos = les_infos.filter(InformationBD.dateIN >= debut_saison, 
+            les_infos = les_infos.filter(InformationBD.dateIN >= debut_saison,
                                  InformationBD.dateIN <= fin_saison)
         except (ValueError, TypeError):
             pass
@@ -1153,9 +1153,9 @@ def informations():
     page = request.args.get('page', 1, type=int)
     pagination = les_infos.paginate(page=page, per_page=6, error_out=False)
 
-    return render_template("informations.html", 
+    return render_template("informations.html",
                            title=TITLE + " - Informations",
-                           pagination=pagination, 
+                           pagination=pagination,
                            filtre=filtre)
 
 @app.route("/admin/add_information/", methods=["GET", "POST"])
@@ -1213,8 +1213,31 @@ def delete_information(idI):
 # Affiche la page listant tous les articles de presse.
 @app.route("/presse/")
 def presse():
-    lesArticles = PresseBD.query.order_by(PresseBD.dateP.desc()).all()
-    return render_template("presse.html",title=TITLE+"- Presse",articles = lesArticles)
+    page = request.args.get('page', 1, type=int)
+    filtre = FiltreForm(request.args)
+    annee_selectionnee = filtre.annee_scolaire.data
+    les_presses = PresseBD.query
+    if filtre.recherche.data:
+        les_presses = les_presses.filter(PresseBD.titreP.ilike(f"%{filtre.recherche.data}%"))
+    if annee_selectionnee:
+        try:
+            an_debut = int(annee_selectionnee)
+            debut_saison = date(an_debut, 8, 1)
+            fin_saison = date(an_debut + 1, 7, 31)
+            les_presses = les_presses.filter(PresseBD.dateP >= debut_saison, 
+                                 PresseBD.dateP <= fin_saison)
+        except (ValueError, TypeError):
+            pass
+    if filtre.tri.data == 'date_asc':
+        les_presses = les_presses.order_by(PresseBD.dateP.asc(), PresseBD.idPresse.asc())
+    else:
+        les_presses = les_presses.order_by(PresseBD.dateP.desc(), PresseBD.idPresse.desc())
+    pagination = les_presses.paginate(page=page, per_page=6, error_out=False)
+    return render_template("presse.html",
+                           title=TITLE + "- Presse",
+                           pagination=pagination,
+                           articles=pagination.items, 
+                           filtre=filtre)
 
 @app.route("/admin/add_presse/", methods=["GET", "POST"])
 @login_required
@@ -1289,8 +1312,32 @@ def delete_presse(idP):
 
 @app.route("/articles/")
 def articles():
-    les_articles = ArticleBD.query.order_by(ArticleBD.date.desc()).all()
-    return render_template("articles.html", title=TITLE+"- Articles du Club", articles=les_articles)
+    page = request.args.get('page', 1, type=int)
+    filtre = FiltreForm(request.args)
+    annee_selectionnee = filtre.annee_scolaire.data
+    les_articles = ArticleBD.query
+    if filtre.recherche.data:
+        les_articles = les_articles.filter(
+            ArticleBD.titre.ilike(f"%{filtre.recherche.data}%"))
+    if annee_selectionnee:
+        try:
+            an_debut = int(annee_selectionnee)
+            debut_saison = date(an_debut, 8, 1)
+            fin_saison = date(an_debut + 1, 7, 31)
+            les_articles = les_articles.filter(ArticleBD.date >= debut_saison, ArticleBD.date
+                                 <= fin_saison)
+        except (ValueError, TypeError):
+            pass
+    if filtre.tri.data == 'date_asc':
+        les_articles = les_articles.order_by(ArticleBD.date.asc(), ArticleBD.id.asc())
+    else:
+        les_articles = les_articles.order_by(ArticleBD.date.desc(), ArticleBD.id.desc())
+    pagination = les_articles.paginate(page=page, per_page=6, error_out=False)
+    return render_template("articles.html",
+                           title=TITLE + " - Articles du Club",
+                           pagination=pagination,
+                           articles=pagination,
+                           filtre=filtre)
 
 @app.route("/article/<int:idA>")
 def article_detail(idA):
