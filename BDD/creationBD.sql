@@ -55,6 +55,7 @@ create table MEMBRE(
     activite boolean DEFAULT True,
     idParamNotifMembre integer,
     numTel varchar(20),
+    numLicense varchar(67) default null,
     PRIMARY KEY(idMembre)
 );
 
@@ -132,6 +133,7 @@ create table MODIFICATION(
     ddnModif date,
     numTelModif varchar(20),
     dateModif date,
+    numLicense varchar(67) DEFAULT NULL,
     justificationModif varchar(500),
     idMembre integer,
     PRIMARY KEY(idModif)

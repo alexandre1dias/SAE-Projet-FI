@@ -41,6 +41,7 @@ class ModifForm(FlaskForm):
     ], validators=[DataRequired()])
     email = StringField ('Email' ,validators= [DataRequired(), Email()])
     numTel = StringField('Numéro de téléphone (optionnel)', validators=[Optional()])
+    numLicense = StringField('numéro de License',validators=[Optional()])
     statut = SelectField('Statut', choices=[
         ('Membre', 'Membre'),
         ('Membre du comité', 'Membre du comité'),

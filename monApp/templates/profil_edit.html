@@ -106,6 +106,19 @@
                         {% endif %}
                     </div>
                     <div class="mb-3 row">
+                        <label for="statut" class="col-sm-4 col-form-label text-muted">Numéro de License :</label>
+                        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+                        <div class="col-sm-8">
+                            {{updateForm.numLicense(class_="form-control")}}
+                        </div>
+                        {% endif %}
+                        {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
+                        <div class="col-sm-8">
+                            {{selectedMembre.numLicense}}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3 row">
                         <label for="justification" class="col-sm-4 col-form-label text-muted">Justification :</label>
                         <div class="col-sm-8">
                             {{ updateForm.justification(class_="form-control", rows="5", placeholder="Décrivez la raison de la modification", required=true) }}

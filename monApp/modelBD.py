@@ -45,6 +45,7 @@ class MembreBD(UserMixin, db.Model):
     statut = db.Column(db.String(30), server_default='Membre')
     activite = db.Column(db.Boolean, server_default='1')
     numTel = db.Column(db.String(20))
+    numLicense = db.Column(db.String(67))
     idParaNotif = db.Column('idParamNotifMembre', db.Integer, db.ForeignKey('PARAMETRE_NOTIF_MEMBRE.idParamNotifMembre', use_alter=True, name='fk_membre_param_notif'))
     parametres_notif = db.relationship(
         'ParametreNotifMembreBD',
@@ -214,6 +215,7 @@ class ModifBD(UserMixin, db.Model):
     ddn = db.Column('ddnModif', db.Date)
     numTel = db.Column('numTelModif', db.String(20))
     date = db.Column('dateModif', db.Date)
+    numLicense = db.Column(db.String(67))
     justification = db.Column('justificationModif', db.String(200))
     membre = db.relationship('MembreBD', backref=db.backref('modifications', lazy='dynamic'))
 
