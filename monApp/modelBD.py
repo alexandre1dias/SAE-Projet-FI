@@ -390,7 +390,7 @@ class ImageArticleBD(db.Model):
     """
     Table stockant les multiples images d'un article.
     """
-    __tablename__ = 'IMAGE_ARTICLE'
+    __tablename__ = 'IMAGEARTICLE'
 
     id = db.Column('idImageArticle', db.Integer, primary_key=True)
     nom = db.Column('nomI', db.String(255))
