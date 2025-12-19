@@ -88,7 +88,7 @@
             <h5 class="filtres-titre">Filtres</h5>
             <form action="{{ url_for('competitions') }}" method="GET">
                 <h6> {{ filtre.tri.label }}</h6>
-                <div class="form-group">
+                <div class="d-grid gap-2">
                     {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle") }} 
                 </div>
                 <h6>{{ filtre.sexe.label }}</h6>
@@ -121,7 +121,9 @@
                         {{ subfield.label(class="form-check-label") }}
                     </div>
                 {% endfor %}
+                <div class="d-grid gap-2">
                 {{ filtre.submit(class="btn btn-primary", value="Appliquer les filtres") }}
+                </div>
             </form>
         </div>
     </aside>

@@ -5,6 +5,9 @@
 SET FOREIGN_KEY_CHECKS=0;
 
 -- 1. NETTOYAGE PRÉALABLE (Pour éviter les doublons si on relance)
+DELETE FROM AVOIR WHERE idResultat IN (SELECT idResultat FROM RESULTAT WHERE idCompetition IN (SELECT idCompetition FROM COMPETITION WHERE idEvent BETWEEN 47 AND 76));
+DELETE FROM RESULTER WHERE idResultat IN (SELECT idResultat FROM RESULTAT WHERE idCompetition IN (SELECT idCompetition FROM COMPETITION WHERE idEvent BETWEEN 47 AND 76));
+DELETE FROM RESULTAT WHERE idCompetition IN (SELECT idCompetition FROM COMPETITION WHERE idEvent BETWEEN 47 AND 76);
 DELETE FROM PARTICIPER WHERE idEvent BETWEEN 47 AND 76;
 DELETE FROM COMPETITION WHERE idEvent BETWEEN 47 AND 76;
 DELETE FROM REUNION WHERE idEvent BETWEEN 47 AND 76;
@@ -82,5 +85,33 @@ INSERT INTO PARTICIPER (idMembre, idEvent) VALUES
 -- EventClub (Vie du club)
 (8, 67), (8, 68), (8, 69), (8, 70), (8, 71), 
 (8, 72), (8, 73), (8, 74), (8, 75), (8, 76);
+
+-- ============================================================
+-- 8. INSERTION DES RÉSULTATS (ID 8 = Christophe)
+-- ============================================================
+
+-- Résultat pour Circuit National Vétéran 1 (Event 47)
+INSERT INTO RESULTAT (resultat, dateRE, typeArmeRE, typeCompeteRE, idCompetition, idMembre) 
+SELECT 12, '2025-10-06', 'Épée', 'National', idCompetition, 8 FROM COMPETITION WHERE idEvent = 47;
+INSERT INTO AVOIR (idResultat, idMembre) VALUES (LAST_INSERT_ID(), 8);
+INSERT INTO RESULTER (idResultat, idCompetition) SELECT LAST_INSERT_ID(), idCompetition FROM COMPETITION WHERE idEvent = 47;
+
+-- Résultat pour Tournoi des Maîtres (Event 48)
+INSERT INTO RESULTAT (resultat, dateRE, typeArmeRE, typeCompeteRE, idCompetition, idMembre) 
+SELECT 3, '2025-11-15', 'Épée', 'Régional', idCompetition, 8 FROM COMPETITION WHERE idEvent = 48;
+INSERT INTO AVOIR (idResultat, idMembre) VALUES (LAST_INSERT_ID(), 8);
+INSERT INTO RESULTER (idResultat, idCompetition) SELECT LAST_INSERT_ID(), idCompetition FROM COMPETITION WHERE idEvent = 48;
+
+-- Résultat pour Championnat de Ligue Vétéran (Event 49)
+INSERT INTO RESULTAT (resultat, dateRE, typeArmeRE, typeCompeteRE, idCompetition, idMembre) 
+SELECT 1, '2026-01-20', 'Épée', 'Régional', idCompetition, 8 FROM COMPETITION WHERE idEvent = 49;
+INSERT INTO AVOIR (idResultat, idMembre) VALUES (LAST_INSERT_ID(), 8);
+INSERT INTO RESULTER (idResultat, idCompetition) SELECT LAST_INSERT_ID(), idCompetition FROM COMPETITION WHERE idEvent = 49;
+
+-- Résultat pour Challenge du Vignoble (Event 50)
+INSERT INTO RESULTAT (resultat, dateRE, typeArmeRE, typeCompeteRE, idCompetition, idMembre) 
+SELECT 8, '2026-02-11', 'Épée', 'National', idCompetition, 8 FROM COMPETITION WHERE idEvent = 50;
+INSERT INTO AVOIR (idResultat, idMembre) VALUES (LAST_INSERT_ID(), 8);
+INSERT INTO RESULTER (idResultat, idCompetition) SELECT LAST_INSERT_ID(), idCompetition FROM COMPETITION WHERE idEvent = 50;
 
 SET FOREIGN_KEY_CHECKS=1;

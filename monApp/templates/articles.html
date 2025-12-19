@@ -52,18 +52,17 @@
 
 <aside class="fixed-left">
     <div class="filtres-box">
-        <br>
+        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}           
         <div>
-            {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}           
             <h5 class="filtres-titre">Action</h5>
             <div class="d-grid gap-2">
                 <a href="{{ url_for('add_article') }}" class="btn btn-success">
                     Nouvel Article
                 </a>
             </div>
-            {% endif %}
         </div>
         <br>
+        {% endif %}
         <form action="{{ url_for('articles') }}" method="GET">
             <h5 class="filtres-titre">Années</h5>
             <div class="form-group d-grid gap-2">

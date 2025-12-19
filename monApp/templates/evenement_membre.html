@@ -2,7 +2,6 @@
 
 {% block head_extra %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
-
 {% endblock %}
 
 {% block main %}
@@ -10,35 +9,33 @@
     <div class="header-container mb-4 text-center justify-content-center">
         <h2>Vos Évènements</h2>
     </div>
+    
     <ul class="nav nav-tabs mb-4 justify-content-center">
         <li class="nav-item">
             <a class="nav-link {% if type_page == 'competitions' %}active{% endif %}" 
-               href="{{ url_for('evenement_membre', type='competitions', etat=etat) }}">
+               href="{{ url_for('evenement_membre', type='competitions', etat=etat, recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}">
                Compétitions
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link {% if type_page == 'reunions' %}active{% endif %}" 
-               href="{{ url_for('evenement_membre', type='reunions', etat=etat) }}">
+               href="{{ url_for('evenement_membre', type='reunions', etat=etat, recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}">
                Réunions
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link {% if type_page == 'event_club' %}active{% endif %}" 
-               href="{{ url_for('evenement_membre', type='event_club', etat=etat) }}">
+               href="{{ url_for('evenement_membre', type='event_club', etat=etat, recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}">
                Évènements Club
             </a>
         </li>
     </ul>
 
     <div class="row">
-        <div class="col-lg-9">
-            
             <h4 class="mb-4">
                 {% if etat == 'passees' %}Historique : {% else %}Prochains évènements : {% endif %}
             </h4>
-
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
                 {% for event in pagination.items %}
                     <div class="col">
                         <div class="card pricing-card h-100 border-primary shadow-sm">
@@ -141,62 +138,62 @@
 
         </div>
     </div>
+    
     <aside class="fixed-left">
-                <div class="filtres-box">
-                    <div>
-                        <h5 class="filtres-titre">Action</h5>
-                        <div class="d-grid gap-2">
-                            {% if etat == 'passees' %}
-                                <a href="{{ url_for('evenement_membre', type=type_page, etat='avenir') }}" class="btn btn-outline-success">
-                                    <i class="fas fa-calendar-alt me-2"></i>Voir À venir
-                                </a>
-                            {% else %}
-                                <a href="{{ url_for('evenement_membre', type=type_page, etat='passees') }}" class="btn btn-outline-secondary">
-                                    <i class="fas fa-history me-2"></i>Voir l'historique
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <br>
-                    
-                    <h5 class="filtres-titre">Filtres</h5>
-                    <form action="{{ url_for('evenement_membre') }}" method="GET">
-                        <input type="hidden" name="type" value="{{ type_page }}">
-                        <input type="hidden" name="etat" value="{{ etat }}">
-
-                        <div class="mb-3">
-                            {{ filtre.recherche(class="form-control", placeholder="Nom ou ville...") }}
-                        </div>
-
-                        <h6>{{ filtre.tri.label }}</h6>
-                        <div class="form-group">
-                            {{ filtre.tri(class="form-select") }} 
-                        </div>
-
-                        {% if type_page == 'competitions' %}
-                            <h6>{{ filtre.armes.label }}</h6>
-                            {% for subfield in filtre.armes %}
-                                <div class="form-check">
-                                    {{ subfield(class="form-check-input") }}
-                                    {{ subfield.label(class="form-check-label") }}
-                                </div>
-                            {% endfor %}
-                            <h6>{{ filtre.type_competition.label }}</h6>
-                            {% for subfield in filtre.type_competition %}
-                                <div class="form-check">
-                                    {{ subfield(class="form-check-input") }}
-                                    {{ subfield.label(class="form-check-label") }}
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-
-                        <div class="d-grid gap-2 mt-4">
-                            {{ filtre.submit(class="btn btn-primary", value="Appliquer") }}
-                            <a href="{{ url_for('evenement_membre', type=type_page, etat=etat) }}" class="btn btn-link btn-sm text-decoration-none">Réinitialiser</a>
-                        </div>
-                    </form>
+        <div class="filtres-box">
+            <div>
+                <h5 class="filtres-titre">Action</h5>
+                <div class="d-grid gap-2">
+                    {% if etat == 'passees' %}
+                        <a href="{{ url_for('evenement_membre', type=type_page, etat='avenir', recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}" class="btn btn-outline-success">
+                            <i class="fas fa-calendar-alt me-2"></i>Voir À venir
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('evenement_membre', type=type_page, etat='passees', recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-history me-2"></i>Voir l'historique
+                        </a>
+                    {% endif %}
                 </div>
-            </aside>
+            </div>
+            
+            <br>
+            
+            <h5 class="filtres-titre">Filtres</h5>
+            <form action="{{ url_for('evenement_membre') }}" method="GET">
+                <input type="hidden" name="type" value="{{ type_page }}">
+                <input type="hidden" name="etat" value="{{ etat }}">
+
+                <div class="mb-3">
+                    {{ filtre.recherche(class="form-control", placeholder="Nom ou ville...") }}
+                </div>
+
+                <h6>{{ filtre.tri.label }}</h6>
+                <div class="form-group d-grid gap-2">
+                    {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle") }} 
+                </div>
+
+                {% if type_page == 'competitions' %}
+                    <h6>{{ filtre.armes.label }}</h6>
+                    {% for subfield in filtre.armes %}
+                        <div class="form-check">
+                            {{ subfield(class="form-check-input") }}
+                            {{ subfield.label(class="form-check-label") }}
+                        </div>
+                    {% endfor %}
+                    <h6>{{ filtre.type_competition.label }}</h6>
+                    {% for subfield in filtre.type_competition %}
+                        <div class="form-check">
+                            {{ subfield(class="form-check-input") }}
+                            {{ subfield.label(class="form-check-label") }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="d-grid gap-2 mt-4">
+                    {{ filtre.submit(class="btn btn-primary", value="Appliquer") }}
+                </div>
+            </form>
+        </div>
+    </aside>
 </div>
 {% endblock %}

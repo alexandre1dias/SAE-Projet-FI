@@ -284,7 +284,9 @@ class FiltreForm(FlaskForm):
     recherche = StringField('Rechercher')
     submit = SubmitField('Envoyer')
 
-    CHOIX_TRI = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien')]
+    CHOIX_TRI = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien'), ('resultat', 'Resultat'),
+                 ('nom_asc', 'Nom A-Z'), ('nom_desc', 'Nom Z-A'), ('prenom_asc', 'Prenom A-Z'), ('prenom_desc', 'Prenom Z-A'),
+                ('age_asc', 'Plus agé'), ('age_desc', 'Plus jeune')]
     tri = SelectField(
         'Trier par',
         choices=CHOIX_TRI,
