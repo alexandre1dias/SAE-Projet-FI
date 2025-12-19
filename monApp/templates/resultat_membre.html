@@ -6,43 +6,11 @@
 {% block main %}
 
     <h2 class="text-center mb-5">Liste de vos résultats</h2>
-
     <div class="row">
-        <aside class="col-lg-3 col-md-4 mb-4">
-            <div class="filtres-box">
-                <h5 class="filtres-titre">Filtres</h5>
-                <form action="{{ url_for('resultat_membre') }}" method="GET">
+        
 
-                    <h6>{{ filtre.tri.label }}</h6>
-                    <div class="form-group mb-3">
-                        {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle w-100") }}
-                    </div>
-
-                    <h6>{{ filtre.armes.label }}</h6>
-                    {% for subfield in filtre.armes %}
-                    <div class="form-check">
-                        {{ subfield(class="form-check-input") }}
-                        {{ subfield.label(class="form-check-label") }}
-                    </div>
-                    {% endfor %}
-                    <br>
-
-                    <h6>{{ filtre.type_competition.label }}</h6>
-                    {% for subfield in filtre.type_competition %}
-                    <div class="form-check">
-                        {{ subfield(class="form-check-input") }}
-                        {{ subfield.label(class="form-check-label") }}
-                    </div>
-                    {% endfor %}
-                    <br>
-
-                    {{ filtre.submit(class="btn btn-primary w-100", value="Appliquer les filtres") }}
-                </form>
-            </div>
-        </aside>
-
-        <div class="col-lg-9 col-md-8">
-            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        <div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4">
                 {% if resultats %}
                 {% for resultat in resultats %}
                 <div class="col">
@@ -72,7 +40,7 @@
                 {% endfor %}
                 {% else %}
                 <div class="col-12">
-                    <div class="alert alert-info text-center">
+                    <div>
                         Aucun résultat trouvé pour ces critères.
                     </div>
                 </div>
@@ -110,5 +78,36 @@
             {% endif %}
         </div>
     </div>
+    <aside class="fixed-left">            <div class="filtres-box">
+                <h5 class="filtres-titre">Filtres</h5>
+                <form action="{{ url_for('resultat_membre') }}" method="GET">
+
+                    <h6>{{ filtre.tri.label }}</h6>
+                    <div class="form-group mb-3">
+                        {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle w-100") }}
+                    </div>
+
+                    <h6>{{ filtre.armes.label }}</h6>
+                    {% for subfield in filtre.armes %}
+                    <div class="form-check">
+                        {{ subfield(class="form-check-input") }}
+                        {{ subfield.label(class="form-check-label") }}
+                    </div>
+                    {% endfor %}
+                    <br>
+
+                    <h6>{{ filtre.type_competition.label }}</h6>
+                    {% for subfield in filtre.type_competition %}
+                    <div class="form-check">
+                        {{ subfield(class="form-check-input") }}
+                        {{ subfield.label(class="form-check-label") }}
+                    </div>
+                    {% endfor %}
+                    <br>
+                    {{ filtre.submit(class="btn btn-primary w-100", value="Appliquer les filtres") }}
+                </form>
+            </div>
+        </aside>
 </div>
+
 {% endblock %}

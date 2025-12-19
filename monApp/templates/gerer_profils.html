@@ -103,8 +103,8 @@
             <div>
                 <h5 class="filtres-titre">Action</h5>
                 <div class="d-grid gap-2">
-                    <a href="{{ url_for('inscription') }}" class="btn btn-success">Crée un membre</a>
                     <a href="{{ url_for('gerer_ancien_profils') }}" class="btn btn-secondary">Voir la liste des anciens membres</a>
+                    <a href="{{ url_for('inscription') }}" class="btn btn-success">Crée un membre</a>
                 </div>
             </div>
             <br>
@@ -130,7 +130,9 @@
                         {{ subfield.label(class="form-check-label") }}
                     </div>
                 {% endfor %}
+                <div class="d-grid gap-2">
                 {{ filtre.submit(class="btn btn-primary", value="Appliquer les filtres") }}
+                </div>
             </form>
         </div>
     </aside>

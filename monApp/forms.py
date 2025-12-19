@@ -283,7 +283,7 @@ class FiltreForm(FlaskForm):
     recherche = StringField('Rechercher')
     submit = SubmitField('Envoyer')
 
-    CHOIX_TRI = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien')]
+    CHOIX_TRI = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien'), ('resultat', 'Resultat')]
     tri = SelectField(
         'Trier par',
         choices=CHOIX_TRI,

@@ -1133,6 +1133,9 @@ def informations():
     filtre = FiltreForm(request.args)
     annee_selectionnee = filtre.annee_scolaire.data
     les_infos = InformationBD.query
+    filtre.tri.choices = [('date_desc', 'Plus récent'),
+                          ('date_asc', 'Plus ancien')]
+    
     if filtre.recherche.data:
         les_infos = les_infos.filter(InformationBD.titreIN.ilike(f"%{filtre.recherche.data}%"))
 
@@ -1216,6 +1219,8 @@ def presse():
     page = request.args.get('page', 1, type=int)
     filtre = FiltreForm(request.args)
     annee_selectionnee = filtre.annee_scolaire.data
+    filtre.tri.choices = [('date_desc', 'Plus récent'),
+                          ('date_asc', 'Plus ancien')]
     les_presses = PresseBD.query
     if filtre.recherche.data:
         les_presses = les_presses.filter(PresseBD.titreP.ilike(f"%{filtre.recherche.data}%"))
@@ -1224,7 +1229,7 @@ def presse():
             an_debut = int(annee_selectionnee)
             debut_saison = date(an_debut, 8, 1)
             fin_saison = date(an_debut + 1, 7, 31)
-            les_presses = les_presses.filter(PresseBD.dateP >= debut_saison, 
+            les_presses = les_presses.filter(PresseBD.dateP >= debut_saison,
                                  PresseBD.dateP <= fin_saison)
         except (ValueError, TypeError):
             pass
@@ -1236,7 +1241,7 @@ def presse():
     return render_template("presse.html",
                            title=TITLE + "- Presse",
                            pagination=pagination,
-                           articles=pagination.items, 
+                           articles=pagination.items,
                            filtre=filtre)
 
 @app.route("/admin/add_presse/", methods=["GET", "POST"])
@@ -1315,6 +1320,8 @@ def articles():
     page = request.args.get('page', 1, type=int)
     filtre = FiltreForm(request.args)
     annee_selectionnee = filtre.annee_scolaire.data
+    filtre.tri.choices = [('date_desc', 'Plus récent'),
+                          ('date_asc', 'Plus ancien')]
     les_articles = ArticleBD.query
     if filtre.recherche.data:
         les_articles = les_articles.filter(
@@ -1521,7 +1528,8 @@ def resultat_membre():
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
     filtre.tri.choices = [('date_desc', 'Plus récent'),
-                          ('date_asc', 'Plus ancien')]
+                          ('date_asc', 'Plus ancien'),
+                          ('resultat', 'Resultat')]
     lesCompete = ResultatBD.query.join(CompetitionBD).filter(
         ResultatBD.id_membre == current_user.id)
     if filtre.armes.data:
@@ -1533,12 +1541,12 @@ def resultat_membre():
             CompetitionBD.typeComp.in_(filtre.type_competition.data))
     if filtre.tri.data == "date_asc":
         lesCompete = lesCompete.order_by(CompetitionBD.date_debut.asc())
-    elif filtre.tri.data == "classement":
+    elif filtre.tri.data == "resultat":
         lesCompete = lesCompete.order_by(ResultatBD.resultat.asc())
     else:
         lesCompete = lesCompete.order_by(CompetitionBD.date_debut.desc())
 
-    pagination = lesCompete.paginate(page=page, per_page=6, error_out=False)
+    pagination = lesCompete.paginate(page=page, per_page=8, error_out=False)
     return render_template("resultat_membre.html",
                            title=TITLE + "- Résultat du Membre",
                            resultats=pagination.items,
@@ -1550,62 +1558,46 @@ def resultat_membre():
 @login_required
 @membre_required
 def evenement_membre():
-    # 1. Instanciation du formulaire comme dans votre exemple
     filtre = FiltreForm(request.args if request.args else None)
-
-    # 2. Paramètres de base
     page = request.args.get('page', 1, type=int)
     type_page = request.args.get('type', 'competitions')
     etat = request.args.get('etat', 'avenir')
-    today = date.today()
-
+    filtre.tri.choices = [('date_desc', 'Plus récent'),
+                          ('date_asc', 'Plus ancien')]
     query = None
-
-    # =========================================================
-    # BLOC 1 : COMPÉTITIONS
-    # =========================================================
     if type_page == 'competitions':
-        # Requete de base
         query = CompetitionBD.query.join(
-            ParticiperBD, CompetitionBD.id_event == ParticiperBD.id_event
-        ).filter(ParticiperBD.id_membre == current_user.id)
-
-        # Filtre État (Passé/Avenir) - Hors formulaire
+            ParticiperBD,
+            CompetitionBD.id_event == ParticiperBD.id_event).filter(
+                ParticiperBD.id_membre == current_user.id)
         if etat == 'passees':
-            query = query.filter(CompetitionBD.date_debut < today)
+            query = query.filter(CompetitionBD.date_debut < AUJOURDHUI)
         else:
-            query = query.filter(CompetitionBD.date_debut >= today)
+            query = query.filter(CompetitionBD.date_debut >= AUJOURDHUI)
 
         if filtre.armes.data:
-            query = query.filter(CompetitionBD.type_arme.in_(filtre.armes.data))
+            query = query.filter(CompetitionBD.type_arme.in_(
+                filtre.armes.data))
 
         if filtre.type_competition.data:
-            query = query.filter(CompetitionBD.typeComp.in_(filtre.type_competition.data))
+            query = query.filter(
+                CompetitionBD.typeComp.in_(filtre.type_competition.data))
 
         if filtre.recherche.data:
             terme = f"%{filtre.recherche.data}%"
             query = query.filter(
-                or_(
-                    CompetitionBD.nom.ilike(terme),
-                    CompetitionBD.ville.ilike(terme)
-                )
-            )
-
-        # Tri
+                or_(CompetitionBD.nom.ilike(terme),
+                    CompetitionBD.ville.ilike(terme)))
         if filtre.tri.data == 'date_asc':
             query = query.order_by(CompetitionBD.date_debut.asc())
         elif filtre.tri.data == 'nom':
             query = query.order_by(CompetitionBD.nom.asc())
         else:
             query = query.order_by(CompetitionBD.date_debut.desc())
-
-    # =========================================================
-    # BLOC 2 : RÉUNIONS
-    # =========================================================
     elif type_page == 'reunions':
         query = ReunionBD.query.join(
-            ParticiperBD, ReunionBD.idEvent == ParticiperBD.id_event
-        ).filter(ParticiperBD.id_membre == current_user.id)
+            ParticiperBD, ReunionBD.idEvent == ParticiperBD.id_event).filter(
+                ParticiperBD.id_membre == current_user.id)
 
         if etat == 'passees':
             query = query.filter(ReunionBD.dateDebutRE < today)
@@ -1620,15 +1612,11 @@ def evenement_membre():
             query = query.order_by(ReunionBD.dateDebutRE.asc())
         else:
             query = query.order_by(ReunionBD.dateDebutRE.desc())
-
-    # =========================================================
-    # BLOC 3 : ÉVÉNEMENTS CLUB
-    # =========================================================
     elif type_page == 'event_club':
         query = EventClubBD.query.join(
-            ParticiperBD, EventClubBD.id_event == ParticiperBD.id_event
-        ).filter(ParticiperBD.id_membre == current_user.id)
-
+            ParticiperBD,
+            EventClubBD.id_event == ParticiperBD.id_event).filter(
+                ParticiperBD.id_membre == current_user.id)
         if etat == 'passees':
             query = query.filter(EventClubBD.dateDebutEV < today)
         else:
@@ -1642,14 +1630,9 @@ def evenement_membre():
             query = query.order_by(EventClubBD.dateDebutEV.asc())
         else:
             query = query.order_by(EventClubBD.dateDebutEV.desc())
-
     else:
-        # Fallback
         return redirect(url_for('evenement_membre', type='competitions'))
-
-    # Pagination finale
-    pagination = query.paginate(page=page, per_page=6, error_out=False)
-
+    pagination = query.paginate(page=page, per_page=8, error_out=False)
     return render_template("evenement_membre.html",
                            title=TITLE + "- Vos Évènements",
                            pagination=pagination,
@@ -1765,7 +1748,6 @@ def gerer_profils():
                 MembreBD.email.ilike(terme)
             )
         )
-    # Maintenant .paginate() fonctionnera
     pagination = liste.paginate(page=page, per_page=15, error_out=False)
     return render_template("gerer_profils.html",
         title=TITLE + "- Gestion des Profils",pagination=pagination,filtre=filtre)
