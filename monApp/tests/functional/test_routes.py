@@ -97,8 +97,40 @@ def test_page_publique_competition_view(client, app, db):
     assert "Grande Compétition Test" in response.data.decode('utf-8')
     assert "Lyon" in response.data.decode('utf-8')
 
+def test_page_publique_article_detail(client, app, db):
+    """
+    Test de la page de détail d'un article (Route publique).
+    Vérifie l'affichage correct et la gestion de l'erreur 404.
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+
+    # 1. Création d'un article en base de données
+    article = ArticleBD(
+        titre="Article Important",
+        contenu="Ceci est le contenu détaillé de l'article.",
+        date=date.today()
+    )
+    db.session.add(article)
+    db.session.commit()
+
+    # 2. On appelle la route avec l'ID de l'article créé
+    response = client.get(f'/article/{article.id}')
+    
+    assert response.status_code == 200
+    content = response.data.decode('utf-8')
+    assert "Article Important" in content
+    assert "Ceci est le contenu détaillé" in content
+
+    # 3. On appelle la route avec un ID improbable
+    response_404 = client.get('/article/999999')
+
+    assert response_404.status_code == 404
+
 # ==============================================================================
-# 2. PAGES MEMBRES
+# 2. PAGES et SCENARIOS ACTIONS MEMBRES
+# ==============================================================================
+# ==============================================================================
+# PAGES MEMBRES
 # ==============================================================================
 def test_pages_membres_protegees(client, app, db):
     """Test des pages réservées aux membres connectés."""
@@ -156,7 +188,216 @@ def test_pages_membres_protegees(client, app, db):
         assert "Liste des prochains évènements du cercle" in response.data.decode('utf-8')
 
 # ==============================================================================
-# 3. PAGES ADMIN
+# SCENARIOS ACTIONS
+# ==============================================================================
+def test_inscription_reunion_comite(client, app, db):
+    """
+    Test Inscription/Désinscription à une réunion.
+    Utilise un MEMBRE DU COMITÉ car la table PARTICIPER requiert un idMembre.
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+    
+    # 1. Création d'un Membre du Comité (Autorisé par @comite_ou_admin_required)
+    client.get('/logout/')
+    comite_member = MembreBD(
+        email='prez@test.fr', 
+        mdp_hash=generate_password_hash('pass'),
+        nom='Prez', prenom='Boss', 
+        statut='Président',
+        activite=True,
+        sexe='Homme', ddn=date(1980,1,1)
+    )
+    db.session.add(comite_member)
+    
+    # Création de la réunion
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+    
+    reunion = ReunionBD(
+        idEvent=evt.id, nom="AG", 
+        dateDebutRE=date.today(), heureDebutRE="10:00",
+        dateFinRE=date.today(), heureFinRE="12:00"
+    )
+    db.session.add(reunion)
+    db.session.commit()
+    id_reunion = reunion.id
+
+    # 2. Connexion
+    client.post('/login/', data={'email': 'prez@test.fr', 'password': 'pass'})
+
+    # 3. Inscription
+    client.get(f'/reunion/inscrire/{id_reunion}', follow_redirects=True)
+
+    # Vérification
+    participation = ParticiperBD.query.filter_by(
+        id_membre=comite_member.id, 
+        id_event=reunion.idEvent
+    ).first()
+    assert participation is not None, "Le membre du comité devrait être inscrit"
+
+    # 4. D"sinscription
+    client.get(f'/reunion/desinscrire/{id_reunion}', follow_redirects=True)
+
+    # Vérification
+    participation = ParticiperBD.query.filter_by(
+        id_membre=comite_member.id, 
+        id_event=reunion.idEvent
+    ).first()
+    assert participation is None, "Le membre ne devrait plus être inscrit"
+
+def test_desinscription_membre_par_soi_meme(client, app, db):
+    """
+    Test de la fonction desinscrireMembre par le membre lui-même.
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+    
+    # 1. Création et Connexion Membre
+    client.get('/logout/')
+    membre = MembreBD(
+        email='depart@test.fr', 
+        mdp_hash=generate_password_hash('pass'),
+        nom='Partant', prenom='Jean',
+        statut='Membre', activite=True
+    )
+    db.session.add(membre)
+    db.session.commit()
+    
+    client.post('/login/', data={'email': 'depart@test.fr', 'password': 'pass'})
+
+    # 2. Désinscription
+    response = client.get(f'/gerer_profils/desinscrire/{membre.id}', follow_redirects=True)
+
+    # 3. Vérification
+    assert "Entrez dans notre histoire" in response.data.decode('utf-8')
+    membre_db = db.session.get(MembreBD, membre.id)
+    assert membre_db.activite is False
+    assert membre_db.statut == "Ancien Membre"
+
+    # 4. Tentative de connexion
+    res_login = client.post('/login/', data={'email': 'depart@test.fr', 'password': 'pass'}, follow_redirects=True)
+    assert b"/logout/" not in res_login.data
+
+def test_membre_inscription_desinscription_event_club(client, app, db):
+    """
+    Test du flux Membre : S'inscrire soi-même et se désinscrire.
+    Routes :
+    - /inscrire/club/<id>
+    - /desinscrire/club/<id>
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+
+    # 1. Création Evénement
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+    club = EventClubBD(
+        id_event=evt.id, NomEV="Soirée Jeux", 
+        dateDebutEV=date.today(), heureDebutEV="20:00",
+        dateFinEV=date.today(), heureFinEV="23:00",
+        niveauxEV="Tous", passeeEV=False
+    )
+    db.session.add(club)
+
+    # 2. Création et Connexion Membre
+    client.get('/logout/')
+    membre = MembreBD(
+        email='autonome@test.fr', mdp_hash=generate_password_hash('pass'),
+        nom='Autonome', prenom='User', activite=True
+    )
+    db.session.add(membre)
+    db.session.commit()
+    
+    client.post('/login/', data={'email': 'autonome@test.fr', 'password': 'pass'})
+
+    # 3. Inscription
+    client.get(f'/inscrire/club/{club.idEventClub}', follow_redirects=True)
+
+    # Vérification
+    participation = ParticiperBD.query.filter_by(
+        id_membre=membre.id, id_event=club.id_event
+    ).first()
+    assert participation is not None, "Le membre devrait être inscrit"
+
+    # 4. Désinscription
+    client.get(f'/desinscrire/club/{club.idEventClub}', follow_redirects=True)
+
+    # Vérification
+    participation_del = ParticiperBD.query.filter_by(
+        id_membre=membre.id, id_event=club.id_event
+    ).first()
+    assert participation_del is None, "Le membre ne devrait plus être inscrit"
+
+def test_inscription_desinscription_competition_membre(client, app, db):
+    """
+    Test du cycle d'inscription/désinscription à une compétition pour un membre.
+    Routes :
+    - /inscrire/competition/<id>
+    - /desinscrire/competition/<id>
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+
+    # 1. Création de la compétition
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+
+    comp = CompetitionBD(
+        id_event=evt.id,
+        nom="Open de France",
+        ville="Paris",
+        adresse="Grand Palais",
+        date_debut=date.today(),
+        heure_debut="09:00",
+        date_fin=date.today(),
+        heure_fin="18:00",
+        type_arme="Fleuret",
+        sexe="M",
+        typeComp="National",
+        niveaux="Senior",
+        passee=False
+    )
+    db.session.add(comp)
+    
+    # 2. Création et Connexion du Membre
+    client.get('/logout/')
+    membre = MembreBD(
+        email='escrimeur@test.fr', 
+        mdp_hash=generate_password_hash('pass'),
+        nom='Lagardere', prenom='Jean', 
+        statut='Membre', activite=True,
+        niveau='Senior', sexe='Homme'
+    )
+    db.session.add(membre)
+    db.session.commit()
+
+    client.post('/login/', data={'email': 'escrimeur@test.fr', 'password': 'pass'})
+
+    # 3. Inscription
+    client.get(f'/inscrire/competition/{comp.id}', follow_redirects=True)
+
+    # Vérification BDD
+    participation = ParticiperBD.query.filter_by(
+        id_membre=membre.id, 
+        id_event=comp.id_event
+    ).first()
+    assert participation is not None, "L'inscription a échoué en base de données"
+
+    # 4. Désinscription
+    client.get(f'/desinscrire/competition/{comp.id}', follow_redirects=True)
+
+    # Vérification BDD
+    participation_del = ParticiperBD.query.filter_by(
+        id_membre=membre.id, 
+        id_event=comp.id_event
+    ).first()
+    assert participation_del is None, "La désinscription a échoué"
+
+# ==============================================================================
+# 3. PAGES et SCENARIOS ACTIONS ADMIN
+# ==============================================================================
+# ==============================================================================
+# PAGES ADMIN
 # ==============================================================================
 def test_pages_admin_protegees(client, app, db):
     """Test de l'accès aux pages réservées aux administrateurs."""
@@ -314,7 +555,7 @@ def test_club_view_acces_refuse_anonyme(client, app, db):
     assert "/login" in response.location
 
 # ==============================================================================
-# 4. SCENARIOS ACTIONS ADMIN
+# SCENARIOS ACTIONS ADMIN
 # ==============================================================================
 
 def test_scenario_presse_admin(client, app, db):
@@ -402,12 +643,12 @@ def test_scenario_article_admin(client, app, db):
 
     # 2. MODIFICATION
     client.post(f'/admin/edit_article/{art.id}', data={
-        'titre': 'FUCK KC et M8',
-        'contenu': 'Ne soutenez pas ces sionniste'
+        'titre': 'BOUH KC et M8',
+        'contenu': 'Ne soutenez pas ces équipe'
     }, follow_redirects=True)
     
     updated_art = db.session.get(ArticleBD, art.id)
-    assert updated_art.titre == 'FUCK KC et M8'
+    assert updated_art.titre == 'BOUH KC et M8'
 
     # 3. TEST SUPPRESSION IMAGE
     # A. On simule l'existence d'une image en l'ajoutant directement en BDD
@@ -456,6 +697,37 @@ def test_crud_tarifs(client, app, db):
     # 3. SUPPRESSION
     client.post(f'/admin/delete_tarif/{tarif.id}', follow_redirects=True)
     assert db.session.get(TarifBD, tarif.id) is None
+
+def test_crud_horaire(client, app, db):
+    """Test CRUD Horaire : Ajout -> Modif -> Suppression."""
+    app.config['WTF_CSRF_ENABLED'] = False
+    setup_admin(client, db)
+
+    # 1. AJOUT
+    client.post('/admin/gestion_horaires/', data={
+        'jour': 'Lundi',
+        'heure_debut': '09:00',
+        'heure_fin': '18:00',
+        'activite': 'Entraînement'
+    }, follow_redirects=True)
+    
+    horaire = HoraireBD.query.filter_by(jour='Lundi').first()
+    assert horaire is not None
+
+    # 2. MODIFICATION
+    client.post(f'/admin/edit_horaire/{horaire.id}', data={
+        'jour': 'Mardi',
+        'heure_debut': '09:00',
+        'heure_fin': '18:00',
+        'activite': 'Entraînement'
+    }, follow_redirects=True)
+    
+    updated_horaire = db.session.get(HoraireBD, horaire.id)
+    assert updated_horaire.jour == 'Mardi'
+
+    # 3. SUPPRESSION
+    client.post(f'/admin/delete_horaire/{horaire.id}', follow_redirects=True)
+    assert db.session.get(HoraireBD, horaire.id) is None
 
 def test_add_event_complex(client, app, db):
     """
@@ -516,6 +788,28 @@ def test_add_event_complex(client, app, db):
     client.post('/add_event/', data=data_entrainement, follow_redirects=True)
     
     assert EntrainementBD.query.filter_by(adresse='Rue').count() >= 1
+
+    # 4. Test de l'API calendrier
+    # Cette route renvoie du JSON utilisé par FullCalendar
+    response = client.get('/api/events')
+    
+    assert response.status_code == 200
+    
+    # On récupère les données JSON
+    data = response.json
+    assert isinstance(data, list)
+    
+    # On extrait les titres pour vérifier la présence des événements
+    titres = [event['title'] for event in data]
+    
+    # 1. Vérif Compétition
+    assert "Compétition Test" in titres
+    
+    # 2. Vérif Réunion
+    assert "Réunion AG" in titres
+    
+    # 3. Vérif Entraînement
+    assert "Entraînement M17 Épée" in titres
 
 
 def test_gestion_inscriptions(client, app, db):
@@ -701,8 +995,391 @@ def test_contact_form_submission(client, app, db):
     assert notif is not None
     assert "Question" in notif.sourceN
 
+def test_crud_reunion_admin(client, app, db):
+    """
+    Test des actions ADMIN sur une réunion : Modification et Suppression.
+    Routes : /reunion/update/<id> et /reunion/delete/<id>
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+    setup_admin(client, db)
+
+    # 1. Création d'une réunion
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+
+    reunion = ReunionBD(
+        idEvent=evt.id,
+        nom="Réunion Initiale",
+        typeReunionRE="Générale",
+        ville="Salle A",
+        adresse="Rue A",
+        dateDebutRE=date(2025, 1, 1),
+        heureDebutRE="10:00",
+        dateFinRE=date(2025, 1, 1),
+        heureFinRE="12:00",
+        nbParticipantsRE=5,
+        rapportRE="Rapport initial"
+    )
+    db.session.add(reunion)
+    db.session.commit()
+    id_reunion = reunion.id
+
+    # 2. Modification
+    data_update = {
+        'nom': 'Réunion Modifiée',
+        'type_reunion': 'Comité',
+        'ville': 'Salle B',
+        'adresse': 'Rue B',
+        'description': 'Nouveau rapport',
+        'date_debut': '2025-02-02',
+        'heure_debut': '14:00',
+        'date_fin': '2025-02-02',
+        'heure_fin': '16:00'
+    }
+    client.post(f'/reunion/update/{id_reunion}', data=data_update, follow_redirects=True)
+
+    # Vérification BDD
+    updated = db.session.get(ReunionBD, id_reunion)
+    assert updated.nom == 'Réunion Modifiée'
+    assert updated.ville == 'Salle B'
+    assert updated.dateDebutRE == date(2025, 2, 2)
+
+    # 3. Suppression
+    client.post(f'/reunion/delete/{id_reunion}', follow_redirects=True)
+
+    # Vérification BDD
+    assert db.session.get(ReunionBD, id_reunion) is None
+
+def test_admin_gestion_statut_membre(client, app, db):
+    """
+    Test du cycle de vie géré par l'Admin :
+    1. Désinscription d'un membre (desinscrireMembre).
+    2. Consultation de la liste des anciens (gerer_ancien_profils).
+    3. Réinscription du membre (reinscrireMembre).
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+    setup_admin(client, db)
+
+    # 1. Création d'un membre actif
+    membre = MembreBD(
+        email='membre@statut.fr',
+        mdp_hash=generate_password_hash('pass'),
+        nom='Victime', prenom='Test',
+        statut='Membre', activite=True,
+        date_inscription=date.today(),
+        sexe='Homme',
+        niveau='Senior'
+    )
+    db.session.add(membre)
+    db.session.commit()
+    id_membre = membre.id
+
+    # 2. Désinscription
+    client.get(f'/gerer_profils/desinscrire/{id_membre}', follow_redirects=True)
+
+    # Vérification BDD
+    membre_desinscrit = db.session.get(MembreBD, id_membre)
+    assert membre_desinscrit.activite is False
+    assert membre_desinscrit.statut == "Ancien Membre"
+
+    # 3. Consultation
+    response = client.get('/gerer_profils/ancien/')
+    assert response.status_code == 200
+    # On vérifie que le membre apparaît bien dans la page
+    assert "Victime" in response.data.decode('utf-8')
+    assert "Ancien Membre" in response.data.decode('utf-8')
+
+    # 4. Réinscription
+    client.post(f'/gerer_anciens_profils/reinscrire/{id_membre}', follow_redirects=True)
+
+    # Vérification BDD
+    membre_reinscrit = db.session.get(MembreBD, id_membre)
+    assert membre_reinscrit.activite is True
+    assert membre_reinscrit.statut == "Membre"
+
+def test_crud_event_club_admin(client, app, db):
+    """
+    Test des actions ADMIN sur un événement club : Modification et Suppression.
+    Routes : /evenement_club/<id>/club_update/ et /evenement_club/<id>/club_delete/
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+    setup_admin(client, db)
+
+    # 1. Création d'un événement club initial
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+
+    club = EventClubBD(
+        id_event=evt.id,
+        NomEV="Soirée Initiale",
+        villeEV="Orléans",
+        adresseEV="Local A",
+        dateDebutEV=date(2025, 5, 1),
+        heureDebutEV="18:00",
+        dateFinEV=date(2025, 5, 1),
+        heureFinEV="22:00",
+        descriptionEV="Description avant",
+        niveauxEV="Tous",
+        passeeEV=False
+    )
+    db.session.add(club)
+    db.session.commit()
+    id_club = club.idEventClub
+
+    # 2. Modification
+    data_update = {
+        'nom': 'Soirée Modifiée',
+        'lieu': 'Local B',
+        'description': 'Nouvelle description',
+        'date_debut': '2025-06-01',
+        'heure_debut': '19:00',
+        'date_fin': '2025-06-01',
+        'heure_fin': '23:00'
+    }
+    
+    client.post(f'/evenement_club/{id_club}/club_update/', data=data_update, follow_redirects=True)
+
+    # Vérification BDD
+    updated = db.session.get(EventClubBD, id_club)
+    assert updated.NomEV == 'Soirée Modifiée'
+    assert updated.adresseEV == 'Local B'
+    assert updated.dateDebutEV == date(2025, 6, 1)
+
+    # 3. Suppression
+    client.post(f'/evenement_club/{id_club}/club_delete/', follow_redirects=True)
+
+    # Vérification BDD
+    assert db.session.get(EventClubBD, id_club) is None
+
+def test_admin_gestion_inscriptions_event_club(client, app, db):
+    """
+    Test du flux Admin : Inscrire un membre à un événement club puis le retirer.
+    Routes : 
+    - /evenement_club/<id>/inscrire_membres (GET)
+    - /evenement_club/<id>/inscription_membres (POST)
+    - /evenement_club/<id>/delete/<idM> (POST)
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+    setup_admin(client, db)
+
+    # 1. Création de l'événement club
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+    club = EventClubBD(
+        id_event=evt.id, NomEV="Barbecue", 
+        dateDebutEV=date.today(), heureDebutEV="18:00",
+        dateFinEV=date.today(), heureFinEV="22:00",
+        niveauxEV="Tous", passeeEV=False
+    )
+    db.session.add(club)
+    
+    # 2. Création d'un membre à inscrire
+    membre = MembreBD(
+        email='participant@test.fr', mdp_hash=generate_password_hash('pass'),
+        nom='LeParticipant', prenom='Jean', activite=True
+    )
+    db.session.add(membre)
+    db.session.commit()
+
+    # 3. page selection
+    response = client.get(f'/evenement_club/{club.idEventClub}/inscrire_membres')
+    assert response.status_code == 200
+    assert "LeParticipant" in response.data.decode('utf-8')
+
+    # 4. inscription
+    client.post(f'/evenement_club/{club.idEventClub}/inscription_membres', data={
+        'membres_a_inscrire': [membre.id]
+    }, follow_redirects=True)
+
+    # Vérification BDD
+    participation = ParticiperBD.query.filter_by(
+        id_membre=membre.id, id_event=club.id_event
+    ).first()
+    assert participation is not None, "Le membre devrait être inscrit par l'admin"
+
+    # 5. Désinscription
+    client.post(f'/evenement_club/{club.idEventClub}/delete/{membre.id}', follow_redirects=True)
+
+    # Vérification BDD
+    participation_del = ParticiperBD.query.filter_by(
+        id_membre=membre.id, id_event=club.id_event
+    ).first()
+    assert participation_del is None, "Le membre devrait être désinscrit"
+
+def test_admin_gestion_competition_complexe(client, app, db):
+    """
+    Test global de la gestion avancée d'une compétition par l'Admin.
+    Vérifie l'inscription, le classement, l'upload (via présence fichier) et la suppression.
+    """
+    import os
+    import io
+    
+    app.config['WTF_CSRF_ENABLED'] = False
+    setup_admin(client, db)
+
+    # 1. SETUP
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+
+    comp = CompetitionBD(
+        id_event=evt.id, nom="Championnat Test", ville="Lyon",
+        adresse="Gymnase", date_debut=date.today(), heure_debut="09:00",
+        date_fin=date.today(), heure_fin="18:00", type_arme="Sabre",
+        sexe="M", typeComp="National", niveaux="Senior", passee=False
+    )
+    db.session.add(comp)
+    
+    membre = MembreBD(
+        email='champion@test.fr', mdp_hash=generate_password_hash('pass'),
+        nom='Champion', prenom='Luc', activite=True, niveau='Senior'
+    )
+    db.session.add(membre)
+    db.session.commit()
+
+    # 2. INSCRIPTION
+    client.post(f'/competition/{comp.id}/inscription_membres', data={
+        'membres_a_inscrire': [membre.id]
+    }, follow_redirects=True)
+
+    assert ParticiperBD.query.filter_by(id_membre=membre.id, id_event=comp.id_event).first() is not None
+
+    # 3. CLASSEMENT
+    client.post(f'/competition/{comp.id}/classer/{membre.id}', data={'classement': '1'}, follow_redirects=True)
+    res = ResultatBD.query.filter_by(id_competition=comp.id, id_membre=membre.id).first()
+    assert int(res.resultat) == 1
+
+    # 4. UPLOAD DU CLASSEMENT PDF
+    expected_path = os.path.join(app.root_path, 'static', 'classements', str(comp.id), 'classement.pdf')
+    
+    # On s'assure qu'il n'existe pas avant le test
+    if os.path.exists(expected_path):
+        os.remove(expected_path)
+
+    data_pdf = {
+        'classement_pdf': (
+            io.BytesIO(b"%PDF-1.4...fake content..."), 
+            'mon_fichier.pdf', 
+            'application/pdf'
+        )
+    }
+    
+    response = client.post(
+        f'/competition/{comp.id}/upload_classement',
+        data=data_pdf,
+        follow_redirects=True
+    )
+
+    # Vérification
+    assert response.status_code == 200
+
+    if not os.path.exists(expected_path):
+        print("DEBUG HTML:", response.data.decode('utf-8'))
+        raise AssertionError(f"Le fichier n'a pas été créé à l'endroit attendu : {expected_path}")
+    
+    os.remove(expected_path)
+    try:
+        os.rmdir(os.path.dirname(expected_path))
+    except:
+        pass
+
+    # 5. SUPPRESSION PARTICIPANT
+    client.post(f'/competition/{comp.id}/delete/{membre.id}', follow_redirects=True)
+    assert ParticiperBD.query.filter_by(id_membre=membre.id, id_event=comp.id_event).first() is None
+
+def test_admin_crud_competition(client, app, db):
+    """
+    Test complet du cycle de vie d'une compétition (Update, Images, Delete).
+    """
+    import io
+    import os
+    
+    app.config['WTF_CSRF_ENABLED'] = False
+    setup_admin(client, db)
+
+    # 1. SETUP
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+
+    comp = CompetitionBD(
+        id_event=evt.id,
+        nom="Compétition Originale",
+        ville="Paris",
+        adresse="Vieux Stade",
+        date_debut=date(2025, 1, 1),
+        heure_debut="10:00",
+        date_fin=date(2025, 1, 1),
+        heure_fin="18:00",
+        type_arme="Fleuret",
+        sexe="F",
+        typeComp="Régionale",
+        niveaux="M15",
+        passee=False,
+        description="Description originale"
+    )
+    db.session.add(comp)
+    db.session.commit()
+    id_comp = comp.id
+
+    # 2. MODIFICATION
+    data_update = {
+        'nom': 'Compétition Mise à Jour',
+        'ville': 'Bordeaux',
+        'adresse': 'Nouveau Gymnase',
+        'date_debut': '2025-02-01',
+        'heure_debut': '09:00',
+        'date_fin': '2025-02-02',
+        'heure_fin': '17:00',
+        'type_arme': 'Epée',
+        'sexe': 'M',
+        'description': 'Nouvelle description'
+    }
+    
+    client.post(f'/competition_update/{id_comp}', data=data_update, follow_redirects=True)
+
+    # Vérification BDD
+    updated = db.session.get(CompetitionBD, id_comp)
+    assert updated.nom == 'Compétition Mise à Jour'
+    assert updated.type_arme == 'Epée'
+
+    # 3. AJOUT IMAGE
+    data_img = {
+        'image': (io.BytesIO(b"fake_image_content"), 'photo.jpg'),
+        'alt': 'Photo Podium',
+        'prive': 'y'
+    }
+    
+    client.post(f'/competition/{id_comp}/add_image', data=data_img, follow_redirects=True)
+
+    # Vérification BDD
+    db.session.refresh(updated) 
+    assert len(updated.images_rc) == 1
+    image_bd = updated.images_rc[0]
+    assert image_bd.alt == 'Photo Podium'
+    id_img = image_bd.idImage
+
+    # 4. SUPPRESSION IMAGE
+    client.post(f'/competition/delete_image/{id_img}', data={
+        'idCompetition': id_comp
+    }, follow_redirects=True)
+
+    # Vérification BDD
+    db.session.refresh(updated)
+    assert len(updated.images_rc) == 0
+    assert db.session.get(ImageAppBD, id_img) is None
+
+    # 5. SUPPRESSION COMPÉTITION
+    client.post(f'/competition_delete/{id_comp}', follow_redirects=True)
+
+    # Vérification BDD
+    assert db.session.get(CompetitionBD, id_comp) is None
+
 # ==============================================================================
-# 5. TESTS SECURITE
+# 4. TESTS SECURITE
 # ==============================================================================
 def test_securite_membre_vers_admin(client, app, db):
     """
@@ -830,3 +1507,43 @@ def test_inscription_password_strength(client, app, db):
     # On cherche un mot clé du message d'erreur défini dans views.py
     assert b"mot de passe doit contenir" in response.data
     assert InscriptionBD.query.filter_by(email='weak@test.fr').first() is None
+
+# ==============================================================================
+# 5. TESTS DECORATEUR
+# ==============================================================================
+def test_decorateurs_acces_interdit(client, app, db):
+    """
+    Teste les cas de refus spécifiques des décorateurs.
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+
+    # 1. Admin essaie d'accéder à une page Membre
+    setup_admin(client, db) 
+    response_admin = client.get('/resultat_membre/')
+
+    assert response_admin.status_code == 401
+
+    # 2. Membre Standard essaie d'accéder à une page Comité/Réunion
+    client.get('/logout/')
+    membre = MembreBD(
+        email='basique@test.fr', 
+        mdp_hash=generate_password_hash('pass'),
+        nom='Basique', prenom='User', statut='Membre', activite=True
+    )
+    db.session.add(membre)
+    
+    # Création de la réunion
+    evt = EvenementBD()
+    db.session.add(evt)
+    db.session.commit()
+    reunion = ReunionBD(idEvent=evt.id, nom="Réunion", dateDebutRE=date.today(), heureDebutRE="10:00", dateFinRE=date.today(), heureFinRE="11:00")
+    db.session.add(reunion)
+    db.session.commit()
+
+    # Connexion
+    client.post('/login/', data={'email': 'basique@test.fr', 'password': 'pass'})
+
+    # Tentative d'accès
+    response_membre = client.get(f'/reunion/consultation/{reunion.id}')
+   
+    assert response_membre.status_code == 405

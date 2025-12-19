@@ -1735,7 +1735,7 @@ def desinscrireMembre(idM):
     membre.statut = "Ancien Membre"
     db.session.commit()
     # Redirection
-    if current_user.id == idM:
+    if current_user.id == idM and session.get('user_type') != 'admin':
         logout_user()
         flash("Votre compte a été désactivé avec succès.", "success")
         return redirect(url_for('index'))
