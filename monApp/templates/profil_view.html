@@ -81,13 +81,13 @@
         {% elif origine == 'gerer_profils' %}
             <a href="{{ url_for('gerer_profils') }}" class="btn btn-secondary me-2">Retour à la liste</a>
         {% elif origine == 'gerer_ancien_profils' %}
-            <a href="{{ url_for('gerer_ancien_profils') }}" class="btn btn-secondary me-2">Retour à la liste</a>
+            <a href="{{ url_for('gerer_profils', mode='anciens') }}" class="btn btn-secondary me-2">Retour à la liste</a>
         {% else %}
             <a href="{{ url_for('gerer_profils') }}" class="btn btn-secondary me-2">Retour</a>
         {% endif %}
 
         {%if selectedMembre.activite == False %}
-            <form class="d-inline" action="{{ url_for('reinscrit_profil', idM = selectedMembre.id)}}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir réinscire ce membre ?');">
+            <form class="d-inline" action="{{ url_for('reinscrireMembre', idM = selectedMembre.id)}}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir réinscire ce membre ?');">
                 <button type="submit" class="btn btn-success">Réinscrire</button>
             </form>  
         {% endif %}  
