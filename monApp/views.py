@@ -1468,54 +1468,62 @@ def comite_cercle():
 #====================   Page Contact   ====================#
 #==========================================================#
 # Affiche le formulaire de contact et traite sa soumission.
-@app.route("/contact/", methods=['GET', 'POST'])
+@app.route("/contact/", methods=("GET", "POST",))
 def contact():
     form = ContactForm()
     if form.validate_on_submit():
-        try:
-            nouveau_message = FormulaireBD(
-                type=form.type_form.data,
-                sujet=form.sujet.data,
-                email=form.email.data,
-                description=form.description.data,
-                date=datetime.now().date(),
-                repondu=False
-            )
-            db.session.add(nouveau_message)
-            db.session.commit()
+        type_f = form.type_form.data
+        sujet = form.sujet.data
+        email = form.email.data
+        description = form.description.data
+        
+        # Création du formulaire en base
+        nouveau_formulaire = FormulaireBD(
+            type=type_f,
+            sujet=sujet,
+            email=email,
+            description=description,
+            date=date.today(),
+            repondu=False
+        )
+        
+        # Lier au membre si connecté
+        if current_user.is_authenticated and session.get('user_type') == 'membre':
+            nouveau_formulaire.idMembre = current_user.id
+            # Relation Remplir
+            remplir = RemplirBD(id_membre=current_user.id)
+            nouveau_formulaire.remplissages.append(remplir)
 
-            # Création des notifications pour les administrateurs
-            admins = AdminBD.query.all()
-            type_f = form.type_form.data
+        db.session.add(nouveau_formulaire)
+        
+        admins = AdminBD.query.all()
+        for admin in admins:
+            notify = False
+            
+            # Vérification 
+            if type_f == 'Question' and admin.formulaireQuestionSite:
+                notify = True
+            elif type_f == 'Demande' and admin.formulaireDemandeSite:
+                notify = True
+            elif type_f == 'Signalement' and admin.formulaireSignalementSite:
+                notify = True
+            
+            if notify:
+                notif = NotifsBD(
+                    typeN='formulaire',
+                    sourceN=f"Nouveau formulaire ({type_f}) de {email}",
+                    lue=False,
+                    timestamp=datetime.now(),
+                    idAdmin=admin.id,
+                    link=url_for('gerer_formulaires', _external=True)
+                )
+                db.session.add(notif)
 
-            for admin in admins:
-                params = admin.parametres_notif_admin
-                if params:
-                    notify = False
-                    if type_f == 'Question' and params.formulaireQuestionSite:
-                        notify = True
-                    elif type_f == 'Demande' and params.formulaireDemandeSite:
-                        notify = True
-                    elif type_f == 'Signalement' and params.formulaireSignalementSite:
-                        notify = True
-
-                    if notify:
-                        notif = NotifsBD(
-                            typeN="Formulaire Contact",
-                            sourceN=f"{type_f} : {form.email.data}",
-                            lue=False,
-                            timestamp=datetime.now(),
-                            link=url_for('formulaire_view', idFormulaire=nouveau_message.id),
-                            idAdmin=admin.id
-                        )
-                        db.session.add(notif)
-            db.session.commit()
-
-            return redirect(url_for('contact'))
-        except Exception as e:
-            db.session.rollback()
-    return render_template("contact.html", title=TITLE+"- Contact", form=form)
-
+        db.session.commit()
+        flash('Votre message a bien été envoyé.', 'success')
+        return redirect(url_for('contact'))
+    
+    return render_template("contact.html", form=form, title=TITLE+"- Contact")
 
 #==========================================================#
 #====================   Pages Profil   ====================#
@@ -1678,7 +1686,7 @@ def gerer_formulaires():
     
     pagination = liste.paginate(page=page, per_page=15, error_out=False)
     return render_template("gerer_formulaires.html",
-        title=TITLE + " - Gestion Formulaires",
+        title=TITLE + " - Gestion des Formulaires",
         pagination=pagination,
         filtre=filtre,
         mode=mode)
@@ -1701,7 +1709,7 @@ def formulaire_delete(idFormulaire):
     db.session.commit()
     return redirect(url_for('gerer_formulaires'))
 
-# Permet de répondre à un formulaire et de le marquer comme traité - Réservée aux administrateurs.
+# Permet à répondre à un formulaire et de le marquer comme traité - Réservée aux administrateurs.
 @app.route("/repondre_formulaire/<int:idFormulaire>", methods=['POST'])
 @login_required
 @admin_required
@@ -1722,16 +1730,31 @@ def repondre_formulaire(idFormulaire):
 @login_required
 @admin_required
 def gerer_profils():
+    # Récupération du mode
     mode = request.args.get('mode', 'actifs')
     ancien = (mode == 'anciens')
+    
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
+    
+    # Configuration des choix de tri
     filtre.tri.choices = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien'),
                 ('nom_asc', 'Nom A-Z'), ('nom_desc', 'Nom Z-A'), ('prenom_asc', 'Prenom A-Z'), 
                 ('prenom_desc', 'Prenom Z-A'),('age_asc', 'Plus agé'), ('age_desc', 'Plus jeune')]
-    liste = MembreBD.query.filter(MembreBD.activite == (not ancien))
-    liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
-    liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
+    
+    # Filtrage Actif / Ancien
+    if ancien:
+        liste = MembreBD.query.filter(MembreBD.activite == False)
+        titre_page = "Anciens Membres"
+    else:
+        liste = MembreBD.query.filter(MembreBD.activite == True)
+        titre_page = "Gestion des Profils"
+
+    # Application des filtres du formulaire
+    if filtre.sexe.data:
+        liste = liste.filter(MembreBD.sexe.in_(filtre.sexe.data))
+    if filtre.niveau.data:
+        liste = liste.filter(MembreBD.niveau.in_(filtre.niveau.data))
     if filtre.recherche.data:
         terme = f"%{filtre.recherche.data}%"
         liste = liste.filter(
@@ -1741,30 +1764,26 @@ def gerer_profils():
                 MembreBD.email.ilike(terme)
             )
         )
-    if filtre.tri.data == 'date_asc':
-        liste = liste.order_by(MembreBD.date_inscription.asc())
-    elif filtre.tri.data == 'nom_desc':
-        liste = liste.order_by(MembreBD.nom.desc())
-    elif filtre.tri.data == 'nom_asc':
-        liste = liste.order_by(MembreBD.nom.asc())
-    elif filtre.tri.data == 'prenom_desc':
-        liste = liste.order_by(MembreBD.prenom.desc())
-    elif filtre.tri.data == 'prenom_asc':
-        liste = liste.order_by(MembreBD.prenom.asc())
-    elif filtre.tri.data == 'age_desc':
-        liste = liste.order_by(MembreBD.ddn.desc())
-    elif filtre.tri.data == 'age_asc':
-        liste = liste.order_by(MembreBD.ddn.asc())
-    else:
-        liste = liste.order_by(MembreBD.date_inscription.desc())
+    
+    # Application du tri
+    if filtre.tri.data == 'date_asc': liste = liste.order_by(MembreBD.date_inscription.asc())
+    elif filtre.tri.data == 'nom_desc': liste = liste.order_by(MembreBD.nom.desc())
+    elif filtre.tri.data == 'nom_asc': liste = liste.order_by(MembreBD.nom.asc())
+    elif filtre.tri.data == 'prenom_desc': liste = liste.order_by(MembreBD.prenom.desc())
+    elif filtre.tri.data == 'prenom_asc': liste = liste.order_by(MembreBD.prenom.asc())
+    elif filtre.tri.data == 'age_desc': liste = liste.order_by(MembreBD.ddn.desc())
+    elif filtre.tri.data == 'age_asc': liste = liste.order_by(MembreBD.ddn.asc())
+    else: liste = liste.order_by(MembreBD.date_inscription.desc())
 
+    # Pagination
     pagination = liste.paginate(page=page, per_page=15, error_out=False)
+    
     return render_template("gerer_profils.html",
-        title=TITLE + " - Gestion des Profils",
+        title=TITLE + " - " + titre_page,
         pagination=pagination,
+        membres=pagination.items, 
         filtre=filtre,
         mode=mode)
-
 
 # Désactive le compte d'un membre.
 @app.route('/gerer_profils/desinscrire/<int:idM>', methods=["GET", "POST"])
@@ -1804,10 +1823,9 @@ def reinscrireMembre(idM):
 @app.route("/profil_edit/<int:idM>", methods=["GET", "POST"])
 @login_required
 def profil_edit(idM):
-    unMembre = db.session.get(MembreBD,idM)
+    unMembre = db.session.get(MembreBD, idM)
     unForm = ModifForm(obj=unMembre)
     origine = request.args.get('origine', 'profil')
-
     if unForm.validate_on_submit():
         action = request.form.get('submit_action')
         if action == 'admin_save':
@@ -1815,10 +1833,13 @@ def profil_edit(idM):
             db.session.commit()
             return redirect(url_for('gerer_profils'))
         elif action == 'membre_request':
+            # 1. On récupère la modification existante ou on en crée une nouvelle
             uneModif = unMembre.modifications.first()
             if not uneModif:
                 uneModif = ModifBD(id_membre=idM)
                 db.session.add(uneModif)
+            
+            # 2. On met à jour les champs de 'uneModif' avec les données du formulaire
             uneModif.nom = unForm.nom.data
             uneModif.prenom = unForm.prenom.data
             uneModif.numLicense = unForm.numLicense.data
@@ -1828,30 +1849,24 @@ def profil_edit(idM):
             uneModif.numTel = unForm.numTel.data
             uneModif.date = datetime.now()
             uneModif.justification = unForm.justification.data
-            db.session.commit()
-            # Création des notifications pour les administrateurs
+            
+            # 3. Notification des administrateurs
             admins = AdminBD.query.all()
-
             for admin in admins:
-                params = admin.parametres_notif_admin
-                if params:
-                    notify = False
-                    if params.demandeModifSite:
-                        notify = True
-
-                    if notify:
-                        notif = NotifsBD(
-                            typeN="Demande Modification",
-                            sourceN=f"Modification : {unForm.email.data}",
-                            lue=False,
-                            timestamp=datetime.now(),
-                            link=url_for('gerer_inscriptions', type='modification'),
-                            idAdmin=admin.id
-                        )
-                        db.session.add(notif)
+                if admin.demandeModifSite:
+                    notif = NotifsBD(
+                        typeN='modification',
+                        sourceN=f"Demande de modification de {unMembre.prenom} {unMembre.nom}",
+                        lue=False,
+                        timestamp=datetime.now(),
+                        idAdmin=admin.id,
+                        link=url_for('gerer_profils', _external=True)
+                    )
+                    db.session.add(notif)
+            
             db.session.commit()
-            return redirect(url_for('profil_view', idM=unMembre.id, origine='profil'))
-    return render_template("profil_edit.html", title=TITLE + "- Modifier Profil", selectedMembre=unMembre, updateForm = unForm, origine = origine)
+            return redirect(url_for('profil_view', idM=idM, origine='profil'))   
+    return render_template("profil_edit.html", updateForm=unForm, selectedMembre=unMembre, title=TITLE+"- Édition Profil")
 
 # Affiche les demandes d'inscription et de modification de profil - Réservée aux administrateurs.
 @app.route("/gerer_inscriptions/")
@@ -1886,13 +1901,7 @@ def accepter_inscription(idI):
         ddn=inscription.ddn,
         sexe=inscription.sexe,
         numTel=inscription.numTel,
-        mdp_hash=inscription.mdp_hash
-    )
-    db.session.add(nouveauMembre)
-    db.session.delete(inscription)
-    db.session.commit()
-    nouveauNotif=ParametreNotifMembreBD(
-        idMembre=nouveauMembre.id,
+        mdp_hash=inscription.mdp_hash,
         eventInscriptionSite=True,
         evenementInscriptionMail=True,
         eventNouveauSite=True,
@@ -1906,9 +1915,8 @@ def accepter_inscription(idI):
         modifProfilSite=True,
         modifProfilMail=True
     )
-    db.session.add(nouveauNotif)
-    db.session.commit()
-    nouveauMembre.idParaNotif = nouveauNotif.idParamNotifMembre
+    db.session.add(nouveauMembre)
+    db.session.delete(inscription)
     db.session.commit()
     return redirect(url_for('gerer_inscriptions'))
 
@@ -2059,62 +2067,43 @@ def parametres():
                          title=TITLE+"- Paramètres du Membre",
                          form=form)
 
-# Gère les paramètres de notification pour les membres et les administrateurs.
 @app.route("/parametres_notifs/", methods=["GET", "POST"])
 @login_required
 def parametres_notifs():
-    user_type = session.get('user_type')
-    parametres = None
+    """
+    Gère les préférences de notifications pour Membres et Admins.
+    Les champs sont maintenant mis à jour directement sur current_user.
+    """
+    if request.method == 'POST':
+        user_type = session.get('user_type')
+        if user_type == 'membre':
+            current_user.eventInscriptionSite = 'event_insc_site' in request.form
+            current_user.evenementInscriptionMail = 'event_insc_mail' in request.form
+            current_user.eventNouveauSite = 'event_new_site' in request.form
+            current_user.eventNouveauMail = 'event_new_mail' in request.form
+            current_user.eventAnnulationSite = 'event_cancel_site' in request.form
+            current_user.eventAnnulationMail = 'event_cancel_mail' in request.form
+            current_user.resultatNouveauSite = 'result_new_site' in request.form
+            current_user.resultatNouveauMail = 'result_new_mail' in request.form
+            current_user.reponseFormulaireSite = 'form_resp_site' in request.form
+            current_user.reponseFormulaireMail = 'form_resp_mail' in request.form
+            current_user.modifProfilSite = 'profile_mod_site' in request.form
+            current_user.modifProfilMail = 'profile_mod_mail' in request.form
+        elif user_type == 'admin':
+            current_user.formulaireDemandeSite = 'form_req_site' in request.form
+            current_user.formulaireDemandeMail = 'form_req_mail' in request.form
+            current_user.formulaireQuestionSite = 'form_question_site' in request.form
+            current_user.formulaireQuestionMail = 'form_question_mail' in request.form
+            current_user.formulaireSignalementSite = 'form_report_site' in request.form
+            current_user.formulaireSignalementMail = 'form_report_mail' in request.form
+            current_user.demandeModifSite = 'profile_change_site' in request.form
+            current_user.demandeModifMail = 'profile_change_mail' in request.form
+            current_user.demandeInscriptionSite = 'signup_req_site' in request.form
+            current_user.demandeInscriptionMail = 'signup_req_mail' in request.form
 
-    if user_type == 'membre':
-        # Récupère les paramètres de l'utilisateur membre, ou en crée de nouveaux si non existants
-        parametres = ParametreNotifMembreBD.query.filter_by(idMembre=current_user.id).first()
-        if not parametres:
-            parametres = ParametreNotifMembreBD(idMembre=current_user.id)
-            db.session.add(parametres)
-            db.session.commit()
-
-        if request.method == 'POST':
-            # Mettre à jour les préférences du membre
-            parametres.eventInscriptionSite = 'event_insc_site' in request.form
-            parametres.evenementInscriptionMail = 'event_insc_mail' in request.form
-            parametres.eventNouveauSite = 'event_new_site' in request.form
-            parametres.eventNouveauMail = 'event_new_mail' in request.form
-            parametres.eventAnnulationSite = 'event_cancel_site' in request.form
-            parametres.eventAnnulationMail = 'event_cancel_mail' in request.form
-            parametres.resultatNouveauSite = 'result_new_site' in request.form
-            parametres.resultatNouveauMail = 'result_new_mail' in request.form
-            parametres.reponseFormulaireSite = 'form_resp_site' in request.form
-            parametres.reponseFormulaireMail = 'form_resp_mail' in request.form
-            parametres.modifProfilSite = 'profile_mod_site' in request.form
-            parametres.modifProfilMail = 'profile_mod_mail' in request.form
-            db.session.commit()
-            return redirect(url_for('parametres_notifs'))
-
-    elif user_type == 'admin':
-        # Récupère les paramètres de l'utilisateur admin, ou en crée de nouveaux si non existants
-        parametres = ParametreNotifAdminBD.query.filter_by(idAdmin=current_user.id).first()
-        if not parametres:
-            parametres = ParametreNotifAdminBD(idAdmin=current_user.id)
-            db.session.add(parametres)
-            db.session.commit()
-
-        if request.method == 'POST':
-            # Mettre à jour les préférences de l'admin
-            parametres.formulaireDemandeSite = 'form_req_site' in request.form
-            parametres.formulaireDemandeMail = 'form_req_mail' in request.form
-            parametres.formulaireQuestionSite = 'form_question_site' in request.form
-            parametres.formulaireQuestionMail = 'form_question_mail' in request.form
-            parametres.formulaireSignalementSite = 'form_report_site' in request.form
-            parametres.formulaireSignalementMail = 'form_report_mail' in request.form
-            parametres.demandeModifSite = 'profile_change_site' in request.form
-            parametres.demandeModifMail = 'profile_change_mail' in request.form
-            parametres.demandeInscriptionSite = 'signup_req_site' in request.form
-            parametres.demandeInscriptionMail = 'signup_req_mail' in request.form
-            db.session.commit()
-            return redirect(url_for('parametres_notifs'))
-
-    return render_template("parametres_notifs.html", title=TITLE+"- Paramètres notifications", parametres=parametres)
+        db.session.commit()
+        return redirect(url_for('parametres_notifs'))
+    return render_template("parametres_notifs.html", title=TITLE+"- Paramètres notifications", parametres=current_user)
 
 # Permet à l'utilisateur connecté de changer son mot de passe.
 @app.route("/changer_mdp/", methods=['GET', 'POST'])
@@ -2215,12 +2204,8 @@ def inscription():
                     ddn=unForm.date_naissance.data,
                     sexe=unForm.sexe.data,
                     numTel=unForm.numTel.data,
-                    mdp_hash=generate_password_hash(unForm.password.data, method='pbkdf2:sha256')
-                )
-                db.session.add(nouveauMembre)
-                db.session.commit()
-                nouveauNotif=ParametreNotifMembreBD(
-                    idMembre=nouveauMembre.id,
+                    mdp_hash=generate_password_hash(unForm.password.data, method='pbkdf2:sha256'),
+                    # Initialisation directe des notifications
                     eventInscriptionSite=True,
                     evenementInscriptionMail=True,
                     eventNouveauSite=True,
@@ -2234,9 +2219,7 @@ def inscription():
                     modifProfilSite=True,
                     modifProfilMail=True
                 )
-                db.session.add(nouveauNotif)
-                db.session.commit()
-                nouveauMembre.idParaNotif = nouveauNotif.idParamNotifMembre
+                db.session.add(nouveauMembre)
                 db.session.commit()
                 return redirect(url_for('gerer_profils'))
             else:
@@ -2257,22 +2240,20 @@ def inscription():
                 admins = AdminBD.query.all()
 
                 for admin in admins:
-                    params = admin.parametres_notif_admin
-                    if params:
-                        notify = False
-                        if params.demandeInscriptionSite:
-                            notify = True
+                    notify = False
+                    if admin.demandeInscriptionSite:
+                        notify = True
 
-                        if notify:
-                            notif = NotifsBD(
-                                typeN="Demande Inscription",
-                                sourceN=f"Inscription : {unForm.Login.data}",
-                                lue=False,
-                                timestamp=datetime.now(),
-                                link=url_for('gerer_inscriptions', type='inscription'),
-                                idAdmin=admin.id
-                            )
-                            db.session.add(notif)
+                    if notify:
+                        notif = NotifsBD(
+                            typeN="Demande Inscription",
+                            sourceN=f"Inscription : {unForm.Login.data}",
+                            lue=False,
+                            timestamp=datetime.now(),
+                            link=url_for('gerer_inscriptions', type='inscription'),
+                            idAdmin=admin.id
+                        )
+                        db.session.add(notif)
                 db.session.commit()
 
                 return redirect(url_for('index'))

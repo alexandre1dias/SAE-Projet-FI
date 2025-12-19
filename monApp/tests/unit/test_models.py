@@ -25,6 +25,10 @@ def test_new_membre(app, db):
     assert membre.nom == 'Desgranges'
     assert membre.prenom == 'Lucas'
     assert membre.ddn == date(2006, 5, 6)
+    
+    # NOUVEAU : Vérification des paramètres de notification par défaut (fusionnés)
+    assert membre.eventInscriptionSite is True
+    assert membre.evenementInscriptionMail is True
 
 def test_admin(app, db):
     """Test de la table ADMINISTRATEUR."""
@@ -34,6 +38,9 @@ def test_admin(app, db):
 
     retrieved = AdminBD.query.first()
     assert retrieved.email == 'admin@escrime.fr'
+    
+    # NOUVEAU : Vérification des paramètres de notification Admin par défaut
+    assert retrieved.formulaireDemandeSite is True
 
 def test_inscription_attente(app, db):
     """Test de la table INSCRIPTION (demandes en attente)."""
@@ -64,12 +71,10 @@ def test_evenement_generique(app, db):
 
 def test_competition(app, db):
     """Test COMPETITION (lié à EVENEMENT)."""
-    # 1. Créer l'événement parent
     event = EvenementBD()
     db.session.add(event)
-    db.session.flush() # Pour générer l'ID event sans commit
+    db.session.flush()
 
-    # 2. Créer la compétition liée
     compet = CompetitionBD(
         nom='Compétition Régionale',
         ville='Orléans',
@@ -77,7 +82,7 @@ def test_competition(app, db):
         date_fin=date(2024, 6, 2),
         type_arme='Fleuret',
         sexe='F',
-        id_event=event.id # Lien FK
+        id_event=event.id
     )
     db.session.add(compet)
     db.session.commit()
@@ -141,24 +146,20 @@ def test_event_club(app, db):
 
 def test_participer(app, db):
     """Test de la table d'association PARTICIPER (Membre <-> Event)."""
-    # Création des parents
     m = MembreBD(email='p@test.fr', nom='P', prenom='P', date_inscription=date.today())
     e = EvenementBD()
     db.session.add_all([m, e])
     db.session.flush()
 
-    # Création de l'association
     participation = ParticiperBD(id_event=e.id, id_membre=m.id)
     db.session.add(participation)
     db.session.commit()
 
-    # Vérification via la relation SQLAlchemy
     assert m.evenements_inscrits.count() == 1
     assert m.evenements_inscrits[0].id_event == e.id
 
 def test_resultat(app, db):
     """Test RESULTAT (Membre <-> Competition)."""
-    # Setup
     m = MembreBD(email='r@test.fr', date_inscription=date.today())
     evt = EvenementBD()
     db.session.add_all([m, evt])
@@ -168,7 +169,6 @@ def test_resultat(app, db):
     db.session.add(comp)
     db.session.flush()
 
-    # Résultat
     res = ResultatBD(
         resultat='1er',
         date=date(2024, 5, 5),
@@ -186,13 +186,11 @@ def test_resultat(app, db):
 
 def test_formulaire_et_reponse(app, db):
     """Test FORMULAIRE_CONTACT, REPONDRE et REMPLIR."""
-    # Acteurs
     membre = MembreBD(email='user@f.fr', date_inscription=date.today())
     admin = AdminBD(email='admin@f.fr')
     db.session.add_all([membre, admin])
     db.session.flush()
 
-    # Formulaire
     form = FormulaireBD(
         sujet='Question',
         email='user@f.fr',
@@ -202,9 +200,7 @@ def test_formulaire_et_reponse(app, db):
     db.session.add(form)
     db.session.flush()
 
-    # Association Remplir (Membre -> Form)
     remplir = RemplirBD(id_formulaire=form.id, id_membre=membre.id)
-    # Association Repondre (Admin -> Form)
     repondre = RepondreBD(id_formulaire=form.id, id_admin=admin.id)
     
     db.session.add_all([remplir, repondre])
@@ -231,44 +227,7 @@ def test_modif_membre(app, db):
     assert m.modifications.first().nom == 'NouveauNom'
 
 # ==============================================================================
-# 5. TEST PARAMETRES NOTIFICATIONS
-# ==============================================================================
-
-def test_param_notif_membre(app, db):
-    """Test PARAMETRE_NOTIF_MEMBRE."""
-    m = MembreBD(email='notif@test.fr', date_inscription=date.today())
-    db.session.add(m)
-    db.session.flush()
-
-    # Attention à la contrainte circulaire expliquée précédemment
-    # Ici on crée juste le paramètre lié au membre
-    param = ParametreNotifMembreBD(
-        idMembre=m.id,
-        eventNouveauMail=True,
-        eventNouveauSite=False
-    )
-    db.session.add(param)
-    db.session.commit()
-    
-    assert ParametreNotifMembreBD.query.filter_by(idMembre=m.id).first().eventNouveauMail is True
-
-def test_param_notif_admin(app, db):
-    """Test PARAMETRE_NOTIF_ADMIN."""
-    a = AdminBD(email='admin@notif.fr')
-    db.session.add(a)
-    db.session.flush()
-
-    param = ParametreNotifAdminBD(
-        idAdmin=a.id,
-        formulaireDemandeMail=True
-    )
-    db.session.add(param)
-    db.session.commit()
-
-    assert a.parametres_notif_admin.formulaireDemandeMail is True
-
-# ==============================================================================
-# 6. TEST CMS (Articles, Tarifs, Horaires, Info, Presse, Images)
+# 5. TEST CMS (Articles, Tarifs, Horaires, Info, Presse, Images)
 # ==============================================================================
 
 def test_article_et_images(app, db):
@@ -315,12 +274,11 @@ def test_image_app(app, db):
     assert ImageAppBD.query.filter_by(alt='Logo').first() is not None
 
 # ==============================================================================
-# 7. TEST NOTIFICATION
+# 6. TEST NOTIFICATION
 # ==============================================================================
 
 def test_notification(app, db):
     """Test NOTIFICATION."""
-    # Création d'un timestamp propre avec datetime
     ts = datetime(2025, 11, 20, 10, 0, 0)
     
     notif = NotifsBD(
@@ -340,7 +298,7 @@ def test_notification(app, db):
     assert saved_notif.timestamp == ts
 
 # ==============================================================================
-# 8. TEST RELATIONS MANY-TO-MANY (IMAGES)
+# 7. TEST RELATIONS MANY-TO-MANY (IMAGES)
 # ==============================================================================
 
 def test_relation_image_competition(app, db):
@@ -352,7 +310,6 @@ def test_relation_image_competition(app, db):
     comp = CompetitionBD(id_event=evt.id, nom="Compétition Photo")
     img_comp = ImageAppBD(urlI="test_comp.jpg", alt="Test")
     
-    # Ajout via la relation
     comp.images_rc.append(img_comp)
     db.session.add(comp)
     db.session.add(img_comp)
@@ -370,7 +327,6 @@ def test_relation_image_event_club(app, db):
     club = EventClubBD(id_event=evt.id, NomEV="Club Photo")
     img_club = ImageAppBD(urlI="test_club.jpg", alt="TestClub")
     
-    # Ajout via la relation
     club.images_re.append(img_club)
     db.session.add(club)
     db.session.add(img_club)
@@ -380,15 +336,11 @@ def test_relation_image_event_club(app, db):
     assert club.images_re[0].urlI == "test_club.jpg"
 
 # ==============================================================================
-# 9. TEST TABLES ASSOCIATION & NOTIFICATIONS AVANCÉES
+# 8. TEST TABLES ASSOCIATION & NOTIFICATIONS AVANCÉES
 # ==============================================================================
 
 def test_tables_liaison_notification(app, db):
-    """
-    Test technique pour valider l'existence des tables 'recevoir_a' et 'recevoir_m'.
-    Ces tables n'ont pas de relation directe mappée dans NotifsBD, on teste donc 
-    l'insertion brute pour garantir la couverture du code SQLAlchmey.
-    """
+    """Test technique tables 'recevoir_a' et 'recevoir_m'."""
     notif = NotifsBD(typeN="Test Liaison", timestamp=datetime.now(), lue=False)
     admin = AdminBD(email="admin_liaison@test.fr", mdp_hash="pass")
     membre = MembreBD(email="membre_liaison@test.fr", mdp_hash="pass")
@@ -396,7 +348,6 @@ def test_tables_liaison_notification(app, db):
     db.session.add_all([notif, admin, membre])
     db.session.commit()
 
-    # Insertion directe dans les tables de liaison définies dans modelBD.py
     ins_a = recevoir_a.insert().values(idNotifs=notif.idNotifs, idAdmin=admin.id)
     ins_m = recevoir_m.insert().values(idNotifs=notif.idNotifs, idMembre=membre.id)
     
@@ -404,7 +355,6 @@ def test_tables_liaison_notification(app, db):
     db.session.execute(ins_m)
     db.session.commit()
 
-    # Si aucune erreur n'est levée, les tables existent et sont fonctionnelles.
     assert True
 
 def test_notification_fk_users(app, db):
