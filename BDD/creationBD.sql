@@ -2,42 +2,17 @@ CREATE TABLE ADMINISTRATEUR(
     idAdmin integer AUTO_INCREMENT,
     emailA varchar(41) unique,
     mdpA varchar(256) not null,
-    idParamNotifAdmin integer,
+    formulaireDemandeSite boolean DEFAULT true not null,
+    formulaireDemandeMail boolean DEFAULT true not null,
+    formulaireQuestionSite boolean DEFAULT true not null,
+    formulaireQuestionMail boolean DEFAULT true not null,
+    formulaireSignalementSite boolean DEFAULT true not null,
+    formulaireSignalementMail boolean DEFAULT true not null,
+    demandeModifSite boolean DEFAULT true not null,
+    demandeModifMail boolean DEFAULT true not null,
+    demandeInscriptionSite boolean DEFAULT true not null,
+    demandeInscriptionMail boolean DEFAULT true not null,
     PRIMARY KEY(idAdmin)
-);
-
-create table PARAMETRE_NOTIF_ADMIN(
-    idParamNotifAdmin integer AUTO_INCREMENT,
-    formulaireDemandeSite boolean not null,
-    formulaireDemandeMail boolean not null,
-    formulaireQuestionSite boolean not null,
-    formulaireQuestionMail boolean not null,
-    formulaireSignalementSite boolean not null,
-    formulaireSignalementMail boolean not null,
-    demandeModifSite boolean not null,
-    demandeModifMail boolean not null,
-    demandeInscriptionSite boolean not null,
-    demandeInscriptionMail boolean not null,
-    idAdmin integer,
-    PRIMARY KEY(idParamNotifAdmin)
-);
-
-create table PARAMETRE_NOTIF_MEMBRE(
-    idParamNotifMembre integer AUTO_INCREMENT,
-    eventInscriptionSite boolean not null,
-    evenementInscriptionMail boolean not null,
-    eventNouveauSite boolean not null,
-    eventNouveauMail boolean not null,
-    eventAnnulationSite boolean not null,
-    eventAnnulationMail boolean not null,
-    resultatNouveauSite boolean not null,
-    resultatNouveauMail boolean not null,
-    reponseFormulaireSite boolean not null,
-    reponseFormulaireMail boolean not null,
-    modifProfilSite boolean not null,
-    modifProfilMail boolean not null,
-    idMembre integer,
-    PRIMARY KEY(idParamNotifMembre)
 );
     
 create table MEMBRE(
@@ -53,9 +28,20 @@ create table MEMBRE(
     niveau varchar(15) not null,
     statut varchar(30) DEFAULT "Membre",
     activite boolean DEFAULT True,
-    idParamNotifMembre integer,
     numTel varchar(20),
     numLicense varchar(67) default null,
+    eventInscriptionSite boolean DEFAULT true not null,
+    evenementInscriptionMail boolean DEFAULT true not null,
+    eventNouveauSite boolean DEFAULT true not null,
+    eventNouveauMail boolean DEFAULT true not null,
+    eventAnnulationSite boolean DEFAULT true not null,
+    eventAnnulationMail boolean DEFAULT true not null,
+    resultatNouveauSite boolean DEFAULT true not null,
+    resultatNouveauMail boolean DEFAULT true not null,
+    reponseFormulaireSite boolean DEFAULT true not null,
+    reponseFormulaireMail boolean DEFAULT true not null,
+    modifProfilSite boolean DEFAULT true not null,
+    modifProfilMail boolean DEFAULT true not null,
     PRIMARY KEY(idMembre)
 );
 
@@ -335,14 +321,6 @@ CREATE TABLE IMAGEARTICLE (
 -- Ajout des contraintes de clé étrangère
 
 ALTER TABLE MODIFICATION ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
-
-ALTER TABLE ADMINISTRATEUR ADD FOREIGN KEY (idParamNotifAdmin) REFERENCES PARAMETRE_NOTIF_ADMIN(idParamNotifAdmin);
-
-ALTER TABLE PARAMETRE_NOTIF_ADMIN ADD FOREIGN KEY (idAdmin) REFERENCES ADMINISTRATEUR(idAdmin);
-
-ALTER TABLE PARAMETRE_NOTIF_MEMBRE ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
-
-ALTER TABLE MEMBRE ADD FOREIGN KEY (idParamNotifMembre) REFERENCES PARAMETRE_NOTIF_MEMBRE(idParamNotifMembre);
 
 ALTER TABLE NOTIFS ADD FOREIGN KEY (idMembre) REFERENCES MEMBRE(idMembre);
 ALTER TABLE NOTIFS ADD FOREIGN KEY (idAdmin) REFERENCES ADMINISTRATEUR(idAdmin);

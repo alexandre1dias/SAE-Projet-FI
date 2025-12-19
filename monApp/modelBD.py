@@ -46,14 +46,18 @@ class MembreBD(UserMixin, db.Model):
     activite = db.Column(db.Boolean, server_default='1')
     numTel = db.Column(db.String(20))
     numLicense = db.Column(db.String(67))
-    idParaNotif = db.Column('idParamNotifMembre', db.Integer, db.ForeignKey('PARAMETRE_NOTIF_MEMBRE.idParamNotifMembre', use_alter=True, name='fk_membre_param_notif'))
-    parametres_notif = db.relationship(
-        'ParametreNotifMembreBD',
-        back_populates='membre',
-        uselist=False,
-        cascade="all, delete-orphan",
-        foreign_keys='ParametreNotifMembreBD.idMembre'
-    )
+    eventInscriptionSite = db.Column(db.Boolean, default=True, nullable=False)
+    evenementInscriptionMail = db.Column(db.Boolean, default=True, nullable=False)
+    eventNouveauSite = db.Column(db.Boolean, default=True, nullable=False)
+    eventNouveauMail = db.Column(db.Boolean, default=True, nullable=False)
+    eventAnnulationSite = db.Column(db.Boolean, default=True, nullable=False)
+    eventAnnulationMail = db.Column(db.Boolean, default=True, nullable=False)
+    resultatNouveauSite = db.Column(db.Boolean, default=True, nullable=False)
+    resultatNouveauMail = db.Column(db.Boolean, default=True, nullable=False)
+    reponseFormulaireSite = db.Column(db.Boolean, default=True, nullable=False)
+    reponseFormulaireMail = db.Column(db.Boolean, default=True, nullable=False)
+    modifProfilSite = db.Column(db.Boolean, default=True, nullable=False)
+    modifProfilMail = db.Column(db.Boolean, default=True, nullable=False)
 
 #====================   Tables de Evenements   ====================#
 class EvenementBD(UserMixin, db.Model):
@@ -180,6 +184,16 @@ class AdminBD(UserMixin, db.Model):
     id = db.Column('idAdmin', db.Integer, primary_key=True)
     email = db.Column('emailA', db.String(41), unique=True, nullable=False)
     mdp_hash = db.Column('mdpA', db.String(64))
+    formulaireDemandeSite = db.Column(db.Boolean, default=True, nullable=False)
+    formulaireDemandeMail = db.Column(db.Boolean, default=True, nullable=False)
+    formulaireQuestionSite = db.Column(db.Boolean, default=True, nullable=False)
+    formulaireQuestionMail = db.Column(db.Boolean, default=True, nullable=False)
+    formulaireSignalementSite = db.Column(db.Boolean, default=True, nullable=False)
+    formulaireSignalementMail = db.Column(db.Boolean, default=True, nullable=False)
+    demandeModifSite = db.Column(db.Boolean, default=True, nullable=False)
+    demandeModifMail = db.Column(db.Boolean, default=True, nullable=False)
+    demandeInscriptionSite = db.Column(db.Boolean, default=True, nullable=False)
+    demandeInscriptionMail = db.Column(db.Boolean, default=True, nullable=False)
 
 
 class InscriptionBD(UserMixin, db.Model):
@@ -320,56 +334,6 @@ class PresseBD(UserMixin, db.Model):
     contenuP = db.Column(db.String(600))
     lienP = db.Column(db.String(255))
     imageP = db.Column(db.String(255))
-
-class ParametreNotifAdminBD(UserMixin, db.Model):
-    """
-    Modèle SQLAlchemy pour la table PARAMETRE_NOTIF_ADMIN, compatible Flask-Login.
-    """
-    __tablename__ = 'PARAMETRE_NOTIF_ADMIN'
-
-    # Mappage des colonnes SQL
-    idParamNotifAdmin = db.Column(db.Integer, primary_key=True)
-    formulaireDemandeSite = db.Column(db.Boolean)
-    formulaireDemandeMail = db.Column(db.Boolean)
-    formulaireQuestionSite = db.Column(db.Boolean)
-    formulaireQuestionMail = db.Column(db.Boolean)
-    formulaireSignalementSite = db.Column(db.Boolean)
-    formulaireSignalementMail = db.Column(db.Boolean)
-    demandeModifSite = db.Column(db.Boolean)
-    demandeModifMail = db.Column(db.Boolean)
-    demandeInscriptionSite = db.Column(db.Boolean)
-    demandeInscriptionMail = db.Column(db.Boolean)
-    idAdmin = db.Column(db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'))
-    admin = db.relationship('AdminBD', backref=db.backref('parametres_notif_admin', uselist=False))
-
-
-
-class ParametreNotifMembreBD(UserMixin, db.Model):
-    """
-    Modèle SQLAlchemy pour la table PARAMETRE_NOTIF_MEMBRE, compatible Flask-Login.
-    """
-    __tablename__ = 'PARAMETRE_NOTIF_MEMBRE'
-
-    # Mappage des colonnes SQL
-    idParamNotifMembre = db.Column(db.Integer, primary_key=True)
-    eventInscriptionSite = db.Column(db.Boolean)
-    evenementInscriptionMail = db.Column(db.Boolean)
-    eventNouveauSite = db.Column(db.Boolean)
-    eventNouveauMail = db.Column(db.Boolean)
-    eventAnnulationSite = db.Column(db.Boolean)
-    eventAnnulationMail = db.Column(db.Boolean)
-    resultatNouveauSite = db.Column(db.Boolean)
-    resultatNouveauMail = db.Column(db.Boolean)
-    reponseFormulaireSite = db.Column(db.Boolean)
-    reponseFormulaireMail = db.Column(db.Boolean)
-    modifProfilSite = db.Column(db.Boolean)
-    modifProfilMail = db.Column(db.Boolean)
-    idMembre = db.Column(db.Integer, db.ForeignKey('MEMBRE.idMembre'))
-    membre = db.relationship(
-        'MembreBD',
-        back_populates='parametres_notif',
-        foreign_keys='[ParametreNotifMembreBD.idMembre]'
-    )
 
 class HoraireBD(db.Model):
     __tablename__ = 'HORAIRE'
