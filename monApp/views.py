@@ -1852,6 +1852,7 @@ def profil_edit(idM):
                 db.session.add(uneModif)
             uneModif.nom = unForm.nom.data
             uneModif.prenom = unForm.prenom.data
+            uneModif.numLicense = unForm.numLicense.data
             uneModif.email = unForm.email.data
             uneModif.sexe = unForm.sexe.data
             uneModif.ddn = unForm.ddn.data
