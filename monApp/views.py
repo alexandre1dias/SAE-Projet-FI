@@ -1386,6 +1386,10 @@ def delete_image_article(idImg):
     db.session.commit()
     return redirect(url_for('edit_article', idA=article_id))
 
+@app.route("/ffescrime/", methods=["GET", "POST"])
+def ffescrime():
+    return render_template("ffescrime.html", title=TITLE+"- FFEscrime")
+
 #============================================================#
 #====================   Pages A propos   ====================#
 #============================================================#
