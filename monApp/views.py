@@ -332,37 +332,49 @@ def add_event():
 #====================   Pages Competitions   ====================#
 #================================================================#
 
-# Affiche la liste de toutes les compétitions.
 @app.route("/competitions/")
 @app.route("/competitions/<string:etat>")
-def competitions(etat="prochaine"):
+def competitions(etat="prochaines"): # Valeur par défaut : pluriel 'prochaines'
+    # 1. Gestion de la priorité : URL Path > Query Param > Défaut
+    # Si l'utilisateur vient de submit le formulaire, 'etat' peut être dans request.args
+    if request.args.get('etat'):
+        etat = request.args.get('etat')
+    
+    # 2. Définition booléenne
     passee = (etat == "passees")
+    
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
     lesCompetitions = CompetitionBD.query
 
+    # ... (logique de tri inchangée) ...
     filtre.tri.choices = [
         ('date_desc', 'Plus récent'),
         ('date_asc', 'Plus ancien')
     ]
-
     if filtre.tri.data == "date_asc":
         lesCompetitions = lesCompetitions.order_by(CompetitionBD.date_debut.asc())
     else:
         lesCompetitions = lesCompetitions.order_by(CompetitionBD.date_debut.desc())
 
+    # 3. Application du filtre passe/futur
     lesCompetitions = lesCompetitions.filter(CompetitionBD.passee == passee)
 
+    # ... (logique des filtres inchangée) ...
     if filtre.sexe.data:
         lesCompetitions = lesCompetitions.filter(CompetitionBD.sexe.in_(filtre.sexe.data))
     if filtre.niveau.data:
+        # Note: attention à l'import de 'or_' -> from sqlalchemy import or_
         lesCompetitions = lesCompetitions.filter(or_(*(CompetitionBD.niveaux.like(f"%{n}%") for n in filtre.niveau.data)))
     if filtre.armes.data:
         lesCompetitions = lesCompetitions.filter(CompetitionBD.type_arme.in_(filtre.armes.data))
     if filtre.type_competition.data:
         lesCompetitions = lesCompetitions.filter(CompetitionBD.typeComp.in_(filtre.type_competition.data))
+        
     pagination = lesCompetitions.paginate(page=page, per_page=6, error_out=False)
-    return render_template("competitions.html", title=TITLE+"- Competitions", pagination=pagination,filtre = filtre, passee=passee)
+    
+    # On passe bien 'etat' au template pour qu'il puisse générer les liens
+    return render_template("competitions.html", title=TITLE+"- Competitions", pagination=pagination, filtre=filtre, etat=etat)
 
 
 # Affiche les détails d'une compétition spécifique.
