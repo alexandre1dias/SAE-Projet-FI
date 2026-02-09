@@ -4,8 +4,6 @@ from flask_bootstrap5 import Bootstrap
 from flask_login import LoginManager
 from config import LOGIN, PASSWD, SERVEUR, BD
 
-
-
 #Creation de l'app
 app = Flask(__name__)
 
@@ -15,6 +13,7 @@ app.config.from_object('config')
 #Ajout de extension
 db = SQLAlchemy(app)
 Bootstrap(app)
+from .models import MembreBD, AdminBD 
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login" # Indique à Flask-Login quelle est la vue de connexion
