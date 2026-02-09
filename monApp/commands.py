@@ -1,6 +1,6 @@
 import click
 from .app import app, db
-from .modelBD import AdminBD
+from .models import AdminBD
 from werkzeug.security import generate_password_hash
 
 @app.cli.command()
