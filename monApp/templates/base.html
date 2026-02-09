@@ -175,7 +175,7 @@
             </div>
         </nav> {% endblock %}
         {% block content %}
-        <main id="main" role=" main" class=" container">
+        <main id="main" role="main" class="{% if 'has-sidebar' in self.body_class() %}content-with-sidebar{% endif %}">
             {% block main %}{% endblock %}
         </main>
 
