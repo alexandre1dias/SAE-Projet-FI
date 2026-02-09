@@ -1026,6 +1026,21 @@ def reunion_update(idReunion):
 @app.route("/informations/")
 def informations():
     filtre = FiltreForm(request.args)
+
+    # Récupération des années existantes en base pour le filtre
+    dates_bd = db.session.query(InformationBD.dateIN).distinct().all()
+    annees_set = set()
+    for (d,) in dates_bd:
+        if d:
+            annee_debut = d.year if d.month >= 8 else d.year - 1
+            annees_set.add((str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
+    
+    if annees_set:
+        choix_tries = sorted(list(annees_set), key=lambda x: x[0], reverse=True)
+        filtre.annee_scolaire.choices = choix_tries
+        if filtre.annee_scolaire.data not in [c[0] for c in choix_tries]:
+            filtre.annee_scolaire.data = choix_tries[0][0]
+
     annee_selectionnee = filtre.annee_scolaire.data
     les_infos = InformationBD.query
     filtre.tri.choices = [('date_desc', 'Plus récent'),
@@ -1113,6 +1128,21 @@ def delete_information(idI):
 def presse():
     page = request.args.get('page', 1, type=int)
     filtre = FiltreForm(request.args)
+
+    # Récupération des années existantes en base pour le filtre
+    dates_bd = db.session.query(PresseBD.dateP).distinct().all()
+    annees_set = set()
+    for (d,) in dates_bd:
+        if d:
+            annee_debut = d.year if d.month >= 8 else d.year - 1
+            annees_set.add((str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
+    
+    if annees_set:
+        choix_tries = sorted(list(annees_set), key=lambda x: x[0], reverse=True)
+        filtre.annee_scolaire.choices = choix_tries
+        if filtre.annee_scolaire.data not in [c[0] for c in choix_tries]:
+            filtre.annee_scolaire.data = choix_tries[0][0]
+
     annee_selectionnee = filtre.annee_scolaire.data
     filtre.tri.choices = [('date_desc', 'Plus récent'),
                           ('date_asc', 'Plus ancien')]
@@ -1214,6 +1244,21 @@ def delete_presse(idP):
 def articles():
     page = request.args.get('page', 1, type=int)
     filtre = FiltreForm(request.args)
+
+    # Récupération des années existantes en base pour le filtre
+    dates_bd = db.session.query(ArticleBD.date).distinct().all()
+    annees_set = set()
+    for (d,) in dates_bd:
+        if d:
+            annee_debut = d.year if d.month >= 8 else d.year - 1
+            annees_set.add((str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
+    
+    if annees_set:
+        choix_tries = sorted(list(annees_set), key=lambda x: x[0], reverse=True)
+        filtre.annee_scolaire.choices = choix_tries
+        if filtre.annee_scolaire.data not in [c[0] for c in choix_tries]:
+            filtre.annee_scolaire.data = choix_tries[0][0]
+
     annee_selectionnee = filtre.annee_scolaire.data
     filtre.tri.choices = [('date_desc', 'Plus récent'),
                           ('date_asc', 'Plus ancien')]
