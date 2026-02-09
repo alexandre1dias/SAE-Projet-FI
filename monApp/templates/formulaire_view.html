@@ -33,7 +33,7 @@
             <p>{{selectedFormulaire.reponse}}</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ url_for('gerer_anciens_formulaires') }}" class="btn btn-secondary">Retour</a>
+            <a href="{{ url_for('gerer_formulaires', mode='repondus') }}" class="btn btn-secondary">Retour</a>
             <a href="{{ url_for('formulaire_delete', idFormulaire=selectedFormulaire.id) }}" class="btn btn-danger" 
                onclick="event.preventDefault(); if(confirm('Êtes-vous sûr de vouloir supprimer ce formulaire ?')) { document.getElementById('delete-form-{{ selectedFormulaire.id }}').submit(); }">Supprimer</a>
         </div>
