@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap5 import Bootstrap
 from flask_login import LoginManager
 from config import LOGIN, PASSWD, SERVEUR, BD
-from .models import MembreBD, AdminBD 
+
 
 
 #Creation de l'app
@@ -25,6 +25,8 @@ def load_user(user_id):
     Fonction requise par Flask-Login pour charger un utilisateur à partir de son ID.
     Charge un Membre ou un Admin en fonction du 'user_type' stocké dans la session.
     """
+    from .models import MembreBD, AdminBD 
+
     # Récupère le type d'utilisateur stocké dans la session
     user_type = session.get('user_type') 
     
