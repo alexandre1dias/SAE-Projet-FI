@@ -14,10 +14,13 @@
 
     <body class="{% block body_class %}{% endblock %}">
         {% block navbar %}
-        <nav class="navbar navbar-expand-md fixed-top">
+        <nav class="navbar navbar-expand-md fixed-top navbar-dark">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='images/Logo.png') }}"/></a>
-                    <div class="collapse navbar-collapse" id="mainNavbar">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNavbar">
                         <ul class="navbar-nav me-auto mb-2 mb-md-0">
                         <li class="nav-item"><a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Accueil</a></li>
                         <li class="nav-item dropdown"><a class="nav-link dropdown-toggle {% if request.endpoint in ['adresse', 'horaires', 'adhesions', 'materiel'] %}active{% endif %}" href="#" 
