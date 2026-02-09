@@ -1,128 +1,25 @@
 from .app import app, db
-from flask import render_template, request, url_for, redirect, session, abort, flash
-from config import TITLE, AUJOURDHUI
-from flask_login import logout_user, login_user, login_required, current_user
 from .forms import *
+from .fonctions_views import *
+from .gestion_erreurs import *
 from monApp.modelBD import *
+from config import TITLE, AUJOURDHUI
+from flask import render_template, request, url_for, redirect, session, abort, flash
+from flask_login import logout_user, login_user, login_required, current_user
 from flask import jsonify
-from functools import wraps
 from datetime import datetime
-from sqlalchemy import or_,asc, desc
+from sqlalchemy import or_
 import shutil
 import os
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-import re
-from flask_mail import Mail, Message
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+from itsdangerous import SignatureExpired
 
 
-# Définir les extensions de fichiers autorisées
-ALLOWED_EXTENSIONS = {'webp','png', 'jpg', 'jpeg', 'gif'}
 
-def allowed_file(filename):
-    """Vérifie si l'extension du fichier est autorisée."""
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-# Décorateur pour vérifier si l'utilisateur est un admin
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        # On vérifie si l'objet current_user est une instance de la classe AdminBD
-        if not current_user.is_authenticated or not isinstance(current_user, AdminBD):
-            abort(400)  # Déclenche l'erreur "Accès Interdit" Admin
-        return f(*args, **kwargs)
-    return decorated_function
-
-# Décorateur pour vérifier si l'utilisateur est un membre
-def membre_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        # On vérifie l'instance MembreBD
-        if not current_user.is_authenticated or not isinstance(current_user, MembreBD):
-            abort(401)  # Déclenche l'erreur "Accès Interdit" Membre
-        return f(*args, **kwargs)
-    return decorated_function
-
-# Décorateur pour vérifier si l'utilisateur est un membre du comite ou un admin
-def comite_ou_admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        # Liste des status du comite
-        statuts_comite = [
-            'Président', 'Vice-président', 'Secrétaire Général',
-            'Trésorier Général', 'Membre du Comité'
-        ]
-        # Vérifications basées sur les objets
-        is_admin = isinstance(current_user, AdminBD)
-        is_comite_membre = (
-            isinstance(current_user, MembreBD) and
-            current_user.statut in statuts_comite
-        )
-        if not (current_user.is_authenticated and (is_admin or is_comite_membre)):
-            abort(405)  # Déclenche l'erreur "Accès Interdit"
-        return f(*args, **kwargs)
-    return decorated_function
-
-#Vérificateur de mot de passe, vérifie si le mot de passe est complexe
-def est_mot_de_passe_fort(password):
-    # Vérifie la longueur (min 8 caractères)
-    if len(password) < 8:
-        return False
-    # Vérifie la présence d'au moins une minuscule
-    if not re.search(r"[a-z]", password):
-        return False
-    # Vérifie la présence d'au moins une majuscule
-    if not re.search(r"[A-Z]", password):
-        return False
-    # Vérifie la présence d'au moins un chiffre
-    if not re.search(r"[0-9]", password):
-        return False
-    # Vérifie la présence d'au moins un caractère spécial (!@#$%^&*)
-    if not re.search(r"[ !@#$%^&*(),.?\":{}|<>]", password):
-        return False
-
-    return True
-
-# fonction pour récupérer un utilisateur (Membre ou Admin) par email
-def get_user_by_email(email):
-    return MembreBD.query.filter_by(email=email).first() or AdminBD.query.filter_by(email=email).first()
-
-# fonction pour simuler l'envoi d'email
-def simuler_envoi_email(email, link):
-    print("\n" + "="*50)
-    print(f"SIMULATION D'ENVOI D'EMAIL À : {email}")
-    print(f"LIEN : {link}")
-    print("="*50 + "\n")
-
-# initialisation de Flask-Mail et du Serializer pour les tokens
-# variables de config MAIL_* sont définies dans app.config
-mail = Mail(app)
-# source : https://stackoverflow.com/questions/34043847/forcing-itsdangerous-urlsafetimedserializer-to-give-old-signature
-s = URLSafeTimedSerializer(app.config.get('SECRET_KEY', 'default-secret-key'))
-
-# Injecter les notifications dans tous les templates
-@app.context_processor
-def inject_notifications():
-    unread_count = 0
-    notifications_list = []
-    if current_user.is_authenticated:
-        user_type = session.get('user_type')
-        if user_type == 'membre':
-            query = NotifsBD.query.filter_by(idMembre=current_user.id)
-        elif user_type == 'admin':
-            query = NotifsBD.query.filter_by(idAdmin=current_user.id)
-        else:
-            query = None
-
-        if query:
-            unread_count = query.filter_by(lue=False).count()
-            notifications_list = query.order_by(NotifsBD.timestamp.desc()).limit(10).all()
-
-    return dict(unread_count=unread_count, notifications_list=notifications_list)
-
+#==================================================================#
+#====================   Routes Notifications   ====================#
+#==================================================================#
 # Route pour marquer une notification comme lue et rediriger vers son lien
 @app.route("/read_notification/<int:id_notif>")
 @login_required
@@ -246,8 +143,6 @@ def get_events():
     armes = request.args.getlist('armes')
     type_competition = request.args.getlist('type_competition')
     types_event = request.args.getlist('type_event')
-
-
 
     all_events = []
 
@@ -438,37 +333,49 @@ def add_event():
 #====================   Pages Competitions   ====================#
 #================================================================#
 
-# Affiche la liste de toutes les compétitions.
 @app.route("/competitions/")
 @app.route("/competitions/<string:etat>")
-def competitions(etat="prochaine"):
+def competitions(etat="prochaines"): # Valeur par défaut : pluriel 'prochaines'
+    # 1. Gestion de la priorité : URL Path > Query Param > Défaut
+    # Si l'utilisateur vient de submit le formulaire, 'etat' peut être dans request.args
+    if request.args.get('etat'):
+        etat = request.args.get('etat')
+    
+    # 2. Définition booléenne
     passee = (etat == "passees")
+    
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
     lesCompetitions = CompetitionBD.query
 
+    # ... (logique de tri inchangée) ...
     filtre.tri.choices = [
         ('date_desc', 'Plus récent'),
         ('date_asc', 'Plus ancien')
     ]
-
     if filtre.tri.data == "date_asc":
         lesCompetitions = lesCompetitions.order_by(CompetitionBD.date_debut.asc())
     else:
         lesCompetitions = lesCompetitions.order_by(CompetitionBD.date_debut.desc())
 
+    # 3. Application du filtre passe/futur
     lesCompetitions = lesCompetitions.filter(CompetitionBD.passee == passee)
 
+    # ... (logique des filtres inchangée) ...
     if filtre.sexe.data:
         lesCompetitions = lesCompetitions.filter(CompetitionBD.sexe.in_(filtre.sexe.data))
     if filtre.niveau.data:
+        # Note: attention à l'import de 'or_' -> from sqlalchemy import or_
         lesCompetitions = lesCompetitions.filter(or_(*(CompetitionBD.niveaux.like(f"%{n}%") for n in filtre.niveau.data)))
     if filtre.armes.data:
         lesCompetitions = lesCompetitions.filter(CompetitionBD.type_arme.in_(filtre.armes.data))
     if filtre.type_competition.data:
         lesCompetitions = lesCompetitions.filter(CompetitionBD.typeComp.in_(filtre.type_competition.data))
+        
     pagination = lesCompetitions.paginate(page=page, per_page=6, error_out=False)
-    return render_template("competitions.html", title=TITLE+"- Competitions", pagination=pagination,filtre = filtre, passee=passee)
+    
+    # On passe bien 'etat' au template pour qu'il puisse générer les liens
+    return render_template("competitions.html", title=TITLE+"- Competitions", pagination=pagination, filtre=filtre, etat=etat)
 
 
 # Affiche les détails d'une compétition spécifique.
@@ -1132,6 +1039,21 @@ def reunion_update(idReunion):
 @app.route("/informations/")
 def informations():
     filtre = FiltreForm(request.args)
+
+    # Récupération des années existantes en base pour le filtre
+    dates_bd = db.session.query(InformationBD.dateIN).distinct().all()
+    annees_set = set()
+    for (d,) in dates_bd:
+        if d:
+            annee_debut = d.year if d.month >= 8 else d.year - 1
+            annees_set.add((str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
+    
+    if annees_set:
+        choix_tries = sorted(list(annees_set), key=lambda x: x[0], reverse=True)
+        filtre.annee_scolaire.choices = choix_tries
+        if filtre.annee_scolaire.data not in [c[0] for c in choix_tries]:
+            filtre.annee_scolaire.data = choix_tries[0][0]
+
     annee_selectionnee = filtre.annee_scolaire.data
     les_infos = InformationBD.query
     filtre.tri.choices = [('date_desc', 'Plus récent'),
@@ -1219,6 +1141,21 @@ def delete_information(idI):
 def presse():
     page = request.args.get('page', 1, type=int)
     filtre = FiltreForm(request.args)
+
+    # Récupération des années existantes en base pour le filtre
+    dates_bd = db.session.query(PresseBD.dateP).distinct().all()
+    annees_set = set()
+    for (d,) in dates_bd:
+        if d:
+            annee_debut = d.year if d.month >= 8 else d.year - 1
+            annees_set.add((str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
+    
+    if annees_set:
+        choix_tries = sorted(list(annees_set), key=lambda x: x[0], reverse=True)
+        filtre.annee_scolaire.choices = choix_tries
+        if filtre.annee_scolaire.data not in [c[0] for c in choix_tries]:
+            filtre.annee_scolaire.data = choix_tries[0][0]
+
     annee_selectionnee = filtre.annee_scolaire.data
     filtre.tri.choices = [('date_desc', 'Plus récent'),
                           ('date_asc', 'Plus ancien')]
@@ -1320,6 +1257,21 @@ def delete_presse(idP):
 def articles():
     page = request.args.get('page', 1, type=int)
     filtre = FiltreForm(request.args)
+
+    # Récupération des années existantes en base pour le filtre
+    dates_bd = db.session.query(ArticleBD.date).distinct().all()
+    annees_set = set()
+    for (d,) in dates_bd:
+        if d:
+            annee_debut = d.year if d.month >= 8 else d.year - 1
+            annees_set.add((str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
+    
+    if annees_set:
+        choix_tries = sorted(list(annees_set), key=lambda x: x[0], reverse=True)
+        filtre.annee_scolaire.choices = choix_tries
+        if filtre.annee_scolaire.data not in [c[0] for c in choix_tries]:
+            filtre.annee_scolaire.data = choix_tries[0][0]
+
     annee_selectionnee = filtre.annee_scolaire.data
     filtre.tri.choices = [('date_desc', 'Plus récent'),
                           ('date_asc', 'Plus ancien')]
@@ -2341,65 +2293,6 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-
-#==========================================================#
-#====================   Pages Erreur   ====================#
-#==========================================================#
-# Page d'erreur pour les ressources non trouvées (404).
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('gestion_erreur.html',
-                           error_code=404,
-                           error_title="Page non trouvée",
-                           error_message="Désolé, la page que vous cherchez n'existe pas ou a été déplacée."), 404
-
-# Page d'erreur pour les erreurs internes du serveur (500).
-@app.errorhandler(500)
-def internal_server_error(e):
-    db.session.rollback()
-    return render_template('gestion_erreur.html',
-                           error_code=500,
-                           error_title="Erreur interne du serveur",
-                           error_message="Une erreur inattendue s'est produite. Notre équipe technique a été notifiée."), 500
-
-# Page d'erreur pour les accès interdits (403).
-@app.errorhandler(403)
-def forbidden_access(e):
-    return render_template('gestion_erreur.html',
-                           error_code=403,
-                           error_title="Accès Interdit",
-                           error_message="Vous n'avez pas les autorisations nécessaires pour accéder à cette page."), 403
-
-# Page d'erreur spécifique pour les accès réservés aux administrateurs (400).
-@app.errorhandler(400)
-def admin_access(e):
-    return render_template('gestion_erreur.html',
-                           error_code=400,
-                           error_title="Accès Interdit",
-                           error_message="Cette page est réservé au compte de type Admin"), 400
-
-# Page d'erreur spécifique pour les accès réservés aux membres (401).
-@app.errorhandler(401)
-def membre_access(e):
-    return render_template('gestion_erreur.html',
-                           error_code=401,
-                           error_title="Accès Interdit",
-                           error_message="Cette page est réservé au compte de type Membre"), 401
-
-# Page d'erreur spécifique pour les accès réservés au comité (405).
-@app.errorhandler(405)
-def comite_access(e):
-    return render_template('gestion_erreur.html',
-                           error_code=405,
-                           error_title="Accès Interdit",
-                           error_message="Cette page est réservé au membre du comité"), 405
-
-@app.errorhandler(410)
-def page_prive(e):
-    return render_template('gestion_erreur.html',
-                           error_code=410,
-                           error_title="Accès Interdit",
-                           error_message="Cette page esyt privée, vous ne pouvez pas y acceder"), 410
 
 if __name__ == "__main__":
     app.run()

@@ -349,18 +349,27 @@ INSERT INTO IMAGERE (idImage, idEventClub) VALUES (2, 5), (3, 16);
 
 -- Informations diverses
 INSERT INTO INFORMATION (dateIN, heureIN, titreIN, contenuIN) VALUES
+('2023-06-01', '18:00', 'Assemblée Générale 2023', 'L''AG se tiendra le 25 juin à 19h. Présence souhaitée de tous les adhérents.'),
 ('2023-08-15', '10:27','Reception des nouveaux gants','Nous vous informons que les gants que nous attendions sont là'),
+('2023-12-20', '10:00', 'Fermeture vacances de Noël', 'Le club sera fermé du 24 décembre au 2 janvier inclus. Bonnes fêtes à tous !'),
+('2024-06-15', '09:00', 'Réinscriptions 2024-2025', 'Les dossiers de réinscription sont disponibles en ligne. Pensez à renouveler votre licence avant le 15 juillet.'),
+('2024-10-01', '14:00', 'Nouvel équipement disponible', 'Les nouvelles vestes aux couleurs du club sont arrivées. Essayages possibles le mercredi après-midi.'),
+('2025-03-10', '11:00', 'Modification horaires mardi', 'Attention, en raison de travaux, l''entraînement du mardi soir est décalé de 30 minutes (début 19h30).'),
+('2025-05-05', '16:00', 'Appel à bénévoles', 'Nous cherchons des bénévoles pour l''organisation du tournoi régional le mois prochain. Inscrivez-vous au bureau !'),
 ('2025-09-01', '09:00', 'Reprise des entraînements', 'La saison 2025-2026 commence ! Les entraînements reprennent aux horaires habituels dès cette semaine.'),
 ('2025-10-30', '14:00', 'Fermeture Toussaint', 'Le gymnase sera fermé le 1er Novembre. Les entraînements du vendredi sont annulés.'),
 ('2025-11-05', '11:00', 'Nouvelle boutique club', 'La nouvelle boutique en ligne du club est ouverte. Commandez vos tenues et équipements !');
 
 -- Liaison Images - Informations
-INSERT INTO IMAGERIN (idImage, idInformation) VALUES (1, 1), (5, 2), (6, 4);
+INSERT INTO IMAGERIN (idImage, idInformation) VALUES (1, 2), (5, 8), (6, 10);
 
 -- Presse
-INSERT INTO PRESSE (dateP, heureP, titreP, contenuP,lienP) VALUES
-('2025-12-15','15:45','WHITELIST','Compléter votre collection en achetant des booster !!!','https://whitelist.fr/'),
-('2025-12-15','15:45','JOBLIFE',"Venez soutenir l'équipe JOBLIFE !!!",'https://joblife.fr/');
+INSERT INTO PRESSE (dateP, heureP, titreP, contenuP, lienP, imageP) VALUES
+('2023-04-10', '10:00', 'L''escrime locale en plein essor', 'Article de La République du Centre sur la dynamique du club et l''augmentation des licenciés.', 'https://www.larep.fr/escrime-essor', 'presse_rep_centre.jpg'),
+('2024-01-15', '14:30', 'Un champion olympique visite le club', 'Reportage de France 3 Région sur la venue exceptionnelle d''un médaillé olympique pour une masterclass.', 'https://france3-regions.francetvinfo.fr/visite-champion', 'presse_f3.jpg'),
+('2024-11-05', '09:00', 'Le club d''Orléans au sommet', 'L''Équipe consacre une page aux résultats exceptionnels de nos équipes séniors cette saison.', 'https://www.lequipe.fr/escrime-orleans', 'presse_lequipe.jpg'),
+('2025-12-15','15:45','WHITELIST','Compléter votre collection en achetant des booster !!!','https://whitelist.fr/', NULL),
+('2025-12-15','15:45','JOBLIFE',"Venez soutenir l'équipe JOBLIFE !!!",'https://joblife.fr/', NULL);
 
 
 -- ============================================================
@@ -380,6 +389,17 @@ INSERT INTO HORAIRE (jour, heureDebut, heureFin, activite, details) VALUES
 ('Mercredi', '18h15', '19h45', 'Entraînement Fleuret ou Épée', 'M11 à M20'),
 ('Mercredi', '19h45', '21h15', 'Entraînement – Escrime loisir épée', 'Réservé aux débutants ados et adultes H&F'),
 ('Vendredi', '19h00', '21h15', 'Entraînement Épée', 'Entraînement libre M17 à vétérans');
+
+-- ============================================================
+-- 15. ARTICLES
+-- ============================================================
+INSERT INTO ARTICLE (titreA, contenuA, dateA, imgA) VALUES
+('Retour sur les championnats régionaux 2023', 'Nos tireurs ont brillé lors des championnats régionaux ce week-end. Félicitations à tous pour vos podiums et votre engagement.', '2023-05-15', 'podium_regional_2023.jpg'),
+('Stage d''été 2023 : une réussite', 'Le stage d''été a rassemblé plus de 30 jeunes escrimeurs. Au programme : technique, physique et convivialité.', '2023-08-20', 'stage_ete_2023.jpg'),
+('Nos jeunes brillent à Paris', 'Lors du circuit national à Paris, nos M17 ont réalisé de superbes performances. Bravo à Hugo pour sa 3ème place.', '2024-02-10', 'circuit_paris_2024.jpg'),
+('Rénovation de la salle d''armes', 'Les travaux de rénovation sont terminés ! Venez découvrir les nouvelles pistes et le matériel flambant neuf dès la rentrée.', '2024-09-01', 'salle_renovee.jpg'),
+('Interview du Maître d''Armes', 'Découvrez l''interview exclusive de notre Maître d''Armes qui revient sur la saison écoulée et les objectifs à venir.', '2025-06-15', 'maitre_armes.jpg'),
+('Le club fête ses 50 ans', 'Une soirée mémorable pour célébrer un demi-siècle d''escrime et de passion. Merci à tous les anciens et actuels membres présents.', '2025-11-20', '50ans_club.jpg');
 
 -- Réactivation de la vérification des clés étrangères
 SET FOREIGN_KEY_CHECKS=1;

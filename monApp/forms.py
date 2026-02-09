@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired, Email, Optional, ValidationError
 from datetime import date
 from flask_wtf.file import FileField, FileAllowed
 import phonenumbers
-from config import AUJOURDHUI, LISTE_ANNEE
+from config import AUJOURDHUI
 
 
 class LoginForm(FlaskForm):
@@ -232,7 +232,6 @@ class FiltreForm(FlaskForm):
     CHOIX_TYPE_COMPETE = [('Régional', 'Régional'), ('National', 'National')]
     CHOIX_TYPE_EVENT = [('Compétition', 'Compétition'), ('Réunion', 'Réunion'),('Évènement du club', 'Évènement du club'), ('Entraînement', 'Entraînement')]
 
-
     sexe = SelectMultipleField(
         'Sexes',
         choices=CHOIX_SEXE,
@@ -292,30 +291,9 @@ class FiltreForm(FlaskForm):
         choices=CHOIX_TRI,
         default='date_desc'  
     )
-
-
     annee_scolaire = SelectField('Années', choices=[])
 
-    def __init__(self, *args, **kwargs):
-        super(FiltreForm, self).__init__(*args, **kwargs)
-        annee_courante = AUJOURDHUI.year
-        mois_courant = AUJOURDHUI.month
-
-        if mois_courant >= 8:
-            annee_courante = str(annee_courante) + "-" + str(annee_courante + 1)
-        else:
-            annee_courante = str(annee_courante - 1) + "-" + str(annee_courante)
-        if not annee_courante in LISTE_ANNEE:
-            LISTE_ANNEE.append(annee_courante)
-        choix_final = []
-        for annee_str in LISTE_ANNEE:
-            annee_debut = annee_str.split('-')[0]
-            choix_final.append((annee_debut, annee_str))
-        choix_final.reverse()
-        self.annee_scolaire.choices = choix_final
-        if not self.annee_scolaire.data and choix_final:
-            self.annee_scolaire.data = choix_final[0][0] 
-  
+   
         
         
 

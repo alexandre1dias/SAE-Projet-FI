@@ -21,3 +21,4 @@ MAIL_PASSWORD = None
 
 AUJOURDHUI = datetime.now().date()
 LISTE_ANNEE=["2023-2024"]
+ALLOWED_EXTENSIONS = {'webp','png', 'jpg', 'jpeg', 'gif'}
