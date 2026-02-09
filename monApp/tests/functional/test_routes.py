@@ -2,7 +2,7 @@ import pytest
 from flask import url_for
 from werkzeug.security import generate_password_hash
 from datetime import date, datetime
-from monApp.modelBD import *
+from monApp.models import *
 from monApp.forms import ModifForm
 from wtforms import DateField
 from wtforms.validators import DataRequired

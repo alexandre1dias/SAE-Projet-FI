@@ -2,7 +2,7 @@ import pytest
 from datetime import date, datetime, timedelta
 from werkzeug.datastructures import MultiDict
 from monApp.forms import *
-from monApp.modelBD import *
+from monApp.models import *
 
 # ==============================================================================
 # 1. AUTHENTIFICATION (Validation pure & Logique)
