@@ -128,7 +128,6 @@ def inject_notifications():
 @login_required
 def read_notification(id_notif):
     notif = NotifsBD.query.get_or_404(id_notif)
-    # Vérification que la notif appartient bien à l'utilisateur connecté
     if session.get('user_type') == 'membre':
         if notif.idMembre != current_user.id:
             abort(403)
@@ -137,13 +136,15 @@ def read_notification(id_notif):
             abort(403)
     else:
         abort(403)
-
     notif.lue = True
     db.session.commit()
-
+    target_url = request.referrer or url_for('index')
     if notif.link and notif.link != '#':
+        if notif.link.startswith('#'):
+            base_target = target_url.split('#')[0]
+            return redirect(base_target + notif.link)
         return redirect(notif.link)
-    return redirect(request.referrer or url_for('index'))
+    return redirect(target_url)
 
 # Route pour supprimer une notification
 @app.route("/delete_notification/<int:id_notif>", methods=['POST'])
@@ -1709,6 +1710,20 @@ def formulaire_delete(idFormulaire):
     db.session.commit()
     return redirect(url_for('gerer_formulaires'))
 
+# Permet de récupérer le contenue de la réponse
+@app.route("/api/get_reponse/<int:idFormulaire>")
+@login_required
+def api_get_reponse(idFormulaire):
+    """API pour récupérer la réponse d'un formulaire sans recharger la page"""
+    formulaire = FormulaireBD.query.get_or_404(idFormulaire)
+    if session.get('user_type') == 'membre' and formulaire.idMembre != current_user.id:
+        return jsonify({'error': 'Non autorisé'}), 403
+    return jsonify({
+        'sujet': formulaire.sujet,
+        'reponse': formulaire.reponse,
+        'date': formulaire.date.strftime('%d/%m/%Y') if formulaire.date else 'Date inconnue'
+    })
+
 # Permet à répondre à un formulaire et de le marquer comme traité - Réservée aux administrateurs.
 @app.route("/repondre_formulaire/<int:idFormulaire>", methods=['POST'])
 @login_required
@@ -1716,25 +1731,19 @@ def formulaire_delete(idFormulaire):
 def repondre_formulaire(idFormulaire):
     reponse = request.form.get('reponse')
     leFormulaire = FormulaireBD.query.get_or_404(idFormulaire)
-
-    #Logique d'envoi d'email à ajouter ici
-    # Par exemple : send_email(to=formulaire.email, subject=f"Re: {leFormulaire.sujet}", body=reponse)
-    #une fois la réponse envoyée, on supprime le formulaire
     leFormulaire.reponse = reponse
     leFormulaire.repondu = True
-
-    # Notification au membre si applicable
     if leFormulaire.membre and leFormulaire.membre.reponseFormulaireSite:
+        link_special = f"#view_response_{leFormulaire.id}"
         notif = NotifsBD(
             typeN='Réponse Formulaire',
             sourceN=f"Réponse à : {leFormulaire.sujet}",
             lue=False,
             timestamp=datetime.now(),
             idMembre=leFormulaire.membre.id,
-            link='#'
+            link=link_special
         )
         db.session.add(notif)
-
     db.session.commit()
     return redirect(url_for('gerer_formulaires'))
 
