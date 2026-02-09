@@ -1,24 +1,19 @@
-from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify, abort
+from flask import Blueprint, render_template, request, url_for, redirect, session, flash
 from flask_login import login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from datetime import datetime, date
-from sqlalchemy import or_
-import shutil
+from datetime import datetime
 import os
 
 from monApp.app import app, db
-from monApp.forms import *
-from monApp.models import *
-from monApp.services import *
-from monApp.gestion_erreurs import *
-from config import TITLE, AUJOURDHUI
+from monApp.forms import FiltreForm
+from monApp.models import EventClubBD, ParticiperBD, MembreBD, ImageAppBD
+from monApp.services import admin_required, membre_required, allowed_file
+from config import TITLE
 
-# Création du Blueprint
 events_club_bp = Blueprint('events_club', __name__)
 
 #====================   Pages Evenement du club   ====================#
-# Affiche la liste des événements du club.
+
 @events_club_bp.route("/evenement_club/")
 @events_club_bp.route("/evenement_club/<string:etat>")
 @login_required
@@ -27,10 +22,7 @@ def evenement_club(etat="prochaine"):
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
     lesEvements = EventClubBD.query
-    filtre.tri.choices = [
-        ('date_desc', 'Plus récent'),
-        ('date_asc', 'Plus ancien')
-    ]
+    filtre.tri.choices = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien')]
 
     if filtre.tri.data == "date_asc":
         lesEvements = lesEvements.order_by(EventClubBD.dateDebutEV.asc())
@@ -40,13 +32,12 @@ def evenement_club(etat="prochaine"):
     lesEvements = lesEvements.filter(EventClubBD.passeeEV == passee)
     pagination = lesEvements.paginate(page=page, per_page=6, error_out=False)
 
-    return render_template("evenement_club.html",
+    return render_template("evenements_club/evenement_club.html",
                            title=TITLE + "- Evenements du Club",
                            pagination=pagination,
                            filtre=filtre,
                            passee=passee)
 
-# Affiche les détails d'un événement de club spécifique.
 @events_club_bp.route("/evenement_club/<int:idEventClub>/club_view/")
 @login_required
 def club_view(idEventClub):
@@ -57,9 +48,8 @@ def club_view(idEventClub):
     if current_user.is_authenticated and session.get('user_type') == 'membre':
         participation = ParticiperBD.query.filter_by(id_membre=current_user.id, id_event=unEventClub.id_event).first()
         deja_inscrit = participation is not None
-    return render_template("club_view.html",title=TITLE+"- un évenement du club",selectedEventClub=unEventClub, deja_inscrit=deja_inscrit, origine=origine)
+    return render_template("evenements_club/club_view.html",title=TITLE+"- un évenement du club",selectedEventClub=unEventClub, deja_inscrit=deja_inscrit, origine=origine)
 
-# Page de modification d'un événement de club - Réservée aux administrateurs.
 @events_club_bp.route("/evenement_club/<int:idEventClub>/club_update/", methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -77,14 +67,12 @@ def club_update(idEventClub):
             unEventClub.heureFinEV = request.form['heure_fin']
             db.session.commit()
             return redirect(url_for('events_club.club_view', idEventClub=unEventClub.idEventClub))
-        except Exception as e:
+        except Exception:
             db.session.rollback()
     participations = ParticiperBD.query.filter_by(id_event=unEventClub.id_event).all()
     participants = [p.membre for p in participations]
-    lesMembres = MembreBD.query.all()
-    return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club", eventClub=unEventClub, participants=participants)
+    return render_template("evenements_club/club_update.html",title=TITLE+"- Modification d'un évenement du club", eventClub=unEventClub, participants=participants)
 
-# Page pour sélectionner les membres à inscrire à un événement de club - Réservée aux administrateurs.
 @events_club_bp.route("/evenement_club/<int:idEventClub>/inscrire_membres", methods=['GET'])
 @login_required
 @admin_required
@@ -100,9 +88,8 @@ def inscrire_membres_event_club(idEventClub):
     participations = ParticiperBD.query.filter_by(id_event=event_club.id_event).all()
     participants_ids = {p.id_membre for p in participations}
     non_participants = MembreBD.query.filter(MembreBD.id.notin_(participants_ids), MembreBD.activite == True).all()
-    return render_template("club_inscrire_membre.html", title=TITLE+"- Inscrire des membres", eventClub=event_club, non_participants=non_participants, membres_a_inscrire_ids=membres_a_inscrire_ids)
+    return render_template("evenements_club/club_inscrire_membre.html", title=TITLE+"- Inscrire des membres", eventClub=event_club, non_participants=non_participants, membres_a_inscrire_ids=membres_a_inscrire_ids)
 
-# Traite l'inscription de plusieurs membres à un événement de club - Réservée aux administrateurs.
 @events_club_bp.route("/evenement_club/<int:idEventClub>/inscription_membres", methods=['POST'])
 @login_required
 @admin_required
@@ -117,7 +104,6 @@ def inscription_membres_event_club(idEventClub):
     db.session.commit()
     return redirect(url_for('events_club.club_update', idEventClub=idEventClub))
 
-# Supprime la participation d'un membre à un événement de club - Réservée aux administrateurs.
 @events_club_bp.route("/evenement_club/<int:idEventClub>/delete/<int:idM>", methods=['POST'])
 @login_required
 @admin_required
@@ -127,11 +113,10 @@ def delete_membre_eventClub(idEventClub, idM):
     try:
         db.session.delete(participation)
         db.session.commit()
-    except Exception as e:
+    except Exception:
         db.session.rollback()
     return redirect(url_for('events_club.club_update', idEventClub=idEventClub))
 
-# Supprime un événement de club - Réservée aux administrateurs.
 @events_club_bp.route("/evenement_club/<int:idEventClub>/club_delete/", methods=['POST'])
 @login_required
 @admin_required
@@ -141,7 +126,6 @@ def club_delete(idEventClub):
     db.session.commit()
     return redirect(url_for('events_club.evenement_club'))
 
-# Permet à un membre de s'inscrire à un événement de club.
 @events_club_bp.route("/inscrire/club/<int:idEventClub>", methods=['GET'])
 @login_required
 @membre_required
@@ -157,11 +141,10 @@ def inscrire_club(idEventClub):
         nouvelle_participation = ParticiperBD(id_membre=current_user.id, id_event=id_evenement_a_inscrire)
         db.session.add(nouvelle_participation)
         db.session.commit()
-    except Exception as e:
+    except Exception:
         db.session.rollback()
     return redirect(url_for('events_club.club_view', idEventClub=idEventClub))
 
-# Permet à un membre de se désinscrire d'un événement de club.
 @events_club_bp.route("/desinscrire/club/<int:idEventClub>", methods=['GET'])
 @login_required
 @membre_required
@@ -177,7 +160,6 @@ def desinscrire_club(idEventClub):
 @login_required
 @admin_required
 def add_image_club(idEventClub):
-    """Ajoute une image à un événement du club."""
     event_club = EventClubBD.query.get_or_404(idEventClub)
 
     if 'image' not in request.files:
@@ -194,17 +176,14 @@ def add_image_club(idEventClub):
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        # Crée un dossier spécifique pour l'événement s'il n'existe pas
         upload_folder = os.path.join(app.static_folder, 'images', 'events_club', str(event_club.idEventClub))
         os.makedirs(upload_folder, exist_ok=True)
 
         file_path = os.path.join(upload_folder, filename)
         file.save(file_path)
 
-        # Chemin à stocker en BDD, relatif au dossier 'static'
         db_url = os.path.join('images', 'events_club', str(event_club.idEventClub), filename).replace('\\', '/')
 
-        # Crée l'objet Image et l'associe à l'événement
         try:
             new_image = ImageAppBD(urlI=db_url, alt=alt_text, prive=is_prive)
             event_club.images_re.append(new_image)
@@ -224,7 +203,6 @@ def add_image_club(idEventClub):
 @login_required
 @admin_required
 def delete_image_club(idImage):
-    """Supprime une image d'un événement du club."""
     idEventClub = request.form.get('idEventClub')
     if not idEventClub:
         flash("ID de l'événement manquant.", "danger")
@@ -234,16 +212,12 @@ def delete_image_club(idImage):
     event_club = EventClubBD.query.get_or_404(idEventClub)
 
     if image_to_delete in event_club.images_re:
-        # Supprime l'association
         event_club.images_re.remove(image_to_delete)
-
-        # Supprime le fichier physique
         try:
             image_path = os.path.join(app.static_folder, image_to_delete.urlI)
             if os.path.exists(image_path):
                 os.remove(image_path)
 
-            # Optionnel : supprime le dossier s'il est vide
             image_dir = os.path.dirname(image_path)
             if not os.listdir(image_dir):
                 os.rmdir(image_dir)
@@ -251,10 +225,8 @@ def delete_image_club(idImage):
         except Exception as e:
             flash(f"Erreur lors de la suppression du fichier : {e}", "danger")
 
-        # Supprime l'image de la base de données
         db.session.delete(image_to_delete)
         db.session.commit()
-
         flash("L'image a été retirée de l'événement.", "success")
     else:
         flash("Cette image n'était pas associée à cet événement.", "warning")

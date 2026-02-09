@@ -1,29 +1,20 @@
-from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify, abort
+from flask import Blueprint, render_template, request, url_for, redirect, jsonify
 from flask_login import login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
-from datetime import datetime, date
-from sqlalchemy import or_
-import shutil
-import os
-from monApp.app import app, db
-from monApp.forms import *
-from monApp.models import *
-from monApp.services import *
-from monApp.gestion_erreurs import *
-from config import TITLE, AUJOURDHUI
+from monApp.app import db
+from monApp.forms import FiltreForm, EventForm
+from monApp.models import CompetitionBD, ReunionBD, EventClubBD, EntrainementBD, EvenementBD, MembreBD, AdminBD, ParticiperBD
+from monApp.services import admin_required
+from config import TITLE
 
-# Création du Blueprint
 calendrier_bp = Blueprint('calendrier', __name__)
 
 #====================   Pages Calendrier   ====================#
-# Affiche le calendrier interactif des événements.
+
 @calendrier_bp.route("/calendrier/")
 def calendrier():
     filtre = FiltreForm(request.args if request.args else None)
-    return render_template("calendrier.html", title=TITLE+"- Calendrier", filtre=filtre)
+    return render_template("calendrier/calendrier.html", title=TITLE+"- Calendrier", filtre=filtre)
 
-# API pour fournir les données des événements au calendrier FullCalendar.
 @calendrier_bp.route('/api/events')
 def get_events():
     sexes = request.args.getlist('sexe')
@@ -34,10 +25,9 @@ def get_events():
 
     all_events = []
 
-    #Compétitions
+    # Compétitions
     if not types_event or 'Compétition' in types_event:
         query_comp = CompetitionBD.query
-
         if armes:
             query_comp = query_comp.filter(CompetitionBD.type_arme.in_(armes))
         if sexes:
@@ -63,11 +53,10 @@ def get_events():
                 }
             })
 
-    #Reunion
+    # Réunions
     if not types_event or 'Réunion' in types_event:
         voir_reunions = False
         if current_user.is_authenticated:
-            # On utilise isinstance pour être sûr du type d'objet
             if isinstance(current_user, AdminBD):
                 voir_reunions = True
             elif isinstance(current_user, MembreBD):
@@ -78,7 +67,6 @@ def get_events():
                 if current_user.statut in statuts_comite:
                     voir_reunions = True
 
-        # Si l'utilisateur a les droits, on ajoute les réunions
         if voir_reunions:
             for event in ReunionBD.query.all():
                 all_events.append({
@@ -94,7 +82,7 @@ def get_events():
                     }
                 })
 
-    #Event Club
+    # Event Club
     if not types_event or 'Évènement du club' in types_event:
         if current_user.is_authenticated:
             query_club = EventClubBD.query
@@ -113,7 +101,7 @@ def get_events():
                     }
                 })
 
-    #Entrainement
+    # Entrainement
     if not types_event or 'Entrainement' in types_event:
         for event in EntrainementBD.query.all():
             all_events.append({
@@ -133,7 +121,6 @@ def get_events():
             })
     return jsonify(all_events)
 
-# Page pour ajouter un nouvel événement - Réservée aux administrateurs.
 @calendrier_bp.route("/add_event/", methods=["GET", "POST"])
 @login_required
 @admin_required
@@ -177,8 +164,6 @@ def add_event():
                     adresse=form.adresse.data,
                     typeReunionRE=form.type_reunion.data if form.type_reunion.data else "Générale"
                 )
-
-                # Inscription automatique des membres du comité
                 statuts_comite = ['Président', 'Vice-président', 'Vice-Président', 'Secrétaire Général', 'Trésorier Général', 'Membre du Comité']
                 membres_comite = MembreBD.query.filter(MembreBD.statut.in_(statuts_comite)).all()
                 for membre in membres_comite:
@@ -213,6 +198,6 @@ def add_event():
             db.session.add(new_specific_event)
             db.session.commit()
             return redirect(url_for('calendrier.calendrier'))
-        except Exception as e:
+        except Exception:
             db.session.rollback()
-    return render_template("add_event.html", title=TITLE + "- Ajouter un événement", form=form)
+    return render_template("calendrier/add_event.html", title=TITLE + "- Ajouter un événement", form=form)

@@ -1,24 +1,17 @@
-from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify, abort
+from flask import Blueprint, render_template, request, url_for, redirect, session
 from flask_login import login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
-from datetime import datetime, date
-from sqlalchemy import or_
-import shutil
-import os
+from datetime import datetime
 
-from monApp.app import app, db
-from monApp.forms import *
-from monApp.models import *
-from monApp.services import *
-from monApp.gestion_erreurs import *
+from monApp.app import db
+from monApp.forms import FiltreForm
+from monApp.models import ReunionBD, ParticiperBD
+from monApp.services import admin_required, comite_ou_admin_required
 from config import TITLE, AUJOURDHUI
 
-# Création du Blueprint
 reunions_bp = Blueprint('reunions', __name__)
 
 #====================   Pages Reunions   ====================#
-# Page affichant toutes les réunions - Réservée à Admin et Membre du Comité.
+
 @reunions_bp.route("/reunion/")
 @reunions_bp.route("/reunion/<string:etat>")
 @login_required
@@ -44,24 +37,21 @@ def reunion(etat="prochaine"):
         participations = ParticiperBD.query.filter_by(
             id_membre=current_user.id).all()
         ids_evenements_inscrits = {p.id_event for p in participations}
-
-    return render_template("reunion.html",
+    return render_template("reunions/reunion.html",
                            title=TITLE + "- Réunions",
                            pagination=pagination,
                            filtre=filtre,
                            passee=passee,
                            user_registered_event_ids=ids_evenements_inscrits)
 
-# Page de consultation d'une réunion - Réservée à Admin et Membres du Comité.
 @reunions_bp.route("/reunion/consultation/<int:idReunion>")
 @login_required
 @comite_ou_admin_required
 def reunion_view(idReunion):
     reunion = ReunionBD.query.get(idReunion)
     origine = request.args.get('origine', 'default')
-    return render_template("reunion_view.html",title=TITLE+"- Consultatiion d'une réunion", selectedReunion = reunion, origine=origine)
+    return render_template("reunions/reunion_view.html",title=TITLE+"- Consultatiion d'une réunion", selectedReunion = reunion, origine=origine)
 
-# Vue de suppression d'une réunion - Réservée aux administrateurs.
 @reunions_bp.route("/reunion/delete/<int:idReunion>", methods=['POST'])
 @login_required
 @admin_required
@@ -71,7 +61,6 @@ def reunion_delete(idReunion):
     db.session.commit()
     return redirect(url_for('reunions.reunion'))
 
-# Vue d'inscription à une réunion - Réservée aux membres du comité et aux admins.
 @reunions_bp.route("/reunion/inscrire/<int:idReunion>", methods=['GET'])
 @login_required
 @comite_ou_admin_required
@@ -83,12 +72,11 @@ def inscrire_reunion(idReunion):
                                                 id_event=id_evenement_a_inscrire)
         db.session.add(nouvelle_participation)
         db.session.commit()
-    except Exception as e:
+    except Exception:
         db.session.rollback()
 
     return redirect(url_for('reunions.reunion'))
 
-# Vue de désinscription d'une réunion - Réservée aux membres du comité et aux admins.
 @reunions_bp.route("/reunion/desinscrire/<int:idReunion>", methods=['GET'])
 @login_required
 @comite_ou_admin_required
@@ -100,11 +88,10 @@ def desinscrire_reunion(idReunion):
         try:
             db.session.delete(participation)
             db.session.commit()
-        except Exception as e:
+        except Exception:
             db.session.rollback()
     return redirect(url_for('reunions.reunion'))
 
-# Page de modification d'une réunion - Réservée à l'Admin.
 @reunions_bp.route("/reunion/update/<int:idReunion>", methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -116,11 +103,11 @@ def reunion_update(idReunion):
         reunion.ville = request.form['ville']
         reunion.adresse = request.form['adresse']
         reunion.rapportRE = request.form['description']
-        # Mettre à jour les dates et heures
+        
         reunion.dateDebutRE = datetime.strptime(request.form['date_debut'], '%Y-%m-%d').date()
         reunion.heureDebutRE = request.form['heure_debut']
         reunion.dateFinRE = datetime.strptime(request.form['date_fin'], '%Y-%m-%d').date()
         reunion.heureFinRE = request.form['heure_fin']
         db.session.commit()
         return redirect(url_for('reunions.reunion_view', idReunion=reunion.id))
-    return render_template("reunion_update.html", title=TITLE + "- Modification d'une réunion", reunion=reunion)
+    return render_template("reunions/reunion_update.html", title=TITLE + "- Modification d'une réunion", reunion=reunion)

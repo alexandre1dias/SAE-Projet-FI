@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block main %}
+    <h1>Horaire</h1>
+    <p>Jours et horaires d’ouvertures du Cercle, susceptibles de modifications.</p>
+    <ul class="list-group">
+    {% for horaire in horaires %}
+    <li class="list-group-item">
+        <h5>{{ horaire.jour }}</h5>
+        <p><strong>{{ horaire.heure_debut }} - {{ horaire.heure_fin }} :</strong> {{ horaire.activite }} <br>
+        <small>{{ horaire.details }}</small></p>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

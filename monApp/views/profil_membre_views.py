@@ -1,17 +1,11 @@
-from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify, abort
+from flask import Blueprint, render_template, request, url_for, redirect, session, abort
 from flask_login import login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
-from datetime import datetime, date
 from sqlalchemy import or_
-import shutil
-import os
 
-from monApp.app import app, db
-from monApp.forms import *
-from monApp.models import *
-from monApp.services import *
-from monApp.gestion_erreurs import *
+from monApp.app import db
+from monApp.forms import FiltreForm
+from monApp.models import ResultatBD, CompetitionBD, ParticiperBD, ReunionBD, EventClubBD, MembreBD
+from monApp.services import membre_required
 from config import TITLE, AUJOURDHUI
 
 # Création du Blueprint
@@ -20,7 +14,7 @@ profil_bp = Blueprint('profil', __name__)
 #==========================================================#
 #====================   Pages Profil   ====================#
 #==========================================================#
-# Affiche les résultats de compétition du membre connecté.
+
 @profil_bp.route("/resultat_membre/")
 @login_required
 @membre_required
@@ -47,13 +41,12 @@ def resultat_membre():
         lesCompete = lesCompete.order_by(CompetitionBD.date_debut.desc())
 
     pagination = lesCompete.paginate(page=page, per_page=8, error_out=False)
-    return render_template("resultat_membre.html",
+    return render_template("profils_membre/resultat_membre.html",
                            title=TITLE + "- Résultat du Membre",
                            resultats=pagination.items,
                            pagination=pagination,
                            filtre=filtre)
 
-# Affiche les événements auxquels le membre connecté est inscrit.
 @profil_bp.route("/evenement_membre/")
 @login_required
 @membre_required
@@ -133,22 +126,22 @@ def evenement_membre():
     else:
         return redirect(url_for('profil.evenement_membre', type='competitions'))
     pagination = query.paginate(page=page, per_page=8, error_out=False)
-    return render_template("evenement_membre.html",
+    return render_template("profils_membre/evenement_membre.html",
                            title=TITLE + "- Vos Évènements",
                            pagination=pagination,
                            type_page=type_page,
                            etat=etat,
                            filtre=filtre)
 
-# Affiche le profil public d'un membre.
+
 @profil_bp.route("/profil_view/<int:idM>")
+@login_required 
 def profil_view(idM):
     if not session.get("user_type") == "admin":
         if current_user.id != idM:
             abort(410)
-    # origine corresponds à l'origine de l'utilisateur.
     origine = request.args.get('origine', 'gerer_profils')
     id_competition = request.args.get('idCompetition', type=int)
     id_event_club = request.args.get('idEventClub', type=int)
     unMembre = db.session.get(MembreBD,idM)
-    return render_template("profil_view.html", title=TITLE + "- Profil Membre", selectedMembre=unMembre, origine=origine, idCompetition=id_competition, idEventClub=id_event_club)
+    return render_template("profils_membre/profil_view.html", title=TITLE + "- Profil Membre", selectedMembre=unMembre, origine=origine, idCompetition=id_competition, idEventClub=id_event_club)

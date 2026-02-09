@@ -1,19 +1,16 @@
-from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify, abort
+from flask import Blueprint, render_template, request, url_for, redirect, session, flash
 from flask_login import login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from datetime import datetime, date
+from datetime import datetime
 from sqlalchemy import or_
 import shutil
 import os
 from monApp.app import app, db
-from monApp.forms import *
-from monApp.models import *
-from monApp.services import *
-from monApp.gestion_erreurs import *
-from config import TITLE, AUJOURDHUI
+from monApp.forms import FiltreForm
+from monApp.models import CompetitionBD, ParticiperBD, ResultatBD, MembreBD, EvenementBD, ImageAppBD
+from monApp.services import admin_required, membre_required
+from config import TITLE
 
-# Création du Blueprint
 competitions_bp = Blueprint('competitions', __name__)
 
 #================================================================#
@@ -22,7 +19,7 @@ competitions_bp = Blueprint('competitions', __name__)
 
 @competitions_bp.route("/competitions/")
 @competitions_bp.route("/competitions/<string:etat>")
-def competitions(etat="prochaines"): # Valeur par défaut : pluriel 'prochaines'
+def competitions(etat="prochaines"): 
     if request.args.get('etat'):
         etat = request.args.get('etat')
     passee = (etat == "passees")
@@ -51,10 +48,9 @@ def competitions(etat="prochaines"): # Valeur par défaut : pluriel 'prochaines'
         lesCompetitions = lesCompetitions.filter(CompetitionBD.typeComp.in_(filtre.type_competition.data))
         
     pagination = lesCompetitions.paginate(page=page, per_page=6, error_out=False)
-    return render_template("evenements/competitions.html", title=TITLE+"- Competitions", pagination=pagination, filtre=filtre, etat=etat)
+    return render_template("competitions/competitions.html", title=TITLE+"- Competitions", pagination=pagination, filtre=filtre, etat=etat)
 
 
-# Affiche les détails d'une compétition spécifique.
 @competitions_bp.route("/competitions/<int:idCompetition>/view")
 def competition_view(idCompetition):
     uneCompetition = CompetitionBD.query.get(idCompetition)
@@ -80,31 +76,24 @@ def competition_view(idCompetition):
     resultats = ResultatBD.query.filter_by(id_competition=idCompetition).all()
     resultats.sort(key=lambda x: x.resultat)
 
-    # Vérifie si un classement PDF existe pour cette compétition
     classement_pdf_path = os.path.join(app.root_path, 'static', 'classements', str(uneCompetition.id), 'classement.pdf')
     classement_pdf_exists = os.path.exists(classement_pdf_path)
-    return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",competition=uneCompetition,origine=origine,deja_inscrit=deja_inscrit,est_eligible=est_eligible, lesResultats = resultats, classement_pdf_exists=classement_pdf_exists)
+    return render_template("competitions/competition_view.html",title=TITLE+"- Consultation de la competition",competition=uneCompetition,origine=origine,deja_inscrit=deja_inscrit,est_eligible=est_eligible, lesResultats=resultats, classement_pdf_exists=classement_pdf_exists)
 
-# Permet à un membre de s'inscrire à une compétition.
 @competitions_bp.route("/inscrire/competition/<int:idCompetition>", methods=['GET'])
 @login_required
 @membre_required
 def inscrire_competition(idCompetition):
     competition_obj = CompetitionBD.query.get_or_404(idCompetition)
     id_evenement_a_inscrire = competition_obj.id_event
-    deja_inscrit = ParticiperBD.query.filter_by(
-        id_membre=current_user.id,
-        id_event=id_evenement_a_inscrire
-    ).first()
     try:
         nouvelle_participation = ParticiperBD(id_membre=current_user.id, id_event=id_evenement_a_inscrire)
         db.session.add(nouvelle_participation)
         db.session.commit()
-    except Exception as e:
+    except Exception:
         db.session.rollback()
     return redirect(url_for('competitions.competition_view', idCompetition=idCompetition))
 
-# Permet à un utilisateur (membre ou admin) de se désinscrire d'une compétition.
 @competitions_bp.route("/desinscrire/competition/<int:idCompetition>", methods=['GET'])
 @login_required
 def desinscrire_competition(idCompetition):
@@ -114,11 +103,10 @@ def desinscrire_competition(idCompetition):
         try:
             db.session.delete(participation)
             db.session.commit()
-        except Exception as e:
+        except Exception:
             db.session.rollback()
     return redirect(url_for('competitions.competition_view', idCompetition=idCompetition))
 
-# Page de modification d'une compétition - Réservée aux administrateurs.
 @competitions_bp.route("/competition_update/<int:idCompetition>", methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -139,21 +127,19 @@ def competition_update(idCompetition):
             competition.description = request.form['description']
             db.session.commit()
             return redirect(url_for('competitions.competition_view', idCompetition=competition.id, origine=origine))
-        except Exception as e:
+        except Exception:
             db.session.rollback()
-    # Récupérer la liste des participants
+    
     participations = ParticiperBD.query.filter_by(id_event=competition.id_event).all()
     participants = [p.membre for p in participations]
 
-    return render_template("competition_update.html",title=TITLE+"- Modification de la competition", competition=competition, lesParticipants = participants, origine=origine)
+    return render_template("competitions/competition_update.html",title=TITLE+"- Modification de la competition", competition=competition, lesParticipants=participants, origine=origine)
 
-# Page pour sélectionner les membres à inscrire à une compétition - Réservée aux administrateurs.
 @competitions_bp.route("/competition/<int:idC>/inscrire_membres", methods=['GET'])
 @login_required
 @admin_required
 def inscrire_membres_competition(idC):
     competition = CompetitionBD.query.get_or_404(idC)
-
     membres_a_inscrire_ids = request.args.getlist('membres_a_inscrire_ids', type=int)
     if not membres_a_inscrire_ids:
         membres_a_inscrire_ids = []
@@ -161,6 +147,7 @@ def inscrire_membres_competition(idC):
         membres_a_inscrire_ids.append(int(request.args.get('add')))
     if 'remove' in request.args:
         membres_a_inscrire_ids.remove(int(request.args.get('remove')))
+        
     participations = ParticiperBD.query.filter_by(id_event=competition.id_event).all()
     participants_ids = {p.id_membre for p in participations}
     tous_les_non_participants = MembreBD.query.filter(MembreBD.id.notin_(participants_ids), MembreBD.activite == True).all()
@@ -173,9 +160,8 @@ def inscrire_membres_competition(idC):
                        (surclassement_niveau and surclassement_niveau in niveaux_liste)
         if est_eligible:
             non_participants_eligibles.append(non_participant)
-    return render_template("competition_inscrire_membre.html", title=TITLE+"- Inscrire des membres", competition=competition, non_participants=non_participants_eligibles, membres_a_inscrire_ids=membres_a_inscrire_ids)
+    return render_template("competitions/competition_inscrire_membre.html", title=TITLE+"- Inscrire des membres", competition=competition, non_participants=non_participants_eligibles, membres_a_inscrire_ids=membres_a_inscrire_ids)
 
-# Traite l'inscription de plusieurs membres à une compétition - Réservée aux administrateurs.
 @competitions_bp.route("/competition/<int:idC>/inscription_membres", methods=['POST'])
 @login_required
 @admin_required
@@ -191,7 +177,6 @@ def inscription_membres_competition(idC):
     db.session.commit()
     return redirect(url_for('competitions.competition_update', idCompetition=idC))
 
-# Enregistre ou met à jour le classement d'un membre pour une compétition - Réservée aux administrateurs.
 @competitions_bp.route("/competition/<int:idCompetition>/classer/<int:idMembre>", methods=['POST'])
 @login_required
 @admin_required
@@ -209,11 +194,8 @@ def classer_membre(idCompetition, idMembre):
         nouveau_resultat = ResultatBD(resultat=classement, date=competition.date_fin, type_arme=competition.type_arme, type_compete=competition.typeComp, id_competition=idCompetition, id_membre=idMembre)
         db.session.add(nouveau_resultat)
     db.session.commit()
-
-
     return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
-# Gère le téléversement du fichier PDF du classement pour une compétition
 @competitions_bp.route("/competition/<int:idCompetition>/upload_classement", methods=['POST'])
 @login_required
 @admin_required
@@ -225,13 +207,12 @@ def upload_classement_competition(idCompetition):
         return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
     file = request.files['classement_pdf']
-
     if file.filename == '':
         flash('Aucun fichier sélectionné.', 'danger')
         return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
     if file and file.filename.lower().endswith('.pdf'):
-        filename = "classement.pdf" # Nom de fichier fixe pour le retrouver facilement
+        filename = "classement.pdf"
         dossier_classement = os.path.join(app.root_path, 'static', 'classements', str(competition.id))
         os.makedirs(dossier_classement, exist_ok=True)
         file.save(os.path.join(dossier_classement, filename))
@@ -240,7 +221,6 @@ def upload_classement_competition(idCompetition):
         flash('Type de fichier non autorisé. Veuillez téléverser un fichier PDF.', 'danger')
     return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
-# Supprime la participation d'un membre à une compétition - Réservée aux administrateurs.
 @competitions_bp.route("/competition/<int:idC>/delete/<int:idM>", methods=['POST'])
 @login_required
 @admin_required
@@ -250,11 +230,10 @@ def delete_membre_competition(idC, idM):
     try:
         db.session.delete(participation)
         db.session.commit()
-    except Exception as e:
+    except Exception:
         db.session.rollback()
     return redirect(url_for('competitions.competition_update', idCompetition=idC))
 
-# Ajoute une image à une compétition
 @competitions_bp.route("/competition/<int:idCompetition>/add_image", methods=['POST'])
 @login_required
 @admin_required
@@ -266,22 +245,17 @@ def add_image_competition(idCompetition):
         return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
     file = request.files['image']
-
     if file.filename == '':
         flash('Aucun fichier image sélectionné.', 'danger')
         return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
     if file:
         filename = secure_filename(file.filename)
-        # Création d'un dossier unique pour chaque compétition pour éviter les conflits de noms
         dossier_images = os.path.join(app.root_path, 'static', 'images', 'competitions', str(competition.id))
         os.makedirs(dossier_images, exist_ok=True)
-
         file.save(os.path.join(dossier_images, filename))
 
-        # L'URL stockée en BDD est relative au dossier 'static'
         image_url = os.path.join('images', 'competitions', str(competition.id), filename).replace('\\', '/')
-
         alt_text = request.form.get('alt', filename)
         prive = 'prive' in request.form
 
@@ -291,13 +265,12 @@ def add_image_competition(idCompetition):
             db.session.add(nouvelle_image)
             db.session.commit()
             flash('Image ajoutée avec succès.', 'success')
-        except Exception as e:
+        except Exception:
             db.session.rollback()
             flash(f'Erreur lors de l\'ajout de l\'image à la base de données.', 'danger')
 
     return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
-# Supprime une image d'une compétition
 @competitions_bp.route("/competition/delete_image/<int:idImage>", methods=['POST'])
 @login_required
 @admin_required
@@ -310,24 +283,18 @@ def delete_image_competition(idImage):
     competition = CompetitionBD.query.get_or_404(idCompetition)
     image_a_retirer = ImageAppBD.query.get_or_404(idImage)
 
-    # On vérifie si l'image est bien dans la liste de la compétition
     if image_a_retirer in competition.images_rc:
-        # On retire l'association
         competition.images_rc.remove(image_a_retirer)
-
-        # Supprime le fichier physique
         try:
             image_path = os.path.join(app.static_folder, image_a_retirer.urlI)
             if os.path.exists(image_path):
                 os.remove(image_path)
-            # Optionnel : supprime le dossier s'il est vide
             image_dir = os.path.dirname(image_path)
             if not os.listdir(image_dir):
                 os.rmdir(image_dir)
         except Exception as e:
             flash(f"Erreur lors de la suppression du fichier : {e}", "danger")
 
-        # Supprime l'image de la base de données
         db.session.delete(image_a_retirer)
         db.session.commit()
         flash('L\'image a été retirée de la compétition.', 'success')
@@ -336,9 +303,8 @@ def delete_image_competition(idImage):
 
     return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
-# Supprime une compétition et toutes ses participations - Réservée aux administrateurs.
 @competitions_bp.route("/competition_delete/<int:idCompetition>", methods=['POST'])
-@login_required # Assure que seul un utilisateur connecté peut supprimer
+@login_required
 @admin_required
 def competition_delete(idCompetition):
     competition_a_supprimer = CompetitionBD.query.get_or_404(idCompetition)
@@ -351,6 +317,6 @@ def competition_delete(idCompetition):
             if evenement_parent:
                 db.session.delete(evenement_parent)
         db.session.commit()
-    except Exception as e:
+    except Exception:
         db.session.rollback()
     return redirect(url_for('competitions.competitions'))

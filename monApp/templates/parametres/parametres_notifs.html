@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toggle_switch.css') }}">
+{% endblock %}
+
+{% block main %}
+    {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
+    <form action="{{ url_for('parametres_notifs') }}" method="POST">
+    <section class="mb-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} text-center" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <h1>Paramètre de notification Membre</h1>
+        <ul class="list-group">
+        <li class="list-group-item">
+            <h4>Evenement - Inscription </h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="event_insc_site" value="1" {% if parametres.eventInscriptionSite %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail :
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="event_insc_mail" value="1" {% if parametres.evenementInscriptionMail %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Evenement - Nouveau</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="event_new_site" value="1" {% if parametres.eventNouveauSite %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="event_new_mail" value="1" {% if parametres.eventNouveauMail %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Evenement - Annulation </h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="event_cancel_site" value="1" {% if parametres.eventAnnulationSite %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="event_cancel_mail" value="1" {% if parametres.eventAnnulationMail %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Résultat - Nouveau</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="result_new_site" value="1" {% if parametres.resultatNouveauSite %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="result_new_mail" value="1" {% if parametres.resultatNouveauMail %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Réponses de formulaire</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="form_resp_site" value="1" {% if parametres.reponseFormulaireSite %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="form_resp_mail" value="1" {% if parametres.reponseFormulaireMail %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Modification du Profil</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="profile_mod_site" value="1" {% if parametres.modifProfilSite %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="profile_mod_mail" value="1" {% if parametres.modifProfilMail %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+    </ul>
+    </section>
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">Enregistrer les préférences</button>
+    </div>
+    </form>
+    {% endif %}
+
+
+    {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+    <form action="{{ url_for('parametres_notifs') }}" method="POST">
+    <section class="mb-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} text-center" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <h1>Paramètre de notification Admin</h1>
+        <ul class="list-group">
+        <li class="list-group-item">
+            <h4>Formulaire - Demande</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="form_req_site" value="1" {% if parametres.formulaireDemandeSite %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="form_req_mail" value="1" {% if parametres.formulaireDemandeMail %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Formulaire - Question</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="form_question_site" value="1" {% if parametres.formulaireQuestionSite %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="form_question_mail" value="1" {% if parametres.formulaireQuestionMail %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Formulaire - Signalement</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="form_report_site" value="1" {% if parametres.formulaireSignalementSite %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="form_report_mail" value="1" {% if parametres.formulaireSignalementMail %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Demande de modification de profil</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="profile_change_site" value="1" {% if parametres.demandeModifSite %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="profile_change_mail" value="1" {% if parametres.demandeModifMail %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <h4>Demande d'inscription</h4>
+            <div class="switch-container">
+                <div class="switch-group">
+                    Notifications sur le site:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="signup_req_site" value="1" {% if parametres.demandeInscriptionSite %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    Notifications par mail:
+                    <label class="a8z-toggle-switch" data-style="rounded" data-color="rouge">
+                        <input type="checkbox" name="signup_req_mail" value="1" {% if parametres.demandeInscriptionMail %}checked{% endif %}>
+                        <span class="toggle">
+                            <span class="switch"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </li>
+    </ul>
+    </section>
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">Enregistrer les préférences</button>
+    </div>
+    </form>
+    {% endif %}
+
+{% endblock %}

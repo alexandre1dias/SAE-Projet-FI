@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendrier.css') }}">
+{% endblock %}
+
+{% block main %}
+<h1 class="text-center mb-5" id="calendrier-titre">Calendrier des Évènements</h1>
+<aside class="fixed-left">
+<div class="filtres-box">
+    {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+    <div>
+        <h5 class="filtres-titre">Action</h5>
+        <a href="{{ url_for('calendrier.add_event') }}" class="btn btn-primary w-100">
+            Ajouter un événement
+        </a>
+    </div>
+    {% endif%}
+    <br>
+    <h5 class="filtres-titre">Filtres</h5>
+    <form action="{{ url_for('calendrier.calendrier') }}" method="GET">
+
+        <h6>{{ filtre.type_event.label }}</h6>
+        {% for subfield in filtre.type_event %}
+            <div class="form-check custom-check-{{ subfield.data | replace(' ', '-') 
+            | replace('é', 'e') | replace('è', 'e') | replace('É', 'e') | replace('î', 'i') | lower }}">
+                {{ subfield(class="form-check-input") }}
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+
+        <h6>{{ filtre.type_competition.label }}</h6>
+        {% for subfield in filtre.type_competition %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+
+        <h6>{{ filtre.armes.label }}</h6>
+        {% for subfield in filtre.armes %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+
+        <h6>{{ filtre.sexe.label }}</h6>
+        {% for subfield in filtre.sexe %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+
+        <h6>{{ filtre.niveau.label }}</h6>
+        {% for subfield in filtre.niveau %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+        {{ filtre.submit(class="btn btn-primary", value="Appliquer les filtres") }}
+    </form>
+</div>
+</aside>
+<div class="calendrier-wrapper" id='calendar'></div>
+
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="eventModalLabel">Détails de l'événement</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4 id="modalTitle" class="text-primary mb-4 text-center"></h4>
+                
+                <div class="fs-6"> <p class="mb-2"><strong>Type :</strong> <span id="modalType"></span></p>
+                    <p class="mb-2"><strong>Début :</strong> <span id="modalStart"></span></p>
+                    <p class="mb-2"><strong>Fin :</strong> <span id="modalEnd"></span></p>
+                    
+                    <div id="lineNiveau">
+                        <p class="mb-2"><strong>Niveaux :</strong> <span id="modalNiveaux"></span></p>
+                    </div>
+                    
+                    <div id="lineArme">
+                        <p class="mb-2"><strong>Arme :</strong> <span id="modalArme"></span></p>
+                    </div>
+
+                    <hr> <p class="mb-2"><strong>Ville :</strong> <span id="modalVille"></span></p>
+                    <p class="mb-2"><strong>Adresse :</strong> <span id="modalAdresse"></span></p>
+                    
+                    <hr> <p class="mb-2"><strong>Infos :</strong> <span id="modalDescription" class="text-muted"></span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        
+        // Initialisation de la modale Bootstrap
+        var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            firstDay: 1,
+            height: 700,
+            fixedWeekCount: false,
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            },
+            buttonText: {
+                today: "Aujourd'hui",
+                month: 'Mois',
+                week: 'Semaine',
+                day: 'Jour',
+                list: 'Liste'
+            },
+            
+            events: function(info, successCallback, failureCallback) {
+                const urlParams = new URLSearchParams(window.location.search);
+                // Utilisation de url_for pour l'API
+                let apiUrl = "{{ url_for('calendrier.get_events') }}" + "?" + urlParams.toString();
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        successCallback(data);
+                    })
+                    .catch(error => {
+                        console.error("Erreur lors de la récupération des événements:", error);
+                        failureCallback(error);
+                    });
+            },
+            eventClick: function(info) {
+                // Si l'événement a une URL (Compétition, Réunion...), on redirige
+                if (info.event.extendedProps.url) {
+                    window.location.href = info.event.extendedProps.url;
+                }
+
+                // Sinon (Entraînement), on ouvre la modale
+                else {
+                    let event = info.event;
+                    let props = event.extendedProps;
+                    
+                    document.getElementById('eventModalLabel').innerText = props.type || 'Détails';
+                    document.getElementById('modalTitle').innerText = event.title;
+                    document.getElementById('modalType').innerText = props.type || 'Non spécifié';
+                    document.getElementById('modalVille').innerText = props.ville || 'Non spécifié';
+                    document.getElementById('modalAdresse').innerText = props.adresse || 'Non spécifié';
+                    document.getElementById('modalDescription').innerText = props.description || 'Aucune description';
+                    
+                    let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                    document.getElementById('modalStart').innerText = event.start ? event.start.toLocaleDateString('fr-FR', options) : '';
+                    document.getElementById('modalEnd').innerText = event.end ? event.end.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) : '';
+                    
+                    // Niveaux
+                    let elemNiveau = document.getElementById('lineNiveau');
+                    let spanNiveau = document.getElementById('modalNiveaux');
+                    if (props.niveaux) {
+                        spanNiveau.innerText = props.niveaux;
+                        elemNiveau.style.display = 'block';
+                    } else {
+                        elemNiveau.style.display = 'none';
+                    }
+                    
+                    // Armes
+                    let elemArme = document.getElementById('lineArme');
+                    let spanArme = document.getElementById('modalArme');
+                    if (props.arme) {
+                        spanArme.innerText = props.arme;
+                        elemArme.style.display = 'block';
+                    } else {
+                        elemArme.style.display = 'none';
+                    }
+
+                    eventModal.show();
+                }
+            }
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

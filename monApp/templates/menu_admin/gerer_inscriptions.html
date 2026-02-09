@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="header-container mb-4">
+    <h1>Gestion des inscriptions et modifications</h1>
+</div>
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link {% if type_page == 'inscription' %}active{% endif %}" aria-current="page"
+            href="{{ url_for('admin.gerer_inscriptions', type='inscription') }}">Inscriptions</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if type_page == 'modification' %}active{% endif %}"
+            href="{{ url_for('admin.gerer_inscriptions', type='modification') }}">Modifications</a>
+    </li>
+</ul>
+
+<table class="table table-striped table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Demandeur</th>
+            <th>Détails</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for uneRequete in pagination.items %}
+        <tr>
+            {% if type_page == 'modification' %}
+            <td>Modification</td>
+            <td>{{ uneRequete.membre.prenom }} {{ uneRequete.membre.nom }}</td>
+
+            <td>
+                {% if uneRequete.nom != uneRequete.membre.nom %}
+                <strong>Nom :</strong> {{ uneRequete.membre.nom }} &#x2794; {{ uneRequete.nom
+                }}<br>
+                {% endif %}
+
+                {% if uneRequete.prenom != uneRequete.membre.prenom %}
+                <strong>Prénom :</strong> {{ uneRequete.membre.prenom }} &#x2794; {{
+                uneRequete.prenom }}<br>
+                {% endif %}
+
+                {% if uneRequete.sexe != uneRequete.membre.sexe %}
+                <strong>Sexe :</strong> {{ uneRequete.membre.sexe }} &#x2794; {{
+                uneRequete.sexe }}<br>
+                {% endif %}
+
+                {% if uneRequete.email != uneRequete.membre.email %}
+                <strong>Email :</strong> {{ uneRequete.membre.email }} &#x2794; {{
+                uneRequete.email }}<br>
+                {% endif %}
+
+                {% if uneRequete.ddn != uneRequete.membre.ddn %}
+                <strong>Date de naissance :</strong> {{ uneRequete.membre.ddn }} &#x2794; {{
+                uneRequete.ddn }}<br>
+                {% endif %}
+            </td>
+            <td>{{ uneRequete.date }}</td>
+            <td class="actions">
+                <form class="d-inline" action="{{ url_for('admin.accepter_modifications', idModif=uneRequete.id) }}"
+                    method="post" onsubmit="return confirm('Voulez-vous accepter cette demande ?');">
+                    <button type="submit" class="btn btn-success btn-sm">Accepter</button>
+                </form>
+
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#refusModal-modification-{{ uneRequete.id }}">Refuser</button>
+                {% if uneRequete.justification %}
+                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#justificationModal-{{ uneRequete.id }}">Justification</button>
+                {% endif%}
+            </td>
+
+            {% else %}
+            <td>Inscription</td>
+            <td>{{ uneRequete.prenom }} {{ uneRequete.nom }}</td>
+            <td>
+                <strong>Nom: </strong>{{ uneRequete.nom }}<br>
+                <strong>Prénom: </strong>{{ uneRequete.prenom }}<br>
+                <strong>Date de naissance: </strong>{{ uneRequete.ddn }}<br>
+                <strong>Email: </strong>{{ uneRequete.email }}<br>
+                <strong>Sexe: </strong>{{ uneRequete.sexe }}
+            </td>
+            <td>{{ uneRequete.date }}</td>
+            <td class="actions">
+                <form class="d-inline" action="{{ url_for('admin.accepter_inscription', idI=uneRequete.id) }}" method="post"
+                    onsubmit="return confirm('Voulez-vous accepter cette demande ?');">
+                    <button type="submit" class="btn btn-success btn-sm">Accepter</button>
+                </form>
+
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#refusModal-inscription-{{ uneRequete.id }}">Refuser</button>
+            </td>
+            {% endif %}
+        </tr>
+
+        {% set modalId = "refusModal-" ~ type_page ~ "-" ~ uneRequete.id %}
+        {% set redirectionRefus = url_for('admin.refuser_inscription', idI=uneRequete.id) if type_page == 'inscription' else
+        url_for('admin.refuser_modification', idM=uneRequete.id) %}
+
+        <div class="modal fade" id="{{ modalId }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Refus {{ type_page }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ redirectionRefus }}">
+                        <div class="modal-body">
+                            <p>Veuillez indiquer la raison du refus.</p>
+                            <div class="mb-3">
+                                <label class="form-label">Justification :</label>
+                                <textarea class="form-control" name="justification" rows="4" required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-danger">Confirmer le Refus</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {% if type_page == 'modification' and uneRequete.justification %}
+        <div class="modal fade" id="justificationModal-{{ uneRequete.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Justification de la demande</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ uneRequete.justification }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Retour</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if pagination.items %}
+<div class="d-flex justify-content-center mt-4">
+    <ul class="pagination">
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+            <a class="page-link"
+                href="{{ url_for('admin.gerer_inscriptions', page=pagination.prev_num, type=type_page) if pagination.has_prev else '#' }}">
+                &laquo; Avant
+            </a>
+        </li>
+
+        <li class="page-item disabled">
+            <span class="page-link">
+                Page {{ pagination.page }} sur {{ pagination.pages }}
+            </span>
+        </li>
+
+        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+            <a class="page-link"
+                href="{{ url_for('admin.gerer_inscriptions', page=pagination.next_num, type=type_page) if pagination.has_next else '#' }}">
+                Après &raquo;
+            </a>
+        </li>
+    </ul>
+</div>
+{% endif %}
+
+{% endblock %}

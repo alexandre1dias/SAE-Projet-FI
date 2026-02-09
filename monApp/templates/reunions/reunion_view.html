@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block main %}
+
+<h1 class="mb-4" >{{selectedReunion.nom}}</h1>
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <h4 class="mb-0">Détails de la Réunion</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Début:</strong> {{ selectedReunion.dateDebutRE.strftime('%d/%m/%Y')  }} à {{ selectedReunion.heureDebutRE }}</li>
+                    <li class="list-group-item"><strong>Ville:</strong> {{ selectedReunion.ville or 'Non spécifiée'}} </li>
+                    <li class="list-group-item"><strong>Type:</strong> {{selectedReunion.typeReunionRE}}</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Fin:</strong> {{ selectedReunion.dateFinRE.strftime('%d/%m/%Y') }} à {{ selectedReunion.heureFinRE }}</li>
+                    <li class="list-group-item"><strong>Adresse:</strong> {{ selectedReunion.adresse or 'Non spécifiée' }}</li>
+                    <li class="list-group-item"><strong>Nombre Participants:</strong> {{ selectedReunion.evenement.participants.count()}}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<h2>Description:</h2>
+<p>{{ selectedReunion.rapportRE or "Aucun rapport disponible." }}</p>
+<div class="d-flex justify-content-center">
+    {% if origine == 'calendrier' %}
+        <a href="{{ url_for('calendrier.calendrier') }}" class="btn btn-secondary">Retour</a>
+    {% else %}
+        <a href="{{ url_for('reunions.reunion') }}" class="btn btn-secondary">Retour</a>
+    {% endif %}
+    <a href="{{ url_for('reunions.reunion_update', idReunion=selectedReunion.id) }}" class="btn btn-primary ms-2">Modifier évènement</a>
+    <form action="{{ url_for('reunions.reunion_delete', idReunion=selectedReunion.id) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réunion ?');" class="ms-2">
+        <button type="submit" class="btn btn-danger">Supprimer évènement</button>
+    </form>
+</div>
+    
+{% endblock %}
