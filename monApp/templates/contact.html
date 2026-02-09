@@ -113,26 +113,33 @@
 
     <script>
         function declencherMailto() {
-            // Récupération des valeurs
-            var sujet = document.getElementById('inputSujet').value;
-            var email = document.getElementById('inputEmail').value;
-            var description = document.getElementById('inputDescription').value;
             var typeForm = document.querySelector('input[name="type_form"]:checked');
             var typeTexte = typeForm ? typeForm.value : "Contact";
-            // Construction du lien mailto
-            //var destinataire = "blois.escrime@wanadoo.fr";
-            var sujetFinal = "[" + typeTexte + "] " + sujet;
-            var corpsMessage = "Message envoyé par : " + email + "\n\n" + 
-                            "Contenu du message :\n" + description;
-            var lien = "mailto:" + destinataire + 
-                    "?subject=" + encodeURIComponent(sujetFinal) + 
-                    "&body=" + encodeURIComponent(corpsMessage);
-            // Ouverture du logiciel
-            window.location.href = lien;
-            // S'il clique sur "Annuler", le formulaire n'est PAS envoyé à MariaDB.
-            var estValide = confirm("Votre logiciel de messagerie vient de s'ouvrir. \n\nAvez-vous bien envoyé le mail ? \n(Cliquez sur OK pour enregistrer votre demande sur le site) \n(Cliquez sur Annuler pour fermer la pop-up et ne pas enregistrer la demande sur le site, cela n'affecte pas l'envoi de mail ou le non envoi)");
+            var configMail = {
+                'Question': {{ 'true' if mail_question else 'false' }},
+                'Demande': {{ 'true' if mail_demande else 'false' }},
+                'Signalement': {{ 'true' if mail_signalement else 'false' }}
+            };
+            var doitEnvoyerMail = configMail[typeTexte];
+            if (doitEnvoyerMail) {
+                var sujet = document.getElementById('inputSujet').value;
+                var email = document.getElementById('inputEmail').value;
+                var description = document.getElementById('inputDescription').value;
+                
+                var destinataire = "blois.escrime@wanadoo.fr";
+                var sujetFinal = "[" + typeTexte + "] " + sujet;
+                var corpsMessage = "Message envoyé par : " + email + "\n\n" + 
+                                   "Contenu du message :\n" + description;
 
-            return estValide; 
+                var lien = "mailto:" + destinataire + 
+                           "?subject=" + encodeURIComponent(sujetFinal) + 
+                           "&body=" + encodeURIComponent(corpsMessage);
+
+                window.location.href = lien;
+            } else {
+                console.log("Mailto désactivé pour : " + typeTexte);
+            }
+            return true;
         }
     </script>
 {% endblock %}

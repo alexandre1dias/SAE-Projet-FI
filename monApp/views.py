@@ -1412,13 +1412,19 @@ def comite_cercle():
 # Affiche le formulaire de contact et traite sa soumission.
 @app.route("/contact/", methods=("GET", "POST",))
 def contact():
+    # Récupérer l'unique administrateur
+    admin = AdminBD.query.first()
+    # Récupérer ses préférences pour le Mailto (Client)
+    # Si l'admin n'existe pas ou si l'option est désactivée, ce sera False
+    mail_question = admin.formulaireQuestionMail if admin else False
+    mail_demande = admin.formulaireDemandeMail if admin else False
+    mail_signalement = admin.formulaireSignalementMail if admin else False
     form = ContactForm()
     if form.validate_on_submit():
         type_f = form.type_form.data
         sujet = form.sujet.data
         email = form.email.data
         description = form.description.data
-        
         # Création du formulaire en base
         nouveau_formulaire = FormulaireBD(
             type=type_f,
@@ -1428,29 +1434,23 @@ def contact():
             date=date.today(),
             repondu=False
         )
-        
         # Lier au membre si connecté
         if current_user.is_authenticated and session.get('user_type') == 'membre':
             nouveau_formulaire.idMembre = current_user.id
             # Relation Remplir
             remplir = RemplirBD(id_membre=current_user.id)
             nouveau_formulaire.remplissages.append(remplir)
-
         db.session.add(nouveau_formulaire)
-        
-        admins = AdminBD.query.all()
-        for admin in admins:
-            notify = False
-            
-            # Vérification 
+        # Gestion de la notification interne (La cloche sur le site)
+        if admin:
+            notify_site = False
             if type_f == 'Question' and admin.formulaireQuestionSite:
-                notify = True
+                notify_site = True
             elif type_f == 'Demande' and admin.formulaireDemandeSite:
-                notify = True
+                notify_site = True
             elif type_f == 'Signalement' and admin.formulaireSignalementSite:
-                notify = True
-            
-            if notify:
+                notify_site = True     
+            if notify_site:
                 notif = NotifsBD(
                     typeN='formulaire',
                     sourceN=f"Nouveau formulaire ({type_f}) de {email}",
@@ -1460,12 +1460,16 @@ def contact():
                     link=url_for('gerer_formulaires', _external=True)
                 )
                 db.session.add(notif)
-
         db.session.commit()
         flash('Votre message a bien été envoyé.', 'success')
         return redirect(url_for('contact'))
-    
-    return render_template("contact.html", form=form, title=TITLE+"- Contact")
+    # On passe les préférences mail au template
+    return render_template("contact.html", 
+                           form=form, 
+                           title=TITLE+"- Contact",
+                           mail_question=mail_question,
+                           mail_demande=mail_demande,
+                           mail_signalement=mail_signalement)
 
 #==========================================================#
 #====================   Pages Profil   ====================#
