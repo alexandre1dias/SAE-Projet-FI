@@ -51,7 +51,7 @@
             <div class="col-lg-6 contact-form">
                 <h2>Nous contacter</h2>
                 
-                <form action="{{ url_for('contact') }}" method="POST" novalidate>
+                <form action="{{ url_for('contact') }}" method="POST" novalidate onsubmit="declencherMailto()">
                     
                     {{ form.hidden_tag() }}
 
@@ -73,7 +73,7 @@
                     </div>
 
                     <div class="mb-3">
-                        {{ form.sujet(class="form-control" + (" is-invalid" if form.sujet.errors else ""), placeholder="Sujet") }}
+                        {{ form.sujet(id="inputSujet", class="form-control" + (" is-invalid" if form.sujet.errors else ""), placeholder="Sujet") }}
                         {% if form.sujet.errors %}
                             <div class="invalid-feedback d-block">
                                 {% for error in form.sujet.errors %}
@@ -84,7 +84,7 @@
                     </div>
 
                     <div class="mb-3">
-                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Entrez une adresse email valide") }}
+                        {{ form.email(id="inputEmail", class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Entrez une adresse email valide") }}
                         {% if form.email.errors %}
                             <div class="invalid-feedback d-block">
                                 {% for error in form.email.errors %}
@@ -95,7 +95,7 @@
                     </div>
 
                     <div class="mb-3">
-                        {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows="5", placeholder="Entrez votre message") }}
+                        {{ form.description(id="inputDescription", class="form-control" + (" is-invalid" if form.description.errors else ""), rows="5", placeholder="Entrez votre message") }}
                         {% if form.description.errors %}
                             <div class="invalid-feedback d-block">
                                 {% for error in form.description.errors %}
@@ -110,4 +110,29 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function declencherMailto() {
+            // 1. Récupération des valeurs saisies par l'utilisateur
+            var sujet = document.getElementById('inputSujet').value;
+            var email = document.getElementById('inputEmail').value;
+            var description = document.getElementById('inputDescription').value;
+            var typeForm = document.querySelector('input[name="type_form"]:checked');
+            var typeTexte = typeForm ? typeForm.value : "Contact";
+            // 2. Construction du lien mailto
+            var destinataire = "blois.escrime@wanadoo.fr";
+            var sujetFinal = "[" + typeTexte + "] " + sujet;
+            // On inclut l'email saisi dans le corps du message pour référence
+            var corpsMessage = "Message envoyé par : " + email + "\n\n" + 
+                               "Contenu du message :\n" + description;
+            // 3. Création de l'URL spéciale
+            var lien = "mailto:" + destinataire + 
+                       "?subject=" + encodeURIComponent(sujetFinal) + 
+                       "&body=" + encodeURIComponent(corpsMessage);
+            // 4. Ouverture du logiciel de messagerie
+            window.location.href = lien;
+            // On retourne true pour laisser le formulaire s'envoyer aussi à la base de données
+            return true;
+        }
+    </script>
 {% endblock %}
