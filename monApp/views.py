@@ -1722,6 +1722,19 @@ def repondre_formulaire(idFormulaire):
     #une fois la réponse envoyée, on supprime le formulaire
     leFormulaire.reponse = reponse
     leFormulaire.repondu = True
+
+    # Notification au membre si applicable
+    if leFormulaire.membre and leFormulaire.membre.reponseFormulaireSite:
+        notif = NotifsBD(
+            typeN='Réponse Formulaire',
+            sourceN=f"Réponse à : {leFormulaire.sujet}",
+            lue=False,
+            timestamp=datetime.now(),
+            idMembre=leFormulaire.membre.id,
+            link='#'
+        )
+        db.session.add(notif)
+
     db.session.commit()
     return redirect(url_for('gerer_formulaires'))
 
