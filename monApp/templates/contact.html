@@ -51,7 +51,7 @@
             <div class="col-lg-6 contact-form">
                 <h2>Nous contacter</h2>
                 
-                <form action="{{ url_for('contact') }}" method="POST" novalidate onsubmit="declencherMailto()">
+                <form action="{{ url_for('contact') }}" method="POST" novalidate onsubmit="return declencherMailto()">
                     
                     {{ form.hidden_tag() }}
 
@@ -113,26 +113,26 @@
 
     <script>
         function declencherMailto() {
-            // 1. Récupération des valeurs saisies par l'utilisateur
+            // Récupération des valeurs
             var sujet = document.getElementById('inputSujet').value;
             var email = document.getElementById('inputEmail').value;
             var description = document.getElementById('inputDescription').value;
             var typeForm = document.querySelector('input[name="type_form"]:checked');
             var typeTexte = typeForm ? typeForm.value : "Contact";
-            // 2. Construction du lien mailto
-            var destinataire = "blois.escrime@wanadoo.fr";
+            // Construction du lien mailto
+            //var destinataire = "blois.escrime@wanadoo.fr";
             var sujetFinal = "[" + typeTexte + "] " + sujet;
-            // On inclut l'email saisi dans le corps du message pour référence
             var corpsMessage = "Message envoyé par : " + email + "\n\n" + 
-                               "Contenu du message :\n" + description;
-            // 3. Création de l'URL spéciale
+                            "Contenu du message :\n" + description;
             var lien = "mailto:" + destinataire + 
-                       "?subject=" + encodeURIComponent(sujetFinal) + 
-                       "&body=" + encodeURIComponent(corpsMessage);
-            // 4. Ouverture du logiciel de messagerie
+                    "?subject=" + encodeURIComponent(sujetFinal) + 
+                    "&body=" + encodeURIComponent(corpsMessage);
+            // Ouverture du logiciel
             window.location.href = lien;
-            // On retourne true pour laisser le formulaire s'envoyer aussi à la base de données
-            return true;
+            // S'il clique sur "Annuler", le formulaire n'est PAS envoyé à MariaDB.
+            var estValide = confirm("Votre logiciel de messagerie vient de s'ouvrir. \n\nAvez-vous bien envoyé le mail ? \n(Cliquez sur OK pour enregistrer votre demande sur le site) \n(Cliquez sur Annuler pour fermer la pop-up et ne pas enregistrer la demande sur le site, cela n'affecte pas l'envoi de mail ou le non envoi)");
+
+            return estValide; 
         }
     </script>
 {% endblock %}
