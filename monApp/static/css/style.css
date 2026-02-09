@@ -874,6 +874,29 @@ background-color: #1c1c1e !important;
 color: #fefefe;
 }
 
+/* pagination en mode sombre */
+body.dark-mode .pagination .page-item .page-link {
+    background-color: #2c2c2e;
+    color: #fefefe;
+    border-color: #555;
+}
+
+body.dark-mode .pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #2c2c2e;
+    border-color: #555;
+}
+
+body.dark-mode .pagination .page-item .page-link:hover {
+    background-color: #3a3a3c;
+}
+
+body.dark-mode .pagination .page-item.active .page-link {
+    background-color: #b82828;
+    border-color: #b82828;
+    color: white;
+}
+
 /*le container des filtres*/
 .fixed-left {
     position: fixed; 
