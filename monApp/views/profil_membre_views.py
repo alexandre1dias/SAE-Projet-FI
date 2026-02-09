@@ -1,8 +1,27 @@
+from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify, abort
+from flask_login import login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from datetime import datetime, date
+from sqlalchemy import or_
+import shutil
+import os
+
+from monApp.app import app, db
+from monApp.forms import *
+from monApp.models import *
+from monApp.services import *
+from monApp.gestion_erreurs import *
+from config import TITLE, AUJOURDHUI
+
+# Création du Blueprint
+profil_bp = Blueprint('profil', __name__)
+
 #==========================================================#
 #====================   Pages Profil   ====================#
 #==========================================================#
 # Affiche les résultats de compétition du membre connecté.
-@app.route("/resultat_membre/")
+@profil_bp.route("/resultat_membre/")
 @login_required
 @membre_required
 def resultat_membre():
@@ -35,7 +54,7 @@ def resultat_membre():
                            filtre=filtre)
 
 # Affiche les événements auxquels le membre connecté est inscrit.
-@app.route("/evenement_membre/")
+@profil_bp.route("/evenement_membre/")
 @login_required
 @membre_required
 def evenement_membre():
@@ -112,7 +131,7 @@ def evenement_membre():
         else:
             query = query.order_by(EventClubBD.dateDebutEV.desc())
     else:
-        return redirect(url_for('evenement_membre', type='competitions'))
+        return redirect(url_for('profil.evenement_membre', type='competitions'))
     pagination = query.paginate(page=page, per_page=8, error_out=False)
     return render_template("evenement_membre.html",
                            title=TITLE + "- Vos Évènements",
@@ -122,7 +141,7 @@ def evenement_membre():
                            filtre=filtre)
 
 # Affiche le profil public d'un membre.
-@app.route("/profil_view/<int:idM>")
+@profil_bp.route("/profil_view/<int:idM>")
 def profil_view(idM):
     if not session.get("user_type") == "admin":
         if current_user.id != idM:

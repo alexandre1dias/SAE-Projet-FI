@@ -16,7 +16,7 @@ Bootstrap(app)
 from .models import MembreBD, AdminBD 
 
 login_manager = LoginManager(app)
-login_manager.login_view = "login" # Indique à Flask-Login quelle est la vue de connexion
+login_manager.login_view = "auth.login"  # Indique à Flask-Login quelle est la vue de connexion (avec le blueprint)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -43,5 +43,9 @@ def load_user(user_id):
         
     # Sinon on cherche si c'est un membre
     return MembreBD.query.get(int(user_id))
+
+# Enregistrement des blueprints
+from monApp.views import register_blueprints
+register_blueprints(app)
 
 from . import commands

@@ -1,9 +1,27 @@
+from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify, abort
+from flask_login import login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from datetime import datetime, date
+from sqlalchemy import or_
+import shutil
+import os
+from monApp.app import app, db
+from monApp.forms import *
+from monApp.models import *
+from monApp.services import *
+from monApp.gestion_erreurs import *
+from config import TITLE, AUJOURDHUI
+
+# Création du Blueprint
+competitions_bp = Blueprint('competitions', __name__)
+
 #================================================================#
 #====================   Pages Competitions   ====================#
 #================================================================#
 
-@app.route("/competitions/")
-@app.route("/competitions/<string:etat>")
+@competitions_bp.route("/competitions/")
+@competitions_bp.route("/competitions/<string:etat>")
 def competitions(etat="prochaines"): # Valeur par défaut : pluriel 'prochaines'
     if request.args.get('etat'):
         etat = request.args.get('etat')
@@ -37,7 +55,7 @@ def competitions(etat="prochaines"): # Valeur par défaut : pluriel 'prochaines'
 
 
 # Affiche les détails d'une compétition spécifique.
-@app.route("/competitions/<int:idCompetition>/view")
+@competitions_bp.route("/competitions/<int:idCompetition>/view")
 def competition_view(idCompetition):
     uneCompetition = CompetitionBD.query.get(idCompetition)
     origine = request.args.get('origine', 'default')
@@ -68,7 +86,7 @@ def competition_view(idCompetition):
     return render_template("competition_view.html",title=TITLE+"- Consultation de la competition",competition=uneCompetition,origine=origine,deja_inscrit=deja_inscrit,est_eligible=est_eligible, lesResultats = resultats, classement_pdf_exists=classement_pdf_exists)
 
 # Permet à un membre de s'inscrire à une compétition.
-@app.route("/inscrire/competition/<int:idCompetition>", methods=['GET'])
+@competitions_bp.route("/inscrire/competition/<int:idCompetition>", methods=['GET'])
 @login_required
 @membre_required
 def inscrire_competition(idCompetition):
@@ -84,10 +102,10 @@ def inscrire_competition(idCompetition):
         db.session.commit()
     except Exception as e:
         db.session.rollback()
-    return redirect(url_for('competition_view', idCompetition=idCompetition))
+    return redirect(url_for('competitions.competition_view', idCompetition=idCompetition))
 
 # Permet à un utilisateur (membre ou admin) de se désinscrire d'une compétition.
-@app.route("/desinscrire/competition/<int:idCompetition>", methods=['GET'])
+@competitions_bp.route("/desinscrire/competition/<int:idCompetition>", methods=['GET'])
 @login_required
 def desinscrire_competition(idCompetition):
     competition_obj = CompetitionBD.query.get_or_404(idCompetition)
@@ -98,10 +116,10 @@ def desinscrire_competition(idCompetition):
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-    return redirect(url_for('competition_view', idCompetition=idCompetition))
+    return redirect(url_for('competitions.competition_view', idCompetition=idCompetition))
 
 # Page de modification d'une compétition - Réservée aux administrateurs.
-@app.route("/competition_update/<int:idCompetition>", methods=['GET', 'POST'])
+@competitions_bp.route("/competition_update/<int:idCompetition>", methods=['GET', 'POST'])
 @login_required
 @admin_required
 def competition_update(idCompetition):
@@ -120,7 +138,7 @@ def competition_update(idCompetition):
             competition.sexe = request.form['sexe']
             competition.description = request.form['description']
             db.session.commit()
-            return redirect(url_for('competition_view', idCompetition=competition.id, origine=origine))
+            return redirect(url_for('competitions.competition_view', idCompetition=competition.id, origine=origine))
         except Exception as e:
             db.session.rollback()
     # Récupérer la liste des participants
@@ -130,7 +148,7 @@ def competition_update(idCompetition):
     return render_template("competition_update.html",title=TITLE+"- Modification de la competition", competition=competition, lesParticipants = participants, origine=origine)
 
 # Page pour sélectionner les membres à inscrire à une compétition - Réservée aux administrateurs.
-@app.route("/competition/<int:idC>/inscrire_membres", methods=['GET'])
+@competitions_bp.route("/competition/<int:idC>/inscrire_membres", methods=['GET'])
 @login_required
 @admin_required
 def inscrire_membres_competition(idC):
@@ -158,7 +176,7 @@ def inscrire_membres_competition(idC):
     return render_template("competition_inscrire_membre.html", title=TITLE+"- Inscrire des membres", competition=competition, non_participants=non_participants_eligibles, membres_a_inscrire_ids=membres_a_inscrire_ids)
 
 # Traite l'inscription de plusieurs membres à une compétition - Réservée aux administrateurs.
-@app.route("/competition/<int:idC>/inscription_membres", methods=['POST'])
+@competitions_bp.route("/competition/<int:idC>/inscription_membres", methods=['POST'])
 @login_required
 @admin_required
 def inscription_membres_competition(idC):
@@ -171,19 +189,19 @@ def inscription_membres_competition(idC):
             nouvelle_participation = ParticiperBD(id_membre=membre_id, id_event=competition.id_event)
             db.session.add(nouvelle_participation)
     db.session.commit()
-    return redirect(url_for('competition_update', idCompetition=idC))
+    return redirect(url_for('competitions.competition_update', idCompetition=idC))
 
 # Enregistre ou met à jour le classement d'un membre pour une compétition - Réservée aux administrateurs.
-@app.route("/competition/<int:idCompetition>/classer/<int:idMembre>", methods=['POST'])
+@competitions_bp.route("/competition/<int:idCompetition>/classer/<int:idMembre>", methods=['POST'])
 @login_required
 @admin_required
 def classer_membre(idCompetition, idMembre):
     competition = CompetitionBD.query.get_or_404(idCompetition)
     classement = request.form.get('classement')
     if not classement:
-        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
     if not classement.isdigit():
-        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
     resultat_existant = ResultatBD.query.filter_by(id_competition=idCompetition,id_membre=idMembre).first()
     if resultat_existant:
         resultat_existant.resultat = classement
@@ -193,10 +211,10 @@ def classer_membre(idCompetition, idMembre):
     db.session.commit()
 
 
-    return redirect(url_for('competition_update', idCompetition=idCompetition))
+    return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
 # Gère le téléversement du fichier PDF du classement pour une compétition
-@app.route("/competition/<int:idCompetition>/upload_classement", methods=['POST'])
+@competitions_bp.route("/competition/<int:idCompetition>/upload_classement", methods=['POST'])
 @login_required
 @admin_required
 def upload_classement_competition(idCompetition):
@@ -204,13 +222,13 @@ def upload_classement_competition(idCompetition):
 
     if 'classement_pdf' not in request.files:
         flash('Aucun fichier n\'a été envoyé.', 'danger')
-        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
     file = request.files['classement_pdf']
 
     if file.filename == '':
         flash('Aucun fichier sélectionné.', 'danger')
-        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
     if file and file.filename.lower().endswith('.pdf'):
         filename = "classement.pdf" # Nom de fichier fixe pour le retrouver facilement
@@ -220,10 +238,10 @@ def upload_classement_competition(idCompetition):
         flash('Le classement PDF a été téléversé avec succès.', 'success')
     else:
         flash('Type de fichier non autorisé. Veuillez téléverser un fichier PDF.', 'danger')
-    return redirect(url_for('competition_update', idCompetition=idCompetition))
+    return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
 # Supprime la participation d'un membre à une compétition - Réservée aux administrateurs.
-@app.route("/competition/<int:idC>/delete/<int:idM>", methods=['POST'])
+@competitions_bp.route("/competition/<int:idC>/delete/<int:idM>", methods=['POST'])
 @login_required
 @admin_required
 def delete_membre_competition(idC, idM):
@@ -234,10 +252,10 @@ def delete_membre_competition(idC, idM):
         db.session.commit()
     except Exception as e:
         db.session.rollback()
-    return redirect(url_for('competition_update', idCompetition=idC))
+    return redirect(url_for('competitions.competition_update', idCompetition=idC))
 
 # Ajoute une image à une compétition
-@app.route("/competition/<int:idCompetition>/add_image", methods=['POST'])
+@competitions_bp.route("/competition/<int:idCompetition>/add_image", methods=['POST'])
 @login_required
 @admin_required
 def add_image_competition(idCompetition):
@@ -245,13 +263,13 @@ def add_image_competition(idCompetition):
 
     if 'image' not in request.files:
         flash('Aucun fichier image n\'a été envoyé.', 'danger')
-        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
     file = request.files['image']
 
     if file.filename == '':
         flash('Aucun fichier image sélectionné.', 'danger')
-        return redirect(url_for('competition_update', idCompetition=idCompetition))
+        return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
     if file:
         filename = secure_filename(file.filename)
@@ -277,17 +295,17 @@ def add_image_competition(idCompetition):
             db.session.rollback()
             flash(f'Erreur lors de l\'ajout de l\'image à la base de données.', 'danger')
 
-    return redirect(url_for('competition_update', idCompetition=idCompetition))
+    return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
 # Supprime une image d'une compétition
-@app.route("/competition/delete_image/<int:idImage>", methods=['POST'])
+@competitions_bp.route("/competition/delete_image/<int:idImage>", methods=['POST'])
 @login_required
 @admin_required
 def delete_image_competition(idImage):
     idCompetition = request.form.get('idCompetition')
     if not idCompetition:
         flash('ID de compétition manquant.', 'danger')
-        return redirect(request.referrer or url_for('index'))
+        return redirect(request.referrer or url_for('general.index'))
 
     competition = CompetitionBD.query.get_or_404(idCompetition)
     image_a_retirer = ImageAppBD.query.get_or_404(idImage)
@@ -316,10 +334,10 @@ def delete_image_competition(idImage):
     else:
         flash('Cette image n\'était pas associée à cette compétition.', 'warning')
 
-    return redirect(url_for('competition_update', idCompetition=idCompetition))
+    return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
 # Supprime une compétition et toutes ses participations - Réservée aux administrateurs.
-@app.route("/competition_delete/<int:idCompetition>", methods=['POST'])
+@competitions_bp.route("/competition_delete/<int:idCompetition>", methods=['POST'])
 @login_required # Assure que seul un utilisateur connecté peut supprimer
 @admin_required
 def competition_delete(idCompetition):
@@ -335,4 +353,4 @@ def competition_delete(idCompetition):
         db.session.commit()
     except Exception as e:
         db.session.rollback()
-    return redirect(url_for('competitions'))
+    return redirect(url_for('competitions.competitions'))

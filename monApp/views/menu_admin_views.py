@@ -1,8 +1,27 @@
+from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify, abort
+from flask_login import login_required, current_user, logout_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from datetime import datetime, date
+from sqlalchemy import or_
+import shutil
+import os
+
+from monApp.app import app, db
+from monApp.forms import *
+from monApp.models import *
+from monApp.services import *
+from monApp.gestion_erreurs import *
+from config import TITLE, AUJOURDHUI
+
+# Création du Blueprint
+admin_bp = Blueprint('admin', __name__)
+
 #==============================================================#
 #====================   Pages Menu Admin   ====================#
 #==============================================================#
 # Affiche les formulaires de contact non répondus - Réservée aux administrateurs.
-@app.route("/gerer_formulaires/")
+@admin_bp.route("/gerer_formulaires/")
 @login_required
 @admin_required
 def gerer_formulaires():
@@ -29,7 +48,7 @@ def gerer_formulaires():
         mode=mode)
 
 # Affiche le détail d'un formulaire de contact - Réservée aux administrateurs.
-@app.route("/formulaire_view/<int:idFormulaire>")
+@admin_bp.route("/formulaire_view/<int:idFormulaire>")
 @login_required
 @admin_required
 def formulaire_view(idFormulaire):
@@ -37,17 +56,17 @@ def formulaire_view(idFormulaire):
     return render_template("formulaire_view.html",title=TITLE+"- Consultation de Formulaire", selectedFormulaire=unFormulaire)
 
 # Supprime un formulaire de contact - Réservée aux administrateurs.
-@app.route("/formulaire_delete/<int:idFormulaire>", methods=['POST'])
+@admin_bp.route("/formulaire_delete/<int:idFormulaire>", methods=['POST'])
 @login_required
 @admin_required
 def formulaire_delete(idFormulaire):
     formulaire = FormulaireBD.query.get_or_404(idFormulaire)
     db.session.delete(formulaire)
     db.session.commit()
-    return redirect(url_for('gerer_formulaires'))
+    return redirect(url_for('admin.gerer_formulaires'))
 
 # Permet de récupérer le contenue de la réponse
-@app.route("/api/get_reponse/<int:idFormulaire>")
+@admin_bp.route("/api/get_reponse/<int:idFormulaire>")
 @login_required
 def api_get_reponse(idFormulaire):
     """API pour récupérer la réponse d'un formulaire sans recharger la page"""
@@ -61,7 +80,7 @@ def api_get_reponse(idFormulaire):
     })
 
 # Permet à répondre à un formulaire et de le marquer comme traité - Réservée aux administrateurs.
-@app.route("/repondre_formulaire/<int:idFormulaire>", methods=['POST'])
+@admin_bp.route("/repondre_formulaire/<int:idFormulaire>", methods=['POST'])
 @login_required
 @admin_required
 def repondre_formulaire(idFormulaire):
@@ -81,10 +100,10 @@ def repondre_formulaire(idFormulaire):
         )
         db.session.add(notif)
     db.session.commit()
-    return redirect(url_for('gerer_formulaires'))
+    return redirect(url_for('admin.gerer_formulaires'))
 
 # Affiche la liste des membres actifs pour la gestion - Réservée aux administrateurs.
-@app.route("/gerer_profils/")
+@admin_bp.route("/gerer_profils/")
 @login_required
 @admin_required
 def gerer_profils():
@@ -144,7 +163,7 @@ def gerer_profils():
         mode=mode)
 
 # Désactive le compte d'un membre.
-@app.route('/gerer_profils/desinscrire/<int:idM>', methods=["GET", "POST"])
+@admin_bp.route('/gerer_profils/desinscrire/<int:idM>', methods=["GET", "POST"])
 @login_required
 def desinscrireMembre(idM):
     # On récupère le membre ciblé
@@ -162,9 +181,9 @@ def desinscrireMembre(idM):
     if current_user.id == idM and session.get('user_type') != 'admin':
         logout_user()
         flash("Votre compte a été désactivé avec succès.", "success")
-        return redirect(url_for('index'))
+        return redirect(url_for('general.index'))
     else:
-        return redirect(url_for('gerer_profils'))
+        return redirect(url_for('admin.gerer_profils'))
 
 # Réactive le compte d'un ancien membre - Réservée aux administrateurs.
 @app.route ('/gerer_anciens_profils/reinscrire/<int:idM>', methods =("POST" ,))
@@ -175,10 +194,10 @@ def reinscrireMembre(idM):
     membre.activite = True
     membre.statut = "Membre"
     db.session.commit()
-    return redirect(url_for('gerer_profils'))
+    return redirect(url_for('admin.gerer_profils'))
 
 # Page de modification d'un profil, accessible par le membre lui-même ou un admin.
-@app.route("/profil_edit/<int:idM>", methods=["GET", "POST"])
+@admin_bp.route("/profil_edit/<int:idM>", methods=["GET", "POST"])
 @login_required
 def profil_edit(idM):
     unMembre = db.session.get(MembreBD, idM)
@@ -189,7 +208,7 @@ def profil_edit(idM):
         if action == 'admin_save':
             unForm.populate_obj(unMembre)
             db.session.commit()
-            return redirect(url_for('gerer_profils'))
+            return redirect(url_for('admin.gerer_profils'))
         elif action == 'membre_request':
             # 1. On récupère la modification existante ou on en crée une nouvelle
             uneModif = unMembre.modifications.first()
@@ -218,16 +237,16 @@ def profil_edit(idM):
                         lue=False,
                         timestamp=datetime.now(),
                         idAdmin=admin.id,
-                        link=url_for('gerer_profils', _external=True)
+                        link=url_for('admin.gerer_profils', _external=True)
                     )
                     db.session.add(notif)
             
             db.session.commit()
-            return redirect(url_for('profil_view', idM=idM, origine='profil'))   
+            return redirect(url_for('profil.profil_view', idM=idM, origine='profil'))   
     return render_template("profil_edit.html", updateForm=unForm, selectedMembre=unMembre, title=TITLE+"- Édition Profil")
 
 # Affiche les demandes d'inscription et de modification de profil - Réservée aux administrateurs.
-@app.route("/gerer_inscriptions/")
+@admin_bp.route("/gerer_inscriptions/")
 @login_required
 @admin_required
 def gerer_inscriptions():
@@ -276,7 +295,7 @@ def accepter_inscription(idI):
     db.session.add(nouveauMembre)
     db.session.delete(inscription)
     db.session.commit()
-    return redirect(url_for('gerer_inscriptions'))
+    return redirect(url_for('admin.gerer_inscriptions'))
 
 # Accepte une demande de modification de profil - Réservée aux administrateurs.
 @app.route ('/accepter_modifications/<int:idModif>', methods =("POST" ,))
@@ -294,10 +313,10 @@ def accepter_modifications(idModif):
         membre_a_modifier.numTel = modifications.numTel
         db.session.delete(modifications)
         db.session.commit()
-    return redirect(url_for('gerer_inscriptions'))
+    return redirect(url_for('admin.gerer_inscriptions'))
 
 # Refuse et supprime une demande d'inscription - Réservée aux administrateurs.
-@app.route('/refuser_inscription/<int:idI>', methods=["POST"])
+@admin_bp.route('/refuser_inscription/<int:idI>', methods=["POST"])
 @login_required
 @admin_required
 def refuser_inscription(idI):
@@ -306,10 +325,10 @@ def refuser_inscription(idI):
     inscription_a_supprimer = db.session.get(InscriptionBD, idI)
     db.session.delete(inscription_a_supprimer)
     db.session.commit()
-    return redirect(url_for('gerer_inscriptions'))
+    return redirect(url_for('admin.gerer_inscriptions'))
 
 # Refuse et supprime une demande de modification - Réservée aux administrateurs.
-@app.route('/refuser_modification/<int:idM>', methods=["POST"])
+@admin_bp.route('/refuser_modification/<int:idM>', methods=["POST"])
 @login_required
 @admin_required
 def refuser_modification(idM):
@@ -318,9 +337,9 @@ def refuser_modification(idM):
     modification_a_supprimer = db.session.get(ModifBD, idM)
     db.session.delete(modification_a_supprimer)
     db.session.commit()
-    return redirect(url_for('gerer_inscriptions'))
+    return redirect(url_for('admin.gerer_inscriptions'))
 
-@app.route("/admin/gestion_tarifs/", methods=["GET", "POST"])
+@admin_bp.route("/admin/gestion_tarifs/", methods=["GET", "POST"])
 @login_required
 @admin_required
 def gestion_tarifs():
@@ -335,13 +354,13 @@ def gestion_tarifs():
         try:
             db.session.add(nouveau_tarif)
             db.session.commit()
-            return redirect(url_for('gestion_tarifs'))
+            return redirect(url_for('admin.gestion_tarifs'))
         except Exception as e:
             db.session.rollback()
     les_tarifs = TarifBD.query.order_by(TarifBD.categorie, TarifBD.prix).all()
     return render_template("admin_gestion_tarifs.html", title="Gestion Tarifs", form=form, tarifs=les_tarifs)
 
-@app.route("/admin/delete_tarif/<int:idT>", methods=["POST"])
+@admin_bp.route("/admin/delete_tarif/<int:idT>", methods=["POST"])
 @login_required
 @admin_required
 def delete_tarif(idT):
@@ -351,9 +370,9 @@ def delete_tarif(idT):
         db.session.commit()
     except Exception as e:
         db.session.rollback()
-    return redirect(url_for('gestion_tarifs'))
+    return redirect(url_for('admin.gestion_tarifs'))
 
-@app.route("/admin/edit_tarif/<int:idT>", methods=["GET", "POST"])
+@admin_bp.route("/admin/edit_tarif/<int:idT>", methods=["GET", "POST"])
 @login_required
 @admin_required
 def edit_tarif(idT):
@@ -362,11 +381,11 @@ def edit_tarif(idT):
     if form.validate_on_submit():
         form.populate_obj(tarif)
         db.session.commit()
-        return redirect(url_for('gestion_tarifs'))
+        return redirect(url_for('admin.gestion_tarifs'))
     return render_template("admin_edit_tarif.html", title="Modifier Tarif", form=form)
 
 
-@app.route("/admin/gestion_horaires/", methods=["GET", "POST"])
+@admin_bp.route("/admin/gestion_horaires/", methods=["GET", "POST"])
 @login_required
 @admin_required
 def gestion_horaires():
@@ -382,7 +401,7 @@ def gestion_horaires():
         try:
             db.session.add(nouveau_horaire)
             db.session.commit()
-            return redirect(url_for('gestion_horaires'))
+            return redirect(url_for('admin.gestion_horaires'))
         except Exception as e:
             db.session.rollback()
     les_horaires = HoraireBD.query.all()
@@ -390,7 +409,7 @@ def gestion_horaires():
     les_horaires.sort(key=lambda x: ordre_jours.get(x.jour, 8))
     return render_template("admin_gestion_horaires.html", title="Gestion Horaires", form=form, horaires=les_horaires)
 
-@app.route("/admin/delete_horaire/<int:idH>", methods=["POST"])
+@admin_bp.route("/admin/delete_horaire/<int:idH>", methods=["POST"])
 @login_required
 @admin_required
 def delete_horaire(idH):
@@ -400,9 +419,9 @@ def delete_horaire(idH):
         db.session.commit()
     except Exception as e:
         db.session.rollback()
-    return redirect(url_for('gestion_horaires'))
+    return redirect(url_for('admin.gestion_horaires'))
 
-@app.route("/admin/edit_horaire/<int:idH>", methods=["GET", "POST"])
+@admin_bp.route("/admin/edit_horaire/<int:idH>", methods=["GET", "POST"])
 @login_required
 @admin_required
 def edit_horaire(idH):
@@ -411,5 +430,5 @@ def edit_horaire(idH):
     if form.validate_on_submit():
         form.populate_obj(horaire)
         db.session.commit()
-        return redirect(url_for('gestion_horaires'))
+        return redirect(url_for('admin.gestion_horaires'))
     return render_template("admin_edit_horaire.html", title="Modifier Horaire", form=form)

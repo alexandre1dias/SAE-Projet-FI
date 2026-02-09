@@ -1,15 +1,34 @@
+from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify, abort
+from flask_login import login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from datetime import datetime, date
+from sqlalchemy import or_
+import shutil
+import os
+
+from monApp.app import app, db
+from monApp.forms import *
+from monApp.models import *
+from monApp.services import *
+from monApp.gestion_erreurs import *
+from config import TITLE, AUJOURDHUI
+
+# Création du Blueprint
+parametres_bp = Blueprint('parametres', __name__)
+
 #==============================================================#
 #====================   Pages Paramètres   ====================#
 #==============================================================#
 # Affiche la page des paramètres du compte (vue générale).
-@app.route('/parametres/')
+@parametres_bp.route('/parametres/')
 def parametres():
     form = ParametresForm()
     return render_template("parametres.html",
                          title=TITLE+"- Paramètres du Membre",
                          form=form)
 
-@app.route("/parametres_notifs/", methods=["GET", "POST"])
+@parametres_bp.route("/parametres_notifs/", methods=["GET", "POST"])
 @login_required
 def parametres_notifs():
     """
@@ -44,11 +63,11 @@ def parametres_notifs():
             current_user.demandeInscriptionMail = 'signup_req_mail' in request.form
 
         db.session.commit()
-        return redirect(url_for('parametres_notifs'))
+        return redirect(url_for('parametres.parametres_notifs'))
     return render_template("parametres_notifs.html", title=TITLE+"- Paramètres notifications", parametres=current_user)
 
 # Permet à l'utilisateur connecté de changer son mot de passe.
-@app.route("/changer_mdp/", methods=['GET', 'POST'])
+@parametres_bp.route("/changer_mdp/", methods=['GET', 'POST'])
 @login_required
 def changer_mdp():
     form = MdpChangeForm()
@@ -56,18 +75,18 @@ def changer_mdp():
         # verifie ancien mot de passe
         if not check_password_hash(current_user.mdp_hash, form.old_password.data):
             flash("L'ancien mot de passe est incorrect.", 'danger')
-            return redirect(url_for('changer_mdp'))
+            return redirect(url_for('parametres.changer_mdp'))
         # verifie correspondance
         if form.new_password.data != form.confirm_new_password.data:
             flash("Les nouveaux mots de passe ne correspondent pas.", 'danger')
-            return redirect(url_for('changer_mdp'))
+            return redirect(url_for('parametres.changer_mdp'))
         # verifie si mdp fort
         if not est_mot_de_passe_fort(form.new_password.data):
             flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
-            return redirect(url_for('changer_mdp'))
+            return redirect(url_for('parametres.changer_mdp'))
         # maj le mdp
         current_user.mdp_hash = generate_password_hash(form.new_password.data, method='pbkdf2:sha256')
         db.session.commit()
         flash("Votre mot de passe a été mis à jour avec succès.", 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('general.index'))
     return render_template("changer_mdp.html", form=form, title=TITLE+"- Changer mot de passe")

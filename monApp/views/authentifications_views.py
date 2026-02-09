@@ -1,12 +1,26 @@
+from flask import Blueprint, render_template, request, url_for, redirect, session, flash
+from flask_login import logout_user, login_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import SignatureExpired
+from datetime import datetime
+from monApp.app import app, db
+from monApp.forms import LoginForm, InscriptionForm, MdpOublieForm, ResetPasswordForm
+from monApp.models import MembreBD, AdminBD, InscriptionBD, NotifsBD
+from monApp.services import est_mot_de_passe_fort, get_user_by_email, s, simuler_envoi_email
+from config import TITLE
+
+# Création du Blueprint
+auth_bp = Blueprint('auth', __name__)
+
 #=============================================================#
 #====================   Pages Connexion   ====================#
 #=============================================================#
 # Gère la connexion des membres et des administrateurs.
-@app.route ("/login/", methods =("GET","POST"))
+@auth_bp.route("/login/", methods=("GET","POST"))
 def login():
     # Si l'utilisateur est déjà connecté, on le redirige vers l'accueil
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('general.index'))
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -21,16 +35,16 @@ def login():
 
         # 3. Vérifier si un utilisateur a été trouvé
         if utilisateur is None:
-            return redirect(url_for('login', message = "emailIncorrect"))
+            return redirect(url_for('auth.login', message = "emailIncorrect"))
 
         # 4. Vérifier si le mot de passe est correct
         # La vérification du mot de passe est une comparaison directe
         if not check_password_hash(utilisateur.mdp_hash, form.password.data):
-            return redirect(url_for('login', message = "mdpIncorrect"))
+            return redirect(url_for('auth.login', message = "mdpIncorrect"))
 
         # 5. Vérifier si le compte membre est actif
         if not est_admin and not utilisateur.activite:
-            return redirect(url_for('login', message = "desincrit"))
+            return redirect(url_for('auth.login', message = "desincrit"))
 
         # Connexion de l'utilisateur
         login_user(utilisateur)
@@ -39,13 +53,13 @@ def login():
         # Redirection vers la page demandée ou l'accueil
         next_page = request.args.get('next')
         if check_password_hash(utilisateur.mdp_hash, form.password.data):
-            return redirect(next_page) if next_page else redirect(url_for('index'))
+            return redirect(next_page) if next_page else redirect(url_for('general.index'))
 
     message = request.args.get('message')
     return render_template("login.html", title=TITLE + "- Connexion", form=form, message=message)
 
 # Gère l'inscription de nouveaux utilisateurs (demande ou création directe par admin).
-@app.route("/inscription/", methods=["GET", "POST"])
+@auth_bp.route("/inscription/", methods=["GET", "POST"])
 def inscription():
     unForm = InscriptionForm()
     if unForm.validate_on_submit():
@@ -89,7 +103,7 @@ def inscription():
                 )
                 db.session.add(nouveauMembre)
                 db.session.commit()
-                return redirect(url_for('gerer_profils'))
+                return redirect(url_for('admin.gerer_profils'))
             else:
                 nouvelle_inscription = InscriptionBD(
                     email=unForm.Login.data,
@@ -118,13 +132,13 @@ def inscription():
                             sourceN=f"Inscription : {unForm.Login.data}",
                             lue=False,
                             timestamp=datetime.now(),
-                            link=url_for('gerer_inscriptions', type='inscription'),
+                            link=url_for('admin.gerer_inscriptions', type='inscription'),
                             idAdmin=admin.id
                         )
                         db.session.add(notif)
                 db.session.commit()
 
-                return redirect(url_for('index'))
+                return redirect(url_for('general.index'))
         except Exception as e:
             db.session.rollback()
             print(f"ERREUR INSCRIPTION : {e}")
@@ -135,7 +149,7 @@ def inscription():
                                    message_erreur=f"Erreur technique : {str(e)}")
     return render_template("inscription.html",title=TITLE+"- Inscriptions", form=unForm)
 
-@app.route("/mdp_oublier/", methods=["GET", "POST"])
+@auth_bp.route("/mdp_oublier/", methods=["GET", "POST"])
 def mdp_oublier():
     form = MdpOublieForm()
     if form.validate_on_submit():
@@ -144,23 +158,23 @@ def mdp_oublier():
 
         if user:
             token = s.dumps(email, salt='email-recover')
-            link = url_for('reset_with_token', token=token, _external=True)
+            link = url_for('auth.reset_with_token', token=token, _external=True)
 
             # Simulation d'envoi
             simuler_envoi_email(email, link)
 
         flash("Si cet email correspond à un compte, un lien de réinitialisation vous a été envoyé.", "info")
-        return redirect(url_for('login'))
+        return redirect(url_for('auth.login'))
     return render_template("mdp_oublier.html", title=TITLE + "- Mot de passe oublié", form=form)
 
-@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+@auth_bp.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_with_token(token):
     try:
-        # Cette ligne décode le token , récupère l’email qui y était stocké et vérifie que le token n’a pas été modifié / il a été généré avec le bon salt
+        # Cette ligne décode le token , récupère l'email qui y était stocké et vérifie que le token n'a pas été modifié / il a été généré avec le bon salt
         email = s.loads(token, salt='email-recover', max_age=3600) # 1 heure d'expiration
     except (SignatureExpired, Exception):
         flash("Le lien de réinitialisation est invalide ou a expiré.", "danger")
-        return redirect(url_for('mdp_oublier'))
+        return redirect(url_for('auth.mdp_oublier'))
 
     form = ResetPasswordForm()
     if form.validate_on_submit():
@@ -173,16 +187,16 @@ def reset_with_token(token):
             user.mdp_hash = generate_password_hash(form.password.data, method='pbkdf2:sha256')
             db.session.commit()
             flash("Votre mot de passe a été mis à jour avec succès.", "success")
-            return redirect(url_for('login'))
+            return redirect(url_for('auth.login'))
         else:
             flash("Utilisateur introuvable.", "danger")
-            return redirect(url_for('login'))
+            return redirect(url_for('auth.login'))
 
     return render_template('reset_password.html', form=form, title="Réinitialisation mot de passe")
 
 # Déconnecte l'utilisateur.
-@app.route("/logout/")
+@auth_bp.route("/logout/")
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('general.index'))

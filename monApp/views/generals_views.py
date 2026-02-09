@@ -1,16 +1,23 @@
+from flask import Blueprint, render_template, request, url_for, redirect, session, flash
+from flask_login import current_user
+from datetime import datetime, date
 
+from monApp.app import app, db
+from monApp.forms import ContactForm
+from monApp.models import (PresseBD, InformationBD, CompetitionBD, MembreBD, 
+                            AdminBD, FormulaireBD, RemplirBD, NotifsBD, 
+                            HoraireBD, TarifBD)
+from config import TITLE
 
-
-
-
-
+# Création du Blueprint
+general_bp = Blueprint('general', __name__)
 
 #==========================================================#
 #====================   Page Accueil   ====================#
 #==========================================================#
 # Affiche la page d'accueil avec les dernières actualités.
-@app.route("/")
-@app.route("/index/")
+@general_bp.route("/")
+@general_bp.route("/index/")
 def index():
     les_derniers_articles = PresseBD.query.order_by(PresseBD.dateP.desc()).limit(3).all()
     les_dernieres_informations = InformationBD.query.order_by(InformationBD.dateIN.desc()).limit(3).all()
@@ -21,12 +28,12 @@ def index():
 #====================   Pages Renseignements   ====================#
 #==================================================================#
 # Affiche la page avec l'adresse du club.
-@app.route("/adresse/")
+@general_bp.route("/adresse/")
 def adresse():
     return render_template("adresse.html",title=TITLE+"- Adresse")
 
 # Affiche la page des horaires d'entraînement.
-@app.route("/horaires/")
+@general_bp.route("/horaires/")
 def horaires():
     les_horaires = HoraireBD.query.all()
     ordre_jours = {
@@ -42,13 +49,13 @@ def horaires():
     return render_template("horaire.html", title=TITLE+"- Horaires", horaires=les_horaires)
 
 # Affiche la page avec les informations sur l'adhésion.
-@app.route("/adhesions/")
+@general_bp.route("/adhesions/")
 def adhesions():
     tarifs_adhesion = TarifBD.query.filter_by(categorie='Adhesion').all()
     return render_template("adhesion.html", title=TITLE+"- Adhésions", tarifs=tarifs_adhesion)
 
 # Affiche la page d'information sur le matériel et la location.
-@app.route("/materiel/")
+@general_bp.route("/materiel/")
 def materiel():
     tarifs_materiel = TarifBD.query.filter_by(categorie='Materiel').all()
     return render_template("materiel.html", title=TITLE+"- Matériel et tenues", tarifs=tarifs_materiel)
@@ -57,7 +64,7 @@ def materiel():
 #====================   Pages Escrim feminin   ====================#
 #==================================================================#
 # Affiche la page dédiée à l'escrime féminine.
-@app.route("/escrime-feminin/")
+@general_bp.route("/escrime-feminin/")
 def escrime_feminin():
     return render_template("escrime_feminin.html",title=TITLE+"- L'escrime Féminin")
 
@@ -66,7 +73,7 @@ def escrime_feminin():
 #====================   Page Contact   ====================#
 #==========================================================#
 # Affiche le formulaire de contact et traite sa soumission.
-@app.route("/contact/", methods=("GET", "POST",))
+@general_bp.route("/contact/", methods=("GET", "POST",))
 def contact():
     # Récupérer l'unique administrateur
     admin = AdminBD.query.first()
@@ -113,12 +120,12 @@ def contact():
                     lue=False,
                     timestamp=datetime.now(),
                     idAdmin=admin.id,
-                    link=url_for('gerer_formulaires', _external=True)
+                    link=url_for('admin.gerer_formulaires', _external=True)
                 )
                 db.session.add(notif)
         db.session.commit()
         flash('Votre message a bien été envoyé.', 'success')
-        return redirect(url_for('contact'))
+        return redirect(url_for('general.contact'))
     # On passe les préférences mail au template
     return render_template("contact.html", 
                            form=form, 

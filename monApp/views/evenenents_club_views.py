@@ -1,7 +1,26 @@
+from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify, abort
+from flask_login import login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from datetime import datetime, date
+from sqlalchemy import or_
+import shutil
+import os
+
+from monApp.app import app, db
+from monApp.forms import *
+from monApp.models import *
+from monApp.services import *
+from monApp.gestion_erreurs import *
+from config import TITLE, AUJOURDHUI
+
+# Création du Blueprint
+events_club_bp = Blueprint('events_club', __name__)
+
 #====================   Pages Evenement du club   ====================#
 # Affiche la liste des événements du club.
-@app.route("/evenement_club/")
-@app.route("/evenement_club/<string:etat>")
+@events_club_bp.route("/evenement_club/")
+@events_club_bp.route("/evenement_club/<string:etat>")
 @login_required
 def evenement_club(etat="prochaine"):
     passee = (etat == "passees")
@@ -28,7 +47,7 @@ def evenement_club(etat="prochaine"):
                            passee=passee)
 
 # Affiche les détails d'un événement de club spécifique.
-@app.route("/evenement_club/<int:idEventClub>/club_view/")
+@events_club_bp.route("/evenement_club/<int:idEventClub>/club_view/")
 @login_required
 def club_view(idEventClub):
     unEventClub = EventClubBD.query.get(idEventClub)
@@ -41,7 +60,7 @@ def club_view(idEventClub):
     return render_template("club_view.html",title=TITLE+"- un évenement du club",selectedEventClub=unEventClub, deja_inscrit=deja_inscrit, origine=origine)
 
 # Page de modification d'un événement de club - Réservée aux administrateurs.
-@app.route("/evenement_club/<int:idEventClub>/club_update/", methods=['GET', 'POST'])
+@events_club_bp.route("/evenement_club/<int:idEventClub>/club_update/", methods=['GET', 'POST'])
 @login_required
 @admin_required
 def club_update(idEventClub):
@@ -57,7 +76,7 @@ def club_update(idEventClub):
             unEventClub.dateFinEV = datetime.strptime(request.form['date_fin'], '%Y-%m-%d').date()
             unEventClub.heureFinEV = request.form['heure_fin']
             db.session.commit()
-            return redirect(url_for('club_view', idEventClub=unEventClub.idEventClub))
+            return redirect(url_for('events_club.club_view', idEventClub=unEventClub.idEventClub))
         except Exception as e:
             db.session.rollback()
     participations = ParticiperBD.query.filter_by(id_event=unEventClub.id_event).all()
@@ -66,7 +85,7 @@ def club_update(idEventClub):
     return render_template("club_update.html",title=TITLE+"- Modification d'un évenement du club", eventClub=unEventClub, participants=participants)
 
 # Page pour sélectionner les membres à inscrire à un événement de club - Réservée aux administrateurs.
-@app.route("/evenement_club/<int:idEventClub>/inscrire_membres", methods=['GET'])
+@events_club_bp.route("/evenement_club/<int:idEventClub>/inscrire_membres", methods=['GET'])
 @login_required
 @admin_required
 def inscrire_membres_event_club(idEventClub):
@@ -84,7 +103,7 @@ def inscrire_membres_event_club(idEventClub):
     return render_template("club_inscrire_membre.html", title=TITLE+"- Inscrire des membres", eventClub=event_club, non_participants=non_participants, membres_a_inscrire_ids=membres_a_inscrire_ids)
 
 # Traite l'inscription de plusieurs membres à un événement de club - Réservée aux administrateurs.
-@app.route("/evenement_club/<int:idEventClub>/inscription_membres", methods=['POST'])
+@events_club_bp.route("/evenement_club/<int:idEventClub>/inscription_membres", methods=['POST'])
 @login_required
 @admin_required
 def inscription_membres_event_club(idEventClub):
@@ -96,10 +115,10 @@ def inscription_membres_event_club(idEventClub):
             nouvelle_participation = ParticiperBD(id_membre=membre_id, id_event=event_club.id_event)
             db.session.add(nouvelle_participation)
     db.session.commit()
-    return redirect(url_for('club_update', idEventClub=idEventClub))
+    return redirect(url_for('events_club.club_update', idEventClub=idEventClub))
 
 # Supprime la participation d'un membre à un événement de club - Réservée aux administrateurs.
-@app.route("/evenement_club/<int:idEventClub>/delete/<int:idM>", methods=['POST'])
+@events_club_bp.route("/evenement_club/<int:idEventClub>/delete/<int:idM>", methods=['POST'])
 @login_required
 @admin_required
 def delete_membre_eventClub(idEventClub, idM):
@@ -110,20 +129,20 @@ def delete_membre_eventClub(idEventClub, idM):
         db.session.commit()
     except Exception as e:
         db.session.rollback()
-    return redirect(url_for('club_update', idEventClub=idEventClub))
+    return redirect(url_for('events_club.club_update', idEventClub=idEventClub))
 
 # Supprime un événement de club - Réservée aux administrateurs.
-@app.route("/evenement_club/<int:idEventClub>/club_delete/", methods=['POST'])
+@events_club_bp.route("/evenement_club/<int:idEventClub>/club_delete/", methods=['POST'])
 @login_required
 @admin_required
 def club_delete(idEventClub):
     evenement_a_supprimer = EventClubBD.query.get_or_404(idEventClub)
     db.session.delete(evenement_a_supprimer)
     db.session.commit()
-    return redirect(url_for('evenement_club'))
+    return redirect(url_for('events_club.evenement_club'))
 
 # Permet à un membre de s'inscrire à un événement de club.
-@app.route("/inscrire/club/<int:idEventClub>", methods=['GET'])
+@events_club_bp.route("/inscrire/club/<int:idEventClub>", methods=['GET'])
 @login_required
 @membre_required
 def inscrire_club(idEventClub):
@@ -140,10 +159,10 @@ def inscrire_club(idEventClub):
         db.session.commit()
     except Exception as e:
         db.session.rollback()
-    return redirect(url_for('club_view', idEventClub=idEventClub))
+    return redirect(url_for('events_club.club_view', idEventClub=idEventClub))
 
 # Permet à un membre de se désinscrire d'un événement de club.
-@app.route("/desinscrire/club/<int:idEventClub>", methods=['GET'])
+@events_club_bp.route("/desinscrire/club/<int:idEventClub>", methods=['GET'])
 @login_required
 @membre_required
 def desinscrire_club(idEventClub):
@@ -152,9 +171,9 @@ def desinscrire_club(idEventClub):
     if participation:
         db.session.delete(participation)
         db.session.commit()
-    return redirect(url_for('club_view', idEventClub=idEventClub))
+    return redirect(url_for('events_club.club_view', idEventClub=idEventClub))
 
-@app.route('/club/add_image/<int:idEventClub>', methods=['POST'])
+@events_club_bp.route('/club/add_image/<int:idEventClub>', methods=['POST'])
 @login_required
 @admin_required
 def add_image_club(idEventClub):
@@ -163,7 +182,7 @@ def add_image_club(idEventClub):
 
     if 'image' not in request.files:
         flash('Aucun fichier sélectionné.', 'danger')
-        return redirect(url_for('club_update', idEventClub=idEventClub))
+        return redirect(url_for('events_club.club_update', idEventClub=idEventClub))
 
     file = request.files['image']
     alt_text = request.form.get('alt', 'Image pour l\'événement ' + event_club.NomEV)
@@ -171,7 +190,7 @@ def add_image_club(idEventClub):
 
     if file.filename == '':
         flash('Aucun fichier image sélectionné.', 'warning')
-        return redirect(url_for('club_update', idEventClub=idEventClub))
+        return redirect(url_for('events_club.club_update', idEventClub=idEventClub))
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
@@ -198,10 +217,10 @@ def add_image_club(idEventClub):
     else:
         flash('Type de fichier non autorisé.', 'danger')
 
-    return redirect(url_for('club_update', idEventClub=idEventClub))
+    return redirect(url_for('events_club.club_update', idEventClub=idEventClub))
 
 
-@app.route('/club/delete_image/<int:idImage>', methods=['POST'])
+@events_club_bp.route('/club/delete_image/<int:idImage>', methods=['POST'])
 @login_required
 @admin_required
 def delete_image_club(idImage):
@@ -209,7 +228,7 @@ def delete_image_club(idImage):
     idEventClub = request.form.get('idEventClub')
     if not idEventClub:
         flash("ID de l'événement manquant.", "danger")
-        return redirect(url_for('index'))
+        return redirect(url_for('general.index'))
 
     image_to_delete = ImageAppBD.query.get_or_404(idImage)
     event_club = EventClubBD.query.get_or_404(idEventClub)
@@ -240,4 +259,4 @@ def delete_image_club(idImage):
     else:
         flash("Cette image n'était pas associée à cet événement.", "warning")
 
-    return redirect(url_for('club_update', idEventClub=idEventClub))
+    return redirect(url_for('events_club.club_update', idEventClub=idEventClub))

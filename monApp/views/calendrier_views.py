@@ -1,12 +1,30 @@
+from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify, abort
+from flask_login import login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from datetime import datetime, date
+from sqlalchemy import or_
+import shutil
+import os
+from monApp.app import app, db
+from monApp.forms import *
+from monApp.models import *
+from monApp.services import *
+from monApp.gestion_erreurs import *
+from config import TITLE, AUJOURDHUI
+
+# Création du Blueprint
+calendrier_bp = Blueprint('calendrier', __name__)
+
 #====================   Pages Calendrier   ====================#
 # Affiche le calendrier interactif des événements.
-@app.route("/calendrier/")
+@calendrier_bp.route("/calendrier/")
 def calendrier():
     filtre = FiltreForm(request.args if request.args else None)
     return render_template("calendrier.html", title=TITLE+"- Calendrier", filtre=filtre)
 
 # API pour fournir les données des événements au calendrier FullCalendar.
-@app.route('/api/events')
+@calendrier_bp.route('/api/events')
 def get_events():
     sexes = request.args.getlist('sexe')
     niveaux = request.args.getlist('niveau')
@@ -37,7 +55,7 @@ def get_events():
                 'end': f"{event.date_fin.isoformat()}T{event.heure_fin}",
                 'color': '#007bff',
                 'extendedProps': {
-                    'url': url_for('competition_view', idCompetition=event.id, origine='calendrier'),
+                    'url': url_for('competitions.competition_view', idCompetition=event.id, origine='calendrier'),
                     'type': 'Compétition',
                     'description': event.description,
                     'niveaux': event.niveaux,
@@ -70,7 +88,7 @@ def get_events():
                     'end': f"{event.dateFinRE.isoformat()}T{event.heureFinRE}" if event.dateFinRE and event.heureFinRE else None,
                     'color': '#ffc107',
                     'extendedProps': {
-                        'url': url_for('reunion_view', idReunion=event.id, origine='calendrier'),
+                        'url': url_for('reunions.reunion_view', idReunion=event.id, origine='calendrier'),
                         'type': 'Réunion',
                         'description': event.rapportRE
                     }
@@ -88,7 +106,7 @@ def get_events():
                     'end': f"{event.dateFinEV.isoformat()}T{event.heureFinEV}",
                     'color': '#28a745',
                     'extendedProps': {
-                        'url': url_for('club_view', idEventClub=event.idEventClub, origine='calendrier'),
+                        'url': url_for('events_club.club_view', idEventClub=event.idEventClub, origine='calendrier'),
                         'type': 'Événement du Club',
                         'description': event.descriptionEV,
                         'niveaux': event.niveauxEV
@@ -116,7 +134,7 @@ def get_events():
     return jsonify(all_events)
 
 # Page pour ajouter un nouvel événement - Réservée aux administrateurs.
-@app.route("/add_event/", methods=["GET", "POST"])
+@calendrier_bp.route("/add_event/", methods=["GET", "POST"])
 @login_required
 @admin_required
 def add_event():
@@ -194,7 +212,7 @@ def add_event():
                 )
             db.session.add(new_specific_event)
             db.session.commit()
-            return redirect(url_for('calendrier'))
+            return redirect(url_for('calendrier.calendrier'))
         except Exception as e:
             db.session.rollback()
     return render_template("add_event.html", title=TITLE + "- Ajouter un événement", form=form)

@@ -1,8 +1,26 @@
+from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify, abort
+from flask_login import login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from datetime import datetime, date
+from sqlalchemy import or_
+import shutil
+import os
+from monApp.app import app, db
+from monApp.forms import *
+from monApp.models import *
+from monApp.services import *
+from monApp.gestion_erreurs import *
+from config import TITLE, AUJOURDHUI
+
+# Création du Blueprint
+articles_bp = Blueprint('articles', __name__)
+
 #==============================================================#
 #====================   Pages Actualités   ====================#
 #==============================================================#
 # Affiche la page listant toutes les informations.
-@app.route("/informations/")
+@articles_bp.route("/informations/")
 def informations():
     filtre = FiltreForm(request.args)
 
@@ -50,7 +68,7 @@ def informations():
                            pagination=pagination,
                            filtre=filtre)
 
-@app.route("/admin/add_information/", methods=["GET", "POST"])
+@articles_bp.route("/admin/add_information/", methods=["GET", "POST"])
 @login_required
 @admin_required
 def add_information():
@@ -66,12 +84,12 @@ def add_information():
         try:
             db.session.add(nouvelle_info)
             db.session.commit()
-            return redirect(url_for('informations'))
+            return redirect(url_for('articles.informations'))
         except Exception as e:
             db.session.rollback()
     return render_template("admin_form_information.html", title="Ajouter une information", form=form)
 
-@app.route("/admin/edit_information/<int:idI>", methods=["GET", "POST"])
+@articles_bp.route("/admin/edit_information/<int:idI>", methods=["GET", "POST"])
 @login_required
 @admin_required
 def edit_information(idI):
@@ -85,12 +103,12 @@ def edit_information(idI):
         info.contenuIN = form.contenu.data
         try:
             db.session.commit()
-            return redirect(url_for('informations'))
+            return redirect(url_for('articles.informations'))
         except Exception as e:
             db.session.rollback()
     return render_template("admin_form_information.html", title="Modifier une information", form=form)
 
-@app.route("/admin/delete_information/<int:idI>", methods=["POST"])
+@articles_bp.route("/admin/delete_information/<int:idI>", methods=["POST"])
 @login_required
 @admin_required
 def delete_information(idI):
@@ -100,11 +118,11 @@ def delete_information(idI):
         db.session.commit()
     except Exception as e:
         db.session.rollback()
-    return redirect(url_for('informations'))
+    return redirect(url_for('articles.informations'))
 
 
 # Affiche la page listant tous les articles de presse.
-@app.route("/presse/")
+@articles_bp.route("/presse/")
 def presse():
     page = request.args.get('page', 1, type=int)
     filtre = FiltreForm(request.args)
@@ -149,7 +167,7 @@ def presse():
                            articles=pagination.items,
                            filtre=filtre)
 
-@app.route("/admin/add_presse/", methods=["GET", "POST"])
+@articles_bp.route("/admin/add_presse/", methods=["GET", "POST"])
 @login_required
 @admin_required
 def add_presse():
@@ -173,10 +191,10 @@ def add_presse():
             file.save(os.path.join(dossier_presse, filename))
             nouveau_presse.imageP = filename
             db.session.commit()
-        return redirect(url_for('presse'))
+        return redirect(url_for('articles.presse'))
     return render_template("admin_form_presse.html", title="Ajouter un article de presse", form=form)
 
-@app.route("/admin/edit_presse/<int:idP>", methods=["GET", "POST"])
+@articles_bp.route("/admin/edit_presse/<int:idP>", methods=["GET", "POST"])
 @login_required
 @admin_required
 def edit_presse(idP):
@@ -202,10 +220,10 @@ def edit_presse(idP):
             file.save(os.path.join(dossier_presse, filename))
             article_presse.imageP = filename
         db.session.commit()
-        return redirect(url_for('presse'))
+        return redirect(url_for('articles.presse'))
     return render_template("admin_form_presse.html", title="Modifier l'article de presse", form=form)
 
-@app.route("/admin/delete_presse/<int:idP>", methods=["POST"])
+@articles_bp.route("/admin/delete_presse/<int:idP>", methods=["POST"])
 @login_required
 @admin_required
 def delete_presse(idP):
@@ -218,9 +236,9 @@ def delete_presse(idP):
         db.session.commit()
     except Exception as e:
         db.session.rollback()
-    return redirect(url_for('presse'))
+    return redirect(url_for('articles.presse'))
 
-@app.route("/articles/")
+@articles_bp.route("/articles/")
 def articles():
     page = request.args.get('page', 1, type=int)
     filtre = FiltreForm(request.args)
@@ -266,12 +284,12 @@ def articles():
                            articles=pagination,
                            filtre=filtre)
 
-@app.route("/article/<int:idA>")
+@articles_bp.route("/article/<int:idA>")
 def article_detail(idA):
     article = ArticleBD.query.get_or_404(idA)
     return render_template("article_detail.html", title=article.titre, article=article)
 
-@app.route("/admin/add_article/", methods=["GET", "POST"])
+@articles_bp.route("/admin/add_article/", methods=["GET", "POST"])
 @login_required
 @admin_required
 def add_article():
@@ -299,10 +317,10 @@ def add_article():
                     nouvelle_image = ImageArticleBD(nom=filename, id_article=nouveau_article.id)
                     db.session.add(nouvelle_image)
             db.session.commit()
-        return redirect(url_for('articles'))
+        return redirect(url_for('articles.articles'))
     return render_template("admin_form_article.html", title="Rédiger un article", form=form)
 
-@app.route("/admin/edit_article/<int:idA>", methods=["GET", "POST"])
+@articles_bp.route("/admin/edit_article/<int:idA>", methods=["GET", "POST"])
 @login_required
 @admin_required
 def edit_article(idA):
@@ -323,10 +341,10 @@ def edit_article(idA):
                     nouvelle_image = ImageArticleBD(nom=filename, id_article=article.id)
                     db.session.add(nouvelle_image)
         db.session.commit()
-        return redirect(url_for('articles'))
+        return redirect(url_for('articles.articles'))
     return render_template("admin_form_article.html", title="Modifier un article", form=form, article=article)
 
-@app.route("/admin/delete_article/<int:idA>", methods=["POST"])
+@articles_bp.route("/admin/delete_article/<int:idA>", methods=["POST"])
 @login_required
 @admin_required
 def delete_article(idA):
@@ -341,9 +359,9 @@ def delete_article(idA):
         db.session.commit()
     except Exception as e:
         db.session.rollback()
-    return redirect(url_for('articles'))
+    return redirect(url_for('articles.articles'))
 
-@app.route("/admin/delete_image_article/<int:idImg>", methods=["POST"])
+@articles_bp.route("/admin/delete_image_article/<int:idImg>", methods=["POST"])
 @login_required
 @admin_required
 def delete_image_article(idImg):
@@ -358,9 +376,9 @@ def delete_image_article(idImg):
         pass
     db.session.delete(image)
     db.session.commit()
-    return redirect(url_for('edit_article', idA=article_id))
+    return redirect(url_for('articles.edit_article', idA=article_id))
 
-@app.route("/ffescrime/", methods=["GET", "POST"])
+@articles_bp.route("/ffescrime/", methods=["GET", "POST"])
 def ffescrime():
     return render_template("ffescrime.html", title=TITLE+"- FFEscrime")
 
@@ -368,12 +386,12 @@ def ffescrime():
 #====================   Pages A propos   ====================#
 #============================================================#
 # Affiche la page de l'historique du club.
-@app.route("/historique/")
+@articles_bp.route("/historique/")
 def historique():
     return render_template("historique.html",title=TITLE+"- Historique")
 
 # Affiche la page de présentation du comité directeur.
-@app.route("/comite_cercle/")
+@articles_bp.route("/comite_cercle/")
 def comite_cercle():
     comite = {
         "president": MembreBD.query.filter_by(statut='Président').first(),
