@@ -7,7 +7,7 @@ from .app import app
 from flask import session, abort
 from flask_login import current_user
 from .forms import *
-from monApp.modelBD import *
+from monApp.models import *
 
 #========================================================#
 #====================   Décorateurs  ====================#
