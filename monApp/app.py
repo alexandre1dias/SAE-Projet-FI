@@ -42,3 +42,5 @@ def load_user(user_id):
         
     # Sinon on cherche si c'est un membre
     return MembreBD.query.get(int(user_id))
+
+from . import commands
