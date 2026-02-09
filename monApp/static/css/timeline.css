@@ -58,20 +58,24 @@ body{
 .main-timeline .icon:before {
     background: #fff;
     border: 2px solid #232323;
-    left: -3px
+    left: 0;
+    transform: translateX(-3px);
 }
 
 .main-timeline .icon:after {
     border: 2px solid #c72121;
-    left: 3px
+    left: 0;
+    transform: translateX(3px);
 }
 
 .main-timeline .timeline:hover .icon:before {
-    left: 3px
+    left: 0;
+    transform: translateX(3px);
 }
 
 .main-timeline .timeline:hover .icon:after {
-    left: -3px
+    left: 0;
+    transform: translateX(-3px);
 }
 
 .main-timeline .date-content {
@@ -119,20 +123,24 @@ body{
 .main-timeline .date-outer:before {
     background: #fff;
     border: 2px solid #232323;
-    left: -6px
+    left: 0;
+    transform: translateX(-6px);
 }
 
 .main-timeline .date-outer:after {
     border: 2px solid #c72121;
-    left: 6px
+    left: 0;
+    transform: translateX(6px);
 }
 
 .main-timeline .timeline:hover .date-outer:before {
-    left: 6px
+    left: 0; 
+    transform: translateX(6px);
 }
 
 .main-timeline .timeline:hover .date-outer:after {
-    left: -6px
+    left: 0;
+    transform: translateX(-6px);
 }
 
 .main-timeline .date {
