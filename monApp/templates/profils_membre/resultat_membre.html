@@ -51,7 +51,7 @@
             <div class="d-flex justify-content-center mt-5">
                 <ul class="pagination">
                     <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
-                        <a class="page-link" href="{{ url_for('resultat_membre', 
+                        <a class="page-link" href="{{ url_for('profil.resultat_membre', 
                                 page=pagination.prev_num, 
                                 tri=filtre.tri.data,
                                 armes=filtre.armes.data,
@@ -65,7 +65,7 @@
                         </span>
                     </li>
                     <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
-                        <a class="page-link" href="{{ url_for('resultat_membre', 
+                        <a class="page-link" href="{{ url_for('profil.resultat_membre', 
                                 page=pagination.next_num, 
                                 tri=filtre.tri.data,
                                 armes=filtre.armes.data,
