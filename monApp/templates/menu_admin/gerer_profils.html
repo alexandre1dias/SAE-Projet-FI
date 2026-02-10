@@ -39,13 +39,13 @@
                 <td>{{ unMembre.statut }}</td>
                 <td>{{ unMembre.sexe }}</td>
                 <td class="actions">
-                    <a href="{{ url_for('profil_view', idM=unMembre.id, origine='gestion_' + mode) }}" class="btn btn-warning">Consulter</a>
+                    <a href="{{ url_for('profil.profil_view', idM=unMembre.id, origine='gestion_' + mode) }}" class="btn btn-warning">Consulter</a>
                     
                     {% if mode == 'actifs' %}
-                        <a href="{{ url_for('profil_edit', idM=unMembre.id, origine='gestion_actifs') }}" class="btn btn-primary">Modifier</a>
+                        <a href="{{ url_for('admin.profil_edit', idM=unMembre.id, origine='gestion_actifs') }}" class="btn btn-primary">Modifier</a>
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal-{{ unMembre.id }}">Désinscrire</button>
                     {% else %}
-                        <form action="{{ url_for('reinscrireMembre', idM=unMembre.id) }}" method="post" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir réinscrire ce membre ?');">
+                        <form action="{{ url_for('admin.reinscrireMembre', idM=unMembre.id) }}" method="post" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir réinscrire ce membre ?');">
                             <button type="submit" class="btn btn-success">Réinscrire</button>
                         </form>
                     {% endif %}
@@ -60,7 +60,7 @@
                             <h5 class="modal-title" id="desinscriptionModalLabel-{{ unMembre.id }}">Désinscrire {{ unMembre.prenom }} {{ unMembre.nom }}</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form method="POST" action="{{ url_for('desinscrireMembre', idM=unMembre.id) }}">
+                        <form method="POST" action="{{ url_for('admin.desinscrireMembre', idM=unMembre.id) }}">
                             <div class="modal-body">
                                 <p>Êtes-vous sûr de vouloir désinscrire ce membre ?</p>
                                 <div class="mb-3">
@@ -86,7 +86,7 @@
     <div class="d-flex justify-content-center mt-4">
         <ul class="pagination">
             <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('gerer_profils', 
+                <a class="page-link" href="{{ url_for('admin.gerer_profils', 
                     mode=mode,
                     page=pagination.prev_num, 
                     recherche=filtre.recherche.data, 
@@ -103,7 +103,7 @@
             </li>
 
             <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('gerer_profils', 
+                <a class="page-link" href="{{ url_for('admin.gerer_profils', 
                     mode=mode,
                     page=pagination.next_num, 
                     recherche=filtre.recherche.data, 
@@ -116,14 +116,13 @@
     </div>
     {% endif %}
 
-    <!--Filtres-->
     <aside class="fixed-left">
     <div class="filtres-box">
         <div>
             <h5 class="filtres-titre">Action</h5>
             <div class="d-grid gap-2">
                 {% if mode == 'actifs' %}
-                    <a href="{{ url_for('gerer_profils', 
+                    <a href="{{ url_for('admin.gerer_profils', 
                         mode='anciens', 
                         recherche=filtre.recherche.data, 
                         sexe=filtre.sexe.data, 
@@ -132,9 +131,9 @@
                        Voir la liste des anciens membres
                     </a>
                     
-                    <a href="{{ url_for('inscription') }}" class="btn btn-success">Créer un membre</a>
+                    <a href="{{ url_for('auth.inscription') }}" class="btn btn-success">Créer un membre</a>
                 {% else %}
-                    <a href="{{ url_for('gerer_profils', 
+                    <a href="{{ url_for('admin.gerer_profils', 
                         mode='actifs', 
                         recherche=filtre.recherche.data, 
                         sexe=filtre.sexe.data, 
@@ -148,7 +147,7 @@
         <br>
         <h5 class="filtres-titre">Filtres</h5>
         
-        <form action="{{ url_for('gerer_profils') }}" method="GET">
+        <form action="{{ url_for('admin.gerer_profils') }}" method="GET">
             <input type="hidden" name="mode" value="{{ mode }}">
 
             <div class="search-container">

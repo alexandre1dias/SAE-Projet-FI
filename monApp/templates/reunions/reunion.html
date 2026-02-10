@@ -33,17 +33,17 @@
                             
                             <div class="text-center mt-auto">
                                 {% if passee %}
-                                    <a href="{{ url_for('reunion_view', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">Consulter rapport</a>
+                                    <a href="{{ url_for('reunions.reunion_view', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">Consulter rapport</a>
                                 {% else %}
                                     {% if current_user.is_authenticated %}
                                         {% if session.get('user_type') == 'membre' %}
                                             {% if reunion.idEvent in user_registered_event_ids %}
-                                                <a href="{{ url_for('desinscrire_reunion', idReunion=reunion.id) }}" class="btn btn-outline-danger btn-custom">Se désinscrire</a>
+                                                <a href="{{ url_for('reunions.desinscrire_reunion', idReunion=reunion.id) }}" class="btn btn-outline-danger btn-custom">Se désinscrire</a>
                                             {% else %}
-                                                <a href="{{ url_for('inscrire_reunion', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">S'inscrire</a>
+                                                <a href="{{ url_for('reunions.inscrire_reunion', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">S'inscrire</a>
                                             {% endif %}
                                         {% elif session.get('user_type') == 'admin' %}
-                                            <a href="{{ url_for('reunion_update', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">Modifier</a>
+                                            <a href="{{ url_for('reunions.reunion_update', idReunion=reunion.id) }}" class="btn btn-outline-primary btn-custom">Modifier</a>
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
@@ -59,7 +59,7 @@
     <div class="d-flex justify-content-center mt-4">
         <ul class="pagination">
             <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('reunion', 
+                <a class="page-link" href="{{ url_for('reunions.reunion', 
                     etat='passees' if passee else 'prochaine',
                     page=pagination.prev_num, 
                     tri=filtre.tri.data) if pagination.has_prev else '#' }}">
@@ -72,7 +72,7 @@
                 </span>
             </li>
             <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('reunion', 
+                <a class="page-link" href="{{ url_for('reunions.reunion', 
                     etat='passees' if passee else 'prochaine',
                     page=pagination.next_num, 
                     tri=filtre.tri.data) if pagination.has_next else '#' }}">
@@ -89,19 +89,23 @@
                 <h5 class="filtres-titre">Action</h5>
                 <div class="d-grid gap-2">
                     {% if passee %}
-                        <a href="{{ url_for('reunion', etat='prochaine') }}" class="btn btn-secondary">
+                        <a href="{{ url_for('reunions.reunion', etat='prochaine') }}" class="btn btn-secondary">
                             Voir les prochaines réunions
                         </a>
                     {% else %}
-                        <a href="{{ url_for('reunion', etat='passees') }}" class="btn btn-secondary">
+                        <a href="{{ url_for('reunions.reunion', etat='passees') }}" class="btn btn-secondary">
                             Voir les anciennes réunions
                         </a>
                     {% endif %}
                 </div>
             </div>
             <br>
+            <h5 class="filtres-titre">Années</h5>
+            <div class="form-group mb-3">
+                {{ filtre.annee_scolaire(class="btn btn-outline-primary dropdown-toggle w-100", onchange="this.form.submit()") }} 
+            </div>
             <h5 class="filtres-titre">Filtres</h5>
-            <form action="{{ url_for('reunion', etat='passees' if passee else 'prochaine') }}" method="GET">
+            <form action="{{ url_for('reunions.reunion', etat='passees' if passee else 'prochaine') }}" method="GET">
                 <h6>{{ filtre.tri.label }}</h6>
                 <div class="form-group mb-3">
                     {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle w-100") }} 

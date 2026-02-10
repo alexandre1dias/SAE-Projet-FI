@@ -1,9 +1,8 @@
-{% extends "base.html"%}
+{% extends "base.html" %}
 {% block head_extra %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}">
 {% endblock %}
 {% block main %}
-<div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <h1 class="text-center mb-4">Nous Contacter</h1>
@@ -50,7 +49,7 @@
             <div class="col-lg-6 contact-form">
                 <h2>Nous contacter</h2>
                 
-                <form action="{{ url_for('contact') }}" method="POST" novalidate>
+                <form action="{{ url_for('general.contact') }}" method="POST" novalidate onsubmit="return declencherMailto()">
                     
                     {{ form.hidden_tag() }}
 
@@ -72,7 +71,7 @@
                     </div>
 
                     <div class="mb-3">
-                        {{ form.sujet(class="form-control" + (" is-invalid" if form.sujet.errors else ""), placeholder="Sujet") }}
+                        {{ form.sujet(id="inputSujet", class="form-control" + (" is-invalid" if form.sujet.errors else ""), placeholder="Sujet") }}
                         {% if form.sujet.errors %}
                             <div class="invalid-feedback d-block">
                                 {% for error in form.sujet.errors %}
@@ -83,7 +82,7 @@
                     </div>
 
                     <div class="mb-3">
-                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Entrez une adresse email valide") }}
+                        {{ form.email(id="inputEmail", class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Entrez une adresse email valide") }}
                         {% if form.email.errors %}
                             <div class="invalid-feedback d-block">
                                 {% for error in form.email.errors %}
@@ -94,7 +93,7 @@
                     </div>
 
                     <div class="mb-3">
-                        {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows="5", placeholder="Entrez votre message") }}
+                        {{ form.description(id="inputDescription", class="form-control" + (" is-invalid" if form.description.errors else ""), rows="5", placeholder="Entrez votre message") }}
                         {% if form.description.errors %}
                             <div class="invalid-feedback d-block">
                                 {% for error in form.description.errors %}
@@ -109,7 +108,7 @@
             </div>
         </div>
     </div>
-</div>
+
     <script>
         function declencherMailto() {
             var typeForm = document.querySelector('input[name="type_form"]:checked');
