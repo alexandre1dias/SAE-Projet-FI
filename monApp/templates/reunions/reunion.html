@@ -100,12 +100,12 @@
                 </div>
             </div>
             <br>
+            <form action="{{ url_for('reunions.reunion', etat='passees' if passee else 'prochaine') }}" method="GET">
             <h5 class="filtres-titre">Années</h5>
             <div class="form-group mb-3">
                 {{ filtre.annee_scolaire(class="btn btn-outline-primary dropdown-toggle w-100", onchange="this.form.submit()") }} 
             </div>
             <h5 class="filtres-titre">Filtres</h5>
-            <form action="{{ url_for('reunions.reunion', etat='passees' if passee else 'prochaine') }}" method="GET">
                 <h6>{{ filtre.tri.label }}</h6>
                 <div class="form-group mb-3">
                     {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle w-100") }} 
