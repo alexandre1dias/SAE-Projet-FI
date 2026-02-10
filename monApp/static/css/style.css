@@ -8,6 +8,10 @@
     margin-top: 7em;
 }
 
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
 
 #cloche img {
   width: 28px;   
