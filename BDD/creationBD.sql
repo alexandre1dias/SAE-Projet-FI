@@ -275,7 +275,7 @@ create table PRESSE(
     idPresse integer AUTO_INCREMENT,
     dateP date,
     heureP varchar(5) not null,
-    titreP varchar(50) not null,
+    titreP varchar(550) not null,
     contenuP varchar(600),
     lienP varchar(255) not null,
     imageP VARCHAR(255),
@@ -303,7 +303,7 @@ CREATE TABLE TARIF (
 
 CREATE TABLE ARTICLE (
     idArticle integer AUTO_INCREMENT,
-    titreA varchar(100) not null,
+    titreA varchar(500) not null,
     contenuA text,
     dateA date not null,
     imgA varchar(255),
