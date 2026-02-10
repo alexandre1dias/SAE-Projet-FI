@@ -365,11 +365,9 @@ INSERT INTO IMAGERIN (idImage, idInformation) VALUES (1, 2), (5, 8), (6, 10);
 
 -- Presse
 INSERT INTO PRESSE (dateP, heureP, titreP, contenuP, lienP, imageP) VALUES
-('2023-04-10', '10:00', 'L''escrime locale en plein essor', 'Article de La République du Centre sur la dynamique du club et l''augmentation des licenciés.', 'https://www.larep.fr/escrime-essor', 'presse_rep_centre.jpg'),
-('2024-01-15', '14:30', 'Un champion olympique visite le club', 'Reportage de France 3 Région sur la venue exceptionnelle d''un médaillé olympique pour une masterclass.', 'https://france3-regions.francetvinfo.fr/visite-champion', 'presse_f3.jpg'),
-('2024-11-05', '09:00', 'Le club d''Orléans au sommet', 'L''Équipe consacre une page aux résultats exceptionnels de nos équipes séniors cette saison.', 'https://www.lequipe.fr/escrime-orleans', 'presse_lequipe.jpg'),
-('2025-12-15','15:45','WHITELIST','Compléter votre collection en achetant des booster !!!','https://whitelist.fr/', NULL),
-('2025-12-15','15:45','JOBLIFE',"Venez soutenir l'équipe JOBLIFE !!!",'https://joblife.fr/', NULL);
+('2024-11-05', '09:00', 'Le club d''Orléans au sommet', 'L''Équipe consacre une page aux résultats exceptionnels de nos équipes séniors cette saison.', 'https://www.lequipe.fr/escrime-orleans',NULL),
+('2023-04-10', '10:00', 'L''escrime locale en plein essor', 'Article de La République du Centre sur la dynamique du club et l''augmentation des licenciés.', 'https://fr.wikipedia.org/wiki/Escrime', NULL),
+('2024-01-15', '14:30', 'Un champion olympique visite le club', 'Reportage de France 3 Région sur la venue exceptionnelle d''un médaillé olympique pour une masterclass.', 'https://www.sports.gouv.fr/escrime-328', NULL);
 
 
 -- ============================================================
