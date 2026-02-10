@@ -1,16 +1,5 @@
-<<<<<<< HEAD
-{%extends "base.html"%}
-
-
-
-{%block main%}
-<div class="container-fluid py-4 px-4">
-
-=======
 {% extends "base.html" %}
 {% block main %}
-<div class="container-fluid py-4 px-4">
->>>>>>> 212995a (correction pour le merge du commit de Erman)
 <div class="header-container mb-4">
     <h1>Gestion des inscriptions et modifications</h1>
 </div>
@@ -18,11 +7,11 @@
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item">
         <a class="nav-link {% if type_page == 'inscription' %}active{% endif %}" aria-current="page"
-            href="{{ url_for('gerer_inscriptions', type='inscription') }}">Inscriptions</a>
+            href="{{ url_for('admin.gerer_inscriptions', type='inscription') }}">Inscriptions</a>
     </li>
     <li class="nav-item">
         <a class="nav-link {% if type_page == 'modification' %}active{% endif %}"
-            href="{{ url_for('gerer_inscriptions', type='modification') }}">Modifications</a>
+            href="{{ url_for('admin.gerer_inscriptions', type='modification') }}">Modifications</a>
     </li>
 </ul>
 
@@ -71,7 +60,7 @@
             </td>
             <td>{{ uneRequete.date }}</td>
             <td class="actions">
-                <form class="d-inline" action="{{ url_for('accepter_modifications', idModif=uneRequete.id) }}"
+                <form class="d-inline" action="{{ url_for('admin.accepter_modifications', idModif=uneRequete.id) }}"
                     method="post" onsubmit="return confirm('Voulez-vous accepter cette demande ?');">
                     <button type="submit" class="btn btn-success btn-sm">Accepter</button>
                 </form>
@@ -96,7 +85,7 @@
             </td>
             <td>{{ uneRequete.date }}</td>
             <td class="actions">
-                <form class="d-inline" action="{{ url_for('accepter_inscription', idI=uneRequete.id) }}" method="post"
+                <form class="d-inline" action="{{ url_for('admin.accepter_inscription', idI=uneRequete.id) }}" method="post"
                     onsubmit="return confirm('Voulez-vous accepter cette demande ?');">
                     <button type="submit" class="btn btn-success btn-sm">Accepter</button>
                 </form>
@@ -108,8 +97,8 @@
         </tr>
 
         {% set modalId = "refusModal-" ~ type_page ~ "-" ~ uneRequete.id %}
-        {% set redirectionRefus = url_for('refuser_inscription', idI=uneRequete.id) if type_page == 'inscription' else
-        url_for('refuser_modification', idM=uneRequete.id) %}
+        {% set redirectionRefus = url_for('admin.refuser_inscription', idI=uneRequete.id) if type_page == 'inscription' else
+        url_for('admin.refuser_modification', idM=uneRequete.id) %}
 
         <div class="modal fade" id="{{ modalId }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
@@ -163,7 +152,7 @@
     <ul class="pagination">
         <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
             <a class="page-link"
-                href="{{ url_for('gerer_inscriptions', page=pagination.prev_num, type=type_page) if pagination.has_prev else '#' }}">
+                href="{{ url_for('admin.gerer_inscriptions', page=pagination.prev_num, type=type_page) if pagination.has_prev else '#' }}">
                 &laquo; Avant
             </a>
         </li>
@@ -176,17 +165,12 @@
 
         <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
             <a class="page-link"
-                href="{{ url_for('gerer_inscriptions', page=pagination.next_num, type=type_page) if pagination.has_next else '#' }}">
+                href="{{ url_for('admin.gerer_inscriptions', page=pagination.next_num, type=type_page) if pagination.has_next else '#' }}">
                 Après &raquo;
             </a>
         </li>
     </ul>
 </div>
-<<<<<<< HEAD
-
-=======
-</div>
->>>>>>> 212995a (correction pour le merge du commit de Erman)
 {% endif %}
 
 {% endblock %}

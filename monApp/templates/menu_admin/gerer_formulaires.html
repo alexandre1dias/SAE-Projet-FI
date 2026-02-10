@@ -1,12 +1,5 @@
 {% extends "base.html" %}
-<<<<<<< HEAD
-
 {% block body_class %}has-sidebar{% endblock %}
-
-
-=======
-{% block body_class %}has-sidebar{% endblock %}
->>>>>>> 212995a (correction pour le merge du commit de Erman)
 {% block main %}
     <div class="header-container">
          <h1>
@@ -40,14 +33,14 @@
                 <td class="actions">
                     {# Si on est dans les formulaires répondus #}
                     {% if mode == 'repondus' %}
-                        <a href="{{ url_for('formulaire_view', idFormulaire=formulaire.id) }}" class="btn btn-warning">Consulter</a>
-                        <form class="d-inline" action="{{ url_for('formulaire_delete', idFormulaire=formulaire.id) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce formulaire ?');">
+                        <a href="{{ url_for('admin.formulaire_view', idFormulaire=formulaire.id) }}" class="btn btn-warning">Consulter</a>
+                        <form class="d-inline" action="{{ url_for('admin.formulaire_delete', idFormulaire=formulaire.id) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce formulaire ?');">
                             <button type="submit" class="btn btn-danger">Supprimer</button>
                         </form>
                     
                     {# Si on est dans les formulaires en attente #}
                     {% else %}
-                        <a href="{{ url_for('formulaire_view', idFormulaire=formulaire.id) }}" class="btn btn-warning">Gérer</a>
+                        <a href="{{ url_for('admin.formulaire_view', idFormulaire=formulaire.id) }}" class="btn btn-warning">Gérer</a>
                     {% endif %}
                 </td>
             </tr>
@@ -69,7 +62,7 @@
     <div class="d-flex justify-content-center mt-4">
         <ul class="pagination">
             <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('gerer_formulaires', 
+                <a class="page-link" href="{{ url_for('admin.gerer_formulaires', 
                     mode=mode,
                     page=pagination.prev_num, 
                     type_formulaire=filtre.type_formulaire.data) if pagination.has_prev else '#' }}">
@@ -84,7 +77,7 @@
             </li>
 
             <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('gerer_formulaires', 
+                <a class="page-link" href="{{ url_for('admin.gerer_formulaires', 
                     mode=mode,
                     page=pagination.next_num, 
                     type_formulaire=filtre.type_formulaire.data) if pagination.has_next else '#' }}">
@@ -101,14 +94,14 @@
                 <h5 class="filtres-titre">Action</h5>
                 <div class="d-grid gap-2">
                     {% if mode == 'attente' %}
-                        <a href="{{ url_for('gerer_formulaires', 
+                        <a href="{{ url_for('admin.gerer_formulaires', 
                             mode='repondus', 
                             type_formulaire=filtre.type_formulaire.data) }}" 
                            class="btn btn-secondary">
                            Voir les formulaires répondus
                         </a>
                     {% else %}
-                        <a href="{{ url_for('gerer_formulaires', 
+                        <a href="{{ url_for('admin.gerer_formulaires', 
                             mode='attente', 
                             type_formulaire=filtre.type_formulaire.data) }}" 
                            class="btn btn-secondary">
@@ -120,7 +113,7 @@
             <br>
             <h5 class="filtres-titre">Filtres</h5>
             
-            <form action="{{ url_for('gerer_formulaires') }}" method="GET">
+            <form action="{{ url_for('admin.gerer_formulaires') }}" method="GET">
                 <input type="hidden" name="mode" value="{{ mode }}">
                 <div class="form-group mb-3">
                     {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle w-100") }} 
