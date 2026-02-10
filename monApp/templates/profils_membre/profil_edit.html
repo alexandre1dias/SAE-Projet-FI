@@ -18,7 +18,7 @@
                 {%endif%}
             {%endif%}
             <div class="card shadow-sm p-4">
-                <form method="POST" action="{{ url_for('profil_edit', idM=selectedMembre.id, origine = origine) }}">
+                <form method="POST" action="{{ url_for('admin.profil_edit', idM=selectedMembre.id, origine = origine) }}">
                     {{ updateForm.hidden_tag () }}
                     <div class="mb-3 row">
         
@@ -141,7 +141,7 @@
                             Valider la demande de modifications
                         </button>
                         {% endif %}
-                        <a href="{{ url_for('profil_view', idM=selectedMembre.id, origine=origine) }}" class="btn btn-secondary">Annuler</a>
+                        <a href="{{ url_for('profil.profil_view', idM=selectedMembre.id, origine=origine) }}" class="btn btn-secondary">Annuler</a>
                     </div>
                 </form>
             </div>
