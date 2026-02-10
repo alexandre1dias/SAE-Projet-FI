@@ -1,4 +1,8 @@
 {%extends "base.html"%}
+
+{% block body_class %}has-sidebar{% endblock %}
+
+
 {% block head_extra %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/calendrier.css') }}">
 {% endblock %}
