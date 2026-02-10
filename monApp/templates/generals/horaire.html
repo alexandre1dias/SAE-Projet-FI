@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% block main %}
+    <div class="container py-5">
+
     <h1>Horaire</h1>
-    <p>Jours et horaires d’ouvertures du Cercle, susceptibles de modifications.</p>
+    <p>Jours et horaires d'ouvertures du Cercle, susceptibles de modifications.</p>
     <ul class="list-group">
     {% for horaire in horaires %}
     <li class="list-group-item">
@@ -11,4 +13,5 @@
     </li>
     {% endfor %}
 </ul>
+</div>
 {% endblock %}
