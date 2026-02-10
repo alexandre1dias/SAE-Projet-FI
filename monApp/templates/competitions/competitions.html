@@ -86,10 +86,12 @@
                 </div>
             </div>
             <br>
+            <h5 class="filtres-titre">Années</h5>
+            <div class="d-grid gap-2 mb-3">
+                {{ filtre.annee_scolaire(class="btn btn-outline-primary dropdown-toggle", onchange="this.form.submit()") }} 
+            </div>
             <h5 class="filtres-titre">Filtres</h5>
-            
             <form action="{{ url_for('competitions.competitions', etat=etat) }}" method="GET">
-                
                 <h6> {{ filtre.tri.label }}</h6>
                 <div class="d-grid gap-2">
                     {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle") }} 
