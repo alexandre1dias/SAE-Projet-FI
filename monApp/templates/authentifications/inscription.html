@@ -11,14 +11,16 @@
             <h1>Inscription</h1>
         </div>
         
-        <form method="POST" action="" style="width: 100%;">
+        <form method="POST" action="" style="width: 100%;" onsubmit="return declencherMailto()">
             {{ form.hidden_tag() }}
             
             <div class="form-group">
                 {{ form.Login(
-                    class="form-input" + (" is-invalid" if form.Login.errors else ""), 
-                    placeholder="Rentrer votre email"
-                ) }}
+                    id="inputEmail",
+                    class="form-input" + (" is-invalid" if form.Login.errors else ""),
+                    placeholder="Rentrer votre email",
+                    required=True
+                    ) }}
                 {% if form.Login.errors %}
                     <div class="invalid-feedback d-block text-white">
                         {% for error in form.Login.errors %}
@@ -30,9 +32,11 @@
 
             <div class="form-group">
                 {{ form.nom(
-                    class="form-input" + (" is-invalid" if form.nom.errors else ""), 
-                    placeholder="Rentrer votre nom"
-                ) }}
+                    id="inputNom",
+                    class="form-input" + (" is-invalid" if form.nom.errors else ""),
+                    placeholder="Rentrer votre nom",
+                    required=True
+                    ) }}
                 {% if form.nom.errors %}
                     <div class="invalid-feedback d-block text-white">
                         {% for error in form.nom.errors %}
@@ -44,9 +48,11 @@
 
             <div class="form-group">
                 {{ form.prenom(
-                    class="form-input" + (" is-invalid" if form.prenom.errors else ""), 
-                    placeholder="Rentrer votre prenom"
-                ) }}
+                    id="inputPrenom",
+                    class="form-input" + (" is-invalid" if form.prenom.errors else ""),
+                    placeholder="Rentrer votre prenom",
+                    required=True
+                    ) }}
                 {% if form.prenom.errors %}
                     <div class="invalid-feedback d-block text-white">
                         {% for error in form.prenom.errors %}
@@ -62,7 +68,8 @@
                     type="text", 
                     placeholder="Rentrer votre date de naissance", 
                     onfocus="(this.type='date')", 
-                    onblur="if(!this.value)this.type='text'"
+                    onblur="if(!this.value)this.type='text'",
+                    required=True
                 ) }}
                 {% if form.date_naissance.errors %}
                     <div class="invalid-feedback d-block text-white">
@@ -75,9 +82,11 @@
 
             <div class="form-group">
                 {{ form.sexe(
-                    class="form-input form-select form-select-white-arrow" + (" is-invalid" if form.sexe.errors else ""), 
-                    placeholder="Choisir votre sexe"
-                ) }}
+                    id="inputSexe",
+                    class="form-input form-select form-select-white-arrow" + (" is-invalid" if form.sexe.errors else ""),
+                    placeholder="Choisir votre sexe",
+                    required=True
+                    ) }}
                 {% if form.sexe.errors %}
                     <div class="invalid-feedback d-block text-white">
                         {% for error in form.sexe.errors %}
@@ -104,7 +113,8 @@
             <div class="form-group">
                 {{ form.password(
                     class="form-input" + (" is-invalid" if form.password.errors else ""), 
-                    placeholder="Rentrer votre mot de passe"
+                    placeholder="Rentrer votre mot de passe",
+                    required=True
                 ) }}
                 {% if form.password.errors %}
                     <div class="invalid-feedback d-block text-white">
@@ -118,7 +128,8 @@
             <div class="form-group">
                 {{ form.confirm_password(
                     class="form-input" + (" is-invalid" if form.confirm_password.errors else ""), 
-                    placeholder="Confirmer votre mot de passe"
+                    placeholder="Confirmer votre mot de passe",
+                    required=True
                 ) }}
                 {% if form.confirm_password.errors %}
                     <div class="invalid-feedback d-block text-white">
@@ -176,4 +187,23 @@
 {% if erreur_email %}
     <div class="alert alert-danger">{{ erreur_email }}</div>
 {% endif %}
+<script>
+    function declencherMailto() {
+        var nom = document.getElementById('inputNom').value;
+        var prenom = document.getElementById('inputPrenom').value;
+        var email = document.getElementById('inputEmail').value;
+        var sexe = document.getElementById('inputSexe').value;
+        var actif = {{ 'true' if mail_inscription else 'false' }};
+        var destinataire = "blois.escrime@wanadoo.fr";
+        var sujetFinal = "[Demande Inscription] " + prenom + " " + nom;
+        var corpsFinal = "Bonjour,\n\nJe souhaite m'inscrire au club.\n" +
+                         "Voici mes informations :\n" +
+                         "- Nom : " + nom + "\n" +
+                         "- Prénom : " + prenom + "\n" +
+                         "- Email : " + email + "\n" +
+                         "- Sexe : " + sexe + "\n\n" +
+                         "Cordialement.";
+        return ouvrirClientMail(actif, destinataire, sujetFinal, corpsFinal);
+    }
+</script>
 {% endblock %}

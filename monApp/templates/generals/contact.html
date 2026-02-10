@@ -115,32 +115,19 @@
         function declencherMailto() {
             var typeForm = document.querySelector('input[name="type_form"]:checked');
             var typeTexte = typeForm ? typeForm.value : "Contact";
-            // Note: Assurez-vous que les variables mail_question, etc. sont passées par le backend
+            var sujetInput = document.getElementById('inputSujet').value;
+            var emailInput = document.getElementById('inputEmail').value;
+            var descInput = document.getElementById('inputDescription').value;
             var configMail = {
                 'Question': {{ 'true' if mail_question else 'false' }},
                 'Demande': {{ 'true' if mail_demande else 'false' }},
                 'Signalement': {{ 'true' if mail_signalement else 'false' }}
             };
-            var doitEnvoyerMail = configMail[typeTexte];
-            if (doitEnvoyerMail) {
-                var sujet = document.getElementById('inputSujet').value;
-                var email = document.getElementById('inputEmail').value;
-                var description = document.getElementById('inputDescription').value;
-                
-                var destinataire = "blois.escrime@wanadoo.fr";
-                var sujetFinal = "[" + typeTexte + "] " + sujet;
-                var corpsMessage = "Message envoyé par : " + email + "\n\n" + 
-                                   "Contenu du message :\n" + description;
-
-                var lien = "mailto:" + destinataire + 
-                           "?subject=" + encodeURIComponent(sujetFinal) + 
-                           "&body=" + encodeURIComponent(corpsMessage);
-
-                window.location.href = lien;
-            } else {
-                console.log("Mailto désactivé pour : " + typeTexte);
-            }
-            return true;
+            var actif = configMail[typeTexte];
+            var destinataire = "blois.escrime@wanadoo.fr";
+            var sujetFinal = "[" + typeTexte + "] " + sujetInput;
+            var corpsFinal = "Envoyé par : " + emailInput + "\n\n" + descInput;
+            return ouvrirClientMail(actif, destinataire, sujetFinal, corpsFinal);
         }
     </script>
 {% endblock %}
