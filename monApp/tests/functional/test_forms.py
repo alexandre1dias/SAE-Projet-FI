@@ -224,7 +224,12 @@ def test_contact_form(app, db):
 def test_filtre_form(app):
     """Test FiltreForm."""
     with app.test_request_context():
-        form = FiltreForm(formdata=MultiDict({'sexe': ['Homme']}))
+        form = FiltreForm(formdata=MultiDict({
+            'sexe': ['Homme'],
+            'tri': 'date_desc',
+            'annee_scolaire': '2023-2024'
+        }))
+        form.annee_scolaire.choices = [('2023-2024', '2023-2024')] 
         assert form.validate() is True
 
 def test_horaire_form(app, db):
