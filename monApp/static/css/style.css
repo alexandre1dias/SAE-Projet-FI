@@ -1513,8 +1513,10 @@ body.dark-mode .ffe-card-text {
 /* Responsive adjustments for sidebar layout */
 @media (min-width: 992px) {
     .content-with-sidebar {
+        width: auto;
         margin-left: 300px;
-        padding: 20px;
+        padding: 20px !important;
+        box-sizing: border-box;
     }
 }
 
