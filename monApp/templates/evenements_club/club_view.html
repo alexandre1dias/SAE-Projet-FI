@@ -12,14 +12,14 @@
             <div class="col-md-6">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><strong>Début:</strong> {{ selectedEventClub.dateDebutEV.strftime('%d/%m/%Y') }} à {{ selectedEventClub.heureDebutEV }}</li>
-                    <li class="list-group-item"><strong>Ville:</strong> {{ selectedEventClub.ville or 'Non spécifiée'}} </li>
+                    <li class="list-group-item"><strong>Ville:</strong> {{ selectedEventClub.villeEV or 'Non spécifiée'}} </li>
                     <li class="list-group-item"><strong>Niveaux:</strong> {{selectedEventClub.niveauxEV}}</li>
                 </ul>
             </div>
             <div class="col-md-6">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><strong>Fin:</strong> {{ selectedEventClub.dateFinEV.strftime('%d/%m/%Y') }} à {{ selectedEventClub.heureFinEV }}</li>
-                    <li class="list-group-item"><strong>Adresse:</strong> {{ selectedEventClub.adresse or 'Non spécifiée' }}</li>
+                    <li class="list-group-item"><strong>Adresse:</strong> {{ selectedEventClub.adresseEV or 'Non spécifiée' }}</li>
                     <li class="list-group-item"><strong>Nombre Participants:</strong> {{ selectedEventClub.evenement.participants.count()}}</li>
                 </ul>
             </div>

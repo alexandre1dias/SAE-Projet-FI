@@ -71,7 +71,7 @@
     </form>
 </div>
 </aside>
-<div class="calendrier-wrapper" id='calendar'></div>
+<div class="calendrier-wrapper" id='calendar' data-api-url="{{ url_for('calendrier.get_events') }}"></div>
 
 <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -111,93 +111,5 @@
 
 {% block scripts %}
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-        
-        // Initialisation de la modale Bootstrap
-        var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
-
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            locale: 'fr',
-            firstDay: 1,
-            height: 700,
-            fixedWeekCount: false,
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-            },
-            buttonText: {
-                today: "Aujourd'hui",
-                month: 'Mois',
-                week: 'Semaine',
-                day: 'Jour',
-                list: 'Liste'
-            },
-            
-            events: function(info, successCallback, failureCallback) {
-                const urlParams = new URLSearchParams(window.location.search);
-                // Utilisation de url_for pour l'API
-                let apiUrl = "{{ url_for('calendrier.get_events') }}" + "?" + urlParams.toString();
-                fetch(apiUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        successCallback(data);
-                    })
-                    .catch(error => {
-                        console.error("Erreur lors de la récupération des événements:", error);
-                        failureCallback(error);
-                    });
-            },
-            eventClick: function(info) {
-                // Si l'événement a une URL (Compétition, Réunion...), on redirige
-                if (info.event.extendedProps.url) {
-                    window.location.href = info.event.extendedProps.url;
-                }
-
-                // Sinon (Entraînement), on ouvre la modale
-                else {
-                    let event = info.event;
-                    let props = event.extendedProps;
-                    
-                    document.getElementById('eventModalLabel').innerText = props.type || 'Détails';
-                    document.getElementById('modalTitle').innerText = event.title;
-                    document.getElementById('modalType').innerText = props.type || 'Non spécifié';
-                    document.getElementById('modalVille').innerText = props.ville || 'Non spécifié';
-                    document.getElementById('modalAdresse').innerText = props.adresse || 'Non spécifié';
-                    document.getElementById('modalDescription').innerText = props.description || 'Aucune description';
-                    
-                    let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-                    document.getElementById('modalStart').innerText = event.start ? event.start.toLocaleDateString('fr-FR', options) : '';
-                    document.getElementById('modalEnd').innerText = event.end ? event.end.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) : '';
-                    
-                    // Niveaux
-                    let elemNiveau = document.getElementById('lineNiveau');
-                    let spanNiveau = document.getElementById('modalNiveaux');
-                    if (props.niveaux) {
-                        spanNiveau.innerText = props.niveaux;
-                        elemNiveau.style.display = 'block';
-                    } else {
-                        elemNiveau.style.display = 'none';
-                    }
-                    
-                    // Armes
-                    let elemArme = document.getElementById('lineArme');
-                    let spanArme = document.getElementById('modalArme');
-                    if (props.arme) {
-                        spanArme.innerText = props.arme;
-                        elemArme.style.display = 'block';
-                    } else {
-                        elemArme.style.display = 'none';
-                    }
-
-                    eventModal.show();
-                }
-            }
-        });
-        calendar.render();
-    });
-</script>
+<script src="{{ url_for('static', filename='js/calendrier.js') }}"></script>
 {% endblock %}

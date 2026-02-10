@@ -51,8 +51,11 @@
             <div class="col-lg-6 contact-form">
                 <h2>Nous contacter</h2>
                 
-                <form action="{{ url_for('general.contact') }}" method="POST" novalidate onsubmit="return declencherMailto()">
-                    
+                <form action="{{ url_for('general.contact') }}" method="POST" novalidate onsubmit="return MailtoContact()" id="formContact"
+                      data-mail-question="{{ 'true' if mail_question else 'false' }}"
+                      data-mail-demande="{{ 'true' if mail_demande else 'false' }}"
+                      data-mail-signalement="{{ 'true' if mail_signalement else 'false' }}">
+
                     {{ form.hidden_tag() }}
 
                     <div class="mb-3">
@@ -110,4 +113,5 @@
             </div>
         </div>
     </div>
+<script src="{{ url_for('static', filename='js/mailto.js') }}"></script>
 {% endblock %}
