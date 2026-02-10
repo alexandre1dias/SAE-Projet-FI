@@ -176,6 +176,8 @@ def reinscrireMembre(idM):
 def profil_edit(idM):
     unMembre = db.session.get(MembreBD, idM)
     unForm = ModifForm(obj=unMembre)
+    admin = AdminBD.query.first()
+    mail_modif = admin.demandeModifMail if admin else False
     if unForm.validate_on_submit():
         action = request.form.get('submit_action')
         if action == 'admin_save':
@@ -213,7 +215,12 @@ def profil_edit(idM):
             
             db.session.commit()
             return redirect(url_for('profil.profil_view', idM=idM, origine='profil'))   
-    return render_template("profils_membre/profil_edit.html", updateForm=unForm, selectedMembre=unMembre, title=TITLE+"- Édition Profil")
+    return render_template("profils_membre/profil_edit.html", 
+                           updateForm=unForm, 
+                           selectedMembre=unMembre, 
+                           title=TITLE+"- Édition Profil",
+                           mail_modif=mail_modif)
+
 
 @admin_bp.route("/gerer_inscriptions/")
 @login_required

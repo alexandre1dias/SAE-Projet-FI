@@ -48,6 +48,8 @@ def login():
 
 @auth_bp.route("/inscription/", methods=["GET", "POST"])
 def inscription():
+    admin = AdminBD.query.first()
+    mail_inscription = admin.demandeInscriptionMail if admin else False
     unForm = InscriptionForm()
     if unForm.validate_on_submit():
         mdp_clair = unForm.password.data
@@ -131,7 +133,10 @@ def inscription():
                                    title=TITLE+"- Inscriptions",
                                    form=unForm,
                                    message_erreur=f"Erreur technique : {str(e)}")
-    return render_template("authentifications/inscription.html", title=TITLE+"- Inscriptions", form=unForm)
+    return render_template("authentifications/inscription.html", 
+                           title=TITLE+"- Inscriptions", 
+                           form=unForm,
+                           mail_inscription=mail_inscription)
 
 @auth_bp.route("/mdp_oublier/", methods=["GET", "POST"])
 def mdp_oublier():

@@ -18,20 +18,20 @@
                 {%endif%}
             {%endif%}
             <div class="card shadow-sm p-4">
-                <form method="POST" action="{{ url_for('admin.profil_edit', idM=selectedMembre.id, origine = origine) }}">
+                <form method="POST" action="{{ url_for('admin.profil_edit', idM=selectedMembre.id, origine = origine) }}" onsubmit="return declencherMailto()">
                     {{ updateForm.hidden_tag () }}
                     <div class="mb-3 row">
         
                         <label for="nom" class="col-sm-4 col-form-label text-muted">Nom :</label>
                         <div class="col-sm-8">
-                            {{updateForm.nom(size =50, class_="form-control")}}
+                            {{updateForm.nom(id="inputNom", size=50, class_="form-control")}}
                         </div>
                     </div>
 
                     <div class="mb-3 row">
                         <label for="prenom" class="col-sm-4 col-form-label text-muted">Prénom :</label>
                         <div class="col-sm-8">
-                            {{updateForm.prenom(size =50, class_="form-control")}}
+                            {{updateForm.prenom(id="inputPrenom", size=50, class_="form-control")}}
                         </div>
                     </div>
 
@@ -118,7 +118,7 @@
                     <div class="mb-3 row">
                         <label for="justification" class="col-sm-4 col-form-label text-muted">Justification :</label>
                         <div class="col-sm-8">
-                            {{ updateForm.justification(class_="form-control", rows="5", placeholder="Décrivez la raison de la modification", required=true) }}
+                            {{ updateForm.justification(id="inputJustification", class_="form-control", rows="5", placeholder="Décrivez la raison de la modification", required=true) }}
                             {% if updateForm.justification.errors %}
                                 <div class="invalid-feedback d-block">
                                     {% for error in updateForm.justification.errors %}
@@ -148,4 +148,19 @@
         </div>
     </div>
 </div>
+<script>
+    function declencherMailto() {
+        var activeBtn = document.activeElement;
+        if (activeBtn && activeBtn.value === 'admin_save') return true;
+        var nom = document.getElementById('inputNom').value;
+        var prenom = document.getElementById('inputPrenom').value;
+        var motifElement = document.getElementById('inputJustification');
+        var motif = motifElement ? motifElement.value : "";
+        var actif = {{ 'true' if mail_modif else 'false' }};
+        var destinataire = "blois.escrime@wanadoo.fr";
+        var sujetFinal = "[Modification Profil] " + prenom + " " + nom;
+        var corpsFinal = "Bonjour,\nJe souhaite modifier mon profil.\nJustification : " + motif;
+        return ouvrirClientMail(actif, destinataire, sujetFinal, corpsFinal);
+    }
+</script>
 {% endblock %}
