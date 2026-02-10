@@ -9,7 +9,7 @@
         <div>
             <h5 class="filtres-titre">Action</h5>
             <div class="d-grid gap-2">
-                <a href="{{ url_for('add_information') }}" class="btn btn-success">
+                <a href="{{ url_for('articles.add_information') }}" class="btn btn-success">
                     Nouvelle Information
                 </a>
             </div>
@@ -17,7 +17,7 @@
         </div>
         {% endif %}
         
-        <form action="{{ url_for('informations') }}" method="GET">
+        <form action="{{ url_for('articles.informations') }}" method="GET">
             <h5 class="filtres-titre">Années</h5>
             <div class="form-group d-grid gap-2">
                 {{ filtre.annee_scolaire(class="btn btn-outline-primary dropdown-toggle", onchange="this.form.submit()") }} 
@@ -59,8 +59,8 @@
                     
                     {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
                     <div class="d-flex gap-2">
-                        <a href="{{ url_for('edit_information', idI=information.idInformation) }}" class="btn btn-warning btn-sm">Modifier</a>
-                        <form action="{{ url_for('delete_information', idI=information.idInformation) }}" method="POST" onsubmit="return confirm('Supprimer cette info ?');">
+                        <a href="{{ url_for('articles.edit_information', idI=information.idInformation) }}" class="btn btn-warning btn-sm">Modifier</a>
+                        <form action="{{ url_for('articles.delete_information', idI=information.idInformation) }}" method="POST" onsubmit="return confirm('Supprimer cette info ?');">
                             <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
                         </form>
                     </div>
@@ -76,7 +76,7 @@
     <div class="d-flex justify-content-center mt-4">
     <ul class="pagination">
         <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
-            <a class="page-link" href="{{ url_for('informations', 
+            <a class="page-link" href="{{ url_for('articles.informations', 
                 page=pagination.prev_num, 
                 recherche=filtre.recherche.data,
                 tri=filtre.tri.data,
@@ -90,7 +90,7 @@
             </span>
         </li>
         <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
-            <a class="page-link" href="{{ url_for('informations', 
+            <a class="page-link" href="{{ url_for('articles.informations', 
                 page=pagination.next_num, 
                 recherche=filtre.recherche.data,
                 tri=filtre.tri.data,
