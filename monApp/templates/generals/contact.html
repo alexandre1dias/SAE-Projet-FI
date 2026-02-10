@@ -110,28 +110,4 @@
             </div>
         </div>
     </div>
-<<<<<<< HEAD:monApp/templates/generals/contact.html
-
-    <script>
-        function declencherMailto() {
-            var typeForm = document.querySelector('input[name="type_form"]:checked');
-            var typeTexte = typeForm ? typeForm.value : "Contact";
-            var sujetInput = document.getElementById('inputSujet').value;
-            var emailInput = document.getElementById('inputEmail').value;
-            var descInput = document.getElementById('inputDescription').value;
-            var configMail = {
-                'Question': {{ 'true' if mail_question else 'false' }},
-                'Demande': {{ 'true' if mail_demande else 'false' }},
-                'Signalement': {{ 'true' if mail_signalement else 'false' }}
-            };
-            var actif = configMail[typeTexte];
-            var destinataire = "blois.escrime@wanadoo.fr";
-            var sujetFinal = "[" + typeTexte + "] " + sujetInput;
-            var corpsFinal = "Envoyé par : " + emailInput + "\n\n" + descInput;
-            return ouvrirClientMail(actif, destinataire, sujetFinal, corpsFinal);
-        }
-    </script>
-=======
-</div>
->>>>>>> 2854d5f (Avancé dans la responsivité avec correction des problèmes.):monApp/templates/contact.html
 {% endblock %}
