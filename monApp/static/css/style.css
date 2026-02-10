@@ -325,7 +325,7 @@ section{
 /* Page connexion */
 body {
     font-family: sans-serif; 
-    display: flex;
+    display: block;
 }
 
 .page-login {
@@ -1355,6 +1355,8 @@ header {
 
 body.homepage #main {
     margin-top: 79px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 /* page FFEscrime  */
@@ -1466,6 +1468,12 @@ body.dark-mode .ffe-card-text {
 
     #main {
         margin-top: 5rem;
+        width: 100%;
+        padding-left: 15px; 
+        padding-right: 15px; 
+        margin-left: auto;   
+        margin-right: auto;  
+        display: block;
     }
 
     .h1acc {
