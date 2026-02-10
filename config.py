@@ -6,10 +6,10 @@ SECRET_KEY = "2lzUl{$*D6#`8uXqlU."
 TITLE = "Cercle d'escrime Blois"
 BOOTSTRAP_SERVE_LOCAL = True
 
-LOGIN=""
-PASSWD=""
-SERVEUR=""
-BD=""
+LOGIN="kurucelik"
+PASSWD="kurucelik"
+SERVEUR="servinfo-maria"
+BD="DBkurucelik"
 SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{LOGIN}:{PASSWD}@{SERVEUR}/{BD}'
 
 # exemple de configuration, on doit l'adapter mais vu qu'ici on a pas de serveur mail et qu'on fait le test sur le terminal ducoup pas besoin de vrai mail sender etc.
