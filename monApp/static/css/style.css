@@ -325,7 +325,7 @@ section{
 /* Page connexion */
 body {
     font-family: sans-serif; 
-    display: flex;
+    display: block;
 }
 
 .page-login {
@@ -1355,6 +1355,8 @@ header {
 
 body.homepage #main {
     margin-top: 79px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 /* page FFEscrime  */
@@ -1459,3 +1461,85 @@ body.dark-mode .ffe-description {
 body.dark-mode .ffe-card-text {
     color: #bbb;
 }
+
+/* faire en sorte que l'acceuil soit responsive en utilisant des rem */
+
+@media (max-width: 768px) {
+
+    #main {
+        margin-top: 5rem;
+        width: 100%;
+        padding-left: 15px; 
+        padding-right: 15px; 
+        margin-left: auto;   
+        margin-right: auto;  
+        display: block;
+    }
+
+    .h1acc {
+        font-size: 1.8rem;
+        padding: 12px 24px;
+        line-height: 1.4;
+    }
+
+    .h2acc {
+        font-size: 1.1rem;
+    }
+
+    .explore-section {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .explore-section .explore-content,
+    .explore-section .explore-col {
+        width: 100% !important;
+        padding: 10px 0 !important;
+    }
+
+    .explore-content h1 {
+        font-size: 1.8rem;
+    }
+
+    .explore-col video {
+        width: 100%;
+        height: auto;
+    }
+
+    .title h1 {
+        font-size: 1.8rem;
+    }
+} 
+/* Responsive adjustments for sidebar layout */
+@media (min-width: 992px) {
+    .content-with-sidebar {
+        width: auto;
+        margin-left: 300px;
+        padding: 20px !important;
+        padding-top: 20px !important;
+        box-sizing: border-box;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .fixed-left {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 20px;
+        z-index: 1;
+    }
+
+    .content-with-sidebar {
+        margin-left: 0;
+    }
+
+    body.has-sidebar #main {
+        margin-top: 0;
+    }
+
+    .fixed-left {
+        margin-top: 0;
+    }
+}
+
