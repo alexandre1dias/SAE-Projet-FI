@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {%extends "base.html"%}
 
 {% block head_extra %}
@@ -5,6 +6,13 @@
 {% endblock %}
 
 {%block main%}
+=======
+{% extends "base.html" %}
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}">
+{% endblock %}
+{% block main %}
+>>>>>>> 212995a (correction pour le merge du commit de Erman)
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -112,4 +120,26 @@
         </div>
     </div>
 </div>
+<<<<<<< HEAD
+=======
+    <script>
+        function declencherMailto() {
+            var typeForm = document.querySelector('input[name="type_form"]:checked');
+            var typeTexte = typeForm ? typeForm.value : "Contact";
+            var sujetInput = document.getElementById('inputSujet').value;
+            var emailInput = document.getElementById('inputEmail').value;
+            var descInput = document.getElementById('inputDescription').value;
+            var configMail = {
+                'Question': {{ 'true' if mail_question else 'false' }},
+                'Demande': {{ 'true' if mail_demande else 'false' }},
+                'Signalement': {{ 'true' if mail_signalement else 'false' }}
+            };
+            var actif = configMail[typeTexte];
+            var destinataire = "blois.escrime@wanadoo.fr";
+            var sujetFinal = "[" + typeTexte + "] " + sujetInput;
+            var corpsFinal = "Envoyé par : " + emailInput + "\n\n" + descInput;
+            return ouvrirClientMail(actif, destinataire, sujetFinal, corpsFinal);
+        }
+    </script>
+>>>>>>> 212995a (correction pour le merge du commit de Erman)
 {% endblock %}
