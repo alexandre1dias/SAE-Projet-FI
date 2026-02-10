@@ -4,6 +4,7 @@
 
 
 {% block main %}
+<div class = "container">
     <div class="header-container">
          <h1>
              {% if mode == 'repondus' %}
@@ -90,49 +91,49 @@
         </ul>
     </div>
     {% endif %}
-
-    <aside class="fixed-left">
-        <div class="filtres-box">
-            <div>
-                <h5 class="filtres-titre">Action</h5>
-                <div class="d-grid gap-2">
-                    {% if mode == 'attente' %}
-                        <a href="{{ url_for('admin.gerer_formulaires', 
-                            mode='repondus', 
-                            type_formulaire=filtre.type_formulaire.data) }}" 
-                           class="btn btn-secondary">
-                           Voir les formulaires répondus
-                        </a>
-                    {% else %}
-                        <a href="{{ url_for('admin.gerer_formulaires', 
-                            mode='attente', 
-                            type_formulaire=filtre.type_formulaire.data) }}" 
-                           class="btn btn-secondary">
-                           Voir les formulaires en attente
-                        </a>
-                    {% endif %}
-                </div>
+</div>
+<aside class="fixed-left">
+    <div class="filtres-box">
+        <div>
+            <h5 class="filtres-titre">Action</h5>
+            <div class="d-grid gap-2">
+                {% if mode == 'attente' %}
+                    <a href="{{ url_for('admin.gerer_formulaires', 
+                        mode='repondus', 
+                        type_formulaire=filtre.type_formulaire.data) }}" 
+                        class="btn btn-secondary">
+                        Voir les formulaires répondus
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('admin.gerer_formulaires', 
+                        mode='attente', 
+                        type_formulaire=filtre.type_formulaire.data) }}" 
+                        class="btn btn-secondary">
+                        Voir les formulaires en attente
+                    </a>
+                {% endif %}
             </div>
-            <br>
-            <h5 class="filtres-titre">Filtres</h5>
-            
-            <form action="{{ url_for('admin.gerer_formulaires') }}" method="GET">
-                <input type="hidden" name="mode" value="{{ mode }}">
-                <div class="form-group mb-3">
-                    {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle w-100") }} 
-                </div>
-                <h6>{{ filtre.type_formulaire.label }}</h6>
-                {% for subfield in filtre.type_formulaire %}
-                    <div class="form-check">
-                        {{ subfield(class="form-check-input") }}
-                        {{ subfield.label(class="form-check-label") }}
-                    </div>
-                {% endfor %}
-                <div class="d-grid gap-2">
-                    {{ filtre.submit(class="btn btn-primary", value="Appliquer les filtres") }}
-                </div>
-            </form>
         </div>
-    </aside>
+        <br>
+        <h5 class="filtres-titre">Filtres</h5>
+        
+        <form action="{{ url_for('admin.gerer_formulaires') }}" method="GET">
+            <input type="hidden" name="mode" value="{{ mode }}">
+            <div class="form-group mb-3">
+                {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle w-100") }} 
+            </div>
+            <h6>{{ filtre.type_formulaire.label }}</h6>
+            {% for subfield in filtre.type_formulaire %}
+                <div class="form-check">
+                    {{ subfield(class="form-check-input") }}
+                    {{ subfield.label(class="form-check-label") }}
+                </div>
+            {% endfor %}
+            <div class="d-grid gap-2">
+                {{ filtre.submit(class="btn btn-primary", value="Appliquer les filtres") }}
+            </div>
+        </form>
+    </div>
+</aside>
 
 {% endblock %}
