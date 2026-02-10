@@ -1,4 +1,13 @@
+<<<<<<< HEAD
+{%extends "base.html"%}
+
+{% block body_class %}has-sidebar{% endblock %}
+
+
+=======
 {% extends "base.html" %}
+{% block body_class %}has-sidebar{% endblock %}
+>>>>>>> 212995a (correction pour le merge du commit de Erman)
 {% block head_extra %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
 {% endblock %}
@@ -26,7 +35,7 @@
                                 <li>Participants : {{ uneCompetition.evenement.participants.count() if uneCompetition.evenement else 0 }}</li>
                             </ul>
                             <div class="text-center mt-auto">
-                                <a href="{{ url_for('competitions.competition_view', idCompetition=uneCompetition.id) }}" class="btn btn-outline-primary btn-custom">Consulter</a>
+                                <a href="{{ url_for('competition_view', idCompetition=uneCompetition.id) }}" class="btn btn-outline-primary btn-custom">Consulter</a>
                             </div>
                         </div>
                     </div>
@@ -39,7 +48,7 @@
     <div class="d-flex justify-content-center mt-4">
     <ul class="pagination">
         <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
-            <a class="page-link" href="{{ url_for('competitions.competitions', 
+            <a class="page-link" href="{{ url_for('competitions', 
                 page=pagination.prev_num, 
                 sexe=filtre.sexe.data,
                 niveau=filtre.niveau.data,
@@ -55,7 +64,7 @@
             </span>
         </li>
         <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
-            <a class="page-link" href="{{ url_for('competitions.competitions', 
+            <a class="page-link" href="{{ url_for('competitions', 
                 page=pagination.next_num, 
                 sexe=filtre.sexe.data,
                 niveau=filtre.niveau.data,
@@ -75,11 +84,11 @@
                 <h5 class="filtres-titre">Action</h5>
                 <div class="d-grid gap-2">
                     {% if etat == 'passees' %}
-                        <a href="{{ url_for('competitions.competitions', etat='prochaines') }}" class="btn btn-secondary">
+                        <a href="{{ url_for('competitions', etat='prochaines') }}" class="btn btn-secondary">
                             Voir les prochaines compétitions 
                         </a>
                     {% else %}
-                        <a href="{{ url_for('competitions.competitions', etat='passees') }}" class="btn btn-secondary">
+                        <a href="{{ url_for('competitions', etat='passees') }}" class="btn btn-secondary">
                             Voir les compétitions passées
                         </a>
                     {% endif %}
@@ -88,7 +97,7 @@
             <br>
             <h5 class="filtres-titre">Filtres</h5>
             
-            <form action="{{ url_for('competitions.competitions', etat=etat) }}" method="GET">
+            <form action="{{ url_for('competitions', etat=etat) }}" method="GET">
                 
                 <h6> {{ filtre.tri.label }}</h6>
                 <div class="d-grid gap-2">

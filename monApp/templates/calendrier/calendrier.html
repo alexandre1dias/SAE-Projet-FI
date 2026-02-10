@@ -1,9 +1,16 @@
-{% extends "base.html" %}
+<<<<<<< HEAD
+{%extends "base.html"%}
 
+{% block body_class %}has-sidebar{% endblock %}
+
+
+=======
+{% extends "base.html" %}
+{% block body_class %}has-sidebar{% endblock %}
+>>>>>>> 212995a (correction pour le merge du commit de Erman)
 {% block head_extra %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/calendrier.css') }}">
 {% endblock %}
-
 {% block main %}
 <h1 class="text-center mb-5" id="calendrier-titre">Calendrier des Évènements</h1>
 <aside class="fixed-left">
@@ -11,14 +18,14 @@
     {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
     <div>
         <h5 class="filtres-titre">Action</h5>
-        <a href="{{ url_for('calendrier.add_event') }}" class="btn btn-primary w-100">
+        <a href="{{ url_for('add_event') }}" class="btn btn-primary w-100">
             Ajouter un événement
         </a>
     </div>
     {% endif%}
     <br>
     <h5 class="filtres-titre">Filtres</h5>
-    <form action="{{ url_for('calendrier.calendrier') }}" method="GET">
+    <form action="{{ url_for('calendrier') }}" method="GET">
 
         <h6>{{ filtre.type_event.label }}</h6>
         {% for subfield in filtre.type_event %}
@@ -68,7 +75,8 @@
     </form>
 </div>
 </aside>
-<div class="calendrier-wrapper" id='calendar'></div>
+<!--Ligne pour l'affichage du calendrier-->
+    <div class="calendrier-wrapper" id='calendar'></div>
 
 <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -136,8 +144,7 @@
             
             events: function(info, successCallback, failureCallback) {
                 const urlParams = new URLSearchParams(window.location.search);
-                // Utilisation de url_for pour l'API
-                let apiUrl = "{{ url_for('calendrier.get_events') }}" + "?" + urlParams.toString();
+                let apiUrl = '/api/events?' + urlParams.toString();
                 fetch(apiUrl)
                     .then(response => response.json())
                     .then(data => {
