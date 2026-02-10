@@ -619,9 +619,9 @@ input:checked + .slider:before {
 /*le container des filtres*/
 .fixed-left {
     position: fixed; 
-    top: 0;
+    top: 0; 
     left: 0;
-    height: 100vh;
+    height: 100vh; 
     width: 300px;  
     padding: 10px;
     overflow-y: auto; 
@@ -908,9 +908,10 @@ input:checked + .slider:before {
 
 /* Permet à la section de s'étendre sur toute la largeur */
 .competitions-section {
-    width: 100%;
+    width: 90%;
+    max-width: 1200px;
     position: static !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     left: auto !important;
     display: block !important;
 }
@@ -1000,7 +1001,18 @@ header {
 
 body.homepage #main {
     margin-top: 79px !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+
 }
 
+.content-with-sidebar {
+    margin-left: 300px; 
+    width: calc(100% - 300px); 
+}
+
+
+@media (max-width: 768px) {
+    .content-with-sidebar {
+        margin-left: 0;
+        width: 100%;
+    }
+}
