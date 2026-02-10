@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, url_for, redirect, session, flash
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from datetime import datetime, date
 from sqlalchemy import or_
 import shutil
 import os
@@ -26,7 +26,27 @@ def competitions(etat="prochaines"):
 
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
+    dates_bd = db.session.query(CompetitionBD.date_debut).distinct().all()
+    annees_set = set()
+    for (d,) in dates_bd:
+        if d:
+            annee_debut = d.year if d.month >= 8 else d.year - 1
+            annees_set.add((str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
+    if annees_set:
+        choix_tries = sorted(list(annees_set), key=lambda x: x[0], reverse=True)
+        filtre.annee_scolaire.choices = choix_tries
+        if filtre.annee_scolaire.data not in [c[0] for c in choix_tries]:
+            filtre.annee_scolaire.data = choix_tries[0][0]
+    annee_selectionnee = filtre.annee_scolaire.data
     lesCompetitions = CompetitionBD.query
+    if annee_selectionnee:
+        try:
+            an_debut = int(annee_selectionnee)
+            debut_saison = date(an_debut, 8, 1)
+            fin_saison = date(an_debut + 1, 7, 31)
+            lesCompetitions = lesCompetitions.filter(CompetitionBD.date_debut >= debut_saison, CompetitionBD.date_debut <= fin_saison)
+        except (ValueError, TypeError):
+            pass
     filtre.tri.choices = [
         ('date_desc', 'Plus récent'),
         ('date_asc', 'Plus ancien')
