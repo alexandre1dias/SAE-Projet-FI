@@ -265,12 +265,6 @@ create table INFORMATION(
     PRIMARY KEY(idInformation)
 );
 
-create table IMAGERIN(
-    idImage integer,
-    idInformation integer,
-    PRIMARY KEY(idImage, idInformation)
-);
-
 create table PRESSE(
     idPresse integer AUTO_INCREMENT,
     dateP date,
@@ -365,8 +359,5 @@ ALTER TABLE IMAGERC ADD FOREIGN KEY (idCompetition) REFERENCES COMPETITION(idCom
 
 ALTER TABLE IMAGERE ADD FOREIGN KEY (idImage) REFERENCES IMAGEAPP(idImage);
 ALTER TABLE IMAGERE ADD FOREIGN KEY (idEventClub) REFERENCES EVENTCLUB(idEventClub);
-
-ALTER TABLE IMAGERIN ADD FOREIGN KEY (idImage) REFERENCES IMAGEAPP(idImage);
-ALTER TABLE IMAGERIN ADD FOREIGN KEY (idInformation) REFERENCES INFORMATION(idInformation);
 
 ALTER TABLE IMAGEARTICLE ADD FOREIGN KEY (idArticle) REFERENCES ARTICLE(idArticle);
