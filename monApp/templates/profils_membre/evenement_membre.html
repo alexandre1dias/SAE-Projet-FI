@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
+{% endblock %}
+
+{% block main %}
+<div class="container-fluid py-5">
+    <div class="header-container mb-4 text-center justify-content-center">
+        <h2>Vos Évènements</h2>
+    </div>
+    
+    <ul class="nav nav-tabs mb-4 justify-content-center">
+        <li class="nav-item">
+            <a class="nav-link {% if type_page == 'competitions' %}active{% endif %}" 
+               href="{{ url_for('profil.evenement_membre', type='competitions', etat=etat, recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}">
+               Compétitions
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if type_page == 'reunions' %}active{% endif %}" 
+               href="{{ url_for('profil.evenement_membre', type='reunions', etat=etat, recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}">
+               Réunions
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if type_page == 'event_club' %}active{% endif %}" 
+               href="{{ url_for('profil.evenement_membre', type='event_club', etat=etat, recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}">
+               Évènements Club
+            </a>
+        </li>
+    </ul>
+
+    <div class="row">
+            <h4 class="mb-4">
+                {% if etat == 'passees' %}Historique : {% else %}Prochains évènements : {% endif %}
+            </h4>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
+                {% for event in pagination.items %}
+                    <div class="col">
+                        <div class="card pricing-card h-100 border-primary shadow-sm">
+                            
+                            <div class="card-header pricing-header basic-header p-4 bg-light">
+                                <h3 class="card-title text-center mb-0 h5">
+                                    {% if type_page == 'competitions' %}
+                                        {{ event.nom }}
+                                    {% elif type_page == 'reunions' %}
+                                        {{ event.nom }}
+                                    {% elif type_page == 'event_club' %}
+                                        {{ event.NomEV }}
+                                    {% endif %}
+                                </h3>
+                            </div>
+
+                            <div class="card-body p-4 d-flex flex-column">
+                                <h4 class="card-title text-center mb-3 h6 text-muted">
+                                    {% if type_page == 'competitions' %}
+                                        {{ event.niveaux }}
+                                    {% elif type_page == 'reunions' %}
+                                        {{ event.niveauRE }}
+                                    {% elif type_page == 'event_club' %}
+                                        {{ event.niveauxEV }}
+                                    {% endif %}
+                                </h4>
+
+                                <ul class="feature-list text-center mb-4 list-unstyled flex-grow-1">
+                                    {% if type_page == 'competitions' %}
+                                        <li class="mb-2 fs-5"><strong>{{ event.date_debut.strftime('%d/%m/%Y') }}</strong></li>
+                                        <li><i class="fas fa-fist-raised me-2"></i>{{ event.type_arme }}</li>
+                                        <li><i class="fas fa-map-marker-alt me-2"></i>{{ event.ville }}</li>
+                                    
+                                    {% elif type_page == 'reunions' %}
+                                        <li class="mb-2 fs-5"><strong>{{ event.dateDebutRE.strftime('%d/%m/%Y') }}</strong></li>
+                                        <li><i class="far fa-clock me-2"></i>{{ event.heureDebutRE }} - {{ event.heureFinRE }}</li>
+                                        <li><i class="fas fa-map-marker-alt me-2"></i>{{ event.ville }}</li>
+                                    
+                                    {% elif type_page == 'event_club' %}
+                                        <li class="mb-2 fs-5"><strong>{{ event.dateDebutEV.strftime('%d/%m/%Y') }}</strong></li>
+                                        <li><i class="far fa-clock me-2"></i>{{ event.heureDebutEV }}</li>
+                                        <li><i class="fas fa-map-marker-alt me-2"></i>{{ event.villeEV }}</li>
+                                    {% endif %}
+                                </ul>
+
+                                <div class="text-center d-flex justify-content-center gap-2 mt-auto">
+                                    {% if type_page == 'competitions' %}
+                                        <a href="{{ url_for('competitions.competition_view', idCompetition=event.id, origine='evenement_membre') }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                        {% if etat == 'avenir' %}
+                                        <a href="{{ url_for('competitions.desinscrire_competition', idCompetition=event.id) }}" 
+                                           class="btn btn-sm btn-outline-danger btn-custom"
+                                           onclick="return confirm('Êtes-vous sûr de vouloir vous désinscrire ?');">Désinscrire</a>
+                                        {% endif %}
+                                    
+                                    {% elif type_page == 'reunions' %}
+                                        <a href="{{ url_for('competitions.reunion_view', idReunion=event.id) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                        {% if etat == 'avenir' %}
+                                        <a href="{{ url_for('competitions.desinscrire_reunion', idReunion=event.id) }}" 
+                                           class="btn btn-sm btn-outline-danger btn-custom"
+                                           onclick="return confirm('Êtes-vous sûr de vouloir vous désinscrire ?');">Désinscrire</a>
+                                        {% endif %}
+                                    
+                                    {% elif type_page == 'event_club' %}
+                                        <a href="{{ url_for('competitions.club_view', idEventClub=event.idEventClub, origine='evenement_membre') }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                        {% if etat == 'avenir' %}
+                                        <a href="{{ url_for('competitions.desinscrire_club', idEventClub=event.idEventClub) }}" 
+                                           class="btn btn-sm btn-outline-danger btn-custom"
+                                           onclick="return confirm('Êtes-vous sûr de vouloir vous désinscrire ?');">Désinscrire</a>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-info text-center py-4">
+                            <i class="fas fa-info-circle fa-2x mb-3"></i><br>
+                            Aucun évènement trouvé.
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if pagination.pages > 1 %}
+            <div class="d-flex justify-content-center mt-4">
+                <ul class="pagination">
+                    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('profil.evenement_membre', page=pagination.prev_num, type=type_page, etat=etat, sexe=filtre.sexe.data, armes=filtre.armes.data, tri=filtre.tri.data, niveau=filtre.niveau.data, type_competition=filtre.type_competition.data, recherche=filtre.recherche.data) }}">Précédent</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Page {{ pagination.page }} sur {{ pagination.pages }}</span>
+                    </li>
+                    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('profil.evenement_membre', page=pagination.next_num, type=type_page, etat=etat, sexe=filtre.sexe.data, armes=filtre.armes.data, tri=filtre.tri.data, niveau=filtre.niveau.data, type_competition=filtre.type_competition.data, recherche=filtre.recherche.data) }}">Suivant</a>
+                    </li>
+                </ul>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+    
+    <aside class="fixed-left">
+        <div class="filtres-box">
+            <div>
+                <h5 class="filtres-titre">Action</h5>
+                <div class="d-grid gap-2">
+                    {% if etat == 'passees' %}
+                        <a href="{{ url_for('profil.evenement_membre', type=type_page, etat='avenir', recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}" class="btn btn-outline-success">
+                            <i class="fas fa-calendar-alt me-2"></i>Voir À venir
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('profil.evenement_membre', type=type_page, etat='passees', recherche=filtre.recherche.data, tri=filtre.tri.data, armes=filtre.armes.data, type_competition=filtre.type_competition.data) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-history me-2"></i>Voir l'historique
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <br>
+            
+            <h5 class="filtres-titre">Filtres</h5>
+            <form action="{{ url_for('profil.evenement_membre') }}" method="GET">
+                <input type="hidden" name="type" value="{{ type_page }}">
+                <input type="hidden" name="etat" value="{{ etat }}">
+
+                <div class="mb-3">
+                    {{ filtre.recherche(class="form-control", placeholder="Nom ou ville...") }}
+                </div>
+
+                <h6>{{ filtre.tri.label }}</h6>
+                <div class="form-group d-grid gap-2">
+                    {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle") }} 
+                </div>
+
+                {% if type_page == 'competitions' %}
+                    <h6>{{ filtre.armes.label }}</h6>
+                    {% for subfield in filtre.armes %}
+                        <div class="form-check">
+                            {{ subfield(class="form-check-input") }}
+                            {{ subfield.label(class="form-check-label") }}
+                        </div>
+                    {% endfor %}
+                    <h6>{{ filtre.type_competition.label }}</h6>
+                    {% for subfield in filtre.type_competition %}
+                        <div class="form-check">
+                            {{ subfield(class="form-check-input") }}
+                            {{ subfield.label(class="form-check-label") }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="d-grid gap-2 mt-4">
+                    {{ filtre.submit(class="btn btn-primary", value="Appliquer") }}
+                </div>
+            </form>
+        </div>
+    </aside>
+</div>
+{% endblock %}

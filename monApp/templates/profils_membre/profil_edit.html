@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="container py-5">
+    <h1 class="text-center mb-5">Modifier le profil de {{ selectedMembre.prenom }} {{ selectedMembre.nom }}</h1>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+                {%if selectedMembre.modifications.count() > 0%}
+                <div class="alert alert-danger" role="alert">Ce membre a déjà une demande de modification en cours</div>
+                {%endif%}
+            {%endif%}
+            {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
+                {%if selectedMembre.modifications.count() > 0%}
+                <div class="alert alert-danger" role="alert">
+                    Vous avez déjà une demande de modification en cours, en faire une nouvelle écrasera l'ancienne<br>
+                </div>
+                {%endif%}
+            {%endif%}
+            <div class="card shadow-sm p-4">
+                <form method="POST" action="{{ url_for('admin.profil_edit', idM=selectedMembre.id, origine = origine) }}">
+                    {{ updateForm.hidden_tag () }}
+                    <div class="mb-3 row">
+        
+                        <label for="nom" class="col-sm-4 col-form-label text-muted">Nom :</label>
+                        <div class="col-sm-8">
+                            {{updateForm.nom(size =50, class_="form-control")}}
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="prenom" class="col-sm-4 col-form-label text-muted">Prénom :</label>
+                        <div class="col-sm-8">
+                            {{updateForm.prenom(size =50, class_="form-control")}}
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="age" class="col-sm-4 col-form-label text-muted">Âge :</label>
+                        <div class="col-sm-8">
+                            <label for="age" class="col-sm-6 col-form-label">{{ selectedMembre.age }}</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="date_naissance" class="col-sm-4 col-form-label text-muted">Date de naissance :</label>
+                        <div class="col-sm-8">
+                            {{updateForm.ddn(type="date", size =50, class_="form-control")}}
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="sexe" class="col-sm-4 col-form-label text-muted">Sexe :</label>
+                        <div class="col-sm-8">
+                            {{ updateForm.sexe(class_="form-control") }}
+                        </div>
+                    </div>
+
+
+                    <div class="mb-3 row">
+                        <label for="categorie" class="col-sm-4 col-form-label text-muted">Niveau :</label>
+                        <div class="col-sm-8">
+                            <label for="categorie" class="col-sm-4 col-form-label">{{selectedMembre.niveau}}</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="email" class="col-sm-4 col-form-label text-muted">Email :</label>
+                        <div class="col-sm-8">
+                            {{updateForm.email(size =50, class_="form-control" + (" is-invalid" if updateForm.email.errors else ""))}}
+                            {% if updateForm.email.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in updateForm.email.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="numTel" class="col-sm-4 col-form-label text-muted">Numéro téléphone :</label>
+                        <div class="col-sm-8">
+                            {{updateForm.numTel(size =50, class_="form-control" + (" is-invalid" if updateForm.numTel.errors else ""))}}
+                            {% if updateForm.numTel.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in updateForm.numTel.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+
+                    <div class="mb-3 row">
+                        <label for="statut" class="col-sm-4 col-form-label text-muted">Statut :</label>
+                        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+                        <div class="col-sm-8">
+                            {{updateForm.statut(class_="form-control")}}
+                        </div>
+                        {% endif %}
+                        {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
+                        <div class="col-sm-8">
+                            {{selectedMembre.statut}}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="statut" class="col-sm-4 col-form-label text-muted">Numéro de License :</label>
+                        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+                        <div class="col-sm-8">
+                            {{updateForm.numLicense(class_="form-control")}}
+                        </div>
+                        {% endif %}
+                        {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
+                        <div class="col-sm-8">
+                            {{selectedMembre.numLicense}}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="justification" class="col-sm-4 col-form-label text-muted">Justification :</label>
+                        <div class="col-sm-8">
+                            {{ updateForm.justification(class_="form-control", rows="5", placeholder="Décrivez la raison de la modification", required=true) }}
+                            {% if updateForm.justification.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in updateForm.justification.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+
+                    <div class="text-center mt-4">
+                        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+                        <button type="submit" class="btn btn-success" name="submit_action" value="admin_save">
+                            Enregistrer les modifications
+                        </button>
+                        {% endif %}
+                        {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
+                        <button type="submit" class="btn btn-success" name="submit_action" value="membre_request">
+                            Valider la demande de modifications
+                        </button>
+                        {% endif %}
+                        <a href="{{ url_for('profil.profil_view', idM=selectedMembre.id, origine=origine) }}" class="btn btn-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

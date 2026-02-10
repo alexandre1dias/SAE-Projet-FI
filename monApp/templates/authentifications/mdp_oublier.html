@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div class="page-login">
+    <div class="login-container">
+        <h2 class="mdp-oublierh2">Mot de passe oublié</h2>
+        <p class="mdpclassp">Entrez votre adresse email pour recevoir un lien de <strong>réinitialisation</strong></p>
+        <form method="POST" action="" style="width: 100%;">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.email(class="form-input" + (" is-invalid" if form.email.errors else ""), placeholder="VOTRE EMAIL") }}
+                {% for error in form.email.errors %}
+                    <div class="invalid-feedback d-block text-white">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn-connecter", value="ENVOYER") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

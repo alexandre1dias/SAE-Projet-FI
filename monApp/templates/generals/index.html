@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block body_class %}homepage{% endblock %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
+    <style>
+        .header-content { text-align: center; padding: 50px 20px; background: #f8f9fa; margin-bottom: 30px; }
+        .h2acc { color: #dc3545; font-weight: bold; }
+        .explore-section { background: #333; color: white; padding: 40px 0; text-align: center; }
+        .explore-col video { max-width: 100%; border-radius: 10px; margin-top: 20px; }
+        .title { text-align: center; margin-bottom: 30px; }
+        .title h1 { font-weight: bold; }
+        .line { height: 4px; width: 60px; background: #007bff; margin: 10px auto; }
+    </style>
+{% endblock %}
+
+{% block main %}
+<header>
+    <div class="header-content">
+        <h2 class="h2acc">L'escrime à Blois... depuis 1883</h2>
+        <div class="line" style="background-color: #dc3545;"></div>
+        <h1 class="h1acc mt-3"> Entrez dans notre histoire </h1>
+        <br>
+        <a href="{{ url_for('general.historique') }}" class="btn btn-outline-danger btn-lg rounded-pill px-4"> Voir notre histoire </a>
+    </div>
+</header>
+
+<section class="explore-section">
+    <div class="container">
+        <h1>C'était la Fête du Sport à Blois… </h1>
+        <div class="explore-col">
+            <video controls>
+                <source src="{{ url_for('static', filename='video/Fete-du-Sport-Blois-2025-2.mp4') }}" type="video/mp4">
+                Votre navigateur ne supporte pas la balise vidéo.
+            </video>
+        </div>
+    </div>
+</section>
+
+<section class="acceuil-section py-5">
+    <div class="title">
+        <h1>Les dernières informations</h1>
+        <div class="line"></div>
+    </div>
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for article in articles %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        {% if article.images %}
+                            <img src="{{ url_for('static', filename='images/articles/' ~ article.id ~ '/' ~ article.images[0].nom) }}" class="card-img-top" alt="Image article" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{article.titreP}}</h5>
+                            <p class="card-text text-truncate">{{article.contenuP}}</p>
+                            <a href="{{ url_for('articles.presse') }}" class="btn btn-primary btn-sm">Lire plus</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('articles.presse') }}" class="btn btn-outline-primary">Voir tous les articles de presse</a>
+        </div>
+    </div>
+</section>
+
+<section class="acceuil-section py-5 bg-light">
+    <div class="title">
+        <h1>Les dernières compétitions</h1>
+        <div class="line"></div>
+    </div>
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for comp in competitions %}
+                <div class="col">
+                    <div class="card pricing-card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-white border-bottom-0 p-4">
+                            <h3 class="card-title text-center mb-0 text-primary">{{comp.nom}} <br> <small class="text-muted">{{comp.ville}}</small></h3>
+                        </div>
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h4 class="card-title text-center mb-4 h5 fw-bold">{{comp.niveaux}}</h4>
+                            <ul class="feature-list text-center mb-4 list-unstyled">
+                                <li><i class="far fa-calendar-alt me-2"></i> {{comp.date_debut.strftime('%d/%m/%Y')}}</li>
+                                <li><i class="fas fa-fist-raised me-2"></i> {{comp.type_arme}}</li>
+                                <li><i class="fas fa-trophy me-2"></i> {{comp.typeComp}}</li>
+                            </ul>
+                            <div class="text-center mt-auto">
+                                <a href="{{ url_for('competitions.competition_view', idCompetition=comp.id, origine='index') }}" class="btn btn-primary rounded-pill px-4">Voir les résultats</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block main %}
+    <div class="h1-materiel-section">
+        <div class="container">
+            <h1>Matériel et tenue d'escrime</h1>
+            <p class="lead">Le materiel nécessaire pour une efficacité lors du combat</p>
+        </div>
+    </div>
+    <div class="container">
+        <div class="section-location">
+            <div class="col-12">
+                <h2 class="mb-4">Location de matériel</h2>
+                {% for tarif in tarifs %}
+                <div class="box-prix mb-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h4>{{ tarif.nom }}</h4>
+                            <p class="mb-0">{{ tarif.description }}</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="prix">{{ tarif.prix }} €</div>
+                            <p><small>par an</small></p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <h3> Autre information </h3>
+            <p><strong>Les  licenciés sont ensuite <u>tenus d’acheter leur propre matériel.</u></strong></p>
+
+        <div class="text-center my-5">
+            <h3>Des questions sur le matériel ?</h3>
+            <p class="text-muted">On vous répondra avec plaisir !</p>
+            <a href="{{ url_for('general.contact') }}" class="btn btn-primary btn-lg">Contactez-nous</a>
+        </div>
+    </div>
+{% endblock %}

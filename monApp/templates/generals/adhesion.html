@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
+{% endblock %}
+
+{% block main %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1>Adhésion</h1>
+        <p class="lead">Le montant de l’adhésion comprend la licence F.F.E. 2025 – 2026.</p>
+    </div>
+
+    <div class="container">
+        <h2 class="text-center mb-5">Choisissez votre adhésion</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for tarif in tarifs %}
+            <div class="col">
+                <div class="card pricing-card h-100 shadow-sm">
+                    <div class="card-header pricing-header basic-header p-4 bg-primary text-white">
+                        <h3 class="card-title text-center mb-0">{{ tarif.nom }}</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <h2 class="card-title text-center mb-4">{{ tarif.prix }} €<small class="text-muted fs-6">/an</small></h2>
+                        <ul class="feature-list text-center mb-4 list-unstyled">
+                            <li>{{ tarif.description }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

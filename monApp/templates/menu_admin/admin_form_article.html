@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <h1 class="mb-4">{{ title }}</h1>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    Formulaire de rédaction
+                </div>
+                <div class="card-body">
+                    
+                    {% if article and article.images %}
+                    <div class="mb-4 p-3 border rounded bg-light">
+                        <label class="form-label fw-bold text-dark">Images actuelles :</label>
+                        <div class="d-flex flex-wrap gap-3">
+                            {% for img in article.images %}
+                            <div class="position-relative bg-white shadow-sm border" style="width: 120px; height: 120px;">
+                                <img src="{{ url_for('static', filename='images/articles/' ~ article.id ~ '/' ~ img.nom) }}"
+                                     alt="Image article"
+                                     class="d-block w-100 h-100" 
+                                     style="object-fit: cover;">
+                                
+                                <form action="{{ url_for('articles.delete_image_article', idImg=img.id) }}" method="POST" class="position-absolute top-0 end-0">
+                                    <button type="submit" 
+                                            class="btn btn-danger btn-sm py-0 px-2 rounded-0" 
+                                            onclick="return confirm('Voulez-vous vraiment supprimer cette image définitivement ?');"
+                                            title="Supprimer l'image">
+                                        &times;
+                                    </button>
+                                </form>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.titre.label(class="form-label fw-bold") }}
+                            {{ form.titre(class="form-control", placeholder="Ex: Résultat du tournoi régional") }}
+                            {% if form.titre.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.titre.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.images.label(class="form-label fw-bold") }}
+                            {{ form.images(class="form-control", multiple=True) }}
+                            <div class="form-text text-muted">
+                                Vous pouvez sélectionner <strong>plusieurs fichiers</strong> en même temps (Ctrl+Clic ou Cmd+Clic).<br>
+                                Formats acceptés : .jpg, .png.
+                            </div>
+                            {% if form.images.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.images.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.contenu.label(class="form-label fw-bold") }}
+                            {{ form.contenu(class="form-control", style="height: 300px;", placeholder="Rédigez le contenu de votre article ici...") }}
+                            {% if form.contenu.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.contenu.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('articles.articles') }}" class="btn btn-secondary">
+                                &larr; Annuler et retour
+                            </a>
+                            {{ form.submit(class="btn btn-success") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
