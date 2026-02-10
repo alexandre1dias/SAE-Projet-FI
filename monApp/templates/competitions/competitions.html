@@ -98,7 +98,7 @@
                 </div>
                 <h6>{{ filtre.sexe.label }}</h6>
                 {% for subfield in filtre.sexe %}
-                    <div class="form-check">
+                    <div class="form-check form-check-inline">
                         {{ subfield(class="form-check-input") }}
                         {{ subfield.label(class="form-check-label") }}
                     </div>
@@ -106,17 +106,17 @@
                 
                 <h6>{{ filtre.armes.label }}</h6>
                 {% for subfield in filtre.armes %}
-                    <div class="form-check">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
+                    <div class="form-check form-check-inline">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
                 {% endfor %}
 
                 <h6>{{ filtre.type_competition.label }}</h6>
                 {% for subfield in filtre.type_competition %}
-                    <div class="form-check">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
+                    <div class="form-check form-check-inline">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
                 {% endfor %}
 
                 <h6>{{ filtre.niveau.label }}</h6>
                 {% for subfield in filtre.niveau %}
-                    <div class="form-check">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
+                    <div class="form-check form-check-inline">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
                 {% endfor %}
 
                 <div class="d-grid gap-2">
