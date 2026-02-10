@@ -72,19 +72,19 @@
     {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
     <div class="text-center mt-4">
         {% if origine == 'competition_update' %}
-            <a href="{{ url_for('competition_update', idCompetition=idCompetition) }}" class="btn btn-secondary me-2">Retour à la compétition</a>
+            <a href="{{ url_for('competitions.competition_update', idCompetition=idCompetition) }}" class="btn btn-secondary me-2">Retour à la compétition</a>
         {% elif origine == 'club_update' %}
-            <a href="{{ url_for('club_update', idEventClub=idEventClub) }}" class="btn btn-secondary me-2">Retour à l'événement</a>
+            <a href="{{ url_for('events_club.club_update', idEventClub=idEventClub) }}" class="btn btn-secondary me-2">Retour à l'événement</a>
         {% elif origine == 'gerer_profils' %}
-            <a href="{{ url_for('gerer_profils') }}" class="btn btn-secondary me-2">Retour à la liste</a>
+            <a href="{{ url_for('admin.gerer_profils') }}" class="btn btn-secondary me-2">Retour à la liste</a>
         {% elif origine == 'gerer_ancien_profils' %}
-            <a href="{{ url_for('gerer_profils', mode='anciens') }}" class="btn btn-secondary me-2">Retour à la liste</a>
+            <a href="{{ url_for('admin.gerer_profils', mode='anciens') }}" class="btn btn-secondary me-2">Retour à la liste</a>
         {% else %}
-            <a href="{{ url_for('gerer_profils') }}" class="btn btn-secondary me-2">Retour</a>
+            <a href="{{ url_for('admin.gerer_profils') }}" class="btn btn-secondary me-2">Retour</a>
         {% endif %}
 
         {%if selectedMembre.activite == False %}
-            <form class="d-inline" action="{{ url_for('reinscrireMembre', idM = selectedMembre.id)}}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir réinscrire ce membre ?');">
+            <form class="d-inline" action="{{ url_for('admin.reinscrireMembre', idM = selectedMembre.id)}}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir réinscrire ce membre ?');">
                 <button type="submit" class="btn btn-success">Réinscrire</button>
             </form>  
         {% endif %}  
