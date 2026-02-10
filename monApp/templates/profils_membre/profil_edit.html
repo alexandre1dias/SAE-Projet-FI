@@ -18,7 +18,8 @@
                 {%endif%}
             {%endif%}
             <div class="card shadow-sm p-4">
-                <form method="POST" action="{{ url_for('admin.profil_edit', idM=selectedMembre.id, origine = origine) }}" onsubmit="return declencherMailto()">
+                <form method="POST" action="{{ url_for('admin.profil_edit', idM=selectedMembre.id, origine = origine) }}" onsubmit="return MailtoModification()" id="formModification" data-mail-actif="{{ 'true' if mail_modification else 'false' }}">
+
                     {{ updateForm.hidden_tag () }}
                     <div class="mb-3 row">
         
@@ -148,19 +149,5 @@
         </div>
     </div>
 </div>
-<script>
-    function declencherMailto() {
-        var activeBtn = document.activeElement;
-        if (activeBtn && activeBtn.value === 'admin_save') return true;
-        var nom = document.getElementById('inputNom').value;
-        var prenom = document.getElementById('inputPrenom').value;
-        var motifElement = document.getElementById('inputJustification');
-        var motif = motifElement ? motifElement.value : "";
-        var actif = {{ 'true' if mail_modif else 'false' }};
-        var destinataire = "blois.escrime@wanadoo.fr";
-        var sujetFinal = "[Modification Profil] " + prenom + " " + nom;
-        var corpsFinal = "Bonjour,\nJe souhaite modifier mon profil.\nJustification : " + motif;
-        return ouvrirClientMail(actif, destinataire, sujetFinal, corpsFinal);
-    }
-</script>
+<script src="{{ url_for('static', filename='js/mailto.js') }}"></script>
 {% endblock %}

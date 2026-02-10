@@ -360,8 +360,6 @@ INSERT INTO INFORMATION (dateIN, heureIN, titreIN, contenuIN) VALUES
 ('2025-10-30', '14:00', 'Fermeture Toussaint', 'Le gymnase sera fermé le 1er Novembre. Les entraînements du vendredi sont annulés.'),
 ('2025-11-05', '11:00', 'Nouvelle boutique club', 'La nouvelle boutique en ligne du club est ouverte. Commandez vos tenues et équipements !');
 
--- Liaison Images - Informations
-INSERT INTO IMAGERIN (idImage, idInformation) VALUES (1, 2), (5, 8), (6, 10);
 
 -- Presse
 INSERT INTO PRESSE (dateP, heureP, titreP, contenuP, lienP, imageP) VALUES

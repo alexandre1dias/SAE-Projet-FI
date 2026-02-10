@@ -2,7 +2,9 @@
 {% block head_extra %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}">
 {% endblock %}
-{% block main %}
+
+{%block main%}
+<div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <h1 class="text-center mb-4">Nous Contacter</h1>
@@ -49,8 +51,11 @@
             <div class="col-lg-6 contact-form">
                 <h2>Nous contacter</h2>
                 
-                <form action="{{ url_for('general.contact') }}" method="POST" novalidate onsubmit="return declencherMailto()">
-                    
+                <form action="{{ url_for('general.contact') }}" method="POST" novalidate onsubmit="return MailtoContact()" id="formContact"
+                      data-mail-question="{{ 'true' if mail_question else 'false' }}"
+                      data-mail-demande="{{ 'true' if mail_demande else 'false' }}"
+                      data-mail-signalement="{{ 'true' if mail_signalement else 'false' }}">
+
                     {{ form.hidden_tag() }}
 
                     <div class="mb-3">
@@ -108,24 +113,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function declencherMailto() {
-            var typeForm = document.querySelector('input[name="type_form"]:checked');
-            var typeTexte = typeForm ? typeForm.value : "Contact";
-            var sujetInput = document.getElementById('inputSujet').value;
-            var emailInput = document.getElementById('inputEmail').value;
-            var descInput = document.getElementById('inputDescription').value;
-            var configMail = {
-                'Question': {{ 'true' if mail_question else 'false' }},
-                'Demande': {{ 'true' if mail_demande else 'false' }},
-                'Signalement': {{ 'true' if mail_signalement else 'false' }}
-            };
-            var actif = configMail[typeTexte];
-            var destinataire = "blois.escrime@wanadoo.fr";
-            var sujetFinal = "[" + typeTexte + "] " + sujetInput;
-            var corpsFinal = "Envoyé par : " + emailInput + "\n\n" + descInput;
-            return ouvrirClientMail(actif, destinataire, sujetFinal, corpsFinal);
-        }
-    </script>
+<script src="{{ url_for('static', filename='js/mailto.js') }}"></script>
 {% endblock %}

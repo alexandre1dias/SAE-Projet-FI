@@ -315,7 +315,7 @@ section{
 /* Page connexion */
 body {
     font-family: sans-serif; 
-    display: flex;
+    display: block;
 }
 
 .page-login {
@@ -996,5 +996,7 @@ header {
 
 body.homepage #main {
     margin-top: 79px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
