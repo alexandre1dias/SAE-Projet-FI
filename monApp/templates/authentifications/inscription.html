@@ -11,7 +11,7 @@
             <h1>Inscription</h1>
         </div>
         
-        <form method="POST" action="" style="width: 100%;" onsubmit="return declencherMailto()">
+        <form method="POST" action="" style="width: 100%;" onsubmit="return MailtoInscription()" id="formInscription" data-mail-actif="{{ 'true' if mail_inscription else 'false' }}">
             {{ form.hidden_tag() }}
             
             <div class="form-group">
@@ -187,23 +187,5 @@
 {% if erreur_email %}
     <div class="alert alert-danger">{{ erreur_email }}</div>
 {% endif %}
-<script>
-    function declencherMailto() {
-        var nom = document.getElementById('inputNom').value;
-        var prenom = document.getElementById('inputPrenom').value;
-        var email = document.getElementById('inputEmail').value;
-        var sexe = document.getElementById('inputSexe').value;
-        var actif = {{ 'true' if mail_inscription else 'false' }};
-        var destinataire = "blois.escrime@wanadoo.fr";
-        var sujetFinal = "[Demande Inscription] " + prenom + " " + nom;
-        var corpsFinal = "Bonjour,\n\nJe souhaite m'inscrire au club.\n" +
-                         "Voici mes informations :\n" +
-                         "- Nom : " + nom + "\n" +
-                         "- Prénom : " + prenom + "\n" +
-                         "- Email : " + email + "\n" +
-                         "- Sexe : " + sexe + "\n\n" +
-                         "Cordialement.";
-        return ouvrirClientMail(actif, destinataire, sujetFinal, corpsFinal);
-    }
-</script>
+<script src="{{ url_for('static', filename='js/mailto.js') }}"></script>
 {% endblock %}
