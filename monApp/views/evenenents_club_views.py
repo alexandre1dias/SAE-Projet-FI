@@ -79,7 +79,8 @@ def club_update(idEventClub):
     if request.method == 'POST':
         try:
             unEventClub.NomEV = request.form['nom']
-            unEventClub.adresseEV = request.form['lieu']
+            unEventClub.adresseEV = request.form['adresse']
+            unEventClub.villeEV = request.form['ville']
             unEventClub.descriptionEV = request.form['description']
             unEventClub.dateDebutEV = datetime.strptime(request.form['date_debut'], '%Y-%m-%d').date()
             unEventClub.heureDebutEV = request.form['heure_debut']

@@ -17,8 +17,12 @@
                         <input type="text" class="form-control" id="nom" name="nom" value="{{ eventClub.NomEV }}" required>
                     </div>
                     <div class="mb-3">
-                        <label for="lieu" class="form-label">Lieu</label>
-                        <input type="text" class="form-control" id="lieu" name="lieu" value="{{ eventClub.adresseEV }}" required>
+                        <label for="adresse" class="form-label">Adresse</label>
+                        <input type="text" class="form-control" id="adresse" name="adresse" value="{{ eventClub.adresseEV }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ville" class="form-label">Ville</label>
+                        <input type="text" class="form-control" id="ville" name="ville" value="{{ eventClub.villeEV }}" required>
                     </div>
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
@@ -213,13 +217,6 @@
         </div>
     </div>
 
-<script>
-    function enleverMembreVisuellement(id) {
-        var ligne = document.getElementById('row-membre-' + id);
-        if (ligne) {
-            ligne.style.display = 'none';
-        }
-    }
-</script>
+
 
 {% endblock %}
