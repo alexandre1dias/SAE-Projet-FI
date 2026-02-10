@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block main %}
+<div class="container py-5">
     <h1>Mesdames, en Garde !</h1>
     <p>Découvrez l'escrime, un sport d'élégance et de précision au Cercle de Blois.</p>
     <div id="carouselTop" class="carousel slide mb-3" data-bs-ride="carousel">
@@ -93,5 +94,5 @@
     </p>
         <img src="{{ url_for('static', filename='images/escrime_feminin/image8.png') }}" class="d-block mx-auto" alt="Article de presse sur l'escrime féminine">
     <p>article paru dans la Nouvelle République, le 26/10/2008</p>
-    
+</div>
 {% endblock %}
