@@ -1516,6 +1516,7 @@ body.dark-mode .ffe-card-text {
         width: auto;
         margin-left: 300px;
         padding: 20px !important;
+        padding-top: 20px !important;
         box-sizing: border-box;
     }
 }
