@@ -5,7 +5,7 @@ TITLE = "Cercle d'escrime Blois"
 BOOTSTRAP_SERVE_LOCAL = True
 
 LOGIN="root"
-PASSWD="root"
+PASSWD="ldadcsek"
 SERVEUR="db"
 BD="escrime_db"
 SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{LOGIN}:{PASSWD}@{SERVEUR}/{BD}'

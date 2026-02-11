@@ -4,10 +4,10 @@ services:
     container_name: spf_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ldadcsek
       MYSQL_DATABASE: escrime_db
     volumes:
-      - ./init-db:/docker-entrypoint-initdb.d  # Exécute tes scripts SQL automatiquement
+      - db_data:/var/lib/mysql
     networks:
       - net
 
@@ -34,4 +34,4 @@ services:
 
 networks:
   net:
-    external: true # Utilise le réseau traefik existant sur le serveur
+    attachable: true # Utilise le réseau traefik existant sur le serveur
