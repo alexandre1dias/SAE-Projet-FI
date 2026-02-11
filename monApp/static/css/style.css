@@ -55,7 +55,7 @@ nav{
 }
 
 nav .nav-link {
-  color: white; /* Remplacez par le code couleur de votre choix */
+  color: white; 
   font-size: larger;
 }
 
@@ -122,7 +122,7 @@ nav .nav-link.active {
 
 .contact-info-box .icon {
     font-size: 2rem;
-    color: #c85a5a; /* Couleur de l'icône */
+    color: #c85a5a; 
     margin-bottom: 15px;
 }
 
@@ -201,11 +201,11 @@ header{
 
 .h2acc{
     font-size: 4vmin;
-    background-color: rgba(184, 40, 40, 0.8); /* Semi-transparent */
+    background-color: rgba(184, 40, 40, 0.8); 
     padding: 10px 30px;
     border-radius: 50px;
     display: inline-block;
-    backdrop-filter: blur(5px); /* Effet de flou moderne */
+    backdrop-filter: blur(5px); 
 }
 
 .lineH{
@@ -312,8 +312,8 @@ section{
 .explore-col video {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Pour garder les proportions */
-    border-radius: 10px; /* Optionnel : coins arrondis */
+    object-fit: cover; 
+    border-radius: 10px; 
 }
 
 /* Page connexion */
@@ -323,7 +323,7 @@ body {
 }
 
 .page-login {
-    background: #ffffff !important; /* le !important pour forcer la couleur. */ 
+    background: #ffffff !important; 
     min-height: 100vh;
     width: 100%;
     position: fixed;
@@ -461,7 +461,7 @@ body {
 
 /* Inscription*/
 .btn-inscription {
-    display: block; /* Important pour que le lien <a> prenne toute la largeur */
+    display: block;
     width: 100%;
     padding: 15px;
     background: white;
@@ -475,8 +475,8 @@ body {
     letter-spacing: 1px;
     box-sizing: border-box;
     box-shadow: 0 5px 5px rgba(0, 0, 0, 0.3);
-    text-align: center; /* Pour centrer le texte */
-    text-decoration: none; /* Pour enlever le soulignement du lien */
+    text-align: center;
+    text-decoration: none; 
 }
 
 .btn-inscription:hover {
@@ -510,7 +510,7 @@ body {
 
 /* Style pour le conteneur FullCalendar */
 .fullcalendar-container {
-    min-height: 600px; /* Assure que le calendrier a une hauteur visible */
+    min-height: 600px;
 }
 
 
@@ -770,12 +770,11 @@ input:checked + .slider:before {
 
 
 
-/* Rendre les filtres "sticky" sur les écrans de taille moyenne et plus */
-@media (min-width: 768px) { /* Applique à partir de la taille "md" de Bootstrap */
+@media (min-width: 768px) { 
     .filtres-box {
         position: sticky;
-        top: 100px; /* Distance par rapport au haut de la fenêtre lorsque l'élément devient sticky */
-        z-index: 100; /* Assure que les filtres restent au-dessus des autres contenus lors du défilement */
+        top: 100px; 
+        z-index: 100; 
     }
 }
 
@@ -842,7 +841,7 @@ input:checked + .slider:before {
 }
 
 .card-competition button {
-    margin-top: auto; /* Pousse le bouton vers le bas */
+    margin-top: auto; 
 }
 
 /* Ajuster les colonnes Bootstrap */
