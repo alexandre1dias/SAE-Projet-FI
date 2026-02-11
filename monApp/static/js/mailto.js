@@ -68,3 +68,51 @@ function MailtoContact() {
                "&body=" + encodeURIComponent(corpsFinal);
     return gererEnvoi(actif, lien);
 }
+
+function MailtoDesinscription(idM, email, prenom, nom) {
+    var justificationElement = document.getElementById('justification-' + idM);
+    var justification = justificationElement ? justificationElement.value : "Non spécifiée";
+    var actif = true; 
+    var sujetFinal = "[Désinscription] Information concernant votre compte - Cercle d'escrime";
+    var corpsFinal = "Bonjour " + prenom + " " + nom + ",\n\n" +
+                        "Votre compte a été désactivé pour la raison suivante :\n" +
+                        justification + "\n\n" +
+                        "Cordialement.";
+    var lien = "mailto:" + email + 
+               "?subject=" + encodeURIComponent(sujetFinal) + 
+               "&body=" + encodeURIComponent(corpsFinal);
+    return gererEnvoi(actif, lien);
+}
+
+function MailtoAccepterInscription(idI, email, prenom, nom) {
+    var sujet = "[Inscription] Bienvenue au Cercle d'escrime !";
+    var corps = "Bonjour " + prenom + " " + nom + ",\n\n" +
+                "Nous avons le plaisir de vous informer que votre inscription a été validée.\n" +
+                "Vous pouvez dès à présent vous connecter à votre espace membre.";
+    var lien = "mailto:" + email + "?subject=" + encodeURIComponent(sujet) + "&body=" + encodeURIComponent(corps);
+    return gererEnvoi(true, lien);
+}
+
+function MailtoAccepterModification(idModif, email, prenom, nom) {
+    var sujet = "[Profil] Vos modifications ont été validées";
+    var corps = "Bonjour " + prenom + " " + nom + ",\n\n" +
+                "Les modifications demandées pour votre profil ont été acceptées et appliquées.";
+    var lien = "mailto:" + email + "?subject=" + encodeURIComponent(sujet) + "&body=" + encodeURIComponent(corps);
+    return gererEnvoi(true, lien);
+}
+
+function MailtoRefuser(type, id, email, prenom, nom) {
+    var modalSelector = '#refusModal-' + type + '-' + id;
+    var justification = document.querySelector(modalSelector + ' textarea[name="justification"]').value;
+    var sujet = (type === 'inscription') ? 
+        "[Inscription] Information concernant votre demande d'adhésion" : 
+        "[Profil] Information concernant votre demande de modification";
+    var corpsIntro = (type === 'inscription') ? 
+        "Votre demande d'inscription n'a pas pu être acceptée" : 
+        "Votre demande de modification de profil a été refusée";
+    var corpsFinal = "Bonjour " + prenom + " " + nom + ",\n\n" +
+                     corpsIntro + " pour la raison suivante :\n" +
+                     justification;
+    var lien = "mailto:" + email + "?subject=" + encodeURIComponent(sujet) + "&body=" + encodeURIComponent(corpsFinal);
+    return gererEnvoi(true, lien);
+}
