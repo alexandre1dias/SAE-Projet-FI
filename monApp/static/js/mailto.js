@@ -1,9 +1,8 @@
-function ouvrirClientMail(estActif, destinataire, sujet, corps) {
+function gererEnvoi(estActif, lien) {
     if (estActif) {
-        var lien = "mailto:" + destinataire + 
-                   "?subject=" + encodeURIComponent(sujet) + 
-                   "&body=" + encodeURIComponent(corps);
         window.location.href = lien;
+        var confirmation = confirm("Votre logiciel de messagerie vient de s'ouvrir.\n\nAvez-vous bien envoyé le mail ?\n\n(Cliquez sur OK pour finaliser l'enregistrement sur le site, ou Annuler pour stopper l'opération)");
+        return confirmation;
     }
     return true;
 }
@@ -24,8 +23,10 @@ function MailtoInscription() {
                         "- Email : " + email + "\n" +
                         "- Sexe : " + sexe + "\n\n" +
                         "Cordialement.";
-                        
-    return ouvrirClientMail(actif, destinataire, sujetFinal, corpsFinal);
+    var lien = "mailto:" + destinataire + 
+               "?subject=" + encodeURIComponent(sujetFinal) + 
+               "&body=" + encodeURIComponent(corpsFinal);
+    return gererEnvoi(actif, lien);
 }
 
 function MailtoModification() {
@@ -40,7 +41,10 @@ function MailtoModification() {
     var destinataire = "blois.escrime@wanadoo.fr";
     var sujetFinal = "[Modification Profil] " + prenom + " " + nom;
     var corpsFinal = "Bonjour,\nJe souhaite modifier mon profil.\nJustification : " + motif;
-    return ouvrirClientMail(actif, destinataire, sujetFinal, corpsFinal);
+    var lien = "mailto:" + destinataire + 
+               "?subject=" + encodeURIComponent(sujetFinal) + 
+               "&body=" + encodeURIComponent(corpsFinal);
+    return gererEnvoi(actif, lien);
 }
 
 function MailtoContact() {
@@ -59,5 +63,8 @@ function MailtoContact() {
     var destinataire = "blois.escrime@wanadoo.fr";
     var sujetFinal = "[" + typeTexte + "] " + sujetInput;
     var corpsFinal = "Envoyé par : " + emailInput + "\n\n" + descInput;
-    return ouvrirClientMail(actif, destinataire, sujetFinal, corpsFinal);
+    var lien = "mailto:" + destinataire + 
+               "?subject=" + encodeURIComponent(sujetFinal) + 
+               "&body=" + encodeURIComponent(corpsFinal);
+    return gererEnvoi(actif, lien);
 }
