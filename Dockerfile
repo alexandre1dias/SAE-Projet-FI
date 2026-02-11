@@ -1,6 +1,14 @@
 # Utilise une image Python légère
 FROM python:3.11-slim
 
+# Installation des dépendances système nécessaires pour compiler mysqlclient
+RUN apt-get update && apt-get install -y \
+    python3-dev \
+    default-libmysqlclient-dev \
+    build-essential \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
 # Définit le dossier de travail dans le conteneur
 WORKDIR /app
 
