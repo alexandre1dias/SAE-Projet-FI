@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% block main %}
+    <div class="container py-5">
+
     <h1 class="mb-4">Consultation du formulaire #{{ selectedFormulaire.id }}</h1>
-    
+
     <div class="card">
         <div class="card-header">
             <strong>Sujet :</strong> {{ selectedFormulaire.sujet }}
@@ -39,4 +41,5 @@
         {% endif %}
     </form>
     <form id="delete-form-{{ selectedFormulaire.id }}" action="{{ url_for('admin.formulaire_delete', idFormulaire=selectedFormulaire.id) }}" method="post" style="display: none;"></form>
+    </div>
 {% endblock %}

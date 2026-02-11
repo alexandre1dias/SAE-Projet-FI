@@ -1,10 +1,15 @@
 {% extends "base.html" %}
+
+{% block body_class %}has-sidebar{% endblock %}
+
 {% block head_extra %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
 {% endblock %}
 
+
 {% block main %}
 
+<div class="container py-5">
     <h2 class="text-center mb-5">Liste de vos résultats</h2>
     <div class="row">
         
@@ -108,6 +113,7 @@
                 </form>
             </div>
         </aside>
+</div>
 </div>
 
 {% endblock %}
