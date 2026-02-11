@@ -1,2 +1,2 @@
-FLASK_APP= monApp
-FLASK_ENV= development
+FLASK_APP=monApp
+FLASK_ENV=production

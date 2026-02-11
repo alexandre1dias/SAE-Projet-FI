@@ -1,0 +1,37 @@
+services:
+  db:
+    image: mariadb:10.11
+    container_name: spf_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: escrime_db
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d  # Exécute tes scripts SQL automatiquement
+    networks:
+      - net
+
+  web:
+    image: lucas.desgranges/sae-projet-web:latest
+    container_name: spf_web
+    # ports:
+    #   - "5000:5000"
+    depends_on:
+      - db
+    env_file:
+      - .flaskenv
+    networks:
+      - net
+    labels:
+      - "traefik.docker.network=net"
+      - "traefik.enable=true"
+      # URL : web.spf.sae.iuto.ovh
+      - "traefik.http.routers.spf_web_router.rule=Host(`web.spf.sae.iuto.ovh`)"
+      - "traefik.http.routers.spf_web_router.entrypoints=websecure"
+      - "traefik.http.routers.spf_web_router.tls.certresolver=myresolver"
+      # Redirection vers le port interne de Flask (5000)
+      - "traefik.http.services.spf_web_router.loadbalancer.server.port=5000"
+
+networks:
+  net:
+    external: true # Utilise le réseau traefik existant sur le serveur
