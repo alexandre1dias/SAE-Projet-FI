@@ -1004,6 +1004,63 @@ body.homepage #main {
 
 }
 
+/* GESTION DES FILTRES SUR MOBILE */
+@media (max-width: 991.98px) {
+    
+
+    .fixed-left {
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 30px; 
+        padding: 0 15px; 
+        background-color: #f8f9fa; 
+        z-index: 1;
+    }
+
+
+    .filtres-box {
+        box-shadow: none !important; 
+        padding: 15px 0 !important;
+    }
+
+    .filtres-titre {
+        cursor: pointer;
+        margin-bottom: 15px;
+    }
+    
+    .fixed-left .btn {
+        width: 100%;
+        margin-top: 10px;
+    }
+} /* Gestion de la video dans l'accueil */ 
+    .explore-section {
+        flex-direction: column !important; 
+        height: auto !important; 
+        padding: 40px 15px !important;
+    }
+
+    .explore-section .explore-content {
+        width: 100% !important;
+        padding: 0 0 30px 0 !important; 
+        text-align: center;
+        order: 1;     /* forcer le texte à être au dessus */
+
+    }
+
+    .explore-section .explore-col {
+        width: 100% !important;
+        height: auto !important; 
+        margin: 0 !important;
+        order: 2; /* force la vidéo à être en en bas */
+    }
+
+    .explore-col video {
+        width: 100% !important;
+        max-height: 300px; 
+        object-fit: contain; /* voir toute la vidéo sans zoom bizarre */
+    }
 .content-with-sidebar {
     margin-left: 300px; 
     width: calc(100% - 300px); 
