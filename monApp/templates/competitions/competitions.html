@@ -91,10 +91,12 @@
             </div>
             <br>
             <form action="{{ url_for('competitions.competitions', etat=etat) }}" method="GET">
+            {%if etat == 'passees' %}
             <h5 class="filtres-titre">Années</h5>
             <div class="d-grid gap-2 mb-3">
                 {{ filtre.annee_scolaire(class="btn btn-outline-primary dropdown-toggle", onchange="this.form.submit()") }} 
             </div>
+            {%endif%}
             <h5 class="filtres-titre">Filtres</h5>
                 <h6> {{ filtre.tri.label }}</h6>
                 <div class="d-grid gap-2">
