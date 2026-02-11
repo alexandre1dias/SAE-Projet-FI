@@ -6,10 +6,10 @@ SECRET_KEY = "2lzUl{$*D6#`8uXqlU."
 TITLE = "Cercle d'escrime Blois"
 BOOTSTRAP_SERVE_LOCAL = True
 
-LOGIN="desgranges"
-PASSWD="desgranges"
-SERVEUR="servinfo-maria"
-BD="DBdesgranges"
+LOGIN=""
+PASSWD=""
+SERVEUR=""
+BD=""
 SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{LOGIN}:{PASSWD}@{SERVEUR}/{BD}'
 
 AUJOURDHUI = datetime.now().date()
