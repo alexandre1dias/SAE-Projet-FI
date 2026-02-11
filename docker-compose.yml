@@ -12,7 +12,7 @@ services:
       - net
 
   web:
-    image: lucas.desgranges/sae-projet-web:latest
+    image: lucasdesgranges/sae-projet-fi:latest
     container_name: spf_web
     # ports:
     #   - "5000:5000"

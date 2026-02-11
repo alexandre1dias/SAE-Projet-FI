@@ -26,4 +26,4 @@ EXPOSE 5000
 
 # Commande de lancement (lance l'initialisation puis l'app)
 # On part du principe que ton app se lance via un script ou flask run
-CMD python initialisation.py && flask run --host=0.0.0.0
+CMD ["flask", "run", "--host=0.0.0.0"]
