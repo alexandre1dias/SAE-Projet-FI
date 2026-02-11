@@ -662,60 +662,6 @@ input:checked + .slider:before {
     cursor: pointer;
 }
 
-/*le container du calendrier */
-.calendrier-wrapper {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-/*Titre page calendrier*/
-#calendrier-titre{
-    color: #b82828;
-}
-
-/* pour le mode clair par défaut du calendirer lorsque le mode sombre est désactivé */
-.fc {
-    color: #000;
-}
-
-.fc-theme-standard td,
-.fc-theme-standard th {
-    border-color: #ddd;
-    background-color: white;
-}
-
-.fc-daygrid-day {
-    background-color: white;
-    color: #000;
-}
-
-.fc-col-header-cell {
-    background-color: #f8f9fa;
-    color: #000;
-}
-
-.fc-day-today {
-    background-color: #fff3cd !important;
-}
-
-.fc-daygrid-day-number {
-    color: #000;
-}
-
-
-
-
-/* CSS Calendrier */
-
-.calendrier-section {
-    padding: 40px 20px;
-}
-
-.calendrier-section h1 {
-    color: #b82828;
-    margin-bottom: 40px;
-}
-
 .header-container {
     display: flex; 
     justify-content: space-between;

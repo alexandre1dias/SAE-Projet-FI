@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
         initialView: 'dayGridMonth',
         locale: 'fr',
         firstDay: 1,
-        height: 700,
-        fixedWeekCount: false,
+        height: 'auto', 
+        fixedWeekCount: false, 
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
