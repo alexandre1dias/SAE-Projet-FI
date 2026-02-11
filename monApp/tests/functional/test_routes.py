@@ -430,6 +430,16 @@ def test_pages_admin_protegees(client, app, db):
         assert response.status_code == 200
         assert "Listes des prochaines réunions" in response.data.decode('utf-8')
 
+        #E. Tarifs et Matériel
+        response = client.get(url_for('admin.gestion_tarifs'))
+        assert response.status_code == 200
+        assert "Gestion des Tarifs" in response.data.decode('utf-8')
+
+        #F Gestion Horaires
+        response = client.get(url_for('admin.gestion_horaires'))
+        assert response.status_code == 200
+        assert "Gestion des Horaires" in response.data.decode('utf-8')
+
 def test_page_protegee_reunion_view(client, app, db):
     """
     Test de la consultation d'une réunion.
@@ -560,6 +570,82 @@ def test_club_view_acces_refuse_anonyme(client, app, db):
     
     assert response.status_code == 302
     assert "/login" in response.location
+
+def test_admin_formulaire_view(client, app, db):
+    """
+    Test de la consultation d'un formulaire (contact/question) par un admin.
+    Route : /formulaire_view/<id>
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+    
+    # 1. Authentification en tant qu'Admin
+    setup_admin(client, db)
+    
+    # 2. Création d'un formulaire de test en base de données
+    formulaire = FormulaireBD(
+        type="Question",
+        sujet="Problème de licence",
+        email="escrimeur@test.fr",
+        description="Bonjour, je n'arrive pas à retrouver mon numéro de licence.",
+        date=date.today(),
+        repondu=False
+    )
+    db.session.add(formulaire)
+    db.session.commit()
+    id_form = formulaire.id
+    
+    # 3. Appel de la route protégée
+    with app.test_request_context():
+        url = url_for('admin.formulaire_view', idFormulaire=id_form)
+        
+    response = client.get(url)
+    
+    # 4. Vérifications
+    assert response.status_code == 200
+    
+    # Le contenu HTML renvoyé doit contenir les informations du formulaire
+    content = response.data.decode('utf-8')
+    assert "Problème de licence" in content
+    assert "escrimeur@test.fr" in content
+    assert "Bonjour, je n'arrive pas à retrouver mon numéro de licence." in content
+
+def test_admin_formulaire_view_acces_refuse(client, app, db):
+    """
+    Vérifie qu'un utilisateur non connecté ou un simple membre 
+    ne peut pas accéder à la consultation d'un formulaire.
+    """
+    # Création du formulaire
+    formulaire = FormulaireBD(
+        type="Question", sujet="Secret", email="test@test.fr", description="Test"
+    )
+    db.session.add(formulaire)
+    db.session.commit()
+    id_form = formulaire.id
+
+    # 1. Test avec un visiteur anonyme (Non connecté)
+    client.get('/logout/')
+    with app.test_request_context():
+        response_anonyme = client.get(url_for('admin.formulaire_view', idFormulaire=id_form))
+    # Redirection vers la page de login attendue
+    assert response_anonyme.status_code == 302 
+    assert "/login" in response_anonyme.location
+
+    # 2. Test avec un Membre simple
+    membre = MembreBD(
+        email='membre_curieux@test.fr', 
+        mdp_hash=generate_password_hash('pass'),
+        nom='Curieux', prenom='Membre', activite=True
+    )
+    db.session.add(membre)
+    db.session.commit()
+
+    client.post('/login/', data={'email': 'membre_curieux@test.fr', 'password': 'pass'})
+    
+    with app.test_request_context():
+        response_membre = client.get(url_for('admin.formulaire_view', idFormulaire=id_form))
+    
+    # Le décorateur @admin_required doit bloquer l'accès (ex: erreur 401 ou 403 selon votre implémentation)
+    assert response_membre.status_code in [401, 403, 405]
 
 # ==============================================================================
 # SCENARIOS ACTIONS ADMIN
@@ -1140,12 +1226,14 @@ def test_crud_event_club_admin(client, app, db):
     # 2. Modification
     data_update = {
         'nom': 'Soirée Modifiée',
-        'lieu': 'Local B',
+        'ville': 'Orléans',               
+        'adresse': 'Local B',            
         'description': 'Nouvelle description',
         'date_debut': '2025-06-01',
         'heure_debut': '19:00',
         'date_fin': '2025-06-01',
-        'heure_fin': '23:00'
+        'heure_fin': '23:00',
+        'niveaux': 'Tous'                 
     }
     
     with app.test_request_context():
