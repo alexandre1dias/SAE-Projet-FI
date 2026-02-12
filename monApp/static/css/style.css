@@ -1067,7 +1067,7 @@ body.homepage #main {
 }
 
 
-@media (max-width: 768px) {
+@media (max-width: 991.98px) {
     .content-with-sidebar {
         margin-left: 0;
         width: 100%;
