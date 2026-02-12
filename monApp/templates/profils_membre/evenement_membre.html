@@ -96,17 +96,17 @@
                                         {% endif %}
                                     
                                     {% elif type_page == 'reunions' %}
-                                        <a href="{{ url_for('competitions.reunion_view', idReunion=event.id) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                        <a href="{{ url_for('reunions.reunion_view', idReunion=event.id) }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
                                         {% if etat == 'avenir' %}
-                                        <a href="{{ url_for('competitions.desinscrire_reunion', idReunion=event.id) }}" 
+                                        <a href="{{ url_for('reunions.desinscrire_reunion', idReunion=event.id) }}" 
                                            class="btn btn-sm btn-outline-danger btn-custom"
                                            onclick="return confirm('Êtes-vous sûr de vouloir vous désinscrire ?');">Désinscrire</a>
                                         {% endif %}
                                     
                                     {% elif type_page == 'event_club' %}
-                                        <a href="{{ url_for('competitions.club_view', idEventClub=event.idEventClub, origine='evenement_membre') }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
+                                        <a href="{{ url_for('events_club.club_view', idEventClub=event.idEventClub, origine='evenement_membre') }}" class="btn btn-sm btn-outline-primary btn-custom">Consulter</a>
                                         {% if etat == 'avenir' %}
-                                        <a href="{{ url_for('competitions.desinscrire_club', idEventClub=event.idEventClub) }}" 
+                                        <a href="{{ url_for('events_club.desinscrire_club', idEventClub=event.idEventClub) }}" 
                                            class="btn btn-sm btn-outline-danger btn-custom"
                                            onclick="return confirm('Êtes-vous sûr de vouloir vous désinscrire ?');">Désinscrire</a>
                                         {% endif %}
