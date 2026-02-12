@@ -10,6 +10,7 @@ from .profil_membre_views import profil_bp
 from .parametres_views import parametres_bp
 from .notifications_views import notifications_bp
 from .menu_admin_views import admin_bp
+from .erreurs import erreurs_bp
 
 # Liste de tous les blueprints à enregistrer
 all_blueprints = [
@@ -23,7 +24,8 @@ all_blueprints = [
     profil_bp,
     parametres_bp,
     notifications_bp,
-    admin_bp
+    admin_bp,
+    erreurs_bp
 ]
 
 def register_blueprints(app):
