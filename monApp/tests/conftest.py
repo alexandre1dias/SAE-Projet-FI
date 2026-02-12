@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 # On les retire pour laisser le temps à la couverture de démarrer.
 
+
 # ===============================================================
 # 1. Configuration Application
 # ===============================================================
@@ -13,7 +14,7 @@ def app():
     Configure l'application Flask pour le mode TEST.
     """
     from monApp.app import app as flask_app
-    
+
     flask_app.config.update({
         "TESTING": True,
         "WTF_CSRF_ENABLED": False,
@@ -29,13 +30,13 @@ def app():
 # 2. Configuration Base de Données (Remplacement de Session)
 # ===============================================================
 @pytest.fixture(scope='function')
-def db(app):
+def db(monApp):
     """
     Crée une base SQLite isolée et REMPLACE la session globale de l'app.
     """
     from monApp.app import db as _db
     # On importe les modèles pour s'assurer qu'ils sont connus de SQLAlchemy avant create_all
-    import monApp.models 
+    import monApp.models
 
     # A. Création du moteur SQLite manuel
     engine = create_engine('sqlite:///:memory:')

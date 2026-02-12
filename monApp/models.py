@@ -3,26 +3,50 @@ from flask_login import UserMixin
 from sqlalchemy.sql import func
 from datetime import datetime
 
+image_competition_association = db.Table(
+    'IMAGERC',
+    db.Column('idImage',
+              db.Integer,
+              db.ForeignKey('IMAGEAPP.idImage'),
+              primary_key=True),
+    db.Column('idCompetition',
+              db.Integer,
+              db.ForeignKey('COMPETITION.idCompetition'),
+              primary_key=True))
 
-image_competition_association = db.Table('IMAGERC',
-    db.Column('idImage', db.Integer, db.ForeignKey('IMAGEAPP.idImage'), primary_key=True),
-    db.Column('idCompetition', db.Integer, db.ForeignKey('COMPETITION.idCompetition'), primary_key=True)
-)
+image_evenement_club_association = db.Table(
+    'IMAGERE',
+    db.Column('idImage',
+              db.Integer,
+              db.ForeignKey('IMAGEAPP.idImage'),
+              primary_key=True),
+    db.Column('idEventClub',
+              db.Integer,
+              db.ForeignKey('EVENTCLUB.idEventClub'),
+              primary_key=True))
 
-image_evenement_club_association = db.Table('IMAGERE',
-    db.Column('idImage', db.Integer, db.ForeignKey('IMAGEAPP.idImage'), primary_key=True),
-    db.Column('idEventClub', db.Integer, db.ForeignKey('EVENTCLUB.idEventClub'), primary_key=True)
-)
+recevoir_a = db.Table(
+    'RECEVOIRA',
+    db.Column('idNotifs',
+              db.Integer,
+              db.ForeignKey('NOTIFS.idNotifs'),
+              primary_key=True),
+    db.Column('idAdmin',
+              db.Integer,
+              db.ForeignKey('ADMINISTRATEUR.idAdmin'),
+              primary_key=True))
 
-recevoir_a = db.Table('RECEVOIRA',
-    db.Column('idNotifs', db.Integer, db.ForeignKey('NOTIFS.idNotifs'), primary_key=True),
-    db.Column('idAdmin', db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'), primary_key=True)
-)
+recevoir_m = db.Table(
+    'RECEVOIRM',
+    db.Column('idNotifs',
+              db.Integer,
+              db.ForeignKey('NOTIFS.idNotifs'),
+              primary_key=True),
+    db.Column('idMembre',
+              db.Integer,
+              db.ForeignKey('MEMBRE.idMembre'),
+              primary_key=True))
 
-recevoir_m = db.Table('RECEVOIRM',
-    db.Column('idNotifs', db.Integer, db.ForeignKey('NOTIFS.idNotifs'), primary_key=True),
-    db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'), primary_key=True)
-)
 
 class MembreBD(UserMixin, db.Model):
     """
@@ -47,7 +71,9 @@ class MembreBD(UserMixin, db.Model):
     numTel = db.Column(db.String(20))
     numLicense = db.Column(db.String(67))
     eventInscriptionSite = db.Column(db.Boolean, default=True, nullable=False)
-    evenementInscriptionMail = db.Column(db.Boolean, default=True, nullable=False)
+    evenementInscriptionMail = db.Column(db.Boolean,
+                                         default=True,
+                                         nullable=False)
     eventNouveauSite = db.Column(db.Boolean, default=True, nullable=False)
     eventNouveauMail = db.Column(db.Boolean, default=True, nullable=False)
     eventAnnulationSite = db.Column(db.Boolean, default=True, nullable=False)
@@ -58,6 +84,7 @@ class MembreBD(UserMixin, db.Model):
     reponseFormulaireMail = db.Column(db.Boolean, default=True, nullable=False)
     modifProfilSite = db.Column(db.Boolean, default=True, nullable=False)
     modifProfilMail = db.Column(db.Boolean, default=True, nullable=False)
+
 
 #====================   Tables de Evenements   ====================#
 class EvenementBD(UserMixin, db.Model):
@@ -80,14 +107,16 @@ class EvenementBD(UserMixin, db.Model):
                                   back_populates='evenement',
                                   cascade='all, delete-orphan',
                                   lazy=True)
+
     def __repr__(self):
         return f"<Evenement {self.id}>"
+
 
 class ReunionBD(UserMixin, db.Model):
     __tablename__ = 'REUNION'
 
     id = db.Column('idReunion', db.Integer, primary_key=True)
-    nom = db.Column('nomRE' , db.String(41))
+    nom = db.Column('nomRE', db.String(41))
     ville = db.Column('villeRE', db.String(50))
     adresse = db.Column('adresseRE', db.String(50))
     dateDebutRE = db.Column(db.Date)
@@ -100,9 +129,10 @@ class ReunionBD(UserMixin, db.Model):
     idEvent = db.Column(db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
     evenement = db.relationship('EvenementBD', back_populates='reunions')
 
+
 class CompetitionBD(UserMixin, db.Model):
     __tablename__ = 'COMPETITION'
-    
+
     id = db.Column('idCompetition', db.Integer, primary_key=True)
     nom = db.Column('nomCo', db.String(50))
     ville = db.Column('villeCo', db.String(50))
@@ -120,19 +150,23 @@ class CompetitionBD(UserMixin, db.Model):
     classement = db.Column('classementCo', db.String(20))
     passee = db.Column('passeeCO', db.Boolean)
     # Clé étrangère et Relations
-    id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
+    id_event = db.Column('idEvent', db.Integer,
+                         db.ForeignKey('EVENEMENT.idEvent'))
     evenement = db.relationship('EvenementBD', back_populates='competitions')
-    resultats = db.relationship('ResultatBD', backref='competition', lazy=True, cascade='all, delete-orphan')
-    images_rc = db.relationship(
-        'ImageAppBD',
-        secondary=image_competition_association,
-        lazy='subquery',
-        backref=db.backref('competitions_associees', lazy=True)
-    )
+    resultats = db.relationship('ResultatBD',
+                                backref='competition',
+                                lazy=True,
+                                cascade='all, delete-orphan')
+    images_rc = db.relationship('ImageAppBD',
+                                secondary=image_competition_association,
+                                lazy='subquery',
+                                backref=db.backref('competitions_associees',
+                                                   lazy=True))
+
 
 class EventClubBD(UserMixin, db.Model):
     __tablename__ = 'EVENTCLUB'
-    
+
     idEventClub = db.Column(db.Integer, primary_key=True)
     NomEV = db.Column(db.String(50))
     villeEV = db.Column(db.String(50))
@@ -146,14 +180,15 @@ class EventClubBD(UserMixin, db.Model):
     niveauxEV = db.Column(db.String(45))
     passeeEV = db.Column(db.Boolean)
     # Clé étrangère et Relations
-    id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
+    id_event = db.Column('idEvent', db.Integer,
+                         db.ForeignKey('EVENEMENT.idEvent'))
     evenement = db.relationship('EvenementBD', back_populates='event_clubs')
-    images_re = db.relationship(
-        'ImageAppBD',
-        secondary=image_evenement_club_association,
-        lazy='subquery',
-        backref=db.backref('eventclubs_associes', lazy=True)
-    )
+    images_re = db.relationship('ImageAppBD',
+                                secondary=image_evenement_club_association,
+                                lazy='subquery',
+                                backref=db.backref('eventclubs_associes',
+                                                   lazy=True))
+
 
 class EntrainementBD(UserMixin, db.Model):
     """
@@ -170,8 +205,10 @@ class EntrainementBD(UserMixin, db.Model):
     heure_fin = db.Column('heureFinEN', db.String(5))
     type_arme = db.Column('typeArmeEN', db.String(12))
     niveau = db.Column('niveauEN', db.String(15))
-    id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'))
-    evenement = db.relationship('EvenementBD', backref=db.backref('entrainements', lazy=True))
+    id_event = db.Column('idEvent', db.Integer,
+                         db.ForeignKey('EVENEMENT.idEvent'))
+    evenement = db.relationship('EvenementBD',
+                                backref=db.backref('entrainements', lazy=True))
 
 
 class AdminBD(UserMixin, db.Model):
@@ -188,8 +225,12 @@ class AdminBD(UserMixin, db.Model):
     formulaireDemandeMail = db.Column(db.Boolean, default=True, nullable=False)
     formulaireQuestionSite = db.Column(db.Boolean, default=True, nullable=False)
     formulaireQuestionMail = db.Column(db.Boolean, default=True, nullable=False)
-    formulaireSignalementSite = db.Column(db.Boolean, default=True, nullable=False)
-    formulaireSignalementMail = db.Column(db.Boolean, default=True, nullable=False)
+    formulaireSignalementSite = db.Column(db.Boolean,
+                                          default=True,
+                                          nullable=False)
+    formulaireSignalementMail = db.Column(db.Boolean,
+                                          default=True,
+                                          nullable=False)
     demandeModifSite = db.Column(db.Boolean, default=True, nullable=False)
     demandeModifMail = db.Column(db.Boolean, default=True, nullable=False)
     demandeInscriptionSite = db.Column(db.Boolean, default=True, nullable=False)
@@ -203,7 +244,10 @@ class InscriptionBD(UserMixin, db.Model):
     __tablename__ = 'INSCRIPTION'
 
     # Mappage des colonnes SQL
-    id = db.Column('idInscription', db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column('idInscription',
+                   db.Integer,
+                   primary_key=True,
+                   autoincrement=True)
     email = db.Column('mailInscr', db.String(41), unique=True, nullable=False)
     nom = db.Column('nomI', db.String(41))
     prenom = db.Column('prenomI', db.String(41))
@@ -221,7 +265,10 @@ class ModifBD(UserMixin, db.Model):
     __tablename__ = 'MODIFICATION'
 
     id = db.Column('idModif', db.Integer, primary_key=True)
-    id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'), nullable=False)
+    id_membre = db.Column('idMembre',
+                          db.Integer,
+                          db.ForeignKey('MEMBRE.idMembre'),
+                          nullable=False)
     nom = db.Column('nomModif', db.String(41))
     prenom = db.Column('prenomModif', db.String(41))
     email = db.Column('emailModif', db.String(100), unique=True, nullable=False)
@@ -231,7 +278,9 @@ class ModifBD(UserMixin, db.Model):
     date = db.Column('dateModif', db.Date)
     numLicense = db.Column(db.String(67))
     justification = db.Column('justificationModif', db.String(200))
-    membre = db.relationship('MembreBD', backref=db.backref('modifications', lazy='dynamic'))
+    membre = db.relationship('MembreBD',
+                             backref=db.backref('modifications',
+                                                lazy='dynamic'))
 
 
 class ParticiperBD(UserMixin, db.Model):
@@ -241,27 +290,52 @@ class ParticiperBD(UserMixin, db.Model):
     """
     __tablename__ = 'PARTICIPER'
 
-    id_event = db.Column('idEvent', db.Integer, db.ForeignKey('EVENEMENT.idEvent'), primary_key=True)
-    id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'), primary_key=True)
+    id_event = db.Column('idEvent',
+                         db.Integer,
+                         db.ForeignKey('EVENEMENT.idEvent'),
+                         primary_key=True)
+    id_membre = db.Column('idMembre',
+                          db.Integer,
+                          db.ForeignKey('MEMBRE.idMembre'),
+                          primary_key=True)
 
-    membre = db.relationship('MembreBD', backref=db.backref('evenements_inscrits', lazy='dynamic'))
-    evenement = db.relationship('EvenementBD', backref=db.backref('participants', lazy='dynamic'))
+    membre = db.relationship('MembreBD',
+                             backref=db.backref('evenements_inscrits',
+                                                lazy='dynamic'))
+    evenement = db.relationship('EvenementBD',
+                                backref=db.backref('participants',
+                                                   lazy='dynamic'))
+
 
 class RepondreBD(db.Model):
     """
     Table d'association entre un administrateur et un formulaire auquel il a répondu.
     """
     __tablename__ = 'REPONDRE'
-    id_formulaire = db.Column('idFormulaire', db.Integer, db.ForeignKey('FORMULAIRE_CONTACT.idFormulaire'), primary_key=True)
-    id_admin = db.Column('idAdmin', db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'), primary_key=True)
+    id_formulaire = db.Column('idFormulaire',
+                              db.Integer,
+                              db.ForeignKey('FORMULAIRE_CONTACT.idFormulaire'),
+                              primary_key=True)
+    id_admin = db.Column('idAdmin',
+                         db.Integer,
+                         db.ForeignKey('ADMINISTRATEUR.idAdmin'),
+                         primary_key=True)
+
 
 class RemplirBD(db.Model):
     """
     Table d'association entre un membre et un formulaire qu'il a rempli.
     """
     __tablename__ = 'REMPLIR'
-    id_formulaire = db.Column('idFormulaire', db.Integer, db.ForeignKey('FORMULAIRE_CONTACT.idFormulaire'), primary_key=True)
-    id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'), primary_key=True)
+    id_formulaire = db.Column('idFormulaire',
+                              db.Integer,
+                              db.ForeignKey('FORMULAIRE_CONTACT.idFormulaire'),
+                              primary_key=True)
+    id_membre = db.Column('idMembre',
+                          db.Integer,
+                          db.ForeignKey('MEMBRE.idMembre'),
+                          primary_key=True)
+
 
 class FormulaireBD(UserMixin, db.Model):
     """
@@ -280,15 +354,20 @@ class FormulaireBD(UserMixin, db.Model):
     reponse = db.Column(db.String(300))
     repondu = db.Column(db.Boolean)
 
-
     idMembre = db.Column(db.Integer, db.ForeignKey('MEMBRE.idMembre'))
     idAdmin = db.Column(db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'))
 
-    membre = db.relationship('MembreBD', backref=db.backref('formulaires', lazy=True))
-    admin = db.relationship('AdminBD', backref=db.backref('formulaires', lazy=True))
+    membre = db.relationship('MembreBD',
+                             backref=db.backref('formulaires', lazy=True))
+    admin = db.relationship('AdminBD',
+                            backref=db.backref('formulaires', lazy=True))
 
-    reponses = db.relationship('RepondreBD', backref='formulaire', cascade="all, delete-orphan")
-    remplissages = db.relationship('RemplirBD', backref='formulaire', cascade="all, delete-orphan")
+    reponses = db.relationship('RepondreBD',
+                               backref='formulaire',
+                               cascade="all, delete-orphan")
+    remplissages = db.relationship('RemplirBD',
+                                   backref='formulaire',
+                                   cascade="all, delete-orphan")
 
 
 class ResultatBD(db.Model):
@@ -302,10 +381,14 @@ class ResultatBD(db.Model):
     date = db.Column('dateRE', db.Date)
     type_arme = db.Column('typeArmeRE', db.String(12))
     type_compete = db.Column('typeCompeteRE', db.String(15))
-    id_competition = db.Column('idCompetition', db.Integer, db.ForeignKey('COMPETITION.idCompetition'))
-    id_membre = db.Column('idMembre', db.Integer, db.ForeignKey('MEMBRE.idMembre'))
+    id_competition = db.Column('idCompetition', db.Integer,
+                               db.ForeignKey('COMPETITION.idCompetition'))
+    id_membre = db.Column('idMembre', db.Integer,
+                          db.ForeignKey('MEMBRE.idMembre'))
 
-    membre = db.relationship('MembreBD', backref=db.backref('resultats', lazy=True))
+    membre = db.relationship('MembreBD',
+                             backref=db.backref('resultats', lazy=True))
+
 
 class InformationBD(UserMixin, db.Model):
     """
@@ -319,6 +402,7 @@ class InformationBD(UserMixin, db.Model):
     heureIN = db.Column(db.String(5))
     titreIN = db.Column(db.String(50))
     contenuIN = db.Column(db.String(600))
+
 
 class PresseBD(UserMixin, db.Model):
     """
@@ -335,6 +419,7 @@ class PresseBD(UserMixin, db.Model):
     lienP = db.Column(db.String(255))
     imageP = db.Column(db.String(255))
 
+
 class HoraireBD(db.Model):
     __tablename__ = 'HORAIRE'
     id = db.Column('idHoraire', db.Integer, primary_key=True)
@@ -344,6 +429,7 @@ class HoraireBD(db.Model):
     activite = db.Column(db.String(100))
     details = db.Column(db.String(255))
 
+
 class TarifBD(db.Model):
     __tablename__ = 'TARIF'
     id = db.Column('idTarif', db.Integer, primary_key=True)
@@ -351,6 +437,7 @@ class TarifBD(db.Model):
     prix = db.Column(db.Integer)
     description = db.Column(db.String(255))
     categorie = db.Column(db.String(20))
+
 
 class ImageArticleBD(db.Model):
     """
@@ -360,7 +447,9 @@ class ImageArticleBD(db.Model):
 
     id = db.Column('idImageArticle', db.Integer, primary_key=True)
     nom = db.Column('nomI', db.String(255))
-    id_article = db.Column('idArticle', db.Integer, db.ForeignKey('ARTICLE.idArticle'))
+    id_article = db.Column('idArticle', db.Integer,
+                           db.ForeignKey('ARTICLE.idArticle'))
+
 
 class ArticleBD(db.Model):
     __tablename__ = 'ARTICLE'
@@ -369,7 +458,10 @@ class ArticleBD(db.Model):
     titre = db.Column('titreA', db.String(100))
     contenu = db.Column('contenuA', db.Text)
     date = db.Column('dateA', db.Date)
-    images = db.relationship('ImageArticleBD', backref='article', lazy=True, cascade="all, delete-orphan")
+    images = db.relationship('ImageArticleBD',
+                             backref='article',
+                             lazy=True,
+                             cascade="all, delete-orphan")
 
 
 class ImageAppBD(db.Model):
@@ -379,6 +471,7 @@ class ImageAppBD(db.Model):
     urlI = db.Column(db.String(255))
     prive = db.Column(db.Boolean)
     alt = db.Column(db.String(21))
+
 
 class NotifsBD(db.Model):
     __tablename__ = 'NOTIFS'

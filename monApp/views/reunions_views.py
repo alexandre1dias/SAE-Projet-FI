@@ -12,6 +12,7 @@ reunions_bp = Blueprint('reunions', __name__)
 
 #====================   Pages Reunions   ====================#
 
+
 @reunions_bp.route("/reunion/")
 @reunions_bp.route("/reunion/<string:etat>")
 @login_required
@@ -25,7 +26,8 @@ def reunion(etat="prochaine"):
     for (d,) in dates_bd:
         if d:
             annee_debut = d.year if d.month >= 8 else d.year - 1
-            annees_set.add((str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
+            annees_set.add(
+                (str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
     if annees_set:
         choix_tries = sorted(list(annees_set), key=lambda x: x[0], reverse=True)
         filtre.annee_scolaire.choices = choix_tries
@@ -38,7 +40,9 @@ def reunion(etat="prochaine"):
             an_debut = int(annee_selectionnee)
             debut_saison = date(an_debut, 8, 1)
             fin_saison = date(an_debut + 1, 7, 31)
-            lesReunions = lesReunions.filter(ReunionBD.dateDebutRE >= debut_saison, ReunionBD.dateDebutRE <= fin_saison)
+            lesReunions = lesReunions.filter(
+                ReunionBD.dateDebutRE >= debut_saison, ReunionBD.dateDebutRE
+                <= fin_saison)
         except (ValueError, TypeError):
             pass
     filtre.tri.choices = [('date_desc', 'Plus récent'),
@@ -64,13 +68,18 @@ def reunion(etat="prochaine"):
                            passee=passee,
                            user_registered_event_ids=ids_evenements_inscrits)
 
+
 @reunions_bp.route("/reunion/consultation/<int:idReunion>")
 @login_required
 @comite_ou_admin_required
 def reunion_view(idReunion):
     reunion = ReunionBD.query.get(idReunion)
     origine = request.args.get('origine', 'default')
-    return render_template("reunions/reunion_view.html",title=TITLE+"- Consultatiion d'une réunion", selectedReunion = reunion, origine=origine)
+    return render_template("reunions/reunion_view.html",
+                           title=TITLE + "- Consultatiion d'une réunion",
+                           selectedReunion=reunion,
+                           origine=origine)
+
 
 @reunions_bp.route("/reunion/delete/<int:idReunion>", methods=['POST'])
 @login_required
@@ -81,6 +90,7 @@ def reunion_delete(idReunion):
     db.session.commit()
     return redirect(url_for('reunions.reunion'))
 
+
 @reunions_bp.route("/reunion/inscrire/<int:idReunion>", methods=['GET'])
 @login_required
 @comite_ou_admin_required
@@ -89,7 +99,7 @@ def inscrire_reunion(idReunion):
     id_evenement_a_inscrire = reunion_objet.idEvent
     try:
         nouvelle_participation = ParticiperBD(id_membre=current_user.id,
-                                                id_event=id_evenement_a_inscrire)
+                                              id_event=id_evenement_a_inscrire)
         db.session.add(nouvelle_participation)
         db.session.commit()
     except Exception:
@@ -97,13 +107,15 @@ def inscrire_reunion(idReunion):
 
     return redirect(url_for('reunions.reunion'))
 
+
 @reunions_bp.route("/reunion/desinscrire/<int:idReunion>", methods=['GET'])
 @login_required
 @comite_ou_admin_required
 def desinscrire_reunion(idReunion):
     reunion_objet = ReunionBD.query.get_or_404(idReunion)
     id_evenement = reunion_objet.idEvent
-    participation = ParticiperBD.query.filter_by(id_membre=current_user.id, id_event=id_evenement).first()
+    participation = ParticiperBD.query.filter_by(id_membre=current_user.id,
+                                                 id_event=id_evenement).first()
     if participation:
         try:
             db.session.delete(participation)
@@ -111,6 +123,7 @@ def desinscrire_reunion(idReunion):
         except Exception:
             db.session.rollback()
     return redirect(url_for('reunions.reunion'))
+
 
 @reunions_bp.route("/reunion/update/<int:idReunion>", methods=['GET', 'POST'])
 @login_required
@@ -123,11 +136,15 @@ def reunion_update(idReunion):
         reunion.ville = request.form['ville']
         reunion.adresse = request.form['adresse']
         reunion.rapportRE = request.form['description']
-        
-        reunion.dateDebutRE = datetime.strptime(request.form['date_debut'], '%Y-%m-%d').date()
+
+        reunion.dateDebutRE = datetime.strptime(request.form['date_debut'],
+                                                '%Y-%m-%d').date()
         reunion.heureDebutRE = request.form['heure_debut']
-        reunion.dateFinRE = datetime.strptime(request.form['date_fin'], '%Y-%m-%d').date()
+        reunion.dateFinRE = datetime.strptime(request.form['date_fin'],
+                                              '%Y-%m-%d').date()
         reunion.heureFinRE = request.form['heure_fin']
         db.session.commit()
         return redirect(url_for('reunions.reunion_view', idReunion=reunion.id))
-    return render_template("reunions/reunion_update.html", title=TITLE + "- Modification d'une réunion", reunion=reunion)
+    return render_template("reunions/reunion_update.html",
+                           title=TITLE + "- Modification d'une réunion",
+                           reunion=reunion)

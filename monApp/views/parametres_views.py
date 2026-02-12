@@ -14,12 +14,14 @@ parametres_bp = Blueprint('parametres', __name__)
 #====================   Pages Paramètres   ====================#
 #==============================================================#
 
+
 @parametres_bp.route('/parametres/')
 def parametres():
     form = ParametresForm()
     return render_template("parametres/parametres.html",
-                         title=TITLE+"- Paramètres du Membre",
-                         form=form)
+                           title=TITLE + "- Paramètres du Membre",
+                           form=form)
+
 
 @parametres_bp.route("/parametres_notifs/", methods=["GET", "POST"])
 @login_required
@@ -56,25 +58,34 @@ def parametres_notifs():
 
         db.session.commit()
         return redirect(url_for('parametres.parametres_notifs'))
-    return render_template("parametres/parametres_notifs.html", title=TITLE+"- Paramètres notifications", parametres=current_user)
+    return render_template("parametres/parametres_notifs.html",
+                           title=TITLE + "- Paramètres notifications",
+                           parametres=current_user)
+
 
 @parametres_bp.route("/changer_mdp/", methods=['GET', 'POST'])
 @login_required
 def changer_mdp():
     form = MdpChangeForm()
     if form.validate_on_submit():
-        if not check_password_hash(current_user.mdp_hash, form.old_password.data):
+        if not check_password_hash(current_user.mdp_hash,
+                                   form.old_password.data):
             flash("L'ancien mot de passe est incorrect.", 'danger')
             return redirect(url_for('parametres.changer_mdp'))
         if form.new_password.data != form.confirm_new_password.data:
             flash("Les nouveaux mots de passe ne correspondent pas.", 'danger')
             return redirect(url_for('parametres.changer_mdp'))
         if not est_mot_de_passe_fort(form.new_password.data):
-            flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
+            flash(
+                "Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).",
+                'danger')
             return redirect(url_for('parametres.changer_mdp'))
-        
-        current_user.mdp_hash = generate_password_hash(form.new_password.data, method='pbkdf2:sha256')
+
+        current_user.mdp_hash = generate_password_hash(form.new_password.data,
+                                                       method='pbkdf2:sha256')
         db.session.commit()
         flash("Votre mot de passe a été mis à jour avec succès.", 'success')
         return redirect(url_for('general.index'))
-    return render_template("parametres/changer_mdp.html", form=form, title=TITLE+"- Changer mot de passe")
+    return render_template("parametres/changer_mdp.html",
+                           form=form,
+                           title=TITLE + "- Changer mot de passe")

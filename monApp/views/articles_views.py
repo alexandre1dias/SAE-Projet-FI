@@ -16,6 +16,7 @@ articles_bp = Blueprint('articles', __name__)
 #====================   Pages Actualités   ====================#
 #==============================================================#
 
+
 @articles_bp.route("/informations/")
 def informations():
     filtre = FiltreForm(request.args)
@@ -24,8 +25,9 @@ def informations():
     for (d,) in dates_bd:
         if d:
             annee_debut = d.year if d.month >= 8 else d.year - 1
-            annees_set.add((str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
-    
+            annees_set.add(
+                (str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
+
     if annees_set:
         choix_tries = sorted(list(annees_set), key=lambda x: x[0], reverse=True)
         filtre.annee_scolaire.choices = choix_tries
@@ -34,24 +36,29 @@ def informations():
 
     annee_selectionnee = filtre.annee_scolaire.data
     les_infos = InformationBD.query
-    filtre.tri.choices = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien')]
-    
+    filtre.tri.choices = [('date_desc', 'Plus récent'),
+                          ('date_asc', 'Plus ancien')]
+
     if filtre.recherche.data:
-        les_infos = les_infos.filter(InformationBD.titreIN.ilike(f"%{filtre.recherche.data}%"))
+        les_infos = les_infos.filter(
+            InformationBD.titreIN.ilike(f"%{filtre.recherche.data}%"))
 
     if annee_selectionnee:
         try:
             an_debut = int(annee_selectionnee)
             debut_saison = date(an_debut, 8, 1)
             fin_saison = date(an_debut + 1, 7, 31)
-            les_infos = les_infos.filter(InformationBD.dateIN >= debut_saison, InformationBD.dateIN <= fin_saison)
+            les_infos = les_infos.filter(InformationBD.dateIN >= debut_saison,
+                                         InformationBD.dateIN <= fin_saison)
         except (ValueError, TypeError):
             pass
-            
+
     if filtre.tri.data == 'date_asc':
-        les_infos = les_infos.order_by(InformationBD.dateIN.asc(), InformationBD.heureIN.asc())
+        les_infos = les_infos.order_by(InformationBD.dateIN.asc(),
+                                       InformationBD.heureIN.asc())
     else:
-        les_infos = les_infos.order_by(InformationBD.dateIN.desc(), InformationBD.heureIN.desc())
+        les_infos = les_infos.order_by(InformationBD.dateIN.desc(),
+                                       InformationBD.heureIN.desc())
 
     page = request.args.get('page', 1, type=int)
     pagination = les_infos.paginate(page=page, per_page=6, error_out=False)
@@ -61,6 +68,7 @@ def informations():
                            pagination=pagination,
                            filtre=filtre)
 
+
 @articles_bp.route("/admin/information/add/", methods=["GET", "POST"])
 @login_required
 @admin_required
@@ -68,19 +76,20 @@ def add_information():
     form = InformationForm()
     if form.validate_on_submit():
         now = datetime.now()
-        nouvelle_info = InformationBD(
-            titreIN=form.titre.data,
-            contenuIN=form.contenu.data,
-            dateIN=now.date(),
-            heureIN=now.strftime('%H:%M')
-        )
+        nouvelle_info = InformationBD(titreIN=form.titre.data,
+                                      contenuIN=form.contenu.data,
+                                      dateIN=now.date(),
+                                      heureIN=now.strftime('%H:%M'))
         try:
             db.session.add(nouvelle_info)
             db.session.commit()
             return redirect(url_for('articles.informations'))
         except Exception:
             db.session.rollback()
-    return render_template("menu_admin/admin_form_information.html", title="Ajouter une information", form=form)
+    return render_template("menu_admin/admin_form_information.html",
+                           title="Ajouter une information",
+                           form=form)
+
 
 @articles_bp.route("/admin/information/edit/<int:idI>", methods=["GET", "POST"])
 @login_required
@@ -99,7 +108,10 @@ def edit_information(idI):
             return redirect(url_for('articles.informations'))
         except Exception:
             db.session.rollback()
-    return render_template("menu_admin/admin_form_information.html", title="Modifier une information", form=form)
+    return render_template("menu_admin/admin_form_information.html",
+                           title="Modifier une information",
+                           form=form)
+
 
 @articles_bp.route("/admin/information/delete/<int:idI>", methods=["POST"])
 @login_required
@@ -123,8 +135,9 @@ def presse():
     for (d,) in dates_bd:
         if d:
             annee_debut = d.year if d.month >= 8 else d.year - 1
-            annees_set.add((str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
-    
+            annees_set.add(
+                (str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
+
     if annees_set:
         choix_tries = sorted(list(annees_set), key=lambda x: x[0], reverse=True)
         filtre.annee_scolaire.choices = choix_tries
@@ -132,29 +145,35 @@ def presse():
             filtre.annee_scolaire.data = choix_tries[0][0]
 
     annee_selectionnee = filtre.annee_scolaire.data
-    filtre.tri.choices = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien')]
+    filtre.tri.choices = [('date_desc', 'Plus récent'),
+                          ('date_asc', 'Plus ancien')]
     les_presses = PresseBD.query
     if filtre.recherche.data:
-        les_presses = les_presses.filter(PresseBD.titreP.ilike(f"%{filtre.recherche.data}%"))
+        les_presses = les_presses.filter(
+            PresseBD.titreP.ilike(f"%{filtre.recherche.data}%"))
     if annee_selectionnee:
         try:
             an_debut = int(annee_selectionnee)
             debut_saison = date(an_debut, 8, 1)
             fin_saison = date(an_debut + 1, 7, 31)
-            les_presses = les_presses.filter(PresseBD.dateP >= debut_saison, PresseBD.dateP <= fin_saison)
+            les_presses = les_presses.filter(PresseBD.dateP >= debut_saison,
+                                             PresseBD.dateP <= fin_saison)
         except (ValueError, TypeError):
             pass
     if filtre.tri.data == 'date_asc':
-        les_presses = les_presses.order_by(PresseBD.dateP.asc(), PresseBD.idPresse.asc())
+        les_presses = les_presses.order_by(PresseBD.dateP.asc(),
+                                           PresseBD.idPresse.asc())
     else:
-        les_presses = les_presses.order_by(PresseBD.dateP.desc(), PresseBD.idPresse.desc())
+        les_presses = les_presses.order_by(PresseBD.dateP.desc(),
+                                           PresseBD.idPresse.desc())
     pagination = les_presses.paginate(page=page, per_page=6, error_out=False)
-    
+
     return render_template("articles/presse.html",
                            title=TITLE + "- Presse",
                            pagination=pagination,
                            articles=pagination.items,
                            filtre=filtre)
+
 
 @articles_bp.route("/admin/presse/add/", methods=["GET", "POST"])
 @login_required
@@ -163,25 +182,28 @@ def add_presse():
     form = PresseForm()
     if form.validate_on_submit():
         now = datetime.now()
-        nouveau_presse = PresseBD(
-            titreP=form.titre.data,
-            contenuP=form.contenu.data,
-            lienP=form.lien.data,
-            dateP=now.date(),
-            heureP=now.strftime('%H:%M')
-        )
+        nouveau_presse = PresseBD(titreP=form.titre.data,
+                                  contenuP=form.contenu.data,
+                                  lienP=form.lien.data,
+                                  dateP=now.date(),
+                                  heureP=now.strftime('%H:%M'))
         db.session.add(nouveau_presse)
         db.session.commit()
         if form.image.data:
             file = form.image.data
             filename = secure_filename(file.filename)
-            dossier_presse = os.path.join(app.root_path, 'static', 'images', 'presse', str(nouveau_presse.idPresse))
+            dossier_presse = os.path.join(app.root_path, 'static',
+                                          'images', 'presse',
+                                          str(nouveau_presse.idPresse))
             os.makedirs(dossier_presse, exist_ok=True)
             file.save(os.path.join(dossier_presse, filename))
             nouveau_presse.imageP = filename
             db.session.commit()
         return redirect(url_for('articles.presse'))
-    return render_template("menu_admin/admin_form_presse.html", title="Ajouter un article de presse", form=form)
+    return render_template("menu_admin/admin_form_presse.html",
+                           title="Ajouter un article de presse",
+                           form=form)
+
 
 @articles_bp.route("/admin/presse/edit/<int:idP>", methods=["GET", "POST"])
 @login_required
@@ -200,24 +222,31 @@ def edit_presse(idP):
         if form.image.data:
             file = form.image.data
             filename = secure_filename(file.filename)
-            dossier_presse = os.path.join(app.root_path, 'static', 'images', 'presse', str(article_presse.idPresse))
+            dossier_presse = os.path.join(app.root_path, 'static',
+                                          'images', 'presse',
+                                          str(article_presse.idPresse))
             os.makedirs(dossier_presse, exist_ok=True)
             if article_presse.imageP:
-                ancien_chemin = os.path.join(dossier_presse, article_presse.imageP)
+                ancien_chemin = os.path.join(dossier_presse,
+                                             article_presse.imageP)
                 if os.path.exists(ancien_chemin):
                     os.remove(ancien_chemin)
             file.save(os.path.join(dossier_presse, filename))
             article_presse.imageP = filename
         db.session.commit()
         return redirect(url_for('articles.presse'))
-    return render_template("menu_admin/admin_form_presse.html", title="Modifier l'article de presse", form=form)
+    return render_template("menu_admin/admin_form_presse.html",
+                           title="Modifier l'article de presse",
+                           form=form)
+
 
 @articles_bp.route("/admin/presse/delete/<int:idP>", methods=["POST"])
 @login_required
 @admin_required
 def delete_presse(idP):
     article_presse = PresseBD.query.get_or_404(idP)
-    dossier_presse = os.path.join(app.root_path, 'static', 'images', 'presse', str(article_presse.idPresse))
+    dossier_presse = os.path.join(app.root_path, 'static', 'images', 'presse',
+                                  str(article_presse.idPresse))
     if os.path.exists(dossier_presse):
         shutil.rmtree(dossier_presse)
     try:
@@ -237,8 +266,9 @@ def articles():
     for (d,) in dates_bd:
         if d:
             annee_debut = d.year if d.month >= 8 else d.year - 1
-            annees_set.add((str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
-    
+            annees_set.add(
+                (str(annee_debut), f"{annee_debut}-{annee_debut + 1}"))
+
     if annees_set:
         choix_tries = sorted(list(annees_set), key=lambda x: x[0], reverse=True)
         filtre.annee_scolaire.choices = choix_tries
@@ -246,34 +276,43 @@ def articles():
             filtre.annee_scolaire.data = choix_tries[0][0]
 
     annee_selectionnee = filtre.annee_scolaire.data
-    filtre.tri.choices = [('date_desc', 'Plus récent'), ('date_asc', 'Plus ancien')]
+    filtre.tri.choices = [('date_desc', 'Plus récent'),
+                          ('date_asc', 'Plus ancien')]
     les_articles = ArticleBD.query
     if filtre.recherche.data:
-        les_articles = les_articles.filter(ArticleBD.titre.ilike(f"%{filtre.recherche.data}%"))
+        les_articles = les_articles.filter(
+            ArticleBD.titre.ilike(f"%{filtre.recherche.data}%"))
     if annee_selectionnee:
         try:
             an_debut = int(annee_selectionnee)
             debut_saison = date(an_debut, 8, 1)
             fin_saison = date(an_debut + 1, 7, 31)
-            les_articles = les_articles.filter(ArticleBD.date >= debut_saison, ArticleBD.date <= fin_saison)
+            les_articles = les_articles.filter(ArticleBD.date >= debut_saison,
+                                               ArticleBD.date <= fin_saison)
         except (ValueError, TypeError):
             pass
     if filtre.tri.data == 'date_asc':
-        les_articles = les_articles.order_by(ArticleBD.date.asc(), ArticleBD.id.asc())
+        les_articles = les_articles.order_by(ArticleBD.date.asc(),
+                                             ArticleBD.id.asc())
     else:
-        les_articles = les_articles.order_by(ArticleBD.date.desc(), ArticleBD.id.desc())
+        les_articles = les_articles.order_by(ArticleBD.date.desc(),
+                                             ArticleBD.id.desc())
     pagination = les_articles.paginate(page=page, per_page=6, error_out=False)
-    
+
     return render_template("articles/articles.html",
                            title=TITLE + " - Articles du Club",
                            pagination=pagination,
                            articles=pagination,
                            filtre=filtre)
 
+
 @articles_bp.route("/article/<int:idA>")
 def article_detail(idA):
     article = ArticleBD.query.get_or_404(idA)
-    return render_template("articles/article_detail.html", title=article.titre, article=article)
+    return render_template("articles/article_detail.html",
+                           title=article.titre,
+                           article=article)
+
 
 @articles_bp.route("/admin/article/add/", methods=["GET", "POST"])
 @login_required
@@ -281,25 +320,29 @@ def article_detail(idA):
 def add_article():
     form = ArticleForm()
     if form.validate_on_submit():
-        nouveau_article = ArticleBD(
-            titre=form.titre.data,
-            contenu=form.contenu.data,
-            date=datetime.now().date()
-        )
+        nouveau_article = ArticleBD(titre=form.titre.data,
+                                    contenu=form.contenu.data,
+                                    date=datetime.now().date())
         db.session.add(nouveau_article)
         db.session.commit()
         if form.images.data:
-            dossier_article = os.path.join(app.root_path, 'static/images/articles', str(nouveau_article.id))
+            dossier_article = os.path.join(app.root_path,
+                                           'static/images/articles',
+                                           str(nouveau_article.id))
             os.makedirs(dossier_article, exist_ok=True)
             for file in form.images.data:
                 if file.filename:
                     filename = secure_filename(file.filename)
                     file.save(os.path.join(dossier_article, filename))
-                    nouvelle_image = ImageArticleBD(nom=filename, id_article=nouveau_article.id)
+                    nouvelle_image = ImageArticleBD(
+                        nom=filename, id_article=nouveau_article.id)
                     db.session.add(nouvelle_image)
             db.session.commit()
         return redirect(url_for('articles.articles'))
-    return render_template("menu_admin/admin_form_article.html", title="Rédiger un article", form=form)
+    return render_template("menu_admin/admin_form_article.html",
+                           title="Rédiger un article",
+                           form=form)
+
 
 @articles_bp.route("/admin/article/edit/<int:idA>", methods=["GET", "POST"])
 @login_required
@@ -311,24 +354,32 @@ def edit_article(idA):
         article.titre = form.titre.data
         article.contenu = form.contenu.data
         if form.images.data:
-            dossier_article = os.path.join(app.root_path, 'static/images/articles', str(article.id))
+            dossier_article = os.path.join(app.root_path,
+                                           'static/images/articles',
+                                           str(article.id))
             os.makedirs(dossier_article, exist_ok=True)
             for file in form.images.data:
                 if file.filename:
                     filename = secure_filename(file.filename)
                     file.save(os.path.join(dossier_article, filename))
-                    nouvelle_image = ImageArticleBD(nom=filename, id_article=article.id)
+                    nouvelle_image = ImageArticleBD(nom=filename,
+                                                    id_article=article.id)
                     db.session.add(nouvelle_image)
         db.session.commit()
         return redirect(url_for('articles.articles'))
-    return render_template("menu_admin/admin_form_article.html", title="Modifier un article", form=form, article=article)
+    return render_template("menu_admin/admin_form_article.html",
+                           title="Modifier un article",
+                           form=form,
+                           article=article)
+
 
 @articles_bp.route("/admin/article/delete/<int:idA>", methods=["POST"])
 @login_required
 @admin_required
 def delete_article(idA):
     article = ArticleBD.query.get_or_404(idA)
-    dossier_article = os.path.join(app.root_path, 'static/images/articles', str(article.id))
+    dossier_article = os.path.join(app.root_path, 'static/images/articles',
+                                   str(article.id))
     if os.path.exists(dossier_article):
         shutil.rmtree(dossier_article)
     try:
@@ -338,13 +389,15 @@ def delete_article(idA):
         db.session.rollback()
     return redirect(url_for('articles.articles'))
 
+
 @articles_bp.route("/admin/article/image/delete/<int:idImg>", methods=["POST"])
 @login_required
 @admin_required
 def delete_image_article(idImg):
     image = ImageArticleBD.query.get_or_404(idImg)
     article_id = image.id_article
-    chemin_image = os.path.join(app.root_path, 'static/images/articles', str(article_id), image.nom)
+    chemin_image = os.path.join(app.root_path, 'static/images/articles',
+                                str(article_id), image.nom)
     try:
         if os.path.exists(chemin_image):
             os.remove(chemin_image)
@@ -354,6 +407,8 @@ def delete_image_article(idImg):
     db.session.commit()
     return redirect(url_for('articles.edit_article', idA=article_id))
 
+
 @articles_bp.route("/ffescrime/", methods=["GET", "POST"])
 def ffescrime():
-    return render_template("articles/ffescrime.html", title=TITLE+"- FFEscrime")
+    return render_template("articles/ffescrime.html",
+                           title=TITLE + "- FFEscrime")

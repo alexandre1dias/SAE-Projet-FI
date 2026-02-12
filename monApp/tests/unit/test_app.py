@@ -3,6 +3,7 @@ from flask_login import login_user
 from monApp.models import AdminBD, MembreBD
 from monApp.app import load_user
 
+
 def test_load_user_fallback(client, app, db):
     """
     Teste la fonction load_user quand 'user_type' n'est PAS dans la session.
@@ -11,7 +12,7 @@ def test_load_user_fallback(client, app, db):
     admin = AdminBD(email='admin_load@test.fr', mdp_hash='pass')
     db.session.add(admin)
     db.session.commit()
-    
+
     # 2. Création d'un membre "tampon" (ID 1)
     # Cet utilisateur aura le même ID que l'admin, on ne l'utilise pas pour le test
     membre_tampon = MembreBD(email='tampon@test.fr', mdp_hash='pass')
@@ -23,7 +24,7 @@ def test_load_user_fallback(client, app, db):
     membre = MembreBD(email='membre_load@test.fr', mdp_hash='pass')
     db.session.add(membre)
     db.session.commit()
-    
+
     id_admin = admin.id
     id_membre = membre.id
 
@@ -32,7 +33,7 @@ def test_load_user_fallback(client, app, db):
         # Admin(1) existe (et Membre(1) aussi). La fonction priorise Admin.
         if 'user_type' in session:
             session.pop('user_type')
-        
+
         loaded_admin = load_user(id_admin)
         assert loaded_admin is not None
         assert loaded_admin.email == 'admin_load@test.fr'

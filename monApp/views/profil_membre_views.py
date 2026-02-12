@@ -15,6 +15,7 @@ profil_bp = Blueprint('profil', __name__)
 #====================   Pages Profil   ====================#
 #==========================================================#
 
+
 @profil_bp.route("/resultat_membre/")
 @login_required
 @membre_required
@@ -22,8 +23,7 @@ def resultat_membre():
     filtre = FiltreForm(request.args if request.args else None)
     page = request.args.get('page', 1, type=int)
     filtre.tri.choices = [('date_desc', 'Plus récent'),
-                          ('date_asc', 'Plus ancien'),
-                          ('resultat', 'Resultat')]
+                          ('date_asc', 'Plus ancien'), ('resultat', 'Resultat')]
     lesCompete = ResultatBD.query.join(CompetitionBD).filter(
         ResultatBD.id_membre == current_user.id)
     if filtre.armes.data:
@@ -47,6 +47,7 @@ def resultat_membre():
                            pagination=pagination,
                            filtre=filtre)
 
+
 @profil_bp.route("/evenement_membre/")
 @login_required
 @membre_required
@@ -69,8 +70,7 @@ def evenement_membre():
             query = query.filter(CompetitionBD.date_debut >= AUJOURDHUI)
 
         if filtre.armes.data:
-            query = query.filter(CompetitionBD.type_arme.in_(
-                filtre.armes.data))
+            query = query.filter(CompetitionBD.type_arme.in_(filtre.armes.data))
 
         if filtre.type_competition.data:
             query = query.filter(
@@ -107,8 +107,7 @@ def evenement_membre():
             query = query.order_by(ReunionBD.dateDebutRE.desc())
     elif type_page == 'event_club':
         query = EventClubBD.query.join(
-            ParticiperBD,
-            EventClubBD.id_event == ParticiperBD.id_event).filter(
+            ParticiperBD, EventClubBD.id_event == ParticiperBD.id_event).filter(
                 ParticiperBD.id_membre == current_user.id)
         if etat == 'passees':
             query = query.filter(EventClubBD.dateDebutEV < AUJOURDHUI)
@@ -135,7 +134,7 @@ def evenement_membre():
 
 
 @profil_bp.route("/profil_view/<int:idM>")
-@login_required 
+@login_required
 def profil_view(idM):
     if not session.get("user_type") == "admin":
         if current_user.id != idM:
@@ -143,5 +142,10 @@ def profil_view(idM):
     origine = request.args.get('origine', 'gerer_profils')
     id_competition = request.args.get('idCompetition', type=int)
     id_event_club = request.args.get('idEventClub', type=int)
-    unMembre = db.session.get(MembreBD,idM)
-    return render_template("profils_membre/profil_view.html", title=TITLE + "- Profil Membre", selectedMembre=unMembre, origine=origine, idCompetition=id_competition, idEventClub=id_event_club)
+    unMembre = db.session.get(MembreBD, idM)
+    return render_template("profils_membre/profil_view.html",
+                           title=TITLE + "- Profil Membre",
+                           selectedMembre=unMembre,
+                           origine=origine,
+                           idCompetition=id_competition,
+                           idEventClub=id_event_club)

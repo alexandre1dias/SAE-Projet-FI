@@ -13,18 +13,11 @@ from .menu_admin_views import admin_bp
 
 # Liste de tous les blueprints à enregistrer
 all_blueprints = [
-    auth_bp,
-    general_bp,
-    articles_bp,
-    competitions_bp,
-    calendrier_bp,
-    events_club_bp,
-    reunions_bp,
-    profil_bp,
-    parametres_bp,
-    notifications_bp,
+    auth_bp, general_bp, articles_bp, competitions_bp, calendrier_bp,
+    events_club_bp, reunions_bp, profil_bp, parametres_bp, notifications_bp,
     admin_bp
 ]
+
 
 def register_blueprints(app):
     """

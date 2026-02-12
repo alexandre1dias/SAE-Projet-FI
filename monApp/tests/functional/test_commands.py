@@ -1,27 +1,29 @@
 import pytest
 from werkzeug.security import check_password_hash
 from monApp.models import AdminBD
-from monApp.commands import change_admin_password 
+from monApp.commands import change_admin_password
 
 # ==============================================================================
 # TESTS DES COMMANDES CLI
 # ==============================================================================
+
 
 def test_change_admin_password_success(app, db):
     """
     Test du succès de la commande CLI pour modifier le mot de passe d'un admin.
     Vérifie l'affichage console et la mise à jour effective du hash en BDD.
     """
-    # 1. SETUP 
+    # 1. SETUP
     admin = AdminBD(email='admin_cli@test.fr', mdp_hash='vieux_hash_invalide')
     db.session.add(admin)
     db.session.commit()
 
     # 2. Initialisation du runner CLI de Flask
     runner = app.test_cli_runner()
-    
-    # 3. EXECUTION 
-    result = runner.invoke(change_admin_password, ['admin_cli@test.fr', 'NouveauSuperMdp123!'])
+
+    # 3. EXECUTION
+    result = runner.invoke(change_admin_password,
+                           ['admin_cli@test.fr', 'NouveauSuperMdp123!'])
 
     # 4. VERIFICATIONS CLI
     assert result.exit_code == 0
@@ -30,7 +32,9 @@ def test_change_admin_password_success(app, db):
     # 5. VERIFICATIONS BDD
     updated_admin = db.session.get(AdminBD, admin.id)
     assert updated_admin.mdp_hash != 'vieux_hash_invalide'
-    assert check_password_hash(updated_admin.mdp_hash, 'NouveauSuperMdp123!') is True
+    assert check_password_hash(updated_admin.mdp_hash,
+                               'NouveauSuperMdp123!') is True
+
 
 def test_change_admin_password_failure(app, db):
     """
@@ -43,10 +47,11 @@ def test_change_admin_password_failure(app, db):
 
     # 2. Initialisation du runner CLI
     runner = app.test_cli_runner()
-    
+
     # 3. EXECUTION : Email fantôme
-    result = runner.invoke(change_admin_password, ['inconnu@test.fr', 'NouveauSuperMdp123!'])
+    result = runner.invoke(change_admin_password,
+                           ['inconnu@test.fr', 'NouveauSuperMdp123!'])
 
     # 4. VERIFICATIONS
-    assert result.exit_code == 0 
+    assert result.exit_code == 0
     assert "Erreur : Aucun administrateur trouvé avec l'email 'inconnu@test.fr'." in result.output

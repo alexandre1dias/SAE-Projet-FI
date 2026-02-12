@@ -10,10 +10,14 @@ calendrier_bp = Blueprint('calendrier', __name__)
 
 #====================   Pages Calendrier   ====================#
 
+
 @calendrier_bp.route("/calendrier/")
 def calendrier():
     filtre = FiltreForm(request.args if request.args else None)
-    return render_template("calendrier/calendrier.html", title=TITLE+"- Calendrier", filtre=filtre)
+    return render_template("calendrier/calendrier.html",
+                           title=TITLE + "- Calendrier",
+                           filtre=filtre)
+
 
 @calendrier_bp.route('/api/events')
 def get_events():
@@ -33,7 +37,8 @@ def get_events():
         if sexes:
             query_comp = query_comp.filter(CompetitionBD.sexe.in_(sexes))
         if type_competition:
-            query_comp = query_comp.filter(CompetitionBD.typeComp.in_(type_competition))
+            query_comp = query_comp.filter(
+                CompetitionBD.typeComp.in_(type_competition))
         if niveaux:
             query_comp = query_comp.filter(CompetitionBD.niveaux.in_(niveaux))
 
@@ -45,11 +50,18 @@ def get_events():
                 'end': f"{event.date_fin.isoformat()}T{event.heure_fin}",
                 'color': '#007bff',
                 'extendedProps': {
-                    'url': url_for('competitions.competition_view', idCompetition=event.id, origine='calendrier'),
-                    'type': 'Compétition',
-                    'description': event.description,
-                    'niveaux': event.niveaux,
-                    'arme': event.type_arme
+                    'url':
+                        url_for('competitions.competition_view',
+                                idCompetition=event.id,
+                                origine='calendrier'),
+                    'type':
+                        'Compétition',
+                    'description':
+                        event.description,
+                    'niveaux':
+                        event.niveaux,
+                    'arme':
+                        event.type_arme
                 }
             })
 
@@ -62,7 +74,8 @@ def get_events():
             elif isinstance(current_user, MembreBD):
                 statuts_comite = [
                     'Président', 'Vice-président', 'Vice-Président',
-                    'Secrétaire Général', 'Trésorier Général', 'Membre du Comité'
+                    'Secrétaire Général', 'Trésorier Général',
+                    'Membre du Comité'
                 ]
                 if current_user.statut in statuts_comite:
                     voir_reunions = True
@@ -70,15 +83,26 @@ def get_events():
         if voir_reunions:
             for event in ReunionBD.query.all():
                 all_events.append({
-                    'id': f"reunion_{event.id}",
-                    'title': event.nom,
-                    'start': f"{event.dateDebutRE.isoformat()}T{event.heureDebutRE}",
-                    'end': f"{event.dateFinRE.isoformat()}T{event.heureFinRE}" if event.dateFinRE and event.heureFinRE else None,
-                    'color': '#ffc107',
+                    'id':
+                        f"reunion_{event.id}",
+                    'title':
+                        event.nom,
+                    'start':
+                        f"{event.dateDebutRE.isoformat()}T{event.heureDebutRE}",
+                    'end':
+                        f"{event.dateFinRE.isoformat()}T{event.heureFinRE}"
+                        if event.dateFinRE and event.heureFinRE else None,
+                    'color':
+                        '#ffc107',
                     'extendedProps': {
-                        'url': url_for('reunions.reunion_view', idReunion=event.id, origine='calendrier'),
-                        'type': 'Réunion',
-                        'description': event.rapportRE
+                        'url':
+                            url_for('reunions.reunion_view',
+                                    idReunion=event.id,
+                                    origine='calendrier'),
+                        'type':
+                            'Réunion',
+                        'description':
+                            event.rapportRE
                     }
                 })
 
@@ -88,16 +112,27 @@ def get_events():
             query_club = EventClubBD.query
             for event in query_club.all():
                 all_events.append({
-                    'id': f"club_{event.idEventClub}",
-                    'title': event.NomEV,
-                    'start': f"{event.dateDebutEV.isoformat()}T{event.heureDebutEV}",
-                    'end': f"{event.dateFinEV.isoformat()}T{event.heureFinEV}",
-                    'color': '#28a745',
+                    'id':
+                        f"club_{event.idEventClub}",
+                    'title':
+                        event.NomEV,
+                    'start':
+                        f"{event.dateDebutEV.isoformat()}T{event.heureDebutEV}",
+                    'end':
+                        f"{event.dateFinEV.isoformat()}T{event.heureFinEV}",
+                    'color':
+                        '#28a745',
                     'extendedProps': {
-                        'url': url_for('events_club.club_view', idEventClub=event.idEventClub, origine='calendrier'),
-                        'type': 'Événement du Club',
-                        'description': event.descriptionEV,
-                        'niveaux': event.niveauxEV
+                        'url':
+                            url_for('events_club.club_view',
+                                    idEventClub=event.idEventClub,
+                                    origine='calendrier'),
+                        'type':
+                            'Événement du Club',
+                        'description':
+                            event.descriptionEV,
+                        'niveaux':
+                            event.niveauxEV
                     }
                 })
 
@@ -120,6 +155,7 @@ def get_events():
                 }
             })
     return jsonify(all_events)
+
 
 @calendrier_bp.route("/add_event/", methods=["GET", "POST"])
 @login_required
@@ -150,8 +186,7 @@ def add_event():
                     typeComp=form.type.data,
                     passee=False,
                     ville=form.ville.data,
-                    adresse=form.adresse.data
-                )
+                    adresse=form.adresse.data)
             elif category == 'Réunion':
                 new_specific_event = ReunionBD(
                     idEvent=event_id,
@@ -162,12 +197,18 @@ def add_event():
                     heureFinRE=form.end_date.data.time().strftime('%H:%M'),
                     ville=form.ville.data,
                     adresse=form.adresse.data,
-                    typeReunionRE=form.type_reunion.data if form.type_reunion.data else "Générale"
-                )
-                statuts_comite = ['Président', 'Vice-président', 'Vice-Président', 'Secrétaire Général', 'Trésorier Général', 'Membre du Comité']
-                membres_comite = MembreBD.query.filter(MembreBD.statut.in_(statuts_comite)).all()
+                    typeReunionRE=form.type_reunion.data
+                    if form.type_reunion.data else "Générale")
+                statuts_comite = [
+                    'Président', 'Vice-président', 'Vice-Président',
+                    'Secrétaire Général', 'Trésorier Général',
+                    'Membre du Comité'
+                ]
+                membres_comite = MembreBD.query.filter(
+                    MembreBD.statut.in_(statuts_comite)).all()
                 for membre in membres_comite:
-                    participation = ParticiperBD(id_membre=membre.id, id_event=event_id)
+                    participation = ParticiperBD(id_membre=membre.id,
+                                                 id_event=event_id)
                     db.session.add(participation)
             elif category == 'Evenement du club':
                 new_specific_event = EventClubBD(
@@ -181,8 +222,7 @@ def add_event():
                     niveauxEV=", ".join(form.level.data),
                     passeeEV=False,
                     villeEV=form.ville.data,
-                    adresseEV=form.adresse.data
-                )
+                    adresseEV=form.adresse.data)
             elif category == 'Entraînement':
                 new_specific_event = EntrainementBD(
                     id_event=event_id,
@@ -193,11 +233,12 @@ def add_event():
                     niveau=", ".join(form.level.data),
                     jour=form.start_date.data.strftime('%A'),
                     ville=form.ville.data,
-                    adresse=form.adresse.data
-                )
+                    adresse=form.adresse.data)
             db.session.add(new_specific_event)
             db.session.commit()
             return redirect(url_for('calendrier.calendrier'))
         except Exception:
             db.session.rollback()
-    return render_template("calendrier/add_event.html", title=TITLE + "- Ajouter un événement", form=form)
+    return render_template("calendrier/add_event.html",
+                           title=TITLE + "- Ajouter un événement",
+                           form=form)
