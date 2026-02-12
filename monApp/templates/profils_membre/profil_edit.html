@@ -18,7 +18,13 @@
                 {%endif%}
             {%endif%}
             <div class="card shadow-sm p-4">
-                <form method="POST" action="{{ url_for('admin.profil_edit', idM=selectedMembre.id, origine = origine) }}" onsubmit="return MailtoModification()" id="formModification" data-mail-actif="{{ 'true' if mail_modification else 'false' }}">
+                <form method="POST" 
+                    action="{{ url_for('admin.profil_edit', idM=selectedMembre.id, origine = origine) }}" 
+                    onsubmit="return MailtoModification()" 
+                    id="formModification" 
+                    data-mail-actif="{{ 'true' if mail_modification else 'false' }}"
+                    data-membre-email="{{ selectedMembre.email }}"
+                    data-membre-mail-actif="{{ 'true' if selectedMembre.modifProfilMail else 'false' }}">
 
                     {{ updateForm.hidden_tag () }}
                     <div class="mb-3 row">

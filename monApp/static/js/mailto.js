@@ -31,20 +31,34 @@ function MailtoInscription() {
 
 function MailtoModification() {
     var activeBtn = document.activeElement;
-    if (activeBtn && activeBtn.value === 'admin_save') return true;
+    var form = document.getElementById('formModification');
     var nom = document.getElementById('inputNom').value;
     var prenom = document.getElementById('inputPrenom').value;
     var motifElement = document.getElementById('inputJustification');
     var motif = motifElement ? motifElement.value : "";
-    var form = document.getElementById('formModification');
-    var actif = form.dataset.mailActif === 'true';
-    var destinataire = "blois.escrime@wanadoo.fr";
+    if (activeBtn && activeBtn.value === 'admin_save') {
+        var actif = form.dataset.membreMailActif === 'true';
+        var emailDest = form.dataset.membreEmail;
+        var sujet = "[Profil] Mise à jour de vos informations";
+        var corps = "Bonjour " + prenom + " " + nom + ",\n\n" +
+                    "Un administrateur a modifié directement votre profil.\n";
+        if (motif !== "") {
+            corps += "Justification : " + motif + "\n";
+        }
+        corps += "\nCordialement.";
+        var lien = "mailto:" + emailDest + 
+                   "?subject=" + encodeURIComponent(sujet) + 
+                   "&body=" + encodeURIComponent(corps);
+        return gererEnvoi(actif, lien);
+    }
+    var actifAdmin = form.dataset.mailActif === 'true';
+    var destinataireAdmin = "blois.escrime@wanadoo.fr";
     var sujetFinal = "[Modification Profil] " + prenom + " " + nom;
     var corpsFinal = "Bonjour,\nJe souhaite modifier mon profil.\nJustification : " + motif;
-    var lien = "mailto:" + destinataire + 
+    var lienAdmin = "mailto:" + destinataireAdmin + 
                "?subject=" + encodeURIComponent(sujetFinal) + 
                "&body=" + encodeURIComponent(corpsFinal);
-    return gererEnvoi(actif, lien);
+    return gererEnvoi(actifAdmin, lienAdmin);
 }
 
 function MailtoContact() {
@@ -93,17 +107,20 @@ function MailtoAccepterInscription(idI, email, prenom, nom) {
     return gererEnvoi(true, lien);
 }
 
-function MailtoAccepterModification(idModif, email, prenom, nom) {
+function MailtoAccepterModification(idModif, email, prenom, nom, doitEnvoyer) {
+    var actif = (doitEnvoyer === 'true');
     var sujet = "[Profil] Vos modifications ont été validées";
     var corps = "Bonjour " + prenom + " " + nom + ",\n\n" +
                 "Les modifications demandées pour votre profil ont été acceptées et appliquées.";
     var lien = "mailto:" + email + "?subject=" + encodeURIComponent(sujet) + "&body=" + encodeURIComponent(corps);
-    return gererEnvoi(true, lien);
+    return gererEnvoi(actif, lien);
 }
 
-function MailtoRefuser(type, id, email, prenom, nom) {
+function MailtoRefuser(type, id, email, prenom, nom, doitEnvoyer) {
+    var actif = (doitEnvoyer === undefined) ? true : (doitEnvoyer === 'true');
     var modalSelector = '#refusModal-' + type + '-' + id;
-    var justification = document.querySelector(modalSelector + ' textarea[name="justification"]').value;
+    var justificationElement = document.querySelector(modalSelector + ' textarea[name="justification"]');
+    var justification = justificationElement ? justificationElement.value : "";
     var sujet = (type === 'inscription') ? 
         "[Inscription] Information concernant votre demande d'adhésion" : 
         "[Profil] Information concernant votre demande de modification";
@@ -114,5 +131,5 @@ function MailtoRefuser(type, id, email, prenom, nom) {
                      corpsIntro + " pour la raison suivante :\n" +
                      justification;
     var lien = "mailto:" + email + "?subject=" + encodeURIComponent(sujet) + "&body=" + encodeURIComponent(corpsFinal);
-    return gererEnvoi(true, lien);
+    return gererEnvoi(actif, lien);
 }

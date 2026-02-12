@@ -66,7 +66,13 @@
             <td>{{ uneRequete.date }}</td>
             <td class="actions">
                 <form class="d-inline" action="{{ url_for('admin.accepter_modifications', idModif=uneRequete.id) }}" method="post"
-                    onsubmit="return MailtoAccepterModification('{{ uneRequete.id }}', '{{ uneRequete.membre.email }}', '{{ uneRequete.membre.prenom }}', '{{ uneRequete.membre.nom }}')">
+                    onsubmit="return MailtoAccepterModification(
+                        '{{ uneRequete.id }}', 
+                        '{{ uneRequete.membre.email }}', 
+                        '{{ uneRequete.membre.prenom }}', 
+                        '{{ uneRequete.membre.nom }}', 
+                        '{{ 'true' if uneRequete.membre.modifProfilMail else 'false' }}'
+                    )">
                     <button type="submit" class="btn btn-success btn-sm">Accepter</button>
                 </form>
 
@@ -116,7 +122,14 @@
                     {% set prenom = uneRequete.prenom if type_page == 'inscription' else uneRequete.membre.prenom %}
                     {% set nom = uneRequete.nom if type_page == 'inscription' else uneRequete.membre.nom %}
                     <form method="POST" action="{{ redirectionRefus }}"
-                        onsubmit="return MailtoRefuser('{{ type_page }}', '{{ uneRequete.id }}', '{{ email }}', '{{ prenom }}', '{{ nom }}')">
+                        onsubmit="return MailtoRefuser(
+                            '{{ type_page }}', 
+                            '{{ uneRequete.id }}', 
+                            '{{ email }}', 
+                            '{{ prenom }}', 
+                            '{{ nom }}',
+                            '{{ 'true' if (type_page == 'modification' and uneRequete.membre.modifProfilMail) or type_page == 'inscription' else 'false' }}'
+                        )">
                         <div class="modal-body">
                             <p>Veuillez indiquer la raison du refus.</p>
                             <div class="mb-3">
