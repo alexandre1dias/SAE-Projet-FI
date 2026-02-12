@@ -7,7 +7,7 @@ import shutil
 import os
 from monApp.app import app, db
 from monApp.forms import FiltreForm
-from monApp.models import CompetitionBD, ParticiperBD, ResultatBD, MembreBD, EvenementBD, ImageAppBD
+from monApp.models import CompetitionBD, ParticiperBD, ResultatBD, MembreBD, EvenementBD, ImageAppBD, NotifsBD
 from monApp.services import admin_required, membre_required
 from config import TITLE
 
@@ -213,6 +213,16 @@ def classer_membre(idCompetition, idMembre):
     else:
         nouveau_resultat = ResultatBD(resultat=classement, date=competition.date_fin, type_arme=competition.type_arme, type_compete=competition.typeComp, id_competition=idCompetition, id_membre=idMembre)
         db.session.add(nouveau_resultat)
+
+    notif = NotifsBD(
+        typeN="Nouveau Résultat",
+        sourceN=f"Classement : {classement} à {competition.nom}",
+        lue=False,
+        timestamp=datetime.now(),
+        link=url_for('profil.resultat_membre'),
+        idMembre=idMembre
+    )
+    db.session.add(notif)
     db.session.commit()
     return redirect(url_for('competitions.competition_update', idCompetition=idCompetition))
 
