@@ -65,8 +65,14 @@
             </td>
             <td>{{ uneRequete.date }}</td>
             <td class="actions">
-                <form class="d-inline" action="{{ url_for('admin.accepter_modifications', idModif=uneRequete.id) }}"
-                    method="post" onsubmit="return confirm('Voulez-vous accepter cette demande ?');">
+                <form class="d-inline" action="{{ url_for('admin.accepter_modifications', idModif=uneRequete.id) }}" method="post"
+                    onsubmit="return MailtoAccepterModification(
+                        '{{ uneRequete.id }}', 
+                        '{{ uneRequete.membre.email }}', 
+                        '{{ uneRequete.membre.prenom }}', 
+                        '{{ uneRequete.membre.nom }}', 
+                        '{{ 'true' if uneRequete.membre.modifProfilMail else 'false' }}'
+                    )">
                     <button type="submit" class="btn btn-success btn-sm">Accepter</button>
                 </form>
 
@@ -91,7 +97,7 @@
             <td>{{ uneRequete.date }}</td>
             <td class="actions">
                 <form class="d-inline" action="{{ url_for('admin.accepter_inscription', idI=uneRequete.id) }}" method="post"
-                    onsubmit="return confirm('Voulez-vous accepter cette demande ?');">
+                    onsubmit="return MailtoAccepterInscription('{{ uneRequete.id }}', '{{ uneRequete.email }}', '{{ uneRequete.prenom }}', '{{ uneRequete.nom }}')">
                     <button type="submit" class="btn btn-success btn-sm">Accepter</button>
                 </form>
 
@@ -112,7 +118,18 @@
                         <h5 class="modal-title">Refus {{ type_page }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="{{ redirectionRefus }}">
+                    {% set email = uneRequete.email if type_page == 'inscription' else uneRequete.membre.email %}
+                    {% set prenom = uneRequete.prenom if type_page == 'inscription' else uneRequete.membre.prenom %}
+                    {% set nom = uneRequete.nom if type_page == 'inscription' else uneRequete.membre.nom %}
+                    <form method="POST" action="{{ redirectionRefus }}"
+                        onsubmit="return MailtoRefuser(
+                            '{{ type_page }}', 
+                            '{{ uneRequete.id }}', 
+                            '{{ email }}', 
+                            '{{ prenom }}', 
+                            '{{ nom }}',
+                            '{{ 'true' if (type_page == 'modification' and uneRequete.membre.modifProfilMail) or type_page == 'inscription' else 'false' }}'
+                        )">
                         <div class="modal-body">
                             <p>Veuillez indiquer la raison du refus.</p>
                             <div class="mb-3">
