@@ -436,16 +436,19 @@ def accepter_reinitialisation_mdp(idR):
     
     if demande.acceptee:
         return jsonify({'success': False, 'message': 'Cette demande a déjà été acceptée.'}), 400
-    code = ''.join([str(random.randint(0, 9)) for _ in range(9)])
+    data = request.get_json()
+    code = data.get('code')
+    
+    if not code or len(code) != 9:
+        return jsonify({'success': False, 'message': 'Code invalide.'}), 400
     demande.code = code
     demande.acceptee = True
     demande.date_acceptation = datetime.now()
     demande.expiration = datetime.now() + timedelta(hours=24)
     db.session.commit()
     return jsonify({
-        'success': True, 
-        'code': code,
-        'email': demande.email
+        'success': True,
+        'message': 'Code enregistré avec succès.'
     })
 
 @admin_bp.route('/refuser_reinitialisation_mdp/<int:idR>', methods=["POST"])

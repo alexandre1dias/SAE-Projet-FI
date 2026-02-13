@@ -5,7 +5,13 @@
     <div class="login-container">
         <h2 class="mdp-oublierh2">Mot de passe oublié</h2>
         <p class="mdpclassp">Entrez votre adresse email. Un administrateur traitera votre demande et vous enverra un <strong>code de réinitialisation</strong> par email.</p>
-        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <form method="POST" action="" style="width: 100%;">
             {{ form.hidden_tag() }}
             

@@ -10,10 +10,6 @@
             <a class="nav-link {% if mode == 'attente' %}active{% endif %}" 
                href="{{ url_for('admin.gerer_reinitialisation_mdp', mode='attente') }}">
                 En attente
-                {% set nb_attente = pagination.total if mode == 'attente' else 0 %}
-                {% if nb_attente > 0 %}
-                    <span class="badge bg-danger ms-2">{{ nb_attente }}</span>
-                {% endif %}
             </a>
         </li>
         <li class="nav-item">
@@ -47,11 +43,11 @@
                             <td>{{ demande.date_demande.strftime('%d/%m/%Y %H:%M') }}</td>
                             <td>
                                 {% if demande.utilisee %}
-                                    <span class="badge bg-success">Utilisée</span>
+                                    <span>Utilisée</span>
                                 {% elif demande.acceptee %}
-                                    <span class="badge bg-info">Acceptée</span>
+                                    <span>Acceptée</span>
                                 {% else %}
-                                    <span class="badge bg-warning">En attente</span>
+                                    <span>En attente</span>
                                 {% endif %}
                             </td>
                             
@@ -77,7 +73,8 @@
                                 </td>
                                 <td>
                                     {% if demande.expiration %}
-                                        {% if now() > demande.expiration %}
+                                        {% set maintenant = demande.date_demande.__class__.utcnow() %}
+                                        {% if maintenant > demande.expiration %}
                                             <span class="text-danger">Expiré</span>
                                         {% else %}
                                             {{ demande.expiration.strftime('%d/%m/%Y %H:%M') }}
@@ -163,30 +160,49 @@
 </div>
 
 <script>
+// Fonction pour accepter la demande via AJAX, puis envoyer l'email
 function accepterEtEnvoyer(idReinit, email) {
-    fetch("{{ url_for('admin.accepter_reinitialisation_mdp', idR=0) }}".replace('/0', '/' + idReinit), {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            var resetLink = "{{ url_for('auth.reset_password', _external=True) }}";
-            var emailEnvoye = MailtoReinitialisationMdp(email, data.code, resetLink);
-            
-            if (emailEnvoye) {
+    // D'abord générer le code temporairement (sans le sauvegarder en BD)
+    var code = genererCodeTemporaire();
+    var resetLink = "{{ url_for('auth.reset_password', _external=True) }}";
+    
+    // Essayer d'envoyer l'email avec gererEnvoi
+    var emailEnvoye = MailtoReinitialisationMdp(email, code, resetLink);
+    
+    if (emailEnvoye) {
+        // L'admin a confirmé l'envoi, maintenant on sauvegarde en BD
+        fetch("{{ url_for('admin.accepter_reinitialisation_mdp', idR=0) }}".replace('/0', '/' + idReinit), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                code: code
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
                 window.location.reload();
+            } else {
+                alert("Erreur : " + data.message);
             }
-        } else {
-            alert("Erreur : " + data.message);
-        }
-    })
-    .catch(error => {
-        alert("Erreur lors de la génération du code.");
-        console.error(error);
-    });
+        })
+        .catch(error => {
+            alert("Erreur lors de l'enregistrement du code.");
+            console.error(error);
+        });
+    }
+    // Si emailEnvoye est false, on ne fait rien (l'admin a annulé)
+}
+
+// Génère un code à 9 chiffres côté client
+function genererCodeTemporaire() {
+    var code = '';
+    for (var i = 0; i < 9; i++) {
+        code += Math.floor(Math.random() * 10);
+    }
+    return code;
 }
 </script>
 {% endblock %}

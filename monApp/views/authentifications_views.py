@@ -142,10 +142,6 @@ def inscription():
 #================================#
 @auth_bp.route("/mdp_oublier/", methods=["GET", "POST"])
 def mdp_oublier():
-    """
-    Formulaire de demande de réinitialisation de mot de passe.
-    Crée une demande en base de données qui sera traitée par un admin.
-    """
     form = MdpOublieForm()
     if form.validate_on_submit():
         email = form.email.data
@@ -158,11 +154,8 @@ def mdp_oublier():
                 acceptee=False,
                 utilisee=False
             ).first()
-            
             if demande_existante:
                 flash("Une demande de réinitialisation est déjà en cours de traitement pour cet email.", "info")
-                return redirect(url_for('auth.login'))
-            
             # Créer une nouvelle demande de réinitialisation
             nouvelle_demande = ReinitialisationMdpBD(
                 email=email,
@@ -170,7 +163,6 @@ def mdp_oublier():
             )
             db.session.add(nouvelle_demande)
             db.session.commit()
-            
             # Notifier tous les admins
             admins = AdminBD.query.all()
             for admin in admins:
@@ -184,23 +176,18 @@ def mdp_oublier():
                 )
                 db.session.add(notif)
             db.session.commit()
+            flash("Votre demande a été transmise à l'administrateur.", "info") 
+            return redirect(url_for('auth.login'))
 
-        # Message générique pour éviter l'énumération d'emails
-        flash("Si cet email correspond à un compte, votre demande a été transmise à l'administrateur.", "info")
-        return redirect(url_for('auth.login'))
-    
+        else:
+            flash("Email inexistent.", "danger") 
     return render_template("authentifications/mdp_oublier.html", 
                           title=TITLE + "- Mot de passe oublié", 
                           form=form)
 
 @auth_bp.route('/reset_password/', methods=['GET', 'POST'])
 def reset_password():
-    """
-    Page de réinitialisation avec email, code à 9 chiffres et nouveau mot de passe.
-    Accessible après que l'admin a accepté la demande et envoyé le code.
-    """
     form = ResetPasswordWithCodeForm()
-    
     if form.validate_on_submit():
         email = form.email.data
         code = form.code.data
