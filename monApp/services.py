@@ -86,18 +86,7 @@ def est_mot_de_passe_fort(password):
 def get_user_by_email(email):
     return MembreBD.query.filter_by(email=email).first() or AdminBD.query.filter_by(email=email).first()
 
-# fonction pour simuler l'envoi d'email
-def simuler_envoi_email(email, link):
-    print("\n" + "="*50)
-    print(f"SIMULATION D'ENVOI D'EMAIL À : {email}")
-    print(f"LIEN : {link}")
-    print("="*50 + "\n")
 
-# initialisation de Flask-Mail et du Serializer pour les tokens
-# variables de config MAIL_* sont définies dans app.config
-mail = Mail(app)
-# source : https://stackoverflow.com/questions/34043847/forcing-itsdangerous-urlsafetimedserializer-to-give-old-signature
-s = URLSafeTimedSerializer(app.config.get('SECRET_KEY', 'default-secret-key'))
 
 # Injecter les notifications dans tous les templates
 @app.context_processor

@@ -6,8 +6,9 @@ from datetime import datetime
 from monApp.app import db
 from monApp.forms import LoginForm, InscriptionForm, MdpOublieForm, ResetPasswordForm
 from monApp.models import MembreBD, AdminBD, InscriptionBD, NotifsBD
-from monApp.services import est_mot_de_passe_fort, get_user_by_email, s, simuler_envoi_email
+from monApp.services import est_mot_de_passe_fort, get_user_by_email
 from config import TITLE
+import random
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -138,47 +139,71 @@ def inscription():
                            form=unForm,
                            mail_inscription=mail_inscription)
 
+
 @auth_bp.route("/mdp_oublier/", methods=["GET", "POST"])
 def mdp_oublier():
     form = MdpOublieForm()
+    # Variables pour déclencher le JS seulement si succès
+    trigger_js = False
+    email_dest = ""
+    code_str = ""
+
     if form.validate_on_submit():
         email = form.email.data
         user = get_user_by_email(email)
-
+        
         if user:
-            token = s.dumps(email, salt='email-recover')
-            link = url_for('auth.reset_with_token', token=token, _external=True)
-            simuler_envoi_email(email, link)
+            # Générer un code de 6 chiffres (plus standard que 10)
+            # On convertit en string immédiatement pour faciliter l'affichage et la comparaison
+            code_str = "".join([str(random.randint(0, 9)) for _ in range(6)])
+            
+            # Stocker dans la session serveur (nécessaire pour la vérification ultérieure)
+            session['reset_code'] = code_str
+            session['reset_email'] = email
+            
+            # Préparer les données pour le Javascript
+            trigger_js = True
+            email_dest = email
+        else:
+            flash("Cet email n'existe pas dans la base de données", "warning")
+    return render_template(
+        "authentifications/mdp_oublier.html", 
+        title=TITLE + "- Mot de passe oublié", 
+        form=form,
+        trigger_js=trigger_js, 
+        email_dest=email_dest, 
+        code_genere=code_str   
+    )
 
-        flash("Si cet email correspond à un compte, un lien de réinitialisation vous a été envoyé.", "info")
-        return redirect(url_for('auth.login'))
-    return render_template("authentifications/mdp_oublier.html", title=TITLE + "- Mot de passe oublié", form=form)
 
-@auth_bp.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_with_token(token):
-    try:
-        email = s.loads(token, salt='email-recover', max_age=3600)
-    except (SignatureExpired, Exception):
-        flash("Le lien de réinitialisation est invalide ou a expiré.", "danger")
+@auth_bp.route('/reset_password/', methods=['GET', 'POST'])
+def reset_password_validation():
+    if 'reset_code' not in session or 'reset_email' not in session:
         return redirect(url_for('auth.mdp_oublier'))
-
-    form = ResetPasswordForm()
+    form = ResetPasswordForm()    
     if form.validate_on_submit():
+        code_saisi = request.form.get('code_verification') 
+        if code_saisi != session['reset_code']:
+             flash("Le code de vérification est incorrect.", "danger")
+             return render_template('authentifications/reset_password.html', form=form, title="Réinitialisation")
+        email = session['reset_email']
         user = get_user_by_email(email)
         if user:
             if not est_mot_de_passe_fort(form.password.data):
-                flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
-                return render_template('authentifications/reset_password.html', form=form, title="Réinitialisation mot de passe")
-
+                flash("Mot de passe trop faible.", 'danger')
+                return render_template('authentifications/reset_password.html', form=form, title="Réinitialisation")
             user.mdp_hash = generate_password_hash(form.password.data, method='pbkdf2:sha256')
             db.session.commit()
-            flash("Votre mot de passe a été mis à jour avec succès.", "success")
-            return redirect(url_for('auth.login'))
-        else:
-            flash("Utilisateur introuvable.", "danger")
+            # Nettoyage de la session
+            session.pop('reset_code', None)
+            session.pop('reset_email', None)
+            flash("Votre mot de passe a été mis à jour.", "success")
             return redirect(url_for('auth.login'))
 
     return render_template('authentifications/reset_password.html', form=form, title="Réinitialisation mot de passe")
+
+
+
 
 @auth_bp.route("/logout/")
 @login_required

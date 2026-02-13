@@ -1,10 +1,17 @@
 {% extends "base.html" %}
-
 {% block main %}
 <div class="page-login">
     <div class="login-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <h2 class="mdp-oublierh2">Mot de passe oublié</h2>
-        <p class="mdpclassp">Entrez votre adresse email pour recevoir un lien de <strong>réinitialisation</strong></p>
+        <p class="mdpclassp">Entrez votre email pour recevoir un <strong>code de vérification</strong>.</p>
+        
         <form method="POST" action="" style="width: 100%;">
             {{ form.hidden_tag() }}
             <div class="form-group">
@@ -14,9 +21,17 @@
                 {% endfor %}
             </div>
             <div class="form-group">
-                {{ form.submit(class="btn-connecter", value="ENVOYER") }}
+                {{ form.submit(class="btn-connecter", value="OBTENIR LE CODE") }}
             </div>
         </form>
     </div>
 </div>
+<script src="{{ url_for('static', filename='js/mailto.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var email = "{{ email_dest }}";
+        var code = "{{ code_genere }}";
+        MailtoResetPassword(email, code);
+    });
+</script>
 {% endblock %}

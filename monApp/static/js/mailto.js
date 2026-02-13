@@ -133,3 +133,22 @@ function MailtoRefuser(type, id, email, prenom, nom, doitEnvoyer) {
     var lien = "mailto:" + email + "?subject=" + encodeURIComponent(sujet) + "&body=" + encodeURIComponent(corpsFinal);
     return gererEnvoi(actif, lien);
 }
+
+function MailtoResetPassword(email, code) {
+    var destinataire = email; 
+    var sujet = "[Sécurité] Votre code de réinitialisation";
+    var corps = "Bonjour,\n\n" +
+                "Voici le code de réinitialisation demandé pour votre compte :\n\n" +
+                code + "\n\n" +
+                "Veuillez entrer ce code sur la page de modification de mot de passe.\n" +
+                "Cordialement.";
+    var lien = "mailto:" + destinataire + 
+               "?subject=" + encodeURIComponent(sujet) + 
+               "&body=" + encodeURIComponent(corps);
+    var aConfirme = gererEnvoi(true, lien);
+    if (aConfirme) {
+        window.location.href = "/auth/reset_password/";
+    } else {
+        console.log("Opération annulée par l'utilisateur.");
+    }
+}
