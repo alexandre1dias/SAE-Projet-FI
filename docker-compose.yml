@@ -1,6 +1,6 @@
 services:
   db:
-    image: mariadb:10.11
+    image: lucasdesgranges/sae-projet-db:latest
     container_name: spf_db
     restart: always
     environment:
