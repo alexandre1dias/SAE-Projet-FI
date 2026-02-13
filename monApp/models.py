@@ -391,3 +391,24 @@ class NotifsBD(db.Model):
     link = db.Column(db.String(255))
     idAdmin = db.Column(db.Integer, db.ForeignKey('ADMINISTRATEUR.idAdmin'))
     idMembre = db.Column(db.Integer, db.ForeignKey('MEMBRE.idMembre'))
+
+
+
+class ReinitialisationMdpBD(db.Model):
+    """
+    Modèle pour les demandes de réinitialisation de mot de passe.
+    L'admin approuve la demande et envoie un code à 9 chiffres par email.
+    """
+    __tablename__ = 'REINITIALISATION_MDP'
+    
+    id = db.Column('idReinit', db.Integer, primary_key=True)
+    email = db.Column('emailReinit', db.String(100), nullable=False)
+    code = db.Column('codeReinit', db.String(9), nullable=True)  
+    date_demande = db.Column('dateDemande', db.DateTime, default=datetime, nullable=False)
+    date_acceptation = db.Column('dateAcceptation', db.DateTime, nullable=True)
+    acceptee = db.Column('acceptee', db.Boolean, default=False, nullable=False)
+    utilisee = db.Column('utilisee', db.Boolean, default=False, nullable=False) 
+    expiration = db.Column('expiration', db.DateTime, nullable=True)  
+    
+    def __repr__(self):
+        return f"<ReinitialisationMdp {self.email} - Acceptée: {self.acceptee}>"

@@ -1,12 +1,10 @@
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField, widgets, MultipleFileField
-from wtforms.validators import DataRequired, Email, Optional, ValidationError
+from wtforms.validators import DataRequired, Email, Optional, ValidationError, Length, EqualTo
 from datetime import date
 from flask_wtf.file import FileField, FileAllowed
 import phonenumbers
-from config import AUJOURDHUI
-
 
 class LoginForm(FlaskForm):
     email = StringField ('Email' ,validators= [DataRequired(), Email()])
@@ -340,3 +338,42 @@ class PresseForm(FlaskForm):
         FileAllowed(['jpg', 'png', 'jpeg', 'webp'], 'Images seulement !')
     ])
     submit = SubmitField('Publier')
+
+
+class ResetPasswordWithCodeForm(FlaskForm):
+    """
+    Formulaire de réinitialisation de mot de passe avec code à 9 chiffres.
+    """
+    email = StringField(
+        'Email',
+        validators=[
+            DataRequired(message="L'email est requis."),
+            Email(message="Email invalide.")
+        ]
+    )
+    
+    code = StringField(
+        'Code de réinitialisation',
+        validators=[
+            DataRequired(message="Le code est requis."),
+            Length(min=9, max=9, message="Le code doit contenir exactement 9 chiffres.")
+        ]
+    )
+    
+    password = PasswordField(
+        'Nouveau mot de passe',
+        validators=[
+            DataRequired(message="Le mot de passe est requis."),
+            Length(min=8, message="Le mot de passe doit contenir au moins 8 caractères.")
+        ]
+    )
+    
+    confirm_password = PasswordField(
+        'Confirmer le mot de passe',
+        validators=[
+            DataRequired(message="La confirmation est requise."),
+            EqualTo('password', message="Les mots de passe ne correspondent pas.")
+        ]
+    )
+    
+    submit = SubmitField('Réinitialiser le mot de passe')

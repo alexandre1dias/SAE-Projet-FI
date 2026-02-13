@@ -133,3 +133,27 @@ function MailtoRefuser(type, id, email, prenom, nom, doitEnvoyer) {
     var lien = "mailto:" + email + "?subject=" + encodeURIComponent(sujet) + "&body=" + encodeURIComponent(corpsFinal);
     return gererEnvoi(actif, lien);
 }
+
+
+function MailtoReinitialisationMdp(email, code, resetLink) {
+    var actif = true; // Toujours actif pour l'envoi du code
+    var sujet = "Réinitialisation de votre mot de passe";
+    var corps = "Bonjour,\n\n" +
+                "Votre demande de réinitialisation de mot de passe a été acceptée.\n\n" +
+                "Voici votre code de réinitialisation : " + code + "\n\n" +
+                "Ce code est valable pendant 24 heures.\n\n" +
+                "Pour réinitialiser votre mot de passe, veuillez suivre ce lien :\n" +
+                resetLink + "\n\n" +
+                "Vous devrez entrer :\n" +
+                "- Votre adresse email : " + email + "\n" +
+                "- Le code à 9 chiffres : " + code + "\n" +
+                "- Votre nouveau mot de passe\n\n" +
+                "Cordialement,\n" +
+                "L'équipe d'administration";
+    
+    var lien = "mailto:" + email + 
+               "?subject=" + encodeURIComponent(sujet) + 
+               "&body=" + encodeURIComponent(corps);
+    
+    return gererEnvoi(actif, lien);
+}

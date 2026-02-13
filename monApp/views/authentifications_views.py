@@ -1,11 +1,10 @@
 from flask import Blueprint, render_template, request, url_for, redirect, session, flash
 from flask_login import logout_user, login_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from itsdangerous import SignatureExpired
 from datetime import datetime
 from monApp.app import db
-from monApp.forms import LoginForm, InscriptionForm, MdpOublieForm, ResetPasswordForm
-from monApp.models import MembreBD, AdminBD, InscriptionBD, NotifsBD
+from monApp.forms import LoginForm, InscriptionForm, MdpOublieForm, ResetPasswordWithCodeForm
+from monApp.models import MembreBD, AdminBD, InscriptionBD, NotifsBD, ReinitialisationMdpBD
 from monApp.services import est_mot_de_passe_fort, get_user_by_email, s, simuler_envoi_email
 from config import TITLE
 
@@ -138,47 +137,123 @@ def inscription():
                            form=unForm,
                            mail_inscription=mail_inscription)
 
+#================================#
+#===========   MDP Oublie   =====#
+#================================#
 @auth_bp.route("/mdp_oublier/", methods=["GET", "POST"])
 def mdp_oublier():
+    """
+    Formulaire de demande de réinitialisation de mot de passe.
+    Crée une demande en base de données qui sera traitée par un admin.
+    """
     form = MdpOublieForm()
     if form.validate_on_submit():
         email = form.email.data
         user = get_user_by_email(email)
 
         if user:
-            token = s.dumps(email, salt='email-recover')
-            link = url_for('auth.reset_with_token', token=token, _external=True)
-            simuler_envoi_email(email, link)
-
-        flash("Si cet email correspond à un compte, un lien de réinitialisation vous a été envoyé.", "info")
-        return redirect(url_for('auth.login'))
-    return render_template("authentifications/mdp_oublier.html", title=TITLE + "- Mot de passe oublié", form=form)
-
-@auth_bp.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_with_token(token):
-    try:
-        email = s.loads(token, salt='email-recover', max_age=3600)
-    except (SignatureExpired, Exception):
-        flash("Le lien de réinitialisation est invalide ou a expiré.", "danger")
-        return redirect(url_for('auth.mdp_oublier'))
-
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
-        user = get_user_by_email(email)
-        if user:
-            if not est_mot_de_passe_fort(form.password.data):
-                flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
-                return render_template('authentifications/reset_password.html', form=form, title="Réinitialisation mot de passe")
-
-            user.mdp_hash = generate_password_hash(form.password.data, method='pbkdf2:sha256')
+            # Vérifier s'il existe déjà une demande en attente pour cet email
+            demande_existante = ReinitialisationMdpBD.query.filter_by(
+                email=email,
+                acceptee=False,
+                utilisee=False
+            ).first()
+            
+            if demande_existante:
+                flash("Une demande de réinitialisation est déjà en cours de traitement pour cet email.", "info")
+                return redirect(url_for('auth.login'))
+            
+            # Créer une nouvelle demande de réinitialisation
+            nouvelle_demande = ReinitialisationMdpBD(
+                email=email,
+                date_demande=datetime.now()
+            )
+            db.session.add(nouvelle_demande)
             db.session.commit()
-            flash("Votre mot de passe a été mis à jour avec succès.", "success")
-            return redirect(url_for('auth.login'))
-        else:
-            flash("Utilisateur introuvable.", "danger")
-            return redirect(url_for('auth.login'))
+            
+            # Notifier tous les admins
+            admins = AdminBD.query.all()
+            for admin in admins:
+                notif = NotifsBD(
+                    typeN="Demande Réinitialisation MDP",
+                    sourceN=f"Réinitialisation MDP : {email}",
+                    lue=False,
+                    timestamp=datetime.now(),
+                    link=url_for('admin.gerer_reinitialisation_mdp'),
+                    idAdmin=admin.id
+                )
+                db.session.add(notif)
+            db.session.commit()
 
-    return render_template('authentifications/reset_password.html', form=form, title="Réinitialisation mot de passe")
+        # Message générique pour éviter l'énumération d'emails
+        flash("Si cet email correspond à un compte, votre demande a été transmise à l'administrateur.", "info")
+        return redirect(url_for('auth.login'))
+    
+    return render_template("authentifications/mdp_oublier.html", 
+                          title=TITLE + "- Mot de passe oublié", 
+                          form=form)
+
+@auth_bp.route('/reset_password/', methods=['GET', 'POST'])
+def reset_password():
+    """
+    Page de réinitialisation avec email, code à 9 chiffres et nouveau mot de passe.
+    Accessible après que l'admin a accepté la demande et envoyé le code.
+    """
+    form = ResetPasswordWithCodeForm()
+    
+    if form.validate_on_submit():
+        email = form.email.data
+        code = form.code.data
+        nouveau_mdp = form.password.data
+        
+        # Vérifier que l'utilisateur existe
+        user = get_user_by_email(email)
+        if not user:
+            flash("Email incorrect.", "danger")
+            return render_template('authentifications/reset_password.html', 
+                                 form=form, 
+                                 title=TITLE + "- Réinitialisation mot de passe")
+        
+        # Vérifier qu'une demande acceptée existe avec ce code
+        demande = ReinitialisationMdpBD.query.filter_by(
+            email=email,
+            code=code,
+            acceptee=True,
+            utilisee=False
+        ).first()
+        
+        if not demande:
+            flash("Code incorrect ou déjà utilisé.", "danger")
+            return render_template('authentifications/reset_password.html', 
+                                 form=form, 
+                                 title=TITLE + "- Réinitialisation mot de passe")
+        
+        # Vérifier l'expiration (24h après acceptation)
+        if demande.expiration and datetime.now() > demande.expiration:
+            flash("Le code a expiré. Veuillez faire une nouvelle demande.", "danger")
+            demande.utilisee = True  # Marquer comme utilisée pour éviter les réutilisations
+            db.session.commit()
+            return redirect(url_for('auth.mdp_oublier'))
+        
+        # Vérifier la force du mot de passe
+        if not est_mot_de_passe_fort(nouveau_mdp):
+            flash("Le mot de passe est trop faible (8 carac, Maj, min, chiffre, spécial requis).", 'danger')
+            return render_template('authentifications/reset_password.html', 
+                                 form=form, 
+                                 title=TITLE + "- Réinitialisation mot de passe")
+        
+        # Tout est bon : réinitialiser le mot de passe
+        user.mdp_hash = generate_password_hash(nouveau_mdp, method='pbkdf2:sha256')
+        demande.utilisee = True
+        db.session.commit()
+        
+        flash("Votre mot de passe a été mis à jour avec succès.", "success")
+        return redirect(url_for('auth.login'))
+
+    return render_template('authentifications/reset_password.html', 
+                          form=form, 
+                          title=TITLE + "- Réinitialisation mot de passe")
+
 
 @auth_bp.route("/logout/")
 @login_required
