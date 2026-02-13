@@ -104,3 +104,17 @@ flask run
 
 ---
 
+
+### 6. Exemples de comptes
+
+Vous pouvez consulter l'intégralité des comptes créés et leurs mots de passe dans le fichier `insertionBD.sql` (les versions non hachées sont indiquées en commentaire).
+
+Voici trois exemples pour faciliter vos tests :
+
+| Type de compte | Email | Mot de passe |
+| :--- | :--- | :--- |
+| **Membre simple** | `jean.dupont@email.com` | `mdp123` |
+| **Membre du cercle** | `chr.lec@email.com` | `mdp541` |
+| **Administrateur** | `admin@escrime.com` | `motdepasseadmin` |
+
+> **Note :** Pour le membre **Lechopier**, un fichier spécifique `insertLechope.sql` permet d'ajouter plusieurs événements à son compte, ce qui est idéal pour tester l'affichage avec un volume de données plus important.
