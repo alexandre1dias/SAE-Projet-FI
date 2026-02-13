@@ -311,6 +311,17 @@ CREATE TABLE IMAGEARTICLE (
     PRIMARY KEY(idImageArticle)
 );
 
+CREATE TABLE REINITIALISATION_MDP(
+    idReinit integer AUTO_INCREMENT,
+    emailReinit varchar(100) not null,
+    codeReinit varchar(9),
+    dateDemande DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    dateAcceptation DATETIME,
+    acceptee boolean DEFAULT false not null,
+    utilisee boolean DEFAULT false not null,
+    expiration DATETIME,
+    PRIMARY KEY(idReinit)
+);
 
 -- Ajout des contraintes de clé étrangère
 

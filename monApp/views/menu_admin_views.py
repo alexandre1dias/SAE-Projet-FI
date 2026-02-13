@@ -1,13 +1,13 @@
 from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify, abort
 from flask_login import login_required, current_user, logout_user
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import or_
-
 from monApp.app import db
 from monApp.forms import FiltreForm, ModifForm, TarifForm, HoraireForm
-from monApp.models import FormulaireBD, MembreBD, ModifBD, AdminBD, NotifsBD, InscriptionBD, TarifBD, HoraireBD
+from monApp.models import FormulaireBD, MembreBD, ModifBD, AdminBD, NotifsBD, InscriptionBD, TarifBD, HoraireBD, ReinitialisationMdpBD
 from monApp.services import admin_required
 from config import TITLE
+import random
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -398,3 +398,68 @@ def edit_horaire(idH):
         db.session.commit()
         return redirect(url_for('admin.gestion_horaires'))
     return render_template("menu_admin/admin_edit_horaire.html", title="Modifier Horaire", form=form)
+
+
+@admin_bp.route("/gerer_reinitialisation_mdp/")
+@login_required
+@admin_required
+def gerer_reinitialisation_mdp():
+    mode = request.args.get('mode', 'attente')
+    page = request.args.get('page', 1, type=int)
+    if mode == 'traitees':
+        demandes = ReinitialisationMdpBD.query.filter(
+            or_(
+                ReinitialisationMdpBD.acceptee == True,
+                ReinitialisationMdpBD.utilisee == True
+            )
+        ).order_by(ReinitialisationMdpBD.date_demande.desc())
+    else:
+        demandes = ReinitialisationMdpBD.query.filter_by(
+            acceptee=False,
+            utilisee=False
+        ).order_by(ReinitialisationMdpBD.date_demande.desc())
+    
+    pagination = demandes.paginate(page=page, per_page=15, error_out=False)
+    
+    return render_template("menu_admin/gerer_reinitialisation_mdp.html",
+                          title=TITLE + " - Gestion Réinitialisation MDP",
+                          pagination=pagination,
+                          mode=mode)
+
+@admin_bp.route('/accepter_reinitialisation_mdp/<int:idR>', methods=["POST"])
+@login_required
+@admin_required
+def accepter_reinitialisation_mdp(idR):
+    demande = db.session.get(ReinitialisationMdpBD, idR)
+    if not demande:
+        return jsonify({'success': False, 'message': 'Demande introuvable.'}), 404
+    
+    if demande.acceptee:
+        return jsonify({'success': False, 'message': 'Cette demande a déjà été acceptée.'}), 400
+    data = request.get_json()
+    code = data.get('code')
+    
+    if not code or len(code) != 9:
+        return jsonify({'success': False, 'message': 'Code invalide.'}), 400
+    demande.code = code
+    demande.acceptee = True
+    demande.date_acceptation = datetime.now()
+    demande.expiration = datetime.now() + timedelta(hours=24)
+    db.session.commit()
+    return jsonify({
+        'success': True,
+        'message': 'Code enregistré avec succès.'
+    })
+
+@admin_bp.route('/refuser_reinitialisation_mdp/<int:idR>', methods=["POST"])
+@login_required
+@admin_required
+def refuser_reinitialisation_mdp(idR):
+    demande = db.session.get(ReinitialisationMdpBD, idR)
+    if demande:
+        db.session.delete(demande)
+        db.session.commit()
+        flash("Demande de réinitialisation refusée.", "success")
+    else:
+        flash("Demande introuvable.", "danger")
+    return redirect(url_for('admin.gerer_reinitialisation_mdp'))

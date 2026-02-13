@@ -8,7 +8,7 @@ BOOTSTRAP_SERVE_LOCAL = True
 
 LOGIN=""
 PASSWD=""
-SERVEUR="servinfo-maria"
+SERVEUR=""
 BD=""
 SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{LOGIN}:{PASSWD}@{SERVEUR}/{BD}'
 
