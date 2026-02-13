@@ -104,7 +104,7 @@
                 </div>
                 <h6>{{ filtre.sexe.label }}</h6>
                 {% for subfield in filtre.sexe %}
-                    <div class="form-check form-check-inline">
+                    <div class="form-check">
                         {{ subfield(class="form-check-input") }}
                         {{ subfield.label(class="form-check-label") }}
                     </div>
@@ -112,18 +112,25 @@
                 
                 <h6>{{ filtre.armes.label }}</h6>
                 {% for subfield in filtre.armes %}
-                    <div class="form-check form-check-inline">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
+                    <div class="form-check ">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
                 {% endfor %}
 
                 <h6>{{ filtre.type_competition.label }}</h6>
                 {% for subfield in filtre.type_competition %}
-                    <div class="form-check form-check-inline">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
+                    <div class="form-check ">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
                 {% endfor %}
 
                 <h6>{{ filtre.niveau.label }}</h6>
-                {% for subfield in filtre.niveau %}
-                    <div class="form-check form-check-inline">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
-                {% endfor %}
+                <div class="dropdown d-grid mb-3">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuNiveau" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                        Sélectionner
+                    </button>
+                    <ul class="dropdown-menu w-100 p-2" aria-labelledby="dropdownMenuNiveau">
+                        {% for subfield in filtre.niveau %}
+                            <div class="form-check">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
+                        {% endfor %}
+                    </ul>
+                </div>
 
                 <div class="d-grid gap-2">
                 {{ filtre.submit(class="btn btn-primary", value="Appliquer les filtres") }}
