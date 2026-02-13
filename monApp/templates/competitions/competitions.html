@@ -1,0 +1,141 @@
+{%extends "base.html"%}
+
+{% block body_class %}has-sidebar{% endblock %}
+
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adhesion.css') }}">
+{% endblock %}
+{%block main%}
+    <div class="container py-5">
+        {% if etat == 'passees' %}
+            <h2 class="text-center mb-5">Listes des compétitions passées</h2>
+        {% else %}
+            <h2 class="text-center mb-5">Listes des prochaines compétitions</h2>
+        {% endif %}
+        
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for uneCompetition in pagination %}
+                <div class="col">
+                    <div class="card pricing-card h-100">
+                        <div class="card-header pricing-header basic-header p-4">
+                            <h3 class="card-title text-center mb-0"> {{uneCompetition.nom}} <br> {{uneCompetition.ville}}</h3>
+                        </div>
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h4 class="card-title text-center mb-4 h5">{{uneCompetition.niveaux}}</h4>
+                            <ul class="feature-list text-center mb-4">
+                                <li>{{uneCompetition.date_debut}} - {{uneCompetition.date_fin}}</li>
+                                <li>{{uneCompetition.type_arme}}</li>
+                                <li>{{uneCompetition.typeComp}}</li>
+                                <li>Participants : {{ uneCompetition.evenement.participants.count() if uneCompetition.evenement else 0 }}</li>
+                            </ul>
+                            <div class="text-center mt-auto">
+                                <a href="{{ url_for('competitions.competition_view', idCompetition=uneCompetition.id) }}" class="btn btn-outline-primary btn-custom">Consulter</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if pagination.items %}
+    <div class="d-flex justify-content-center mt-4">
+    <ul class="pagination">
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('competitions.competitions', 
+                page=pagination.prev_num, 
+                sexe=filtre.sexe.data,
+                niveau=filtre.niveau.data,
+                armes=filtre.armes.data,
+                type_competition=filtre.type_competition.data,
+                etat=etat) if pagination.has_prev else '#' }}">
+                &laquo; Avant
+            </a>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">
+                Page {{ pagination.page }} sur {{ pagination.pages }}
+            </span>
+        </li>
+        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('competitions.competitions', 
+                page=pagination.next_num, 
+                sexe=filtre.sexe.data,
+                niveau=filtre.niveau.data,
+                armes=filtre.armes.data,
+                type_competition=filtre.type_competition.data,
+                etat=etat) if pagination.has_next else '#' }}">
+                Après &raquo;
+            </a>
+        </li>
+    </ul>
+    </div>
+    {% endif %}
+
+    <aside class="fixed-left">
+        <div class="filtres-box">
+            <div>
+                <h5 class="filtres-titre">Action</h5>
+                <div class="d-grid gap-2">
+                    {% if etat == 'passees' %}
+                        <a href="{{ url_for('competitions.competitions', etat='prochaines') }}" class="btn btn-secondary">
+                            Voir les prochaines compétitions 
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('competitions.competitions', etat='passees') }}" class="btn btn-secondary">
+                            Voir les compétitions passées
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <br>
+            <form action="{{ url_for('competitions.competitions', etat=etat) }}" method="GET">
+            {%if etat == 'passees' %}
+            <h5 class="filtres-titre">Années</h5>
+            <div class="d-grid gap-2 mb-3">
+                {{ filtre.annee_scolaire(class="btn btn-outline-primary dropdown-toggle", onchange="this.form.submit()") }} 
+            </div>
+            {%endif%}
+            <h5 class="filtres-titre">Filtres</h5>
+                <h6> {{ filtre.tri.label }}</h6>
+                <div class="d-grid gap-2">
+                    {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle") }} 
+                </div>
+                <h6>{{ filtre.sexe.label }}</h6>
+                {% for subfield in filtre.sexe %}
+                    <div class="form-check">
+                        {{ subfield(class="form-check-input") }}
+                        {{ subfield.label(class="form-check-label") }}
+                    </div>
+                {% endfor %}
+                
+                <h6>{{ filtre.armes.label }}</h6>
+                {% for subfield in filtre.armes %}
+                    <div class="form-check ">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
+                {% endfor %}
+
+                <h6>{{ filtre.type_competition.label }}</h6>
+                {% for subfield in filtre.type_competition %}
+                    <div class="form-check ">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
+                {% endfor %}
+
+                <h6>{{ filtre.niveau.label }}</h6>
+                <div class="dropdown d-grid mb-3">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuNiveau" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                        Sélectionner
+                    </button>
+                    <ul class="dropdown-menu w-100 p-2" aria-labelledby="dropdownMenuNiveau">
+                        {% for subfield in filtre.niveau %}
+                            <div class="form-check">{{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}</div>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="d-grid gap-2">
+                {{ filtre.submit(class="btn btn-primary", value="Appliquer les filtres") }}
+                </div>
+            </form>
+        </div>
+    </aside>
+{% endblock %}

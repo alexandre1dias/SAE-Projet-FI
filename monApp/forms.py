@@ -1,12 +1,10 @@
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, HiddenField, PasswordField, SubmitField, IntegerField, TextAreaField, DateTimeLocalField, SelectField, SelectMultipleField, DateField, RadioField, widgets, MultipleFileField
-from wtforms.validators import DataRequired, Email, Optional, ValidationError
+from wtforms.validators import DataRequired, Email, Optional, ValidationError, Length, EqualTo
 from datetime import date
 from flask_wtf.file import FileField, FileAllowed
 import phonenumbers
-from config import AUJOURDHUI, LISTE_ANNEE
-
 
 class LoginForm(FlaskForm):
     email = StringField ('Email' ,validators= [DataRequired(), Email()])
@@ -232,7 +230,6 @@ class FiltreForm(FlaskForm):
     CHOIX_TYPE_COMPETE = [('Régional', 'Régional'), ('National', 'National')]
     CHOIX_TYPE_EVENT = [('Compétition', 'Compétition'), ('Réunion', 'Réunion'),('Évènement du club', 'Évènement du club'), ('Entraînement', 'Entraînement')]
 
-
     sexe = SelectMultipleField(
         'Sexes',
         choices=CHOIX_SEXE,
@@ -292,30 +289,9 @@ class FiltreForm(FlaskForm):
         choices=CHOIX_TRI,
         default='date_desc'  
     )
-
-
     annee_scolaire = SelectField('Années', choices=[])
 
-    def __init__(self, *args, **kwargs):
-        super(FiltreForm, self).__init__(*args, **kwargs)
-        annee_courante = AUJOURDHUI.year
-        mois_courant = AUJOURDHUI.month
-
-        if mois_courant >= 8:
-            annee_courante = str(annee_courante) + "-" + str(annee_courante + 1)
-        else:
-            annee_courante = str(annee_courante - 1) + "-" + str(annee_courante)
-        if not annee_courante in LISTE_ANNEE:
-            LISTE_ANNEE.append(annee_courante)
-        choix_final = []
-        for annee_str in LISTE_ANNEE:
-            annee_debut = annee_str.split('-')[0]
-            choix_final.append((annee_debut, annee_str))
-        choix_final.reverse()
-        self.annee_scolaire.choices = choix_final
-        if not self.annee_scolaire.data and choix_final:
-            self.annee_scolaire.data = choix_final[0][0] 
-  
+   
         
         
 
@@ -362,3 +338,42 @@ class PresseForm(FlaskForm):
         FileAllowed(['jpg', 'png', 'jpeg', 'webp'], 'Images seulement !')
     ])
     submit = SubmitField('Publier')
+
+
+class ResetPasswordWithCodeForm(FlaskForm):
+    """
+    Formulaire de réinitialisation de mot de passe avec code à 9 chiffres.
+    """
+    email = StringField(
+        'Email',
+        validators=[
+            DataRequired(message="L'email est requis."),
+            Email(message="Email invalide.")
+        ]
+    )
+    
+    code = StringField(
+        'Code de réinitialisation',
+        validators=[
+            DataRequired(message="Le code est requis."),
+            Length(min=9, max=9, message="Le code doit contenir exactement 9 chiffres.")
+        ]
+    )
+    
+    password = PasswordField(
+        'Nouveau mot de passe',
+        validators=[
+            DataRequired(message="Le mot de passe est requis."),
+            Length(min=8, message="Le mot de passe doit contenir au moins 8 caractères.")
+        ]
+    )
+    
+    confirm_password = PasswordField(
+        'Confirmer le mot de passe',
+        validators=[
+            DataRequired(message="La confirmation est requise."),
+            EqualTo('password', message="Les mots de passe ne correspondent pas.")
+        ]
+    )
+    
+    submit = SubmitField('Réinitialiser le mot de passe')

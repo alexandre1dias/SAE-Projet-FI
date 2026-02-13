@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from monApp.modelBD import *
+from monApp.models import *
 
 # ==============================================================================
 # 1. TEST MEMBRE & AUTH

@@ -1,0 +1,115 @@
+{%extends "base.html"%}
+{% block body_class %}has-sidebar{% endblock %}
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendrier.css') }}">
+{% endblock %}
+{% block main %}
+<div class = "container">
+<h1 class="text-center mb-5" id="calendrier-titre">Calendrier des Évènements</h1>
+<aside class="fixed-left">
+<div class="filtres-box">
+    {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+    <div>
+        <h5 class="filtres-titre">Action</h5>
+        <a href="{{ url_for('calendrier.add_event') }}" class="btn btn-primary w-100">
+            Ajouter un événement
+        </a>
+    </div>
+    {% endif%}
+    <br>
+    <h5 class="filtres-titre">Filtres</h5>
+    <form action="{{ url_for('calendrier.calendrier') }}" method="GET">
+
+        <h6>{{ filtre.type_event.label }}</h6>
+        {% for subfield in filtre.type_event %}
+            <div class="form-check custom-check-{{ subfield.data | replace(' ', '-') 
+            | replace('é', 'e') | replace('è', 'e') | replace('É', 'e') | replace('î', 'i') | lower }}">
+                {{ subfield(class="form-check-input") }}
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+
+        <h6>{{ filtre.type_competition.label }}</h6>
+        {% for subfield in filtre.type_competition %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+
+        <h6>{{ filtre.armes.label }}</h6>
+        {% for subfield in filtre.armes %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+
+        <h6>{{ filtre.sexe.label }}</h6>
+        {% for subfield in filtre.sexe %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+
+        <h6>{{ filtre.niveau.label }}</h6>
+        {% for subfield in filtre.niveau %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+        {{ filtre.submit(class="btn btn-primary", value="Appliquer les filtres") }}
+    </form>
+</div>
+</aside>
+<div class="calendrier-wrapper" id='calendar' data-api-url="{{ url_for('calendrier.get_events') }}"></div>
+
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="eventModalLabel">Détails de l'événement</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4 id="modalTitle" class="text-primary mb-4 text-center"></h4>
+                
+                <div class="fs-6"> <p class="mb-2"><strong>Type :</strong> <span id="modalType"></span></p>
+                    <p class="mb-2"><strong>Début :</strong> <span id="modalStart"></span></p>
+                    <p class="mb-2"><strong>Fin :</strong> <span id="modalEnd"></span></p>
+                    
+                    <div id="lineNiveau">
+                        <p class="mb-2"><strong>Niveaux :</strong> <span id="modalNiveaux"></span></p>
+                    </div>
+                    
+                    <div id="lineArme">
+                        <p class="mb-2"><strong>Arme :</strong> <span id="modalArme"></span></p>
+                    </div>
+
+                    <hr> <p class="mb-2"><strong>Ville :</strong> <span id="modalVille"></span></p>
+                    <p class="mb-2"><strong>Adresse :</strong> <span id="modalAdresse"></span></p>
+                    
+                    <hr> <p class="mb-2"><strong>Infos :</strong> <span id="modalDescription" class="text-muted"></span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+<script src="{{ url_for('static', filename='js/calendrier.js') }}"></script>
+{% endblock %}

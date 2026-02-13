@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block main %}
+
+<h1 class="mb-4" >{{selectedEventClub.NomEV}}</h1>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <h4 class="mb-0">Détails de l'événement du club</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Début:</strong> {{ selectedEventClub.dateDebutEV.strftime('%d/%m/%Y') }} à {{ selectedEventClub.heureDebutEV }}</li>
+                    <li class="list-group-item"><strong>Ville:</strong> {{ selectedEventClub.villeEV or 'Non spécifiée'}} </li>
+                    <li class="list-group-item"><strong>Niveaux:</strong> {{selectedEventClub.niveauxEV}}</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Fin:</strong> {{ selectedEventClub.dateFinEV.strftime('%d/%m/%Y') }} à {{ selectedEventClub.heureFinEV }}</li>
+                    <li class="list-group-item"><strong>Adresse:</strong> {{ selectedEventClub.adresseEV or 'Non spécifiée' }}</li>
+                    <li class="list-group-item"><strong>Nombre Participants:</strong> {{ selectedEventClub.evenement.participants.count()}}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <h2>Description :</h2>
+    <p>{{selectedEventClub.descriptionEV}}</p>
+    {% set public_images = selectedEventClub.images_re|rejectattr('prive')|list %}
+    {% if public_images %}
+        <div id="carouselTop" class="carousel slide mb-3" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                {% for image in public_images %}
+                <button type="button" data-bs-target="#carouselTop" data-bs-slide-to="{{ loop.index0 }}" class="{{ 'active' if loop.first }}" aria-current="true" aria-label="Slide {{ loop.index }}"></button>
+                {% endfor %}
+            </div>
+            <div class="carousel-inner">
+                {% for image in public_images %}
+                <div class="carousel-item {{ 'active' if loop.first }}">
+                    <img src="{{ url_for('static', filename=image.urlI) }}" class="d-block mx-auto" alt="{{ image.alt }}" style="max-height: 400px; object-fit: contain;">
+                </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselTop" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselTop" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    {% endif %}
+    
+    <div class="d-flex justify-content-center">
+        {% if origine == 'calendrier' %}
+            <a href="{{ url_for('calendrier.calendrier') }}" class="btn btn-secondary me-2">Retour</a>
+        {% elif origine == 'evenement_membre'%}
+            <a href="{{ url_for('profil.evenement_membre') }}" class="btn btn-secondary me-2">Retour</a>
+        {% else %}
+            <a href="{{ url_for('events_club.evenement_club') }}" class="btn btn-secondary me-2">Retour</a>
+        {% endif %}
+        
+        {% if current_user.is_authenticated and session.get('user_type') == 'membre' %}
+            {% if not selectedEventClub.passeeEV %}
+                {% if deja_inscrit %}
+                    <a href="{{ url_for('events_club.desinscrire_club', idEventClub=selectedEventClub.idEventClub) }}" class="btn btn-danger me-2">Se désinscrire</a>
+                {% else %}
+                    <a href="{{ url_for('events_club.inscrire_club', idEventClub=selectedEventClub.idEventClub) }}" class="btn btn-success me-2">S'inscrire</a>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+            <a href="{{ url_for('events_club.club_update', idEventClub=selectedEventClub.idEventClub)  }}" class="btn btn-primary me-2">Modifier évènement</a>
+            <form action="{{ url_for('events_club.club_delete', idEventClub=selectedEventClub.idEventClub) }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer cet événement ?');" class="d-inline">
+                <button type="submit" class="btn btn-danger">Supprimer évènement</button>
+            </form>
+        {% endif %}
+    </div>
+
+{% endblock %}

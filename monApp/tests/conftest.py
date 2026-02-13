@@ -35,7 +35,7 @@ def db(app):
     """
     from monApp.app import db as _db
     # On importe les modèles pour s'assurer qu'ils sont connus de SQLAlchemy avant create_all
-    import monApp.modelBD 
+    import monApp.models 
 
     # A. Création du moteur SQLite manuel
     engine = create_engine('sqlite:///:memory:')

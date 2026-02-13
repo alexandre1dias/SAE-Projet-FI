@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block body_class %}has-sidebar{% endblock %}
+
+
+{% block main %}
+<div class = "container">
+    <div class="header-container">
+         <h1>
+             {% if mode == 'anciens' %}
+                Gestion des anciens profils
+             {% else %}
+                Liste des profils des membres
+             {% endif %}
+         </h1>
+    </div>
+ 
+    <table class="table table-striped table-bordered table-hover" id="table-profils" style="table-layout: fixed;">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th style="width: 50px;">Age</th>
+                <th>Date de naissance</th>
+                <th>Date d'inscription</th>
+                <th>Niveau</th>
+                <th>Email</th>
+                <th>Statut</th>
+                <th style="width: 90px;">Sexe</th>
+                <th style="width: 340px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for unMembre in pagination.items %}
+            <tr>
+                <td>{{ unMembre.nom }}</td>
+                <td>{{ unMembre.prenom }}</td>
+                <td>{{ unMembre.age }}</td>
+                <td>{{ unMembre.ddn }}</td>
+                <td>{{ unMembre.date_inscription }}</td>
+                <td>{{ unMembre.niveau }}</td>
+                <td>{{ unMembre.email }}</td>
+                <td>{{ unMembre.statut }}</td>
+                <td>{{ unMembre.sexe }}</td>
+                <td class="actions">
+                    <a href="{{ url_for('profil.profil_view', idM=unMembre.id, origine='gestion_' + mode) }}" class="btn btn-warning">Consulter</a>
+                    
+                    {% if mode == 'actifs' %}
+                        <a href="{{ url_for('admin.profil_edit', idM=unMembre.id, origine='gestion_actifs') }}" class="btn btn-primary">Modifier</a>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desinscriptionModal-{{ unMembre.id }}">Désinscrire</button>
+                    {% else %}
+                        <form action="{{ url_for('admin.reinscrireMembre', idM=unMembre.id) }}" method="post" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir réinscrire ce membre ?');">
+                            <button type="submit" class="btn btn-success">Réinscrire</button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+
+            {% if mode == 'actifs' %}
+            <div class="modal fade" id="desinscriptionModal-{{ unMembre.id }}" tabindex="-1" aria-labelledby="desinscriptionModalLabel-{{ unMembre.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="desinscriptionModalLabel-{{ unMembre.id }}">Désinscrire {{ unMembre.prenom }} {{ unMembre.nom }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form method="POST" 
+                            action="{{ url_for('admin.desinscrireMembre', idM=unMembre.id) }}" 
+                            onsubmit="return MailtoDesinscription('{{ unMembre.id }}', '{{ unMembre.email }}', '{{ unMembre.prenom }}', '{{ unMembre.nom }}')">
+                            <div class="modal-body">
+                                <p>Êtes-vous sûr de vouloir désinscrire ce membre ?</p>
+                                <div class="mb-3">
+                                    <label class="form-label">Raison de la désinscription:</label>
+                                    <textarea class="form-control" id="justification-{{ unMembre.id }}" name="justification" rows="4"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer justify-content-center" >
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-danger">Confirmer la désinscription</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if pagination.items %}
+    <div class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('admin.gerer_profils', 
+                    mode=mode,
+                    page=pagination.prev_num, 
+                    recherche=filtre.recherche.data, 
+                    sexe=filtre.sexe.data, 
+                    niveau=filtre.niveau.data) if pagination.has_prev else '#' }}">
+                    &laquo; Avant
+                </a>
+            </li>
+
+            <li class="page-item disabled">
+                <span class="page-link">
+                    Page {{ pagination.page }} sur {{ pagination.pages }}
+                </span>
+            </li>
+
+            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('admin.gerer_profils', 
+                    mode=mode,
+                    page=pagination.next_num, 
+                    recherche=filtre.recherche.data, 
+                    sexe=filtre.sexe.data, 
+                    niveau=filtre.niveau.data) if pagination.has_next else '#' }}">
+                    Après &raquo;
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+</div>
+    <aside class="fixed-left">
+    <div class="filtres-box">
+        <div>
+            <h5 class="filtres-titre">Action</h5>
+            <div class="d-grid gap-2">
+                {% if mode == 'actifs' %}
+                    <a href="{{ url_for('admin.gerer_profils', 
+                        mode='anciens', 
+                        recherche=filtre.recherche.data, 
+                        sexe=filtre.sexe.data, 
+                        niveau=filtre.niveau.data) }}" 
+                       class="btn btn-secondary">
+                       Voir la liste des anciens membres
+                    </a>
+                    
+                    <a href="{{ url_for('auth.inscription') }}" class="btn btn-success">Créer un membre</a>
+                {% else %}
+                    <a href="{{ url_for('admin.gerer_profils', 
+                        mode='actifs', 
+                        recherche=filtre.recherche.data, 
+                        sexe=filtre.sexe.data, 
+                        niveau=filtre.niveau.data) }}" 
+                       class="btn btn-secondary">
+                       Voir la liste des membres actuels
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <br>
+        <h5 class="filtres-titre">Filtres</h5>
+        
+        <form action="{{ url_for('admin.gerer_profils') }}" method="GET">
+            <input type="hidden" name="mode" value="{{ mode }}">
+
+            <div class="search-container">
+                {{ filtre.recherche(class="form-control search-input", placeholder="Rechercher...") }}
+            </div>
+            <div class="form-group mb-3">
+                {{ filtre.tri(class="btn btn-outline-primary dropdown-toggle w-100") }} 
+            </div>
+            <h6>{{ filtre.sexe.label }}</h6>
+            {% for subfield in filtre.sexe %}
+                <div class="form-check">
+                    {{ subfield(class="form-check-input") }}
+                    {{ subfield.label(class="form-check-label") }}
+                </div>
+            {% endfor %}
+
+            <h6>{{ filtre.niveau.label }}</h6>
+            {% for subfield in filtre.niveau %}
+                <div class="form-check">
+                    {{ subfield(class="form-check-input") }}
+                    {{ subfield.label(class="form-check-label") }}
+                </div>
+            {% endfor %}
+            <div class="d-grid gap-2">
+                {{ filtre.submit(class="btn btn-primary", value="Appliquer les filtres") }}
+            </div>
+        </form>
+    </div>
+</aside>
+
+{% endblock %}

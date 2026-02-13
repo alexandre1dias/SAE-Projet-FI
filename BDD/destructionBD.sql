@@ -1,8 +1,6 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 drop table if exists ADMINISTRATEUR;
-drop table if exists PARAMETRE_NOTIF_ADMIN;
-drop table if exists PARAMETRE_NOTIF_MEMBRE;
 drop table if exists MEMBRE;
 drop table if exists NOTIFS;
 drop table if exists RECEVOIRM;
@@ -35,5 +33,6 @@ drop table if exists HORAIRE;
 drop table if exists TARIF;
 drop table if exists ARTICLE;
 drop table if exists IMAGEARTICLE;
+drop table if exists REINITIALISATION_MDP;
 
 SET FOREIGN_KEY_CHECKS = 1;

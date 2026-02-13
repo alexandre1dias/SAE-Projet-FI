@@ -1,6 +1,6 @@
 from flask import session
 from flask_login import login_user
-from monApp.modelBD import AdminBD, MembreBD
+from monApp.models import AdminBD, MembreBD
 from monApp.app import load_user
 
 def test_load_user_fallback(client, app, db):

@@ -265,17 +265,11 @@ create table INFORMATION(
     PRIMARY KEY(idInformation)
 );
 
-create table IMAGERIN(
-    idImage integer,
-    idInformation integer,
-    PRIMARY KEY(idImage, idInformation)
-);
-
 create table PRESSE(
     idPresse integer AUTO_INCREMENT,
     dateP date,
     heureP varchar(5) not null,
-    titreP varchar(50) not null,
+    titreP varchar(550) not null,
     contenuP varchar(600),
     lienP varchar(255) not null,
     imageP VARCHAR(255),
@@ -303,7 +297,7 @@ CREATE TABLE TARIF (
 
 CREATE TABLE ARTICLE (
     idArticle integer AUTO_INCREMENT,
-    titreA varchar(100) not null,
+    titreA varchar(500) not null,
     contenuA text,
     dateA date not null,
     imgA varchar(255),
@@ -317,6 +311,17 @@ CREATE TABLE IMAGEARTICLE (
     PRIMARY KEY(idImageArticle)
 );
 
+CREATE TABLE REINITIALISATION_MDP(
+    idReinit integer AUTO_INCREMENT,
+    emailReinit varchar(100) not null,
+    codeReinit varchar(9),
+    dateDemande DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    dateAcceptation DATETIME,
+    acceptee boolean DEFAULT false not null,
+    utilisee boolean DEFAULT false not null,
+    expiration DATETIME,
+    PRIMARY KEY(idReinit)
+);
 
 -- Ajout des contraintes de clé étrangère
 
@@ -365,8 +370,5 @@ ALTER TABLE IMAGERC ADD FOREIGN KEY (idCompetition) REFERENCES COMPETITION(idCom
 
 ALTER TABLE IMAGERE ADD FOREIGN KEY (idImage) REFERENCES IMAGEAPP(idImage);
 ALTER TABLE IMAGERE ADD FOREIGN KEY (idEventClub) REFERENCES EVENTCLUB(idEventClub);
-
-ALTER TABLE IMAGERIN ADD FOREIGN KEY (idImage) REFERENCES IMAGEAPP(idImage);
-ALTER TABLE IMAGERIN ADD FOREIGN KEY (idInformation) REFERENCES INFORMATION(idInformation);
 
 ALTER TABLE IMAGEARTICLE ADD FOREIGN KEY (idArticle) REFERENCES ARTICLE(idArticle);

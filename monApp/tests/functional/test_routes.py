@@ -2,7 +2,7 @@ import pytest
 from flask import url_for
 from werkzeug.security import generate_password_hash
 from datetime import date, datetime
-from monApp.modelBD import *
+from monApp.models import *
 from monApp.forms import ModifForm
 from wtforms import DateField
 from wtforms.validators import DataRequired
@@ -32,20 +32,20 @@ def setup_admin(client, db):
 # 1. PAGES PUBLIQUES (Accessibles sans connexion)
 # ==============================================================================
 @pytest.mark.parametrize("page, text", [
-    ('index', 'Entrez dans notre histoire'),
-    ('contact', 'Nous Contacter'),
-    ('historique', "L'HISTOIRE DU CERCLE"),
-    ('comite_cercle', 'Comité directeur du cercle'),
-    ('adresse', 'Adresse'),
-    ('horaires', 'Horaire'),
-    ('adhesions', "Choississez votre adhésion"),
-    ('materiel', "Matériel et tenue d'escrime"),
-    ('escrime_feminin', "Mesdames, en Garde !"),
-    ('calendrier', "Calendrier des Évènements"),
-    ('competitions', "Listes des prochaines compétitions"),
-    ('informations', 'Informations'),
-    ('presse', 'Presse'),
-    ('articles', 'Articles du Club')
+    ('general.index', 'Entrez dans notre histoire'),
+    ('general.contact', 'Nous Contacter'),
+    ('general.historique', "L'HISTOIRE DU CERCLE"),
+    ('general.comite_cercle', 'Comité directeur du cercle'),
+    ('general.adresse', 'Adresse'),
+    ('general.horaires', 'Horaire'),
+    ('general.adhesions', "Choisissez votre adhésion"),
+    ('general.materiel', "Matériel et tenue d'escrime"),
+    ('general.escrime_feminin', "Mesdames, en Garde !"),
+    ('calendrier.calendrier', "Calendrier des Évènements"),
+    ('competitions.competitions', "Listes des prochaines compétitions"),
+    ('articles.informations', 'Informations'),
+    ('articles.presse', 'Presse'),
+    ('articles.articles', 'Articles du Club')
 ])
 def test_pages_publiques_avec_url_for(client, app, page, text):
     """Test des pages accessibles à tous."""
@@ -87,7 +87,7 @@ def test_page_publique_competition_view(client, app, db):
 
     # 2. Appel de la route avec l'ID dynamique
     with app.test_request_context():
-        url = url_for('competition_view', idCompetition=comp.id)
+        url = url_for('competitions.competition_view', idCompetition=comp.id)
     
     response = client.get(url)
 
@@ -113,7 +113,8 @@ def test_page_publique_article_detail(client, app, db):
     db.session.commit()
 
     # 2. On appelle la route avec l'ID de l'article créé
-    response = client.get(f'/article/{article.id}')
+    with app.test_request_context():
+        response = client.get(url_for('articles.article_detail', idA=article.id))
     
     assert response.status_code == 200
     content = response.data.decode('utf-8')
@@ -166,23 +167,23 @@ def test_pages_membres_protegees(client, app, db):
     # 3. Test des routes protégées
     with app.test_request_context():
         # A. Résultats
-        response = client.get(url_for('resultat_membre'))
+        response = client.get(url_for('profil.resultat_membre'))
         assert response.status_code == 200
         assert "Résultat du Membre" in response.data.decode('utf-8')
 
         # B. Événements
-        response = client.get(url_for('evenement_membre'))
+        response = client.get(url_for('profil.evenement_membre'))
         assert response.status_code == 200
         assert "Vos Évènements" in response.data.decode('utf-8')
 
         # C. Profil
-        response = client.get(url_for('profil_view', idM=membre.id)) 
+        response = client.get(url_for('profil.profil_view', idM=membre.id)) 
         assert response.status_code == 200
         content = response.data.decode('utf-8')
         assert "Profil de" in content or "Profil Membre" in content
 
         # D. Evènement du club
-        response = client.get(url_for('evenement_club'))
+        response = client.get(url_for('events_club.evenement_club'))
         assert response.status_code == 200
         assert "Liste des prochains évènements du cercle" in response.data.decode('utf-8')
 
@@ -265,7 +266,8 @@ def test_desinscription_membre_par_soi_meme(client, app, db):
     client.post('/login/', data={'email': 'depart@test.fr', 'password': 'pass'})
 
     # 2. Désinscription
-    response = client.get(f'/gerer_profils/desinscrire/{membre.id}', follow_redirects=True)
+    with app.test_request_context():
+        response = client.get(url_for('admin.desinscrireMembre', idM=membre.id), follow_redirects=True)
 
     # 3. Vérification
     assert "Entrez dans notre histoire" in response.data.decode('utf-8')
@@ -310,7 +312,8 @@ def test_membre_inscription_desinscription_event_club(client, app, db):
     client.post('/login/', data={'email': 'autonome@test.fr', 'password': 'pass'})
 
     # 3. Inscription
-    client.get(f'/inscrire/club/{club.idEventClub}', follow_redirects=True)
+    with app.test_request_context():
+        client.get(url_for('events_club.inscrire_club', idEventClub=club.idEventClub), follow_redirects=True)
 
     # Vérification
     participation = ParticiperBD.query.filter_by(
@@ -319,7 +322,8 @@ def test_membre_inscription_desinscription_event_club(client, app, db):
     assert participation is not None, "Le membre devrait être inscrit"
 
     # 4. Désinscription
-    client.get(f'/desinscrire/club/{club.idEventClub}', follow_redirects=True)
+    with app.test_request_context():
+        client.get(url_for('events_club.desinscrire_club', idEventClub=club.idEventClub), follow_redirects=True)
 
     # Vérification
     participation_del = ParticiperBD.query.filter_by(
@@ -373,7 +377,8 @@ def test_inscription_desinscription_competition_membre(client, app, db):
     client.post('/login/', data={'email': 'escrimeur@test.fr', 'password': 'pass'})
 
     # 3. Inscription
-    client.get(f'/inscrire/competition/{comp.id}', follow_redirects=True)
+    with app.test_request_context():
+        client.get(url_for('competitions.inscrire_competition', idCompetition=comp.id), follow_redirects=True)
 
     # Vérification BDD
     participation = ParticiperBD.query.filter_by(
@@ -383,7 +388,8 @@ def test_inscription_desinscription_competition_membre(client, app, db):
     assert participation is not None, "L'inscription a échoué en base de données"
 
     # 4. Désinscription
-    client.get(f'/desinscrire/competition/{comp.id}', follow_redirects=True)
+    with app.test_request_context():
+        client.get(url_for('competitions.desinscrire_competition', idCompetition=comp.id), follow_redirects=True)
 
     # Vérification BDD
     participation_del = ParticiperBD.query.filter_by(
@@ -406,23 +412,33 @@ def test_pages_admin_protegees(client, app, db):
     # Tests des routes protégées Admin
     with app.test_request_context():
         # A. Profils
-        response = client.get(url_for('gerer_profils'))
+        response = client.get(url_for('admin.gerer_profils'))
         assert response.status_code == 200
         assert "Gestion des Profils" in response.data.decode('utf-8')
         # B. Formulaires
-        response = client.get(url_for('gerer_formulaires'))
+        response = client.get(url_for('admin.gerer_formulaires'))
         assert response.status_code == 200
         assert "Gestion des Formulaires" in response.data.decode('utf-8')
 
         # C. Inscriptions
-        response = client.get(url_for('gerer_inscriptions'))
+        response = client.get(url_for('admin.gerer_inscriptions'))
         assert response.status_code == 200
         assert "Gestion des Inscriptions" in response.data.decode('utf-8')
 
         # D. Réunion
-        response = client.get(url_for('reunion'))
+        response = client.get(url_for('reunions.reunion'))
         assert response.status_code == 200
         assert "Listes des prochaines réunions" in response.data.decode('utf-8')
+
+        #E. Tarifs et Matériel
+        response = client.get(url_for('admin.gestion_tarifs'))
+        assert response.status_code == 200
+        assert "Gestion des Tarifs" in response.data.decode('utf-8')
+
+        #F Gestion Horaires
+        response = client.get(url_for('admin.gestion_horaires'))
+        assert response.status_code == 200
+        assert "Gestion des Horaires" in response.data.decode('utf-8')
 
 def test_page_protegee_reunion_view(client, app, db):
     """
@@ -458,7 +474,7 @@ def test_page_protegee_reunion_view(client, app, db):
 
     # 3. EXECUTION
     with app.test_request_context():
-        url = url_for('reunion_view', idReunion=reunion.id)
+        url = url_for('reunions.reunion_view', idReunion=reunion.id)
     
     response = client.get(url)
 
@@ -481,7 +497,8 @@ def test_page_reunion_view_acces_refuse(client, app, db):
 
     client.get('/logout/') 
     
-    response = client.get(f'/reunion/consultation/{reunion.id}')
+    with app.test_request_context():
+        response = client.get(url_for('reunions.reunion_view', idReunion=reunion.id))
     
     assert response.status_code == 302 
     assert "/login" in response.location
@@ -528,7 +545,7 @@ def test_page_protegee_club_view(client, app, db):
 
     # 4. EXECUTION
     with app.test_request_context():
-        url = url_for('club_view', idEventClub=club.idEventClub)
+        url = url_for('events_club.club_view', idEventClub=club.idEventClub)
     
     response = client.get(url)
 
@@ -548,10 +565,84 @@ def test_club_view_acces_refuse_anonyme(client, app, db):
     db.session.commit()
 
     client.get('/logout/')
-    response = client.get(f'/evenement_club/{club.idEventClub}/club_view/')
+    with app.test_request_context():
+        response = client.get(url_for('events_club.club_view', idEventClub=club.idEventClub))
     
     assert response.status_code == 302
     assert "/login" in response.location
+
+def test_admin_formulaire_view(client, app, db):
+    """
+    Test de la consultation d'un formulaire (contact/question) par un admin.
+    Route : /formulaire_view/<id>
+    """
+    app.config['WTF_CSRF_ENABLED'] = False
+    
+    # 1. Authentification en tant qu'Admin
+    setup_admin(client, db)
+    
+    # 2. Création d'un formulaire de test en base de données
+    formulaire = FormulaireBD(
+        type="Question",
+        sujet="Problème de licence",
+        email="escrimeur@test.fr",
+        description="Bonjour, je n'arrive pas à retrouver mon numéro de licence.",
+        date=date.today(),
+        repondu=False
+    )
+    db.session.add(formulaire)
+    db.session.commit()
+    id_form = formulaire.id
+    
+    # 3. Appel de la route protégée
+    with app.test_request_context():
+        url = url_for('admin.formulaire_view', idFormulaire=id_form)
+        
+    response = client.get(url)
+    
+    # 4. Vérifications
+    assert response.status_code == 200
+    content = response.data.decode('utf-8')
+    assert "Problème de licence" in content
+    assert "escrimeur@test.fr" in content
+    assert " mon numéro de licence." in content
+
+def test_admin_formulaire_view_acces_refuse(client, app, db):
+    """
+    Vérifie qu'un utilisateur non connecté ou un simple membre 
+    ne peut pas accéder à la consultation d'un formulaire.
+    """
+    # Création du formulaire
+    formulaire = FormulaireBD(
+        type="Question", sujet="Secret", email="test@test.fr", description="Test"
+    )
+    db.session.add(formulaire)
+    db.session.commit()
+    id_form = formulaire.id
+
+    # 1. Test avec un visiteur anonyme (Non connecté)
+    client.get('/logout/')
+    with app.test_request_context():
+        response_anonyme = client.get(url_for('admin.formulaire_view', idFormulaire=id_form))
+    # Redirection vers la page de login attendue
+    assert response_anonyme.status_code == 302 
+    assert "/login" in response_anonyme.location
+
+    # 2. Test avec un Membre simple
+    membre = MembreBD(
+        email='membre_curieux@test.fr', 
+        mdp_hash=generate_password_hash('pass'),
+        nom='Curieux', prenom='Membre', activite=True
+    )
+    db.session.add(membre)
+    db.session.commit()
+
+    client.post('/login/', data={'email': 'membre_curieux@test.fr', 'password': 'pass'})
+    
+    with app.test_request_context():
+        response_membre = client.get(url_for('admin.formulaire_view', idFormulaire=id_form))
+    
+    assert response_membre.status_code == 400
 
 # ==============================================================================
 # SCENARIOS ACTIONS ADMIN
@@ -566,11 +657,12 @@ def test_scenario_presse_admin(client, app, db):
     db.session.commit()
 
     # 1. CRÉATION
-    response = client.post('/admin/add_presse/', data={
-        'titre': 'Victoire Régionale',
-        'contenu': 'Le club a gagné !',
-        'lien': 'http://journal.fr'
-    }, follow_redirects=True)
+    with app.test_request_context():
+        response = client.post(url_for('articles.add_presse'), data={
+            'titre': 'Victoire Régionale',
+            'contenu': 'Le club a gagné !',
+            'lien': 'http://journal.fr'
+        }, follow_redirects=True)
     
     assert response.status_code == 200
     
@@ -581,18 +673,20 @@ def test_scenario_presse_admin(client, app, db):
 
     # 3. MODIFICATION
     article = PresseBD.query.filter_by(titreP='Victoire Régionale').first()
-    client.post(f'/admin/edit_presse/{article.idPresse}', data={
-        'titre': 'Victoire Régionale',
-        'contenu': 'Le club a perdu !',
-        'lien': 'http://journal.fr'
-    }, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('articles.edit_presse', idP=article.idPresse), data={
+            'titre': 'Victoire Régionale',
+            'contenu': 'Le club a perdu !',
+            'lien': 'http://journal.fr'
+        }, follow_redirects=True)
     article = PresseBD.query.get(article.idPresse)
 
     # Vérification modification
     assert article.contenuP == 'Le club a perdu !'
 
     # 4. SUPPRESSION
-    client.post(f'/admin/delete_presse/{article.idPresse}', follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('articles.delete_presse', idP=article.idPresse), follow_redirects=True)
     
     # Vérification suppression
     assert PresseBD.query.filter_by(titreP='Victoire Régionale').first() is None
@@ -603,26 +697,29 @@ def test_scenario_informations_admin(client, app, db):
     setup_admin(client, db)
 
     # 1. AJOUT
-    client.post('/admin/add_information/', data={
-        'titre': 'Nouvelle Info',
-        'contenu': 'Contenu important'
-    }, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('articles.add_information'), data={
+            'titre': 'Nouvelle Info',
+            'contenu': 'Contenu important'
+        }, follow_redirects=True)
     
     info = InformationBD.query.filter_by(titreIN='Nouvelle Info').first()
     assert info is not None
     assert info.contenuIN == 'Contenu important'
 
     # 2. MODIFICATION
-    client.post(f'/admin/edit_information/{info.idInformation}', data={
-        'titre': 'Info Modifiée',
-        'contenu': 'Contenu modifié'
-    }, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('articles.edit_information', idI=info.idInformation), data={
+            'titre': 'Info Modifiée',
+            'contenu': 'Contenu modifié'
+        }, follow_redirects=True)
     
     updated_info = db.session.get(InformationBD, info.idInformation)
     assert updated_info.titreIN == 'Info Modifiée'
 
     # 3. SUPPRESSION
-    client.post(f'/admin/delete_information/{info.idInformation}', follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('articles.delete_information', idI=info.idInformation), follow_redirects=True)
     assert db.session.get(InformationBD, info.idInformation) is None
 
 def test_scenario_article_admin(client, app, db):
@@ -631,20 +728,22 @@ def test_scenario_article_admin(client, app, db):
     setup_admin(client, db)
 
     # 1. AJOUT
-    client.post('/admin/add_article/', data={
-        'titre': 'JOBLIFE',
-        'contenu': 'Soutenez JOBLIFE'
-    }, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('articles.add_article'), data={
+            'titre': 'JOBLIFE',
+            'contenu': 'Soutenez JOBLIFE'
+        }, follow_redirects=True)
     
     art = ArticleBD.query.filter_by(titre='JOBLIFE').first()
     assert art is not None
     assert art.contenu == 'Soutenez JOBLIFE'
 
     # 2. MODIFICATION
-    client.post(f'/admin/edit_article/{art.id}', data={
-        'titre': 'BOUH KC et M8',
-        'contenu': 'Ne soutenez pas ces équipe'
-    }, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('articles.edit_article', idA=art.id), data={
+            'titre': 'BOUH KC et M8',
+            'contenu': 'Ne soutenez pas ces équipe'
+        }, follow_redirects=True)
     
     updated_art = db.session.get(ArticleBD, art.id)
     assert updated_art.titre == 'BOUH KC et M8'
@@ -659,13 +758,15 @@ def test_scenario_article_admin(client, app, db):
     assert ImageArticleBD.query.get(id_img) is not None
 
     # B. Appel de la route de suppression
-    client.post(f'/admin/delete_image_article/{id_img}', follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('articles.delete_image_article', idImg=id_img), follow_redirects=True)
 
     # C. Vérification que l'image n'est plus en base
     assert ImageArticleBD.query.get(id_img) is None
 
     # 4. SUPPRESSION
-    client.post(f'/admin/delete_article/{art.id}', follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('articles.delete_article', idA=art.id), follow_redirects=True)
     assert db.session.get(ArticleBD, art.id) is None
 
 def test_crud_tarifs(client, app, db):
@@ -674,27 +775,30 @@ def test_crud_tarifs(client, app, db):
     setup_admin(client, db)
 
     # 1. AJOUT
-    client.post('/admin/gestion_tarifs/', data={
-        'nom': 'Cotisation Test',
-        'prix': 150,
-        'categorie': 'Adhesion'
-    }, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('admin.gestion_tarifs'), data={
+            'nom': 'Cotisation Test',
+            'prix': 150,
+            'categorie': 'Adhesion'
+        }, follow_redirects=True)
     
     tarif = TarifBD.query.filter_by(nom='Cotisation Test').first()
     assert tarif is not None
 
     # 2. MODIFICATION
-    client.post(f'/admin/edit_tarif/{tarif.id}', data={
-        'nom': 'Cotisation Modif',
-        'prix': 160,
-        'categorie': 'Adhesion'
-    }, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('admin.edit_tarif', idT=tarif.id), data={
+            'nom': 'Cotisation Modif',
+            'prix': 160,
+            'categorie': 'Adhesion'
+        }, follow_redirects=True)
     
     updated_tarif = db.session.get(TarifBD, tarif.id)
     assert updated_tarif.prix == 160
 
     # 3. SUPPRESSION
-    client.post(f'/admin/delete_tarif/{tarif.id}', follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('admin.delete_tarif', idT=tarif.id), follow_redirects=True)
     assert db.session.get(TarifBD, tarif.id) is None
 
 def test_crud_horaire(client, app, db):
@@ -703,29 +807,32 @@ def test_crud_horaire(client, app, db):
     setup_admin(client, db)
 
     # 1. AJOUT
-    client.post('/admin/gestion_horaires/', data={
-        'jour': 'Lundi',
-        'heure_debut': '09:00',
-        'heure_fin': '18:00',
-        'activite': 'Entraînement'
-    }, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('admin.gestion_horaires'), data={
+            'jour': 'Lundi',
+            'heure_debut': '09:00',
+            'heure_fin': '18:00',
+            'activite': 'Entraînement'
+        }, follow_redirects=True)
     
     horaire = HoraireBD.query.filter_by(jour='Lundi').first()
     assert horaire is not None
 
     # 2. MODIFICATION
-    client.post(f'/admin/edit_horaire/{horaire.id}', data={
-        'jour': 'Mardi',
-        'heure_debut': '09:00',
-        'heure_fin': '18:00',
-        'activite': 'Entraînement'
-    }, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('admin.edit_horaire', idH=horaire.id), data={
+            'jour': 'Mardi',
+            'heure_debut': '09:00',
+            'heure_fin': '18:00',
+            'activite': 'Entraînement'
+        }, follow_redirects=True)
     
     updated_horaire = db.session.get(HoraireBD, horaire.id)
     assert updated_horaire.jour == 'Mardi'
 
     # 3. SUPPRESSION
-    client.post(f'/admin/delete_horaire/{horaire.id}', follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('admin.delete_horaire', idH=horaire.id), follow_redirects=True)
     assert db.session.get(HoraireBD, horaire.id) is None
 
 def test_add_event_complex(client, app, db):
@@ -748,7 +855,8 @@ def test_add_event_complex(client, app, db):
         'ville': 'Paris',
         'adresse': 'Stade'
     }
-    client.post('/add_event/', data=data_comp, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('calendrier.add_event'), data=data_comp, follow_redirects=True)
     assert CompetitionBD.query.filter_by(nom='Compétition Test').first() is not None
 
     # 2. Ajout REUNION
@@ -764,7 +872,8 @@ def test_add_event_complex(client, app, db):
         'arme': 'Fleuret',
         'type': 'Regionale'
     }
-    client.post('/add_event/', data=data_reunion, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('calendrier.add_event'), data=data_reunion, follow_redirects=True)
     
     # Vérification
     reunion = ReunionBD.query.filter_by(nom='Réunion AG').first()
@@ -784,7 +893,8 @@ def test_add_event_complex(client, app, db):
         'sexe': 'Homme',
         'type': 'Regionale'
     }
-    client.post('/add_event/', data=data_entrainement, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('calendrier.add_event'), data=data_entrainement, follow_redirects=True)
     
     assert EntrainementBD.query.filter_by(adresse='Rue').count() >= 1
 
@@ -828,7 +938,8 @@ def test_gestion_inscriptions(client, app, db):
     id_ok = inscr_ok.id
 
     # 2. Accepter l'inscription
-    client.post(f'/accepter_inscription/{id_ok}', follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('admin.accepter_inscription', idI=id_ok), follow_redirects=True)
     
     # 3. Vérifications
     assert db.session.get(InscriptionBD, id_ok) is None
@@ -847,7 +958,8 @@ def test_gestion_inscriptions(client, app, db):
     db.session.commit()
     id_refus = inscr_refus.id
 
-    client.post(f'/refuser_inscription/{id_refus}', data={'justification': 'Dossier incomplet'}, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('admin.refuser_inscription', idI=id_refus), data={'justification': 'Dossier incomplet'}, follow_redirects=True)
     assert db.session.get(InscriptionBD, id_refus) is None
     assert MembreBD.query.filter_by(email='refused@test.fr').first() is None
 
@@ -894,7 +1006,8 @@ def test_gestion_modifications(client, app, db):
             'statut': 'Membre',
             'justification': 'Mariage'
         }
-        client.post(f'/profil_edit/{id_membre}', data=data_modif, follow_redirects=True)
+        with app.test_request_context():
+            client.post(url_for('admin.profil_edit', idM=id_membre), data=data_modif, follow_redirects=True)
         
         # Vérification
         modif = ModifBD.query.filter_by(id_membre=id_membre).first()
@@ -905,7 +1018,8 @@ def test_gestion_modifications(client, app, db):
         client.get('/logout/')
         client.post('/login/', data={'email': 'superadmin@test.fr', 'password': 'pass'})
         
-        client.post(f'/accepter_modifications/{modif.id}', follow_redirects=True)
+        with app.test_request_context():
+            client.post(url_for('admin.accepter_modifications', idModif=modif.id), follow_redirects=True)
         
         # 3. Vérifications
         assert db.session.get(ModifBD, modif.id) is None
@@ -922,7 +1036,8 @@ def test_gestion_modifications(client, app, db):
         
         data_modif['nom'] = 'NouveauNom' 
         data_modif['prenom'] = 'RefusePrenom' 
-        client.post(f'/profil_edit/{id_membre}', data=data_modif, follow_redirects=True)
+        with app.test_request_context():
+            client.post(url_for('admin.profil_edit', idM=id_membre), data=data_modif, follow_redirects=True)
         
         modif_refus = ModifBD.query.filter_by(id_membre=id_membre).first()
         assert modif_refus is not None
@@ -932,9 +1047,10 @@ def test_gestion_modifications(client, app, db):
         client.get('/logout/')
         client.post('/login/', data={'email': 'superadmin@test.fr', 'password': 'pass'})
         
-        client.post(f'/refuser_modification/{id_modif_refus}', data={
-            'justification': 'Pas valide'
-        }, follow_redirects=True)
+        with app.test_request_context():
+            client.post(url_for('admin.refuser_modification', idM=id_modif_refus), data={
+                'justification': 'Pas valide'
+            }, follow_redirects=True)
         
         # 3. Vérifications
         assert db.session.get(ModifBD, id_modif_refus) is None
@@ -956,12 +1072,13 @@ def test_contact_form_submission(client, app, db):
 
     # 2. Soumission formulaire
     client.get('/logout/')
-    client.post('/contact/', data={
-        'type_form': 'Question',
-        'sujet': 'Besoin info',
-        'email': 'visitor@test.com',
-        'description': 'Bonjour...'
-    }, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('general.contact'), data={
+            'type_form': 'Question',
+            'sujet': 'Besoin info',
+            'email': 'visitor@test.com',
+            'description': 'Bonjour...'
+        }, follow_redirects=True)
 
     # 3. Vérifications
     assert FormulaireBD.query.filter_by(email='visitor@test.com').first() is not None
@@ -1013,7 +1130,8 @@ def test_crud_reunion_admin(client, app, db):
         'date_fin': '2025-02-02',
         'heure_fin': '16:00'
     }
-    client.post(f'/reunion/update/{id_reunion}', data=data_update, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('reunions.reunion_update', idReunion=id_reunion), data=data_update, follow_redirects=True)
 
     # Vérification BDD
     updated = db.session.get(ReunionBD, id_reunion)
@@ -1022,7 +1140,8 @@ def test_crud_reunion_admin(client, app, db):
     assert updated.dateDebutRE == date(2025, 2, 2)
 
     # 3. Suppression
-    client.post(f'/reunion/delete/{id_reunion}', follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('reunions.reunion_delete', idReunion=id_reunion), follow_redirects=True)
 
     # Vérification BDD
     assert db.session.get(ReunionBD, id_reunion) is None
@@ -1052,7 +1171,8 @@ def test_admin_gestion_statut_membre(client, app, db):
     id_membre = membre.id
 
     # 2. Désinscription
-    client.get(f'/gerer_profils/desinscrire/{id_membre}', follow_redirects=True)
+    with app.test_request_context():
+        client.get(url_for('admin.desinscrireMembre', idM=id_membre), follow_redirects=True)
 
     # Vérification BDD
     membre_desinscrit = db.session.get(MembreBD, id_membre)
@@ -1063,7 +1183,7 @@ def test_admin_gestion_statut_membre(client, app, db):
     # On utilise la route principale avec le paramètre GET 'mode=anciens'
     with app.test_request_context():
         # Cela génère /gerer_profils/?mode=anciens
-        url_anciens = url_for('gerer_profils', mode='anciens')
+        url_anciens = url_for('admin.gerer_profils', mode='anciens')
     
     response = client.get(url_anciens)
     assert response.status_code == 200
@@ -1103,15 +1223,18 @@ def test_crud_event_club_admin(client, app, db):
     # 2. Modification
     data_update = {
         'nom': 'Soirée Modifiée',
-        'lieu': 'Local B',
+        'ville': 'Orléans',               
+        'adresse': 'Local B',            
         'description': 'Nouvelle description',
         'date_debut': '2025-06-01',
         'heure_debut': '19:00',
         'date_fin': '2025-06-01',
-        'heure_fin': '23:00'
+        'heure_fin': '23:00',
+        'niveaux': 'Tous'                 
     }
     
-    client.post(f'/evenement_club/{id_club}/club_update/', data=data_update, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('events_club.club_update', idEventClub=id_club), data=data_update, follow_redirects=True)
 
     # Vérification BDD
     updated = db.session.get(EventClubBD, id_club)
@@ -1120,7 +1243,8 @@ def test_crud_event_club_admin(client, app, db):
     assert updated.dateDebutEV == date(2025, 6, 1)
 
     # 3. Suppression
-    client.post(f'/evenement_club/{id_club}/club_delete/', follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('events_club.club_delete', idEventClub=id_club), follow_redirects=True)
 
     # Vérification BDD
     assert db.session.get(EventClubBD, id_club) is None
@@ -1157,14 +1281,16 @@ def test_admin_gestion_inscriptions_event_club(client, app, db):
     db.session.commit()
 
     # 3. page selection
-    response = client.get(f'/evenement_club/{club.idEventClub}/inscrire_membres')
+    with app.test_request_context():
+        response = client.get(url_for('events_club.inscrire_membres_event_club', idEventClub=club.idEventClub))
     assert response.status_code == 200
     assert "LeParticipant" in response.data.decode('utf-8')
 
     # 4. inscription
-    client.post(f'/evenement_club/{club.idEventClub}/inscription_membres', data={
-        'membres_a_inscrire': [membre.id]
-    }, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('events_club.inscription_membres_event_club', idEventClub=club.idEventClub), data={
+            'membres_a_inscrire': [membre.id]
+        }, follow_redirects=True)
 
     # Vérification BDD
     participation = ParticiperBD.query.filter_by(
@@ -1173,7 +1299,8 @@ def test_admin_gestion_inscriptions_event_club(client, app, db):
     assert participation is not None, "Le membre devrait être inscrit par l'admin"
 
     # 5. Désinscription
-    client.post(f'/evenement_club/{club.idEventClub}/delete/{membre.id}', follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('events_club.delete_membre_eventClub', idEventClub=club.idEventClub, idM=membre.id), follow_redirects=True)
 
     # Vérification BDD
     participation_del = ParticiperBD.query.filter_by(
@@ -1213,14 +1340,16 @@ def test_admin_gestion_competition_complexe(client, app, db):
     db.session.commit()
 
     # 2. INSCRIPTION
-    client.post(f'/competition/{comp.id}/inscription_membres', data={
-        'membres_a_inscrire': [membre.id]
-    }, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('competitions.inscription_membres_competition', idC=comp.id), data={
+            'membres_a_inscrire': [membre.id]
+        }, follow_redirects=True)
 
     assert ParticiperBD.query.filter_by(id_membre=membre.id, id_event=comp.id_event).first() is not None
 
     # 3. CLASSEMENT
-    client.post(f'/competition/{comp.id}/classer/{membre.id}', data={'classement': '1'}, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('competitions.classer_membre', idCompetition=comp.id, idMembre=membre.id), data={'classement': '1'}, follow_redirects=True)
     res = ResultatBD.query.filter_by(id_competition=comp.id, id_membre=membre.id).first()
     assert int(res.resultat) == 1
 
@@ -1239,11 +1368,12 @@ def test_admin_gestion_competition_complexe(client, app, db):
         )
     }
     
-    response = client.post(
-        f'/competition/{comp.id}/upload_classement',
-        data=data_pdf,
-        follow_redirects=True
-    )
+    with app.test_request_context():
+        response = client.post(
+            url_for('competitions.upload_classement_competition', idCompetition=comp.id),
+            data=data_pdf,
+            follow_redirects=True
+        )
 
     # Vérification
     assert response.status_code == 200
@@ -1259,7 +1389,8 @@ def test_admin_gestion_competition_complexe(client, app, db):
         pass
 
     # 5. SUPPRESSION PARTICIPANT
-    client.post(f'/competition/{comp.id}/delete/{membre.id}', follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('competitions.delete_membre_competition', idC=comp.id, idM=membre.id), follow_redirects=True)
     assert ParticiperBD.query.filter_by(id_membre=membre.id, id_event=comp.id_event).first() is None
 
 def test_admin_crud_competition(client, app, db):
@@ -1311,7 +1442,8 @@ def test_admin_crud_competition(client, app, db):
         'description': 'Nouvelle description'
     }
     
-    client.post(f'/competition_update/{id_comp}', data=data_update, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('competitions.competition_update', idCompetition=id_comp), data=data_update, follow_redirects=True)
 
     # Vérification BDD
     updated = db.session.get(CompetitionBD, id_comp)
@@ -1325,7 +1457,8 @@ def test_admin_crud_competition(client, app, db):
         'prive': 'y'
     }
     
-    client.post(f'/competition/{id_comp}/add_image', data=data_img, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('competitions.add_image_competition', idCompetition=id_comp), data=data_img, follow_redirects=True)
 
     # Vérification BDD
     db.session.refresh(updated) 
@@ -1335,9 +1468,10 @@ def test_admin_crud_competition(client, app, db):
     id_img = image_bd.idImage
 
     # 4. SUPPRESSION IMAGE
-    client.post(f'/competition/delete_image/{id_img}', data={
-        'idCompetition': id_comp
-    }, follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('competitions.delete_image_competition', idImage=id_img), data={
+            'idCompetition': id_comp
+        }, follow_redirects=True)
 
     # Vérification BDD
     db.session.refresh(updated)
@@ -1345,7 +1479,8 @@ def test_admin_crud_competition(client, app, db):
     assert db.session.get(ImageAppBD, id_img) is None
 
     # 5. SUPPRESSION COMPÉTITION
-    client.post(f'/competition_delete/{id_comp}', follow_redirects=True)
+    with app.test_request_context():
+        client.post(url_for('competitions.competition_delete', idCompetition=id_comp), follow_redirects=True)
 
     # Vérification BDD
     assert db.session.get(CompetitionBD, id_comp) is None
@@ -1385,7 +1520,8 @@ def test_securite_membre_vers_admin(client, app, db):
     assert b"Entrez dans notre histoire" in login_response.data, "Le login Membre a échoué"
 
     # 4. Tentative d'intrusion
-    response = client.post(f'/admin/delete_presse/{presse.idPresse}', follow_redirects=False)
+    with app.test_request_context():
+        response = client.post(url_for('articles.delete_presse', idP=presse.idPresse), follow_redirects=False)
 
     # 5. DIAGNOSTIC & ASSERTION
     if response.status_code == 302:
@@ -1405,18 +1541,19 @@ def test_access_control_admin_pages(client, app):
     client.get('/logout/')
 
     # Liste des routes Admin
-    routes_admin = [
-        '/gerer_profils/',
-        '/gerer_formulaires/',
-        '/admin/add_article/',
-        '/admin/gestion_tarifs/'
-    ]
+    with app.test_request_context():
+        routes_admin = [
+            url_for('admin.gerer_profils'),
+            url_for('admin.gerer_formulaires'),
+            url_for('articles.add_article'),
+            url_for('admin.gestion_tarifs')
+        ]
 
-    for route in routes_admin:
-        response = client.get(route)
-        # Doit rediriger vers login (Code 302)
-        assert response.status_code == 302
-        assert "/login" in response.location
+        for route in routes_admin:
+            response = client.get(route)
+            # Doit rediriger vers login (Code 302)
+            assert response.status_code == 302
+            assert "/login" in response.location
 
 def test_access_control_membre_pages(client, app):
     """
@@ -1425,7 +1562,8 @@ def test_access_control_membre_pages(client, app):
     app.config['LOGIN_DISABLED'] = False
     client.get('/logout/')
 
-    response = client.get('/resultat_membre/')
+    with app.test_request_context():
+        response = client.get(url_for('profil.resultat_membre'))
     assert response.status_code == 302
     assert "/login" in response.location
 
@@ -1444,11 +1582,12 @@ def test_password_change_security(client, app, db):
     client.post('/login/', data={'email': 'pwd@test.fr', 'password': 'VraiMotDePasse123!'})
 
     # Tentative de changement avec MAUVAIS ancien mdp
-    response = client.post('/changer_mdp/', data={
-        'old_password': 'MauvaisPassword',
-        'new_password': 'NewPassword123!',
-        'confirm_new_password': 'NewPassword123!'
-    }, follow_redirects=True)
+    with app.test_request_context():
+        response = client.post(url_for('parametres.changer_mdp'), data={
+            'old_password': 'MauvaisPassword',
+            'new_password': 'NewPassword123!',
+            'confirm_new_password': 'NewPassword123!'
+        }, follow_redirects=True)
 
     # Vérifications
     assert b"ancien mot de passe est incorrect" in response.data
@@ -1465,15 +1604,16 @@ def test_inscription_password_strength(client, app, db):
     """
     app.config['WTF_CSRF_ENABLED'] = False
     
-    response = client.post('/inscription/', data={
-        'Login': 'weak@test.fr',
-        'nom': 'Faible',
-        'prenom': 'User',
-        'date_naissance': '2000-01-01',
-        'sexe': 'Homme',
-        'password': '123',
-        'confirm_password': '123'
-    }, follow_redirects=True)
+    with app.test_request_context():
+        response = client.post(url_for('auth.inscription'), data={
+            'Login': 'weak@test.fr',
+            'nom': 'Faible',
+            'prenom': 'User',
+            'date_naissance': '2000-01-01',
+            'sexe': 'Homme',
+            'password': '123',
+            'confirm_password': '123'
+        }, follow_redirects=True)
 
     # Doit échouer et afficher le message d'erreur
     # On cherche un mot clé du message d'erreur défini dans views.py
@@ -1491,7 +1631,8 @@ def test_decorateurs_acces_interdit(client, app, db):
 
     # 1. Admin essaie d'accéder à une page Membre
     setup_admin(client, db) 
-    response_admin = client.get('/resultat_membre/')
+    with app.test_request_context():
+        response_admin = client.get(url_for('profil.resultat_membre'))
 
     assert response_admin.status_code == 401
 
@@ -1516,6 +1657,7 @@ def test_decorateurs_acces_interdit(client, app, db):
     client.post('/login/', data={'email': 'basique@test.fr', 'password': 'pass'})
 
     # Tentative d'accès
-    response_membre = client.get(f'/reunion/consultation/{reunion.id}')
+    with app.test_request_context():
+        response_membre = client.get(url_for('reunions.reunion_view', idReunion=reunion.id))
    
     assert response_membre.status_code == 405
